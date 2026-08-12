@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+} from "react";
 import { supabase } from "./lib/supabaseClient";
 import {
   LayoutDashboard,
@@ -30,6 +36,7 @@ import {
   Store,
   Watch,
   MapPin,
+  Bell,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -308,6 +315,95 @@ function isLateForShift(checkInTime, shift) {
 }
 function uid(p) {
   return p + Math.random().toString(36).slice(2, 9);
+}
+// Minutes of grace after a shift's start time before a missing check-in
+// is surfaced as a "missed clock-in" notification.
+const LATE_GRACE_MINUTES = 15;
+function addMinutesToClock(hhmm, mins) {
+  const [h, m] = hhmm.split(":").map(Number);
+  const total = (((h * 60 + m + mins) % 1440) + 1440) % 1440;
+  return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+}
+function timeAgoLabel(iso) {
+  if (!iso) return "";
+  const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (mins < 1) return "ឥឡូវនេះ";
+  if (mins < 60) return `${mins} នាទីមុន`;
+  const hrs = Math.round(mins / 60);
+  if (hrs < 24) return `${hrs} ម៉ោងមុន`;
+  return `${Math.round(hrs / 24)} ថ្ងៃមុន`;
+}
+// Notifications are derived live from existing data rather than stored
+// separately: admins/managers see new pending leave requests and active
+// employees who haven't clocked in today past their shift's start time;
+// employees see decisions on their own leave requests.
+function buildNotifications({
+  role,
+  currentEmp,
+  employees,
+  shifts,
+  attendance,
+  leaveRequests,
+}) {
+  const list = [];
+  if (role === "admin") {
+    leaveRequests
+      .filter((r) => r.status === "pending")
+      .forEach((r) => {
+        const emp = employees.find((e) => e.id === r.employeeId);
+        list.push({
+          id: `lr-pending-${r.id}`,
+          page: "leave",
+          tone: "gold",
+          title: "សំណើសុំច្បាប់ថ្មី",
+          message: `${emp?.name || "?"} បានស្នើសុំ${LEAVE_TYPE_LABEL[r.type] || "ច្បាប់"}`,
+          time: r.createdAt,
+        });
+      });
+    const today = todayStr();
+    const now = timeNow();
+    employees
+      .filter((e) => e.status === "active" && e.shiftId)
+      .forEach((e) => {
+        const shift = shifts.find((s) => s.id === e.shiftId);
+        if (!shift || isOvernightShift(shift)) return;
+        const alreadyLogged = attendance.some(
+          (a) => a.employeeId === e.id && a.date === today,
+        );
+        if (alreadyLogged) return;
+        if (now <= addMinutesToClock(shift.start, LATE_GRACE_MINUTES)) return;
+        list.push({
+          id: `mc-${e.id}-${today}`,
+          page: "attendance",
+          tone: "rose",
+          title: "មិនទាន់ចុះឈ្មោះចូលធ្វើការ",
+          message: `${e.name} មិនទាន់ចុះឈ្មោះចូលធ្វើការទេ (${shift.name} ${shift.start})`,
+          time: `${today}T${now}:00`,
+        });
+      });
+  } else if (currentEmp) {
+    leaveRequests
+      .filter(
+        (r) =>
+          r.employeeId === currentEmp.id &&
+          (r.status === "approved" || r.status === "rejected") &&
+          r.reviewedAt,
+      )
+      .forEach((r) => {
+        list.push({
+          id: `lr-decided-${r.id}`,
+          page: "leave",
+          tone: r.status === "approved" ? "forest" : "rose",
+          title:
+            r.status === "approved"
+              ? "សំណើសុំច្បាប់របស់អ្នកត្រូវបានអនុម័ត"
+              : "សំណើសុំច្បាប់របស់អ្នកត្រូវបានបដិសេធ",
+          message: `${LEAVE_TYPE_LABEL[r.type] || "ច្បាប់"} (${r.startDate} – ${r.endDate})`,
+          time: r.reviewedAt,
+        });
+      });
+  }
+  return list.sort((a, b) => (b.time || "").localeCompare(a.time || ""));
 }
 function randomPin() {
   return String(Math.floor(1000 + Math.random() * 9000));
@@ -737,6 +833,221 @@ function Button({ children, variant = "primary", size, style, ...props }) {
     >
       {children}
     </button>
+  );
+}
+const NOTIF_TONE = {
+  gold: "#C08A2E",
+  rose: "#A93E4C",
+  forest: "#2E6F4E",
+  blue: "#3E5C8A",
+};
+function NotificationBell({
+  role,
+  currentAdmin,
+  currentEmp,
+  employees,
+  shifts,
+  attendance,
+  leaveRequests,
+  setPage,
+}) {
+  const [open, setOpen] = useState(false);
+  const boxRef = useRef(null);
+  const userId = role === "admin" ? currentAdmin?.id : currentEmp?.id;
+  const [readIds, setReadIds] = useLocalStorage(
+    `hrsuite:notifications:read:${userId || "guest"}`,
+    [],
+  );
+
+  const notifications = useMemo(
+    () =>
+      buildNotifications({
+        role,
+        currentEmp,
+        employees,
+        shifts,
+        attendance,
+        leaveRequests,
+      }),
+    [role, currentEmp, employees, shifts, attendance, leaveRequests],
+  );
+  const unread = notifications.filter((n) => !readIds.includes(n.id));
+
+  useEffect(() => {
+    function onDocClick(e) {
+      if (boxRef.current && !boxRef.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, []);
+
+  const markRead = (ids) =>
+    setReadIds(Array.from(new Set([...readIds, ...ids])));
+
+  return (
+    <div ref={boxRef} style={{ position: "relative" }}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        aria-label="ការជូនដំណឹង"
+        style={{
+          position: "relative",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          color: T.ink,
+          padding: 6,
+          display: "flex",
+        }}
+      >
+        <Bell size={19} />
+        {unread.length > 0 && (
+          <span
+            style={{
+              position: "absolute",
+              top: 1,
+              right: 1,
+              minWidth: 16,
+              height: 16,
+              borderRadius: 999,
+              background: T.rose,
+              color: "#fff",
+              fontSize: 10,
+              fontWeight: 700,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0 3px",
+              border: `2px solid ${T.paper}`,
+            }}
+          >
+            {unread.length > 9 ? "9+" : unread.length}
+          </span>
+        )}
+      </button>
+      {open && (
+        <div
+          className="wf-card"
+          style={{
+            position: "absolute",
+            right: 0,
+            top: "calc(100% + 8px)",
+            width: 320,
+            maxWidth: "calc(100vw - 32px)",
+            maxHeight: 400,
+            overflowY: "auto",
+            zIndex: 30,
+            boxShadow: "0 12px 32px rgba(18,32,61,0.18)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "12px 14px",
+              borderBottom: `1px solid ${T.lineSoft}`,
+            }}
+          >
+            <span style={{ fontWeight: 700, fontSize: 13, color: T.ink }}>
+              ការជូនដំណឹង
+            </span>
+            {notifications.length > 0 && (
+              <button
+                onClick={() => markRead(notifications.map((n) => n.id))}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: T.forest,
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                }}
+              >
+                កំណត់ថាបានអានទាំងអស់
+              </button>
+            )}
+          </div>
+          {notifications.length === 0 ? (
+            <div
+              style={{
+                padding: "28px 14px",
+                textAlign: "center",
+                color: T.muted,
+                fontSize: 12.5,
+              }}
+            >
+              មិនមានការជូនដំណឹងទេ
+            </div>
+          ) : (
+            notifications.map((n) => {
+              const isUnread = !readIds.includes(n.id);
+              return (
+                <button
+                  key={n.id}
+                  onClick={() => {
+                    markRead([n.id]);
+                    setPage(n.page);
+                    setOpen(false);
+                  }}
+                  style={{
+                    display: "flex",
+                    gap: 10,
+                    width: "100%",
+                    textAlign: "left",
+                    padding: "11px 14px",
+                    background: isUnread ? T.paper : "transparent",
+                    border: "none",
+                    borderBottom: `1px solid ${T.lineSoft}`,
+                    cursor: "pointer",
+                  }}
+                >
+                  <span
+                    style={{
+                      width: 7,
+                      height: 7,
+                      borderRadius: 999,
+                      background: NOTIF_TONE[n.tone] || T.muted,
+                      marginTop: 5,
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span style={{ minWidth: 0 }}>
+                    <div
+                      style={{ fontSize: 12.5, fontWeight: 600, color: T.ink }}
+                    >
+                      {n.title}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 12,
+                        color: T.textSoft,
+                        marginTop: 2,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                      }}
+                    >
+                      {n.message}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 10.5,
+                        color: T.mutedLight,
+                        marginTop: 3,
+                      }}
+                    >
+                      {timeAgoLabel(n.time)}
+                    </div>
+                  </span>
+                </button>
+              );
+            })
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 function Modal({ title, onClose, children, width = 480 }) {
@@ -4507,6 +4818,16 @@ export default function App() {
                 {ADMIN_ROLE_LABEL[currentAdmin?.role]}
               </span>
             )}
+            <NotificationBell
+              role={role}
+              currentAdmin={currentAdmin}
+              currentEmp={currentEmp}
+              employees={employees}
+              shifts={shifts}
+              attendance={attendance}
+              leaveRequests={leaveRequests}
+              setPage={setPage}
+            />
             <Avatar
               name={
                 role === "admin"
