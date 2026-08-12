@@ -286,6 +286,18 @@ function todayStr() {
 function monthKey(d = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
+// Human-readable label for a "YYYY-MM" key, e.g. "2026-01" -> "មករា 2026".
+function monthLabel(mk) {
+  const [y, m] = mk.split("-").map(Number);
+  try {
+    return new Intl.DateTimeFormat("km-KH", {
+      year: "numeric",
+      month: "long",
+    }).format(new Date(y, m - 1, 1));
+  } catch {
+    return mk;
+  }
+}
 function fmtMoney(n) {
   return (
     "$" +
@@ -4257,8 +4269,17 @@ function Payroll({
   payrollPaid,
   setPayrollPaid,
 }) {
-  const mk = monthKey();
+  const currentMk = monthKey();
+  const availableMonths = useMemo(() => {
+    const set = new Set([currentMk]);
+    attendance.forEach((a) => {
+      if (a.date) set.add(a.date.slice(0, 7));
+    });
+    return Array.from(set).sort((a, b) => (a < b ? 1 : -1));
+  }, [attendance, currentMk]);
+  const [mk, setMk] = useState(currentMk);
   const [slipFor, setSlipFor] = useState(null);
+  const isPastMonth = mk !== currentMk;
   const activeEmployees = employees.filter((e) => e.status === "active");
   const list =
     role === "admin"
@@ -4275,6 +4296,53 @@ function Payroll({
 
   return (
     <div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          marginBottom: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: T.muted,
+            textTransform: "uppercase",
+            letterSpacing: ".03em",
+          }}
+        >
+          ខែ
+        </span>
+        <Select
+          value={mk}
+          onChange={(e) => setMk(e.target.value)}
+          style={{ width: "auto", minWidth: 170 }}
+        >
+          {availableMonths.map((m) => (
+            <option key={m} value={m}>
+              {monthLabel(m)}
+              {m === currentMk ? " (ខែបច្ចុប្បន្ន)" : ""}
+            </option>
+          ))}
+        </Select>
+        {isPastMonth && (
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              background: T.goldSoft,
+              color: T.goldText,
+              padding: "5px 10px",
+              borderRadius: 8,
+            }}
+          >
+            កំពុងមើលប្រវត្តិខែមុន
+          </span>
+        )}
+      </div>
       {role === "admin" && (
         <Card
           accent={T.gold}
@@ -4295,7 +4363,7 @@ function Payroll({
                 fontWeight: 700,
               }}
             >
-              ចំណាយប្រាក់ខែសរុប · {mk}
+              ចំណាយប្រាក់ខែសរុប · {monthLabel(mk)}
             </div>
             <div
               style={{
