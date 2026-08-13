@@ -39,6 +39,13 @@ import {
   Watch,
   MapPin,
   Bell,
+  Timer,
+  ThumbsUp,
+  ThumbsDown,
+  Sun,
+  Moon,
+  Settings2,
+  Camera,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -76,12 +83,15 @@ const LANG = {
       shifts: "វេនការងារ",
       attendance: "វត្តមាន",
       leave: "ច្បាប់ឈប់សម្រាក",
+      overtime: "ការងារបន្ថែម (OT)",
       payroll: "ប្រាក់ខែ",
       admins: "គណនីអ្នកគ្រប់គ្រង",
       myAttendance: "វត្តមានរបស់ខ្ញុំ",
       myLeave: "ច្បាប់ឈប់សម្រាករបស់ខ្ញុំ",
+      myOvertime: "ការងារបន្ថែម (OT) របស់ខ្ញុំ",
       myPayroll: "ប្រាក់ខែរបស់ខ្ញុំ",
       myProfile: "ប្រវត្តិរូបរបស់ខ្ញុំ",
+      settings: "ការកំណត់",
     },
     logout: "ចាកចេញ",
     notifications: "ការជូនដំណឹង",
@@ -90,7 +100,198 @@ const LANG = {
     confirmDelete: "បញ្ជាក់ការលុប",
     cancel: "បោះបង់",
     delete: "លុប",
+    edit: "កែសម្រួល",
+    save: "រក្សាទុក",
+    add: "បន្ថែម",
+    search: "ស្វែងរក...",
     employee: "បុគ្គលិក",
+    status: "ស្ថានភាព",
+    actions: "សកម្មភាព",
+    noData: "មិនមានទិន្នន័យ",
+    dash: {
+      welcome: "សូមអញ្ជើញ",
+      totalEmp: "បុគ្គលិកសរុប",
+      active: "សកម្ម",
+      totalDept: "នាយកដ្ឋាន",
+      totalDeptSub: "នាយកដ្ឋានសរុប",
+      presentToday: "មកធ្វើការថ្ងៃនេះ",
+      attendRate: "អត្រាមកធ្វើការ",
+      pendingPayroll: "រង់ចាំបើកប្រាក់ខែ",
+      thisMonth: "ខែនេះ",
+      recentAttend: "ការចូលធ្វើការថ្ងៃនេះ",
+      noAttend: "មិនទាន់មានការចូលធ្វើការថ្ងៃនេះ",
+      empPortalLink: "តំណភ្ជាប់សម្រាប់បុគ្គលិក",
+      showQR: "បង្ហាញ QR Code",
+      copyLink: "ចម្លងតំណ",
+      copied: "បានចម្លងហើយ!",
+      noEmpWarn: 'មិនទាន់មានបុគ្គលិកទេ សូមចូលទៅផ្នែក "បុគ្គលិក" ដើម្បីបន្ថែម',
+      myDept: "នាយកដ្ឋានរបស់ខ្ញុំ",
+      myShift: "វេនការងាររបស់ខ្ញុំ",
+      todayStatus: "ស្ថានភាពថ្ងៃនេះ",
+      payrollStatus: "ស្ថានភាពប្រាក់ខែ",
+      notCheckedIn: "មិនទាន់ចូលធ្វើការ",
+    },
+    depts: {
+      addBtn: "បន្ថែមនាយកដ្ឋាន",
+      editTitle: "កែសម្រួលនាយកដ្ឋាន",
+      addTitle: "បន្ថែមនាយកដ្ឋាន",
+      nameLabel: "ឈ្មោះនាយកដ្ឋាន",
+      codeLabel: "លេខកូដ (ខ្លី)",
+      descLabel: "ការពិពណ៌នា",
+      staffCount: "នាក់",
+      noDesc: "គ្មានការពិពណ៌នា",
+      confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបនាយកដ្ឋាននេះ?",
+    },
+    emps: {
+      addBtn: "បន្ថែមបុគ្គលិក",
+      editTitle: "កែសម្រួលបុគ្គលិក",
+      addTitle: "បន្ថែមបុគ្គលិក",
+      name: "ឈ្មោះ",
+      code: "លេខសម្គាល់",
+      dept: "នាយកដ្ឋាន",
+      shift: "វេន",
+      role: "តួនាទី",
+      salary: "ប្រាក់ខែ",
+      phone: "លេខទូរស័ព្ទ",
+      email: "អ៊ីម៉ែល",
+      joined: "ថ្ងៃចូលធ្វើការ",
+      pin: "PIN (លេខ)",
+      photo: "URL រូបភាព",
+      active: "សកម្ម",
+      inactive: "អសកម្ម",
+      confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបបុគ្គលិកនេះ?",
+      noEmp: "មិនទាន់មានបុគ្គលិកទេ",
+    },
+    sh: {
+      addBtn: "បន្ថែមវេន",
+      editTitle: "កែសម្រួលវេន",
+      addTitle: "បន្ថែមវេន",
+      nameLabel: "ឈ្មោះវេន",
+      startLabel: "ម៉ោងចូល",
+      endLabel: "ម៉ោងចេញ",
+      graceLabel: "ផ្តល់ (នាទី)",
+      confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបវេននេះ?",
+      noShift: "មិនទាន់មានវេនទេ",
+      assignedEmp: "បុគ្គលិកប្រើវេននេះ",
+    },
+    att: {
+      checkIn: "ចូលធ្វើការ",
+      checkOut: "ចេញធ្វើការ",
+      present: "មានវត្តមាន",
+      absent: "អវត្តមាន",
+      late: "មកយឺត",
+      onLeave: "ច្បាប់",
+      date: "កាលបរិច្ឆេទ",
+      inTime: "ម៉ោងចូល",
+      outTime: "ម៉ោងចេញ",
+      setOffice: "កំណត់ទីតាំងការិយាល័យ",
+      noRecord: "មិនទាន់មានកំណត់ត្រាទេ",
+      absentDays: "ថ្ងៃអវត្តមាន",
+    },
+    lv: {
+      addBtn: "សំណើច្បាប់ថ្មី",
+      type: "ប្រភេទច្បាប់",
+      startDate: "ថ្ងៃចាប់ផ្តើម",
+      endDate: "ថ្ងៃបញ្ចប់",
+      reason: "មូលហេតុ",
+      pending: "កំពុងរង់ចាំ",
+      approved: "បានអនុម័ត",
+      rejected: "បានបដិសេធ",
+      approve: "អនុម័ត",
+      reject: "បដិសេធ",
+      confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបសំណើនេះ?",
+      noRequest: "មិនទាន់មានសំណើទេ",
+    },
+    ot: {
+      addBtn: "សុំ OT ថ្មី",
+      date: "កាលបរិច្ឆេទ",
+      hours: "ចំនួនម៉ោង OT",
+      dayType: "ប្រភេទថ្ងៃ",
+      dtNormal: "ថ្ងៃធម្មតា",
+      dtWeekend: "ថ្ងៃឈប់សម្រាក/ចុងសប្តាហ៍",
+      dtHoliday: "ថ្ងៃបុណ្យជាតិ",
+      reason: "មូលហេតុស្នើសុំ",
+      reasonPlaceholder: "សរសេរមូលហេតុសង្ខេប...",
+      submit: "ដាក់ស្នើសំណើ",
+      approve: "អនុម័ត",
+      reject: "បដិសេធ",
+      approvedBy: "អនុម័តដោយ",
+      rejectedBy: "បដិសេធដោយ",
+      rejectTitle: "បដិសេធសំណើ OT",
+      rejectReason: "មូលហេតុបដិសេធ",
+      rejectReasonPlaceholder: "សូមបញ្ជាក់មូលហេតុបដិសេធ...",
+      rejectReasonRequired: "សូមបញ្ចូលមូលហេតុបដិសេធ",
+      confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបសំណើ OT នេះ?",
+      noRequest: "មិនទាន់មានសំណើ OT ទេ",
+      hoursShort: "ម៉ោង",
+      policyTitle: "គោលការណ៍អត្រា OT",
+      policyDesc:
+        "កំណត់អត្រាគុណប្រាក់ OT សម្រាប់ថ្ងៃធម្មតា ថ្ងៃឈប់សម្រាក និងថ្ងៃបុណ្យជាតិ ព្រមទាំងចំនួនម៉ោងធ្វើការស្តង់ដារក្នុងមួយថ្ងៃ។",
+      rateNormal: "អត្រាគុណ · ថ្ងៃធម្មតា",
+      rateWeekend: "អត្រាគុណ · ថ្ងៃឈប់សម្រាក",
+      rateHoliday: "អត្រាគុណ · ថ្ងៃបុណ្យជាតិ",
+      hoursPerDay: "ម៉ោងធ្វើការស្តង់ដារ/ថ្ងៃ",
+      totalOtHours: "ម៉ោង OT សរុប",
+    },
+    pay: {
+      baseSalary: "ប្រាក់ខែមូលដ្ឋាន",
+      netSalary: "ប្រាក់ខែសុទ្ធ",
+      markPaid: "បើកប្រាក់ខែ",
+      paid: "បានបើក",
+      unpaid: "មិនទាន់បើក",
+      totalPaid: "ចំណាយប្រាក់ខែសរុប",
+      absentDed: "ថ្ងៃអវត្តមាន",
+      otPay: "ប្រាក់ OT",
+      viewSlip: "មើលសន្លឹកប្រាក់ខែ",
+      unmarkPaid: "ដកសញ្ញាបានបើក",
+      taxLabel: "ពន្ធលើប្រាក់ខែ",
+      insuranceLabel: "ធានារ៉ាប់រង",
+      policyTitle: "គោលការណ៍កាត់ប្រាក់ខែ",
+      policyDesc:
+        "កំណត់អត្រាភាគរយពន្ធលើប្រាក់ខែ និងធានារ៉ាប់រង ដែលនឹងកាត់ចេញពីប្រាក់ខែមូលដ្ឋានរបស់បុគ្គលិកទាំងអស់។",
+      taxRateLabel: "អត្រាពន្ធលើប្រាក់ខែ (%)",
+      insuranceRateLabel: "អត្រាធានារ៉ាប់រង (%)",
+    },
+    admAcc: {
+      addBtn: "បន្ថែមអ្នកគ្រប់គ្រង",
+      editTitle: "កែសម្រួលអ្នកគ្រប់គ្រង",
+      addTitle: "បន្ថែមអ្នកគ្រប់គ្រង",
+      roleLabel: "តួនាទី",
+      confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបគណនីនេះ?",
+    },
+    profile: {
+      title: "ប្រវត្តិរូបរបស់ខ្ញុំ",
+      editBtn: "កែប្រវត្តិរូប",
+      changePin: "ផ្លាស់ប្តូរ PIN",
+      oldPin: "PIN ចាស់",
+      newPin: "PIN ថ្មី",
+    },
+    qr: {
+      title: "QR Code សម្រាប់បុគ្គលិក",
+      desc: "ស្កេនដើម្បីបើកទំព័រចូលប្រើសម្រាប់បុគ្គលិកដោយផ្ទាល់",
+    },
+    settings: {
+      title: "ការកំណត់គណនី",
+      photoLabel: "រូបភាពប្រវត្តិរូប",
+      choosePhoto: "ជ្រើសរើសរូបភាព",
+      nameLabel: "ឈ្មោះ",
+      namePlaceholder: "បញ្ចូលឈ្មោះរបស់អ្នក",
+      appearance: "រូបរាងទំព័រ",
+      lightMode: "ពន្លឺ (Light)",
+      darkMode: "ងងឹត (Dark)",
+      appearanceDesc: "ប្តូររូបរាងទំព័រសម្រាប់ឧបករណ៍នេះ",
+      saved: "បានរក្សាទុកដោយជោគជ័យ",
+      nameRequired: "សូមបញ្ចូលឈ្មោះ",
+      brandingTitle: "ម៉ាកយីហោក្រុមហ៊ុន",
+      brandingDesc:
+        "ដាក់ឈ្មោះក្រុមហ៊ុន និងឡូហ្គោផ្ទាល់ខ្លួន ដើម្បីជំនួសឈ្មោះ និងឡូហ្គោលំនាំដើម",
+      companyNameLabel: "ឈ្មោះក្រុមហ៊ុន",
+      companyNamePlaceholder: "Workforce Suite",
+      companyLogoLabel: "ឡូហ្គោក្រុមហ៊ុន",
+      chooseLogo: "ជ្រើសរើសឡូហ្គោ",
+      removeLogo: "លុបឡូហ្គោ",
+      brandingSaved: "បានរក្សាទុកម៉ាកយីហោដោយជោគជ័យ",
+    },
   },
   en: {
     appName: "Workforce Suite",
@@ -123,12 +324,15 @@ const LANG = {
       shifts: "Shifts",
       attendance: "Attendance",
       leave: "Leave Requests",
+      overtime: "Overtime (OT)",
       payroll: "Payroll",
       admins: "Admin Accounts",
       myAttendance: "My Attendance",
       myLeave: "My Leave",
+      myOvertime: "My Overtime (OT)",
       myPayroll: "My Payroll",
       myProfile: "My Profile",
+      settings: "Settings",
     },
     logout: "Sign Out",
     notifications: "Notifications",
@@ -137,7 +341,198 @@ const LANG = {
     confirmDelete: "Confirm Delete",
     cancel: "Cancel",
     delete: "Delete",
+    edit: "Edit",
+    save: "Save",
+    add: "Add",
+    search: "Search...",
     employee: "Employee",
+    status: "Status",
+    actions: "Actions",
+    noData: "No data",
+    dash: {
+      welcome: "Welcome",
+      totalEmp: "Total Employees",
+      active: "active",
+      totalDept: "Departments",
+      totalDeptSub: "Total departments",
+      presentToday: "Present Today",
+      attendRate: "Attendance rate",
+      pendingPayroll: "Pending Payroll",
+      thisMonth: "This month",
+      recentAttend: "Today\'s Attendance",
+      noAttend: "No attendance records today",
+      empPortalLink: "Employee Portal Link",
+      showQR: "Show QR Code",
+      copyLink: "Copy Link",
+      copied: "Copied!",
+      noEmpWarn: 'No employees yet. Go to "Employees" to add one.',
+      myDept: "My Department",
+      myShift: "My Shift",
+      todayStatus: "Today's Status",
+      payrollStatus: "Payroll Status",
+      notCheckedIn: "Not checked in",
+    },
+    depts: {
+      addBtn: "Add Department",
+      editTitle: "Edit Department",
+      addTitle: "Add Department",
+      nameLabel: "Department Name",
+      codeLabel: "Short Code",
+      descLabel: "Description",
+      staffCount: "staff",
+      noDesc: "No description",
+      confirmDel: "Are you sure you want to delete this department?",
+    },
+    emps: {
+      addBtn: "Add Employee",
+      editTitle: "Edit Employee",
+      addTitle: "Add Employee",
+      name: "Name",
+      code: "Employee ID",
+      dept: "Department",
+      shift: "Shift",
+      role: "Role",
+      salary: "Salary",
+      phone: "Phone",
+      email: "Email",
+      joined: "Join Date",
+      pin: "PIN (digits)",
+      photo: "Photo URL",
+      active: "Active",
+      inactive: "Inactive",
+      confirmDel: "Are you sure you want to delete this employee?",
+      noEmp: "No employees yet",
+    },
+    sh: {
+      addBtn: "Add Shift",
+      editTitle: "Edit Shift",
+      addTitle: "Add Shift",
+      nameLabel: "Shift Name",
+      startLabel: "Start Time",
+      endLabel: "End Time",
+      graceLabel: "Grace (minutes)",
+      confirmDel: "Are you sure you want to delete this shift?",
+      noShift: "No shifts yet",
+      assignedEmp: "Employees using this shift",
+    },
+    att: {
+      checkIn: "Check In",
+      checkOut: "Check Out",
+      present: "Present",
+      absent: "Absent",
+      late: "Late",
+      onLeave: "On Leave",
+      date: "Date",
+      inTime: "In Time",
+      outTime: "Out Time",
+      setOffice: "Set Office Location",
+      noRecord: "No records yet",
+      absentDays: "Absent days",
+    },
+    lv: {
+      addBtn: "New Leave Request",
+      type: "Leave Type",
+      startDate: "Start Date",
+      endDate: "End Date",
+      reason: "Reason",
+      pending: "Pending",
+      approved: "Approved",
+      rejected: "Rejected",
+      approve: "Approve",
+      reject: "Reject",
+      confirmDel: "Are you sure you want to delete this request?",
+      noRequest: "No requests yet",
+    },
+    ot: {
+      addBtn: "New OT Request",
+      date: "Date",
+      hours: "OT Hours",
+      dayType: "Day Type",
+      dtNormal: "Normal Working Day",
+      dtWeekend: "Day Off / Weekend",
+      dtHoliday: "Public Holiday",
+      reason: "Reason",
+      reasonPlaceholder: "Briefly explain the reason...",
+      submit: "Submit Request",
+      approve: "Approve",
+      reject: "Reject",
+      approvedBy: "Approved by",
+      rejectedBy: "Rejected by",
+      rejectTitle: "Reject OT Request",
+      rejectReason: "Rejection Reason",
+      rejectReasonPlaceholder: "Please state the reason for rejecting...",
+      rejectReasonRequired: "Please enter a rejection reason",
+      confirmDel: "Are you sure you want to delete this OT request?",
+      noRequest: "No OT requests yet",
+      hoursShort: "hrs",
+      policyTitle: "Overtime Rate Policy",
+      policyDesc:
+        "Set the OT pay multiplier for normal working days, days off, and public holidays, plus standard working hours per day.",
+      rateNormal: "Multiplier · Normal Day",
+      rateWeekend: "Multiplier · Day Off",
+      rateHoliday: "Multiplier · Public Holiday",
+      hoursPerDay: "Standard Hours / Day",
+      totalOtHours: "Total OT Hours",
+    },
+    pay: {
+      baseSalary: "Base Salary",
+      netSalary: "Net Salary",
+      markPaid: "Mark as Paid",
+      paid: "Paid",
+      unpaid: "Unpaid",
+      totalPaid: "Total Payroll",
+      absentDed: "Absent days",
+      otPay: "OT Pay",
+      viewSlip: "View Payslip",
+      unmarkPaid: "Unmark as Paid",
+      taxLabel: "Income Tax",
+      insuranceLabel: "Insurance",
+      policyTitle: "Payroll Deduction Policy",
+      policyDesc:
+        "Set the tax and insurance percentage rates deducted from every employee's base salary.",
+      taxRateLabel: "Tax Rate (%)",
+      insuranceRateLabel: "Insurance Rate (%)",
+    },
+    admAcc: {
+      addBtn: "Add Admin",
+      editTitle: "Edit Admin",
+      addTitle: "Add Admin",
+      roleLabel: "Role",
+      confirmDel: "Are you sure you want to delete this account?",
+    },
+    profile: {
+      title: "My Profile",
+      editBtn: "Edit Profile",
+      changePin: "Change PIN",
+      oldPin: "Old PIN",
+      newPin: "New PIN",
+    },
+    qr: {
+      title: "Employee Portal QR Code",
+      desc: "Scan to open the employee login portal directly",
+    },
+    settings: {
+      title: "Account Settings",
+      photoLabel: "Profile Photo",
+      choosePhoto: "Choose Photo",
+      nameLabel: "Name",
+      namePlaceholder: "Enter your name",
+      appearance: "Appearance",
+      lightMode: "Light",
+      darkMode: "Dark",
+      appearanceDesc: "Switch the theme for this device",
+      saved: "Saved successfully",
+      nameRequired: "Please enter a name",
+      brandingTitle: "Company Branding",
+      brandingDesc:
+        "Set a custom company name and logo to replace the default name and logo",
+      companyNameLabel: "Company Name",
+      companyNamePlaceholder: "Workforce Suite",
+      companyLogoLabel: "Company Logo",
+      chooseLogo: "Choose Logo",
+      removeLogo: "Remove Logo",
+      brandingSaved: "Branding saved successfully",
+    },
   },
 };
 
@@ -147,6 +542,57 @@ const LangContext = createContext({
   setLang: () => {},
 });
 const useLang = () => useCtx(LangContext);
+
+const ThemeContext = createContext({
+  theme: "light",
+  setTheme: () => {},
+  toggleTheme: () => {},
+});
+const useTheme = () => useCtx(ThemeContext);
+
+// Company branding (custom app name + logo), editable from Admin Settings
+// by a super admin and shared across the login screens, sidebar, etc.
+const BrandingContext = createContext({
+  branding: { name: "", logo: null },
+  setBranding: () => {},
+});
+const useBranding = () => useCtx(BrandingContext);
+
+function getInitials(name) {
+  const parts = (name || "").trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "WS";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
+
+function ThemeToggle({ variant = "dark" }) {
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === "dark";
+  const chromeIsDark = variant === "dark";
+  return (
+    <button
+      onClick={toggleTheme}
+      title="Dark mode / របៀបងងឹត"
+      aria-label="Toggle dark mode"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: 30,
+        height: 30,
+        background: chromeIsDark ? "rgba(255,255,255,0.10)" : "var(--wf-card)",
+        border: `1px solid ${chromeIsDark ? "rgba(255,255,255,0.18)" : "var(--wf-line)"}`,
+        borderRadius: 8,
+        color: chromeIsDark ? "#fff" : "var(--wf-ink)",
+        cursor: "pointer",
+        transition: "background .15s, border-color .15s",
+        flexShrink: 0,
+      }}
+    >
+      {isDark ? <Sun size={15} /> : <Moon size={15} />}
+    </button>
+  );
+}
 
 function LangToggle({ variant = "dark" }) {
   const { lang, setLang } = useLang();
@@ -179,29 +625,49 @@ function LangToggle({ variant = "dark" }) {
 /* ---------------------------------------------------------------
    Tokens
 ----------------------------------------------------------------*/
-const T = {
+// BRAND is the fixed navy used for "always-dark" chrome — the sidebar,
+// primary buttons, and hero banners — which stays the same regardless of
+// light/dark mode (white text sits on it either way).
+const BRAND = {
   ink: "#12203D",
   inkDark: "#0B1730",
-  paper: "#F5F2EA",
-  card: "#FFFFFF",
+};
+// T holds the tokens that DO change between light/dark mode. Each value is
+// a CSS custom property reference — the actual light/dark hex values are
+// defined once in the injected stylesheet (:root and .wf-dark), so every
+// existing `T.xxx` usage across the app repaints automatically when the
+// theme toggles, with no per-usage changes needed.
+const T = {
+  ink: "var(--wf-ink)",
+  inkDark: "var(--wf-ink-dark)",
+  paper: "var(--wf-paper)",
+  card: "var(--wf-card)",
   forest: "#2E6F4E",
   forestDark: "#245A3F",
-  forestSoft: "#E8F2EC",
-  forestText: "#215D3F",
+  forestSoft: "var(--wf-forest-soft)",
+  forestText: "var(--wf-forest-text)",
   clay: "#B5502F",
   gold: "#C08A2E",
-  goldSoft: "#FBF1DF",
-  goldText: "#8A5E14",
+  goldSoft: "var(--wf-gold-soft)",
+  goldText: "var(--wf-gold-text)",
   rose: "#A93E4C",
-  roseDark: "#8C3140",
-  roseSoft: "#F3E9E9",
+  roseDark: "var(--wf-rose-dark)",
+  roseSoft: "var(--wf-rose-soft)",
   blue: "#3E5C8A",
-  line: "#E7E2D6",
-  lineSoft: "#EEE9DC",
-  muted: "#8A8577",
-  mutedLight: "#B0AA98",
-  text: "#12203D",
-  textSoft: "#4A4638",
+  line: "var(--wf-line)",
+  lineSoft: "var(--wf-line-soft)",
+  muted: "var(--wf-muted)",
+  mutedLight: "var(--wf-muted-light)",
+  text: "var(--wf-ink)",
+  textSoft: "var(--wf-text-soft)",
+  inputBorder: "var(--wf-input-border)",
+  inputBg: "var(--wf-input-bg)",
+  fieldLabel: "var(--wf-field-label)",
+  tableHeadBg: "var(--wf-table-head-bg)",
+  divider: "var(--wf-divider)",
+  dangerBorder: "var(--wf-danger-border)",
+  dangerHoverBg: "var(--wf-danger-hover-bg)",
+  headerBg: "var(--wf-header-bg)",
 };
 const PALETTE = [
   "#2E6F4E",
@@ -229,8 +695,26 @@ const WORKING_DAYS_PER_MONTH = 26;
 const STYLE_ID = "wf-suite-style";
 const CSS = `
 html,body,#root{height:100%;}
-.wf-root{display:flex;height:100vh;height:100dvh;min-height:640px;max-height:100vh;max-height:100dvh;background:${T.paper};font-family:'Inter',sans-serif;color:${T.text};position:relative;overflow:hidden;border-radius:16px;box-shadow:0 1px 2px rgba(18,32,61,0.05),0 20px 48px -16px rgba(18,32,61,0.22);}
-.wf-sidebar{background:linear-gradient(175deg,${T.ink} 0%,${T.inkDark} 100%);color:#fff;width:250px;flex-shrink:0;display:flex;flex-direction:column;transition:transform .25s cubic-bezier(.4,0,.2,1);}
+:root{
+  --wf-ink:#12203D; --wf-ink-dark:#0B1730; --wf-paper:#F5F2EA; --wf-card:#FFFFFF;
+  --wf-forest-soft:#E8F2EC; --wf-forest-text:#215D3F; --wf-gold-soft:#FBF1DF; --wf-gold-text:#8A5E14;
+  --wf-rose-dark:#8C3140; --wf-rose-soft:#F3E9E9; --wf-line:#E7E2D6; --wf-line-soft:#EEE9DC;
+  --wf-muted:#8A8577; --wf-muted-light:#B0AA98; --wf-text-soft:#4A4638;
+  --wf-input-border:#D8D2C2; --wf-input-bg:#FDFCF9; --wf-field-label:#6B6455;
+  --wf-table-head-bg:#FAF8F2; --wf-divider:#F0EDE2; --wf-danger-border:#E4C7CB;
+  --wf-danger-hover-bg:#F8ECEE; --wf-header-bg:rgba(255,255,255,0.92);
+}
+.wf-dark{
+  --wf-ink:#E9ECF4; --wf-ink-dark:#B7BFD4; --wf-paper:#0E1526; --wf-card:#161F35;
+  --wf-forest-soft:#173226; --wf-forest-text:#7FD9A8; --wf-gold-soft:#332715; --wf-gold-text:#E8C067;
+  --wf-rose-dark:#F4A6B0; --wf-rose-soft:#3A2126; --wf-line:#2A3350; --wf-line-soft:#233049;
+  --wf-muted:#8D96B3; --wf-muted-light:#5B6486; --wf-text-soft:#C3C9DC;
+  --wf-input-border:#2E3A5C; --wf-input-bg:#101A30; --wf-field-label:#98A1C0;
+  --wf-table-head-bg:#131C32; --wf-divider:#232D4A; --wf-danger-border:#5C2C36;
+  --wf-danger-hover-bg:#2C1820; --wf-header-bg:rgba(14,21,38,0.92);
+}
+.wf-root{display:flex;height:100vh;height:100dvh;min-height:640px;max-height:100vh;max-height:100dvh;background:${T.paper};font-family:'Inter',sans-serif;color:${T.text};position:relative;overflow:hidden;border-radius:16px;box-shadow:0 1px 2px rgba(18,32,61,0.05),0 20px 48px -16px rgba(18,32,61,0.22);transition:background .15s ease,color .15s ease;}
+.wf-sidebar{background:linear-gradient(175deg,${BRAND.ink} 0%,${BRAND.inkDark} 100%);color:#fff;width:250px;flex-shrink:0;display:flex;flex-direction:column;transition:transform .25s cubic-bezier(.4,0,.2,1);}
 .wf-sidebar-inner{display:flex;flex-direction:column;height:100%;}
 .wf-logo-badge{width:34px;height:34px;border-radius:10px;background:linear-gradient(145deg,${T.forest},${T.forestDark});display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;font-family:'Space Grotesk',sans-serif;flex-shrink:0;box-shadow:0 2px 8px rgba(46,111,78,0.4),inset 0 1px 0 rgba(255,255,255,0.18);}
 .wf-nav-item{position:relative;width:100%;display:flex;align-items:center;gap:11px;padding:10px 14px;border-radius:10px;font-size:13.5px;font-weight:500;background:transparent;color:#AEB8CC;border:none;cursor:pointer;text-align:left;transition:background .15s ease,color .15s ease;}
@@ -238,37 +722,37 @@ html,body,#root{height:100%;}
 .wf-nav-item.active{background:rgba(255,255,255,0.09);color:#fff;font-weight:600;}
 .wf-nav-item.active::before{content:"";position:absolute;left:-10px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:${T.gold};}
 .wf-main{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;background:${T.paper};}
-.wf-header{background:rgba(255,255,255,0.92);backdrop-filter:blur(8px);border-bottom:1px solid ${T.lineSoft};padding:14px 22px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;}
+.wf-header{background:${T.headerBg};backdrop-filter:blur(8px);border-bottom:1px solid ${T.lineSoft};padding:14px 22px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;transition:background .15s ease,border-color .15s ease;}
 .wf-content{flex:1;overflow-y:auto;padding:22px;}
-.wf-card{background:${T.card};border-radius:14px;border:1px solid ${T.line};box-shadow:0 1px 2px rgba(18,32,61,0.04);transition:box-shadow .15s ease;}
+.wf-card{background:${T.card};border-radius:14px;border:1px solid ${T.line};box-shadow:0 1px 2px rgba(18,32,61,0.04);transition:box-shadow .15s ease,background .15s ease,border-color .15s ease;}
 .wf-btn{display:inline-flex;align-items:center;gap:6px;font-weight:600;border-radius:10px;font-size:13px;padding:9px 15px;border:1px solid transparent;cursor:pointer;transition:background .15s ease,transform .1s ease,box-shadow .15s ease;}
 .wf-btn:active:not(:disabled){transform:scale(.97);}
 .wf-btn:disabled{opacity:.5;cursor:not-allowed;}
 .wf-btn-sm{padding:6px 10px;font-size:12px;}
-.wf-btn-primary{background:${T.ink};color:#fff;box-shadow:0 1px 2px rgba(18,32,61,0.18);}
-.wf-btn-primary:hover:not(:disabled){background:${T.inkDark};}
+.wf-btn-primary{background:${BRAND.ink};color:#fff;box-shadow:0 1px 2px rgba(18,32,61,0.18);}
+.wf-btn-primary:hover:not(:disabled){background:${BRAND.inkDark};}
 .wf-btn-accent{background:${T.forest};color:#fff;box-shadow:0 1px 2px rgba(46,111,78,0.22);}
 .wf-btn-accent:hover:not(:disabled){background:${T.forestDark};}
 .wf-btn-ghost{background:transparent;color:${T.ink};border-color:${T.line};}
 .wf-btn-ghost:hover:not(:disabled){background:${T.paper};}
-.wf-btn-danger{background:transparent;color:${T.rose};border-color:#E4C7CB;}
-.wf-btn-danger:hover:not(:disabled){background:#F8ECEE;}
+.wf-btn-danger{background:transparent;color:${T.rose};border-color:${T.dangerBorder};}
+.wf-btn-danger:hover:not(:disabled){background:${T.dangerHoverBg};}
 .wf-btn-danger-solid{background:${T.rose};color:#fff;}
 .wf-btn-danger-solid:hover:not(:disabled){background:${T.roseDark};}
-.wf-input{width:100%;padding:9px 12px;border-radius:10px;border:1px solid #D8D2C2;font-size:13px;background:#FDFCF9;color:${T.text};outline:none;font-family:inherit;transition:border-color .15s ease,box-shadow .15s ease;}
+.wf-input{width:100%;padding:9px 12px;border-radius:10px;border:1px solid ${T.inputBorder};font-size:13px;background:${T.inputBg};color:${T.text};outline:none;font-family:inherit;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
 .wf-input:focus{border-color:${T.forest};box-shadow:0 0 0 3px rgba(46,111,78,0.15);}
-.wf-field-label{display:block;font-size:11px;font-weight:700;color:#6B6455;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;}
-.wf-modal-overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(18,32,61,0.5);backdrop-filter:blur(2px);animation:wf-fade .15s ease;}
-.wf-modal{background:#fff;border-radius:16px;box-shadow:0 24px 64px rgba(18,32,61,0.35);width:100%;max-height:90vh;overflow-y:auto;animation:wf-pop .18s cubic-bezier(.2,.9,.3,1.2);}
-.wf-modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid ${T.lineSoft};position:sticky;top:0;background:#fff;border-radius:16px 16px 0 0;}
+.wf-field-label{display:block;font-size:11px;font-weight:700;color:${T.fieldLabel};margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;}
+.wf-modal-overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(8,12,24,0.55);backdrop-filter:blur(2px);animation:wf-fade .15s ease;}
+.wf-modal{background:${T.card};border-radius:16px;box-shadow:0 24px 64px rgba(18,32,61,0.35);width:100%;max-height:90vh;overflow-y:auto;animation:wf-pop .18s cubic-bezier(.2,.9,.3,1.2);}
+.wf-modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid ${T.lineSoft};position:sticky;top:0;background:${T.card};border-radius:16px 16px 0 0;}
 .wf-avatar{border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;flex-shrink:0;}
 .wf-badge{display:inline-block;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;letter-spacing:.02em;white-space:nowrap;}
 .wf-table{width:100%;font-size:13px;border-collapse:collapse;}
-.wf-table th{text-align:left;font-size:11px;color:${T.muted};text-transform:uppercase;padding:11px 16px;background:#FAF8F2;border-bottom:1px solid ${T.lineSoft};font-weight:700;letter-spacing:.03em;}
-.wf-table td{padding:10px 16px;border-bottom:1px solid #F5F2EA;}
+.wf-table th{text-align:left;font-size:11px;color:${T.muted};text-transform:uppercase;padding:11px 16px;background:${T.tableHeadBg};border-bottom:1px solid ${T.lineSoft};font-weight:700;letter-spacing:.03em;}
+.wf-table td{padding:10px 16px;border-bottom:1px solid ${T.paper};}
 .wf-table tr:last-child td{border-bottom:none;}
 .wf-table tbody tr{transition:background .12s ease;}
-.wf-table tbody tr:hover{background:#FAF8F2;}
+.wf-table tbody tr:hover{background:${T.tableHeadBg};}
 .wf-grid{display:grid;gap:16px;}
 .wf-punch-clock{font-size:34px;font-weight:700;font-family:'JetBrains Mono',monospace;color:${T.ink};font-variant-numeric:tabular-nums;}
 .wf-menu-btn{display:none;background:none;border:none;color:${T.ink};cursor:pointer;padding:4px;}
@@ -359,6 +843,27 @@ const DEFAULT_ADMINS = [
     role: "manager",
   },
 ];
+// Default OT policy used until an admin saves one in Supabase (ot_policy
+// table, single row id=1). Multipliers apply to the derived hourly rate.
+const DEFAULT_OT_POLICY = {
+  rateNormal: 1.5,
+  rateWeekend: 2,
+  rateHoliday: 3,
+  hoursPerDay: 8,
+};
+// Maps an OT request's day type to the matching multiplier key in policy.
+const OT_RATE_KEY = {
+  normal: "rateNormal",
+  weekend: "rateWeekend",
+  holiday: "rateHoliday",
+};
+// Default payroll deduction policy used until an admin saves one in
+// Supabase (payroll_policy table, single row id=1). Rates are percentages
+// (e.g. 5 means 5%) applied to the adjusted base salary.
+const DEFAULT_PAYROLL_POLICY = {
+  taxRate: 5,
+  insuranceRate: 2,
+};
 const DEFAULT_SHIFTS = [
   { id: "s1", name: "វេនព្រឹក", start: "06:00", end: "14:00" },
   { id: "s2", name: "វេនថ្ងៃ", start: "14:00", end: "22:00" },
@@ -448,9 +953,12 @@ function timeNow() {
   const d = new Date();
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
+function hhmm(v) {
+  return typeof v === "string" ? v.slice(0, 5) : v;
+}
 function shiftLabel(shift) {
   if (!shift) return "—";
-  return `${shift.name} · ${shift.start}–${shift.end}`;
+  return `${shift.name} · ${hhmm(shift.start)}–${hhmm(shift.end)}`;
 }
 function isOvernightShift(shift) {
   return !!shift && shift.end <= shift.start;
@@ -461,6 +969,31 @@ function isOvernightShift(shift) {
 function isLateForShift(checkInTime, shift) {
   if (!shift) return checkInTime > "09:00"; // fallback when no shift assigned
   return checkInTime > shift.start;
+}
+// Returns how many minutes past the shift's start time a check-in was, or
+// 0 if the check-in was on time or early. Used to show "late by X" detail.
+function lateMinutesForShift(checkInTime, shift) {
+  if (!checkInTime) return 0;
+  const start = shift ? shift.start : "09:00";
+  if (checkInTime <= start) return 0;
+  const [ch, cm] = checkInTime.split(":").map(Number);
+  const [sh, sm] = start.split(":").map(Number);
+  return ch * 60 + cm - (sh * 60 + sm);
+}
+function formatLateDuration(mins, lang) {
+  if (!mins || mins <= 0) return "";
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (lang === "en") {
+    const parts = [];
+    if (h) parts.push(`${h}h`);
+    if (m || !h) parts.push(`${m}m`);
+    return `Late by ${parts.join(" ")}`;
+  }
+  const parts = [];
+  if (h) parts.push(`${h} ម៉ោង`);
+  if (m || !h) parts.push(`${m} នាទី`);
+  return `មកយឺត ${parts.join(" ")}`;
 }
 function uid(p) {
   return p + Math.random().toString(36).slice(2, 9);
@@ -493,7 +1026,11 @@ function buildNotifications({
   shifts,
   attendance,
   leaveRequests,
+  overtimeRequests = [],
+  lang = "km",
 }) {
+  const LEAVE_TYPE_LABEL = getLeaveTypeLabel(lang);
+  const en = lang === "en";
   const list = [];
   if (role === "admin") {
     leaveRequests
@@ -506,6 +1043,21 @@ function buildNotifications({
           tone: "gold",
           title: "សំណើសុំច្បាប់ថ្មី",
           message: `${emp?.name || "?"} បានស្នើសុំ${LEAVE_TYPE_LABEL[r.type] || "ច្បាប់"}`,
+          time: r.createdAt,
+        });
+      });
+    overtimeRequests
+      .filter((r) => r.status === "pending")
+      .forEach((r) => {
+        const emp = employees.find((e) => e.id === r.employeeId);
+        list.push({
+          id: `ot-pending-${r.id}`,
+          page: "ot",
+          tone: "gold",
+          title: en ? "New OT Request" : "សំណើសុំ OT ថ្មី",
+          message: en
+            ? `${emp?.name || "?"} requested ${r.hours}h OT on ${r.date}`
+            : `${emp?.name || "?"} បានស្នើសុំ OT ចំនួន ${r.hours} ម៉ោង នៅថ្ងៃទី ${r.date}`,
           time: r.createdAt,
         });
       });
@@ -526,7 +1078,7 @@ function buildNotifications({
           page: "attendance",
           tone: "rose",
           title: "មិនទាន់ចុះឈ្មោះចូលធ្វើការ",
-          message: `${e.name} មិនទាន់ចុះឈ្មោះចូលធ្វើការទេ (${shift.name} ${shift.start})`,
+          message: `${e.name} មិនទាន់ចុះឈ្មោះចូលធ្វើការទេ (${shift.name} ${hhmm(shift.start)})`,
           time: `${today}T${now}:00`,
         });
       });
@@ -548,6 +1100,30 @@ function buildNotifications({
               ? "សំណើសុំច្បាប់របស់អ្នកត្រូវបានអនុម័ត"
               : "សំណើសុំច្បាប់របស់អ្នកត្រូវបានបដិសេធ",
           message: `${LEAVE_TYPE_LABEL[r.type] || "ច្បាប់"} (${r.startDate} – ${r.endDate})`,
+          time: r.reviewedAt,
+        });
+      });
+    overtimeRequests
+      .filter(
+        (r) =>
+          r.employeeId === currentEmp.id &&
+          (r.status === "approved" || r.status === "rejected") &&
+          r.reviewedAt,
+      )
+      .forEach((r) => {
+        list.push({
+          id: `ot-decided-${r.id}`,
+          page: "ot",
+          tone: r.status === "approved" ? "forest" : "rose",
+          title:
+            r.status === "approved"
+              ? en
+                ? "Your OT request was approved"
+                : "សំណើសុំ OT របស់អ្នកត្រូវបានអនុម័ត"
+              : en
+                ? "Your OT request was rejected"
+                : "សំណើសុំ OT របស់អ្នកត្រូវបានបដិសេធ",
+          message: `${r.date} · ${r.hours}${en ? "h" : " ម៉ោង"}`,
           time: r.reviewedAt,
         });
       });
@@ -599,9 +1175,57 @@ function monthAttendanceStats(attendance, employeeId, mk) {
   }
   return { absentDays, leaveDays, lateDays };
 }
+// Suggests a default OT day type from a "YYYY-MM-DD" date: Saturday/Sunday
+// suggest "weekend", everything else suggests "normal". Employees can still
+// override this in the request form (e.g. for public holidays).
+function suggestDayType(dateStr) {
+  if (!dateStr) return "normal";
+  const day = new Date(dateStr + "T00:00:00").getDay();
+  return day === 0 || day === 6 ? "weekend" : "normal";
+}
+function getDayTypeLabel(lang, t) {
+  return {
+    normal: t.ot.dtNormal,
+    weekend: t.ot.dtWeekend,
+    holiday: t.ot.dtHoliday,
+  };
+}
+// Sums approved OT hours/pay for one employee within a "YYYY-MM" month.
+// Hourly rate is derived from monthly salary using the policy's standard
+// working hours per day, then multiplied by the per-day-type OT rate.
+function computeOvertimeForMonth(emp, overtimeRequests, mk, otPolicy) {
+  const policy = otPolicy || DEFAULT_OT_POLICY;
+  const hourlyRate =
+    emp.salary / (WORKING_DAYS_PER_MONTH * (policy.hoursPerDay || 8));
+  let otHours = 0;
+  let otPay = 0;
+  overtimeRequests
+    .filter(
+      (r) =>
+        r.employeeId === emp.id &&
+        r.status === "approved" &&
+        r.date &&
+        r.date.startsWith(mk),
+    )
+    .forEach((r) => {
+      const mult = policy[OT_RATE_KEY[r.dayType]] ?? 1.5;
+      otHours += Number(r.hours) || 0;
+      otPay += (Number(r.hours) || 0) * hourlyRate * mult;
+    });
+  return { otHours, otPay, hourlyRate };
+}
 // Computes payroll figures for one employee for a given month, factoring in
-// unpaid absences recorded in attendance. Leave is paid and does not deduct.
-function computePayroll(emp, attendance, mk) {
+// unpaid absences recorded in attendance and approved OT requests. Leave is
+// paid and does not deduct; OT pay is added on top of net salary.
+function computePayroll(
+  emp,
+  attendance,
+  mk,
+  overtimeRequests = [],
+  otPolicy,
+  payrollPolicy,
+) {
+  const policy = payrollPolicy || DEFAULT_PAYROLL_POLICY;
   const { absentDays, leaveDays, lateDays } = monthAttendanceStats(
     attendance,
     emp.id,
@@ -610,9 +1234,17 @@ function computePayroll(emp, attendance, mk) {
   const dailyRate = emp.salary / WORKING_DAYS_PER_MONTH;
   const absenceDeduction = Math.min(emp.salary, absentDays * dailyRate);
   const adjustedBase = emp.salary - absenceDeduction;
-  const tax = adjustedBase * 0.05;
-  const insurance = adjustedBase * 0.02;
-  const net = adjustedBase - tax - insurance;
+  const taxRate = Number(policy.taxRate) || 0;
+  const insuranceRate = Number(policy.insuranceRate) || 0;
+  const tax = adjustedBase * (taxRate / 100);
+  const insurance = adjustedBase * (insuranceRate / 100);
+  const { otHours, otPay } = computeOvertimeForMonth(
+    emp,
+    overtimeRequests,
+    mk,
+    otPolicy,
+  );
+  const net = adjustedBase - tax - insurance + otPay;
   return {
     absentDays,
     leaveDays,
@@ -622,6 +1254,10 @@ function computePayroll(emp, attendance, mk) {
     adjustedBase,
     tax,
     insurance,
+    taxRate,
+    insuranceRate,
+    otHours,
+    otPay,
     net,
   };
 }
@@ -858,8 +1494,163 @@ function useOfficeLocation() {
   return [value, setValue, ready];
 }
 
+// branding is a single settings row (id = 1) shared by everyone — the
+// company name + logo shown on the login screens and sidebar for every
+// admin and employee, not just the device that set it.
+function useBrandingSettings() {
+  const [value, setValueState] = useState({ name: "", logo: null });
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("branding")
+        .select("*")
+        .eq("id", 1)
+        .maybeSingle();
+      if (cancelled) return;
+      if (error) {
+        console.error("[supabase] failed to load branding:", error.message);
+        setValueState({ name: "", logo: null });
+      } else if (data) {
+        setValueState({ name: data.name || "", logo: data.logo || null });
+      } else {
+        setValueState({ name: "", logo: null });
+      }
+      setReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const setValue = useCallback((next) => {
+    setValueState(next);
+    (async () => {
+      const { error } = await supabase.from("branding").upsert({
+        id: 1,
+        name: next.name || "",
+        logo: next.logo || null,
+      });
+      if (error)
+        console.error("[supabase] save failed on branding:", error.message);
+    })();
+  }, []);
+
+  return [value, setValue, ready];
+}
+
 // Login sessions are intentionally per-device, not shared data, so they
 // stay in the browser's own localStorage instead of Supabase.
+// ot_policy is a single settings row (id = 1), same shape as
+// DEFAULT_OT_POLICY. Falls back to the defaults until an admin saves one.
+function useOtPolicy() {
+  const [value, setValueState] = useState(DEFAULT_OT_POLICY);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("ot_policy")
+        .select("*")
+        .eq("id", 1)
+        .maybeSingle();
+      if (cancelled) return;
+      if (error) {
+        console.error("[supabase] failed to load ot_policy:", error.message);
+        setValueState(DEFAULT_OT_POLICY);
+      } else if (data) {
+        setValueState({
+          rateNormal: data.rate_normal ?? DEFAULT_OT_POLICY.rateNormal,
+          rateWeekend: data.rate_weekend ?? DEFAULT_OT_POLICY.rateWeekend,
+          rateHoliday: data.rate_holiday ?? DEFAULT_OT_POLICY.rateHoliday,
+          hoursPerDay: data.hours_per_day ?? DEFAULT_OT_POLICY.hoursPerDay,
+        });
+      } else {
+        setValueState(DEFAULT_OT_POLICY);
+      }
+      setReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const setValue = useCallback((next) => {
+    setValueState(next);
+    (async () => {
+      const { error } = await supabase.from("ot_policy").upsert({
+        id: 1,
+        rate_normal: next.rateNormal,
+        rate_weekend: next.rateWeekend,
+        rate_holiday: next.rateHoliday,
+        hours_per_day: next.hoursPerDay,
+      });
+      if (error)
+        console.error("[supabase] save failed on ot_policy:", error.message);
+    })();
+  }, []);
+
+  return [value, setValue, ready];
+}
+
+// payroll_policy is a single settings row (id = 1), same shape as
+// DEFAULT_PAYROLL_POLICY. Falls back to the defaults until an admin saves one.
+function usePayrollPolicy() {
+  const [value, setValueState] = useState(DEFAULT_PAYROLL_POLICY);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("payroll_policy")
+        .select("*")
+        .eq("id", 1)
+        .maybeSingle();
+      if (cancelled) return;
+      if (error) {
+        console.error(
+          "[supabase] failed to load payroll_policy:",
+          error.message,
+        );
+        setValueState(DEFAULT_PAYROLL_POLICY);
+      } else if (data) {
+        setValueState({
+          taxRate: data.tax_rate ?? DEFAULT_PAYROLL_POLICY.taxRate,
+          insuranceRate:
+            data.insurance_rate ?? DEFAULT_PAYROLL_POLICY.insuranceRate,
+        });
+      } else {
+        setValueState(DEFAULT_PAYROLL_POLICY);
+      }
+      setReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const setValue = useCallback((next) => {
+    setValueState(next);
+    (async () => {
+      const { error } = await supabase.from("payroll_policy").upsert({
+        id: 1,
+        tax_rate: next.taxRate,
+        insurance_rate: next.insuranceRate,
+      });
+      if (error)
+        console.error(
+          "[supabase] save failed on payroll_policy:",
+          error.message,
+        );
+    })();
+  }, []);
+
+  return [value, setValue, ready];
+}
 function useLocalStorage(key, fallback) {
   const [value, setValueState] = useState(() => {
     try {
@@ -914,23 +1705,57 @@ function Avatar({ name, size = 40, photo }) {
     </div>
   );
 }
-const STATUS_MAP = {
-  active: { bg: T.forestSoft, fg: T.forestText, label: "សកម្ម" },
-  inactive: { bg: T.roseSoft, fg: T.roseDark, label: "អសកម្ម" },
-  present: { bg: T.forestSoft, fg: T.forestText, label: "មកធ្វើការ" },
-  late: { bg: T.goldSoft, fg: T.goldText, label: "មកយឺត" },
-  absent: { bg: T.roseSoft, fg: T.roseDark, label: "អវត្តមាន" },
-  leave: { bg: "#E7ECF6", fg: T.blue, label: "ឈប់សម្រាក" },
-  pending: { bg: T.goldSoft, fg: T.goldText, label: "រង់ចាំបង់" },
-  paid: { bg: T.forestSoft, fg: T.forestText, label: "បង់រួច" },
-  approved: { bg: T.forestSoft, fg: T.forestText, label: "អនុម័តហើយ" },
-  rejected: { bg: T.roseSoft, fg: T.roseDark, label: "បដិសេធ" },
-};
-const LEAVE_TYPE_LABEL = {
-  annual: "ច្បាប់ប្រចាំឆ្នាំ",
-  sick: "ច្បាប់ឈឺ",
-  other: "ផ្សេងៗ",
-};
+function getStatusMap(lang) {
+  const en = lang === "en";
+  return {
+    active: {
+      bg: T.forestSoft,
+      fg: T.forestText,
+      label: en ? "Active" : "សកម្ម",
+    },
+    inactive: {
+      bg: T.roseSoft,
+      fg: T.roseDark,
+      label: en ? "Inactive" : "អសកម្ម",
+    },
+    present: {
+      bg: T.forestSoft,
+      fg: T.forestText,
+      label: en ? "Present" : "មកធ្វើការ",
+    },
+    late: { bg: T.goldSoft, fg: T.goldText, label: en ? "Late" : "មកយឺត" },
+    absent: {
+      bg: T.roseSoft,
+      fg: T.roseDark,
+      label: en ? "Absent" : "អវត្តមាន",
+    },
+    leave: { bg: "#E7ECF6", fg: T.blue, label: en ? "On Leave" : "ឈប់សម្រាក" },
+    pending: {
+      bg: T.goldSoft,
+      fg: T.goldText,
+      label: en ? "Pending" : "រង់ចាំបង់",
+    },
+    paid: { bg: T.forestSoft, fg: T.forestText, label: en ? "Paid" : "បង់រួច" },
+    approved: {
+      bg: T.forestSoft,
+      fg: T.forestText,
+      label: en ? "Approved" : "អនុម័តហើយ",
+    },
+    rejected: {
+      bg: T.roseSoft,
+      fg: T.roseDark,
+      label: en ? "Rejected" : "បដិសេធ",
+    },
+  };
+}
+function getLeaveTypeLabel(lang) {
+  const en = lang === "en";
+  return {
+    annual: en ? "Annual Leave" : "ច្បាប់ប្រចាំឆ្នាំ",
+    sick: en ? "Sick Leave" : "ច្បាប់ឈឺ",
+    other: en ? "Other" : "ផ្សេងៗ",
+  };
+}
 // Returns an array of "YYYY-MM-DD" strings for every day from start to end,
 // inclusive. Used to expand an approved leave request into attendance rows.
 function dateRange(start, end) {
@@ -945,6 +1770,8 @@ function dateRange(start, end) {
   return out;
 }
 function StatusPill({ status }) {
+  const { lang } = useLang();
+  const STATUS_MAP = getStatusMap(lang);
   const s = STATUS_MAP[status] || { bg: "#EEE", fg: "#555", label: status };
   return (
     <span className="wf-badge" style={{ background: s.bg, color: s.fg }}>
@@ -990,6 +1817,70 @@ const NOTIF_TONE = {
   forest: "#2E6F4E",
   blue: "#3E5C8A",
 };
+// notification_reads stores, per user (admin or employee id), which
+// notification ids they've already seen. This used to live in
+// localStorage (so "read" state was per-device); now it's a shared table
+// so marking a notification read syncs across every device/browser that
+// account signs into.
+function useNotificationReadIds(userId) {
+  const [ids, setIdsState] = useState([]);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (!userId) {
+      setIdsState([]);
+      setReady(true);
+      return;
+    }
+    let cancelled = false;
+    setReady(false);
+    (async () => {
+      const { data, error } = await supabase
+        .from("notification_reads")
+        .select("*")
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (cancelled) return;
+      if (error) {
+        console.error(
+          "[supabase] failed to load notification_reads:",
+          error.message,
+        );
+        setIdsState([]);
+      } else if (data) {
+        setIdsState(data.read_ids || []);
+      } else {
+        setIdsState([]);
+      }
+      setReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  const setIds = useCallback(
+    (next) => {
+      setIdsState(next);
+      if (!userId) return;
+      (async () => {
+        const { error } = await supabase.from("notification_reads").upsert({
+          user_id: userId,
+          read_ids: next,
+        });
+        if (error)
+          console.error(
+            "[supabase] save failed on notification_reads:",
+            error.message,
+          );
+      })();
+    },
+    [userId],
+  );
+
+  return [ids, setIds, ready];
+}
+
 function NotificationBell({
   role,
   currentAdmin,
@@ -998,15 +1889,21 @@ function NotificationBell({
   shifts,
   attendance,
   leaveRequests,
+  overtimeRequests,
   setPage,
 }) {
+  const { t, lang } = useLang();
   const [open, setOpen] = useState(false);
   const boxRef = useRef(null);
-  const userId = role === "admin" ? currentAdmin?.id : currentEmp?.id;
-  const [readIds, setReadIds] = useLocalStorage(
-    `hrsuite:notifications:read:${userId || "guest"}`,
-    [],
-  );
+  // Admins share one notification mailbox — same as every other admin
+  // table in this app (leave requests, employees, etc.), so if Admin A
+  // marks something read (or it disappears because the underlying record
+  // was actioned/deleted), Admin B sees the same state on any device.
+  // Employees still get their own mailbox, since their notifications are
+  // personal (their own leave/OT decisions) — but it now syncs across
+  // that employee's own devices too instead of staying on one browser.
+  const userId = role === "admin" ? "admin_shared" : currentEmp?.id;
+  const [readIds, setReadIds] = useNotificationReadIds(userId);
 
   const notifications = useMemo(
     () =>
@@ -1017,8 +1914,18 @@ function NotificationBell({
         shifts,
         attendance,
         leaveRequests,
+        overtimeRequests,
+        lang,
       }),
-    [role, currentEmp, employees, shifts, attendance, leaveRequests],
+    [
+      role,
+      currentEmp,
+      employees,
+      shifts,
+      attendance,
+      leaveRequests,
+      overtimeRequests,
+    ],
   );
   const unread = notifications.filter((n) => !readIds.includes(n.id));
 
@@ -1037,7 +1944,7 @@ function NotificationBell({
     <div ref={boxRef} style={{ position: "relative" }}>
       <button
         onClick={() => setOpen((o) => !o)}
-        aria-label="ការជូនដំណឹង"
+        aria-label={t.notifications}
         style={{
           position: "relative",
           background: "none",
@@ -1098,7 +2005,7 @@ function NotificationBell({
             }}
           >
             <span style={{ fontWeight: 700, fontSize: 13, color: T.ink }}>
-              ការជូនដំណឹង
+              {t.notifications}
             </span>
             {notifications.length > 0 && (
               <button
@@ -1112,7 +2019,7 @@ function NotificationBell({
                   fontWeight: 600,
                 }}
               >
-                កំណត់ថាបានអានទាំងអស់
+                {t.markAllRead}
               </button>
             )}
           </div>
@@ -1125,7 +2032,7 @@ function NotificationBell({
                 fontSize: 12.5,
               }}
             >
-              មិនមានការជូនដំណឹងទេ
+              {t.noNotif}
             </div>
           ) : (
             notifications.map((n) => {
@@ -1251,17 +2158,18 @@ function Select(props) {
   return <select className="wf-input" {...props} />;
 }
 function ConfirmDialog({ text, onCancel, onConfirm }) {
+  const { t } = useLang();
   return (
-    <Modal title="បញ្ជាក់ការលុប" onClose={onCancel} width={380}>
+    <Modal title={t.confirmDelete} onClose={onCancel} width={380}>
       <p style={{ fontSize: 14, color: T.textSoft, marginBottom: 20 }}>
         {text}
       </p>
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
         <Button variant="ghost" onClick={onCancel}>
-          បោះបង់
+          {t.cancel}
         </Button>
         <Button variant="danger-solid" onClick={onConfirm}>
-          <Trash2 size={14} /> លុប
+          <Trash2 size={14} /> {t.delete}
         </Button>
       </div>
     </Modal>
@@ -1338,7 +2246,7 @@ const LOGIN_CSS = `
 }
 .wf-login-btn-emp:hover { box-shadow:0 6px 24px rgba(46,111,78,0.45); filter:brightness(1.06); }
 .wf-login-btn-adm {
-  background:linear-gradient(135deg,${T.ink} 0%,${T.inkDark} 100%);
+  background:linear-gradient(135deg,${BRAND.ink} 0%,${BRAND.inkDark} 100%);
   color:#fff;
   box-shadow:0 4px 16px rgba(18,32,61,0.35);
 }
@@ -1390,6 +2298,8 @@ function LoginField({ label, children }) {
 function EmployeeLoginScreen({ employees, onLogin, go }) {
   useLoginStyle();
   const { t } = useLang();
+  const { branding } = useBranding();
+  const displayName = branding.name?.trim() || t.appName;
   const L = t.login;
   const [code, setCode] = useState("");
   const [pin, setPin] = useState("");
@@ -1438,7 +2348,22 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
             marginBottom: 28,
           }}
         >
-          <div className="wf-login-logo-ring">WS</div>
+          <div className="wf-login-logo-ring">
+            {branding.logo ? (
+              <img
+                src={branding.logo}
+                alt={displayName}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  borderRadius: "inherit",
+                }}
+              />
+            ) : (
+              getInitials(displayName)
+            )}
+          </div>
           <div
             style={{
               marginTop: 14,
@@ -1448,7 +2373,7 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
               color: T.ink,
             }}
           >
-            {t.appName}
+            {displayName}
           </div>
           <div style={{ fontSize: 13, color: T.muted, marginTop: 4 }}>
             {L.employeePortal}
@@ -1502,42 +2427,6 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
             {loading ? "..." : L.submit}
           </button>
         </form>
-        <div className="wf-login-divider">
-          <span style={{ fontSize: 11.5, color: T.mutedLight }}>
-            {L.switchToAdmin}
-          </span>
-        </div>
-        <button
-          onClick={() => go("admin")}
-          style={{
-            width: "100%",
-            padding: "10px",
-            borderRadius: 12,
-            border: `1.5px solid ${T.line}`,
-            background: "transparent",
-            color: T.ink,
-            fontSize: 13,
-            fontWeight: 600,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 7,
-            transition: "background .15s",
-          }}
-          onMouseOver={(e) => (e.currentTarget.style.background = T.paper)}
-          onMouseOut={(e) => (e.currentTarget.style.background = "transparent")}
-        >
-          <ShieldCheck size={15} color={T.muted} /> {L.adminTitle}
-        </button>
-        <div className="wf-login-demo">
-          <b style={{ color: T.textSoft }}>{L.demoLabel}</b>
-          <br />
-          {employees
-            .slice(0, 3)
-            .map((e) => `${e.code} / ${e.pin}`)
-            .join("  ·  ")}
-        </div>
       </div>
     </div>
   );
@@ -1546,6 +2435,8 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
 function AdminLoginScreen({ admins, onLogin, go }) {
   useLoginStyle();
   const { t } = useLang();
+  const { branding } = useBranding();
+  const displayName = branding.name?.trim() || t.appName;
   const L = t.login;
   const [username, setUsername] = useState("");
   const [adminPass, setAdminPass] = useState("");
@@ -1612,14 +2503,26 @@ function AdminLoginScreen({ admins, onLogin, go }) {
               width: 64,
               height: 64,
               borderRadius: 20,
-              background: "linear-gradient(145deg,#5C4B9E,#3D3070)",
+              background: branding.logo
+                ? "#fff"
+                : "linear-gradient(145deg,#5C4B9E,#3D3070)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               boxShadow: "0 4px 20px rgba(92,75,158,0.4)",
+              overflow: "hidden",
+              border: branding.logo ? `1px solid ${T.line}` : "none",
             }}
           >
-            <ShieldCheck size={28} color="#fff" />
+            {branding.logo ? (
+              <img
+                src={branding.logo}
+                alt={displayName}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            ) : (
+              <ShieldCheck size={28} color="#fff" />
+            )}
           </div>
           <div
             style={{
@@ -1633,7 +2536,7 @@ function AdminLoginScreen({ admins, onLogin, go }) {
             {L.adminTitle}
           </div>
           <div style={{ fontSize: 13, color: T.muted, marginTop: 4 }}>
-            {t.appName}
+            {displayName}
           </div>
         </div>
         <form onSubmit={submit}>
@@ -1682,11 +2585,6 @@ function AdminLoginScreen({ admins, onLogin, go }) {
             {loading ? "..." : L.adminSubmit}
           </button>
         </form>
-        <div className="wf-login-demo">
-          <b style={{ color: T.textSoft }}>{L.demoLabel}</b>
-          <br />
-          {admins.map((a) => `${a.username} / ${a.password}`).join("  ·  ")}
-        </div>
       </div>
     </div>
   );
@@ -1704,9 +2602,10 @@ function employeePortalUrl() {
   return `${origin}${pathname}#/employee`;
 }
 function QrModal({ url, onClose }) {
+  const { t: t2 } = useLang();
   const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(url)}`;
   return (
-    <Modal title="QR Code សម្រាប់បុគ្គលិក" onClose={onClose} width={340}>
+    <Modal title={t2.qr.title} onClose={onClose} width={340}>
       <div
         style={{
           display: "flex",
@@ -1731,13 +2630,14 @@ function QrModal({ url, onClose }) {
           />
         </div>
         <p style={{ fontSize: 12, color: T.muted, textAlign: "center" }}>
-          ស្កេនដើម្បីបើកទំព័រចូលប្រើសម្រាប់បុគ្គលិកដោយផ្ទាល់
+          {t2.qr.desc}
         </p>
       </div>
     </Modal>
   );
 }
 function EmployeeLinkCard() {
+  const { t } = useLang();
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState(false);
   const url = employeePortalUrl();
@@ -1783,7 +2683,7 @@ function EmployeeLinkCard() {
         </div>
         <div style={{ minWidth: 0 }}>
           <div style={{ fontSize: 12, color: T.muted }}>
-            តំណភ្ជាប់សម្រាប់បុគ្គលិក
+            {t.dash.empPortalLink}
           </div>
           <div
             style={{
@@ -1802,11 +2702,11 @@ function EmployeeLinkCard() {
       </div>
       <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
         <Button variant="ghost" onClick={() => setShowQr(true)}>
-          <QrCode size={14} /> បង្ហាញ QR Code
+          <QrCode size={14} /> {t.dash.showQR}
         </Button>
         <Button variant="accent" onClick={copyLink}>
           {copied ? <CheckCircle2 size={14} /> : <Copy size={14} />}{" "}
-          {copied ? "បានចម្លង!" : "ចម្លងតំណ"}
+          {copied ? t.dash.copied : t.dash.copyLink}
         </Button>
       </div>
       {showQr && <QrModal url={url} onClose={() => setShowQr(false)} />}
@@ -1821,7 +2721,9 @@ function Dashboard({
   payrollPaid,
   role,
   currentEmp,
+  shifts,
 }) {
+  const { t, lang } = useLang();
   const today = todayStr();
   const activeEmployees = employees.filter((e) => e.status === "active");
   const presentToday = attendance.filter((a) => a.date === today).length;
@@ -1833,38 +2735,87 @@ function Dashboard({
   const rate = activeEmployees.length
     ? Math.round((presentToday / activeEmployees.length) * 100)
     : 0;
-  const stats = [
-    {
-      label: "បុគ្គលិកសរុប",
-      value: employees.length,
-      sub: `${activeEmployees.length} សកម្ម`,
-      icon: Users,
-      accent: T.forest,
-    },
-    {
-      label: "នាយកដ្ឋាន",
-      value: departments.length,
-      sub: "នាយកដ្ឋានសរុប",
-      icon: Building2,
-      accent: T.blue,
-    },
-    {
-      label: "មកធ្វើការថ្ងៃនេះ",
-      value: presentToday,
-      sub: `${rate}% អត្រាមកធ្វើការ`,
-      icon: Clock,
-      accent: T.gold,
-    },
-    {
-      label: "រង់ចាំបើកប្រាក់ខែ",
-      value: pendingPayroll,
-      sub: "ខែនេះ",
-      icon: Wallet,
-      accent: T.rose,
-    },
-  ];
+
+  // Employees only ever see their own data on the dashboard — never
+  // company-wide totals, which are admin/manager-only.
+  const myDept = departments.find((d) => d.id === currentEmp?.deptId);
+  const myShift = shifts?.find((s) => s.id === currentEmp?.shiftId);
+  const myTodayRecord = attendance.find(
+    (a) => a.date === today && a.employeeId === currentEmp?.id,
+  );
+  const STATUS_MAP = getStatusMap(lang);
+  const myStatusLabel = myTodayRecord
+    ? STATUS_MAP[myTodayRecord.status]?.label || myTodayRecord.status
+    : t.dash.notCheckedIn;
+  const myPayrollPaid = !!payrollPaid[`${currentEmp?.id}-${mk}`];
+
+  const stats =
+    role === "admin"
+      ? [
+          {
+            label: t.dash.totalEmp,
+            value: employees.length,
+            sub: `${activeEmployees.length} ${t.dash.active}`,
+            icon: Users,
+            accent: T.forest,
+          },
+          {
+            label: t.nav.departments,
+            value: departments.length,
+            sub: t.dash.totalDeptSub,
+            icon: Building2,
+            accent: T.blue,
+          },
+          {
+            label: t.dash.presentToday,
+            value: presentToday,
+            sub: `${rate}% ${t.dash.attendRate}`,
+            icon: Clock,
+            accent: T.gold,
+          },
+          {
+            label: t.dash.pendingPayroll,
+            value: pendingPayroll,
+            sub: t.dash.thisMonth,
+            icon: Wallet,
+            accent: T.rose,
+          },
+        ]
+      : [
+          {
+            label: t.dash.myDept,
+            value: myDept?.name || "—",
+            sub: "",
+            icon: Building2,
+            accent: T.blue,
+          },
+          {
+            label: t.dash.myShift,
+            value: myShift?.name || "—",
+            sub: myShift ? `${myShift.start}–${myShift.end}` : "",
+            icon: Clock,
+            accent: T.gold,
+          },
+          {
+            label: t.dash.todayStatus,
+            value: myStatusLabel,
+            sub: "",
+            icon: CheckCircle2,
+            accent: T.forest,
+          },
+          {
+            label: t.dash.payrollStatus,
+            value: myPayrollPaid
+              ? STATUS_MAP.paid.label
+              : STATUS_MAP.pending.label,
+            sub: t.dash.thisMonth,
+            icon: Wallet,
+            accent: T.rose,
+          },
+        ];
   const recent = [...attendance]
     .filter((a) => a.date === today)
+    .filter((a) => role === "admin" || a.employeeId === currentEmp?.id)
     .slice(-5)
     .reverse();
 
@@ -1874,13 +2825,13 @@ function Dashboard({
         style={{
           padding: 20,
           marginBottom: 22,
-          background: T.ink,
+          background: BRAND.ink,
           color: "#fff",
           position: "relative",
           overflow: "hidden",
         }}
       >
-        <p style={{ color: "#A9B4C7", fontSize: 13 }}>សូមអញ្ជើញ</p>
+        <p style={{ color: "#A9B4C7", fontSize: 13 }}>{t.dash.welcome}</p>
         <h2
           style={{
             fontFamily: "'Space Grotesk',sans-serif",
@@ -1889,7 +2840,7 @@ function Dashboard({
             marginTop: 2,
           }}
         >
-          {role === "admin" ? "អ្នកគ្រប់គ្រងប្រព័ន្ធ" : currentEmp?.name}
+          {role === "admin" ? t.nav.admins : currentEmp?.name}
         </h2>
         <p
           style={{
@@ -1899,7 +2850,7 @@ function Dashboard({
             fontFamily: "'JetBrains Mono',monospace",
           }}
         >
-          {new Date().toLocaleDateString("km-KH", {
+          {new Date().toLocaleDateString(lang === "en" ? "en-US" : "km-KH", {
             weekday: "long",
             year: "numeric",
             month: "long",
@@ -1970,7 +2921,7 @@ function Dashboard({
             fontSize: 14,
           }}
         >
-          ការចូលធ្វើការថ្ងៃនេះ
+          {t.dash.recentAttend}
         </h3>
         {recent.length === 0 ? (
           <p
@@ -1981,12 +2932,15 @@ function Dashboard({
               padding: "28px 0",
             }}
           >
-            មិនទាន់មានការចុះឈ្មោះចូលធ្វើការថ្ងៃនេះទេ
+            {t.dash.noAttend}
           </p>
         ) : (
           <div>
             {recent.map((a) => {
               const emp = employees.find((e) => e.id === a.employeeId);
+              const shift = shifts?.find((s) => s.id === emp?.shiftId);
+              const lateMins =
+                a.status === "late" ? lateMinutesForShift(a.checkIn, shift) : 0;
               return (
                 <div
                   key={a.id}
@@ -1995,7 +2949,7 @@ function Dashboard({
                     alignItems: "center",
                     gap: 12,
                     padding: "10px 0",
-                    borderTop: `1px solid #F0EDE2`,
+                    borderTop: `1px solid ${T.divider}`,
                   }}
                 >
                   <Avatar
@@ -2019,6 +2973,17 @@ function Dashboard({
                       ចូល {a.checkIn || "—"}{" "}
                       {a.checkOut ? `· ចេញ ${a.checkOut}` : ""}
                     </div>
+                    {lateMins > 0 && (
+                      <div
+                        style={{
+                          fontSize: 11,
+                          color: T.goldText,
+                          marginTop: 2,
+                        }}
+                      >
+                        {formatLateDuration(lateMins, lang)}
+                      </div>
+                    )}
                   </div>
                   <StatusPill status={a.status} />
                 </div>
@@ -2035,6 +3000,7 @@ function Dashboard({
    Employees
 ----------------------------------------------------------------*/
 function EmployeeForm({ initial, departments, shifts, onSave, onCancel }) {
+  const { t, lang } = useLang();
   const [f, setF] = useState(
     initial || {
       code: "",
@@ -2053,7 +3019,7 @@ function EmployeeForm({ initial, departments, shifts, onSave, onCancel }) {
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   return (
     <div>
-      <Field label="ឈ្មោះពេញ">
+      <Field label={t.emps.name}>
         <Input
           value={f.name}
           onChange={set("name")}
@@ -2061,10 +3027,10 @@ function EmployeeForm({ initial, departments, shifts, onSave, onCancel }) {
         />
       </Field>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <Field label="លេខសម្គាល់ (ប្រើសម្រាប់ Login)">
+        <Field label={t.emps.code}>
           <Input value={f.code} onChange={set("code")} placeholder="EMP-004" />
         </Field>
-        <Field label="តួនាទី">
+        <Field label={t.emps.role}>
           <Input
             value={f.role}
             onChange={set("role")}
@@ -2143,6 +3109,13 @@ function EmployeeForm({ initial, departments, shifts, onSave, onCancel }) {
           </Select>
         </Field>
       </div>
+      <Field label={t.emps.joined}>
+        <Input
+          type="date"
+          value={f.joined || todayStr()}
+          onChange={set("joined")}
+        />
+      </Field>
       <div
         style={{
           display: "flex",
@@ -2154,14 +3127,14 @@ function EmployeeForm({ initial, departments, shifts, onSave, onCancel }) {
         }}
       >
         <Button variant="ghost" onClick={onCancel}>
-          បោះបង់
+          {t.cancel}
         </Button>
         <Button
           variant="accent"
           onClick={() => onSave(f)}
           disabled={!f.name || !f.code || !f.pin}
         >
-          រក្សាទុក
+          {t.save}
         </Button>
       </div>
     </div>
@@ -2175,6 +3148,7 @@ function Employees({
   setEmployees,
   isSuperAdmin,
 }) {
+  const { t, lang } = useLang();
   const [modal, setModal] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
   const [query, setQuery] = useState("");
@@ -2237,7 +3211,7 @@ function Employees({
           />
         </div>
         <Button variant="accent" onClick={() => setModal({ mode: "add" })}>
-          <Plus size={15} /> បន្ថែមបុគ្គលិក
+          <Plus size={15} /> {t.emps.addBtn}
         </Button>
       </div>
 
@@ -2324,7 +3298,7 @@ function Employees({
                 display: "flex",
                 gap: 8,
                 paddingTop: 10,
-                borderTop: `1px solid #F0EDE2`,
+                borderTop: `1px solid ${T.divider}`,
               }}
             >
               <Button
@@ -2333,7 +3307,7 @@ function Employees({
                 style={{ flex: 1, justifyContent: "center" }}
                 onClick={() => setModal({ mode: "edit", data: e })}
               >
-                <Pencil size={13} /> កែសម្រួល
+                <Pencil size={13} /> {t.edit}
               </Button>
               {isSuperAdmin && (
                 <Button
@@ -2342,7 +3316,7 @@ function Employees({
                   style={{ flex: 1, justifyContent: "center" }}
                   onClick={() => setConfirmDel(e)}
                 >
-                  <Trash2 size={13} /> លុប
+                  <Trash2 size={13} /> {t.delete}
                 </Button>
               )}
             </div>
@@ -2365,11 +3339,7 @@ function Employees({
 
       {modal && (
         <Modal
-          title={
-            modal.mode === "add"
-              ? "បន្ថែមបុគ្គលិកថ្មី"
-              : "កែសម្រួលព័ត៌មានបុគ្គលិក"
-          }
+          title={modal.mode === "add" ? t.emps.addTitle : t.emps.editTitle}
           onClose={() => setModal(null)}
         >
           <EmployeeForm
@@ -2399,6 +3369,7 @@ function Employees({
    Departments
 ----------------------------------------------------------------*/
 function DeptForm({ initial, onSave, onCancel }) {
+  const { t, lang } = useLang();
   const [f, setF] = useState(initial || { name: "", code: "", desc: "" });
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   return (
@@ -2432,10 +3403,10 @@ function DeptForm({ initial, onSave, onCancel }) {
         }}
       >
         <Button variant="ghost" onClick={onCancel}>
-          បោះបង់
+          {t.cancel}
         </Button>
         <Button variant="accent" onClick={() => onSave(f)} disabled={!f.name}>
-          រក្សាទុក
+          {t.save}
         </Button>
       </div>
     </div>
@@ -2443,6 +3414,7 @@ function DeptForm({ initial, onSave, onCancel }) {
 }
 
 function Departments({ departments, setDepartments, employees, isSuperAdmin }) {
+  const { t, lang } = useLang();
   const [modal, setModal] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
   const countIn = (id) => employees.filter((e) => e.deptId === id).length;
@@ -2462,7 +3434,7 @@ function Departments({ departments, setDepartments, employees, isSuperAdmin }) {
         }}
       >
         <Button variant="accent" onClick={() => setModal({ mode: "add" })}>
-          <Plus size={15} /> បន្ថែមនាយកដ្ឋាន
+          <Plus size={15} /> {t.depts.addBtn}
         </Button>
       </div>
       <div
@@ -2517,7 +3489,7 @@ function Departments({ departments, setDepartments, employees, isSuperAdmin }) {
                   borderRadius: 8,
                 }}
               >
-                {countIn(d.id)} នាក់
+                {countIn(d.id)} {t.depts.staffCount}
               </span>
             </div>
             <p style={{ fontSize: 12, color: T.muted, marginTop: 12 }}>
@@ -2529,7 +3501,7 @@ function Departments({ departments, setDepartments, employees, isSuperAdmin }) {
                 gap: 8,
                 paddingTop: 12,
                 marginTop: 12,
-                borderTop: "1px solid #F0EDE2",
+                borderTop: `1px solid ${T.divider}`,
               }}
             >
               <Button
@@ -2538,7 +3510,7 @@ function Departments({ departments, setDepartments, employees, isSuperAdmin }) {
                 style={{ flex: 1, justifyContent: "center" }}
                 onClick={() => setModal({ mode: "edit", data: d })}
               >
-                <Pencil size={13} /> កែសម្រួល
+                <Pencil size={13} /> {t.edit}
               </Button>
               {isSuperAdmin && (
                 <Button
@@ -2547,7 +3519,7 @@ function Departments({ departments, setDepartments, employees, isSuperAdmin }) {
                   style={{ flex: 1, justifyContent: "center" }}
                   onClick={() => setConfirmDel(d)}
                 >
-                  <Trash2 size={13} /> លុប
+                  <Trash2 size={13} /> {t.delete}
                 </Button>
               )}
             </div>
@@ -2556,9 +3528,7 @@ function Departments({ departments, setDepartments, employees, isSuperAdmin }) {
       </div>
       {modal && (
         <Modal
-          title={
-            modal.mode === "add" ? "បន្ថែមនាយកដ្ឋានថ្មី" : "កែសម្រួលនាយកដ្ឋាន"
-          }
+          title={modal.mode === "add" ? t.depts.addTitle : t.depts.editTitle}
           onClose={() => setModal(null)}
         >
           <DeptForm
@@ -2586,6 +3556,7 @@ function Departments({ departments, setDepartments, employees, isSuperAdmin }) {
    Shifts (admin-configurable work shifts, e.g. morning/afternoon/night)
 ----------------------------------------------------------------*/
 function ShiftForm({ initial, onSave, onCancel }) {
+  const { t, lang } = useLang();
   const [f, setF] = useState(
     initial || { name: "", start: "06:00", end: "14:00" },
   );
@@ -2630,14 +3601,14 @@ function ShiftForm({ initial, onSave, onCancel }) {
         }}
       >
         <Button variant="ghost" onClick={onCancel}>
-          បោះបង់
+          {t.cancel}
         </Button>
         <Button
           variant="accent"
           onClick={() => onSave(f)}
           disabled={!f.name || !f.start || !f.end}
         >
-          រក្សាទុក
+          {t.save}
         </Button>
       </div>
     </div>
@@ -2645,6 +3616,7 @@ function ShiftForm({ initial, onSave, onCancel }) {
 }
 
 function Shifts({ shifts, setShifts, employees, isSuperAdmin }) {
+  const { t, lang } = useLang();
   const [modal, setModal] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
   const countIn = (id) => employees.filter((e) => e.shiftId === id).length;
@@ -2663,7 +3635,7 @@ function Shifts({ shifts, setShifts, employees, isSuperAdmin }) {
         }}
       >
         <Button variant="accent" onClick={() => setModal({ mode: "add" })}>
-          <Plus size={15} /> បន្ថែមវេន
+          <Plus size={15} /> {t.sh.addBtn}
         </Button>
       </div>
       <div
@@ -2704,7 +3676,7 @@ function Shifts({ shifts, setShifts, employees, isSuperAdmin }) {
                       fontFamily: "'JetBrains Mono',monospace",
                     }}
                   >
-                    {s.start} – {s.end}
+                    {hhmm(s.start)} – {hhmm(s.end)}
                     {isOvernightShift(s) ? " (ឆ្លងអធ្រាត្រ)" : ""}
                   </div>
                 </div>
@@ -2719,7 +3691,7 @@ function Shifts({ shifts, setShifts, employees, isSuperAdmin }) {
                   borderRadius: 8,
                 }}
               >
-                {countIn(s.id)} នាក់
+                {countIn(s.id)} {t.depts.staffCount}
               </span>
             </div>
             <div
@@ -2728,7 +3700,7 @@ function Shifts({ shifts, setShifts, employees, isSuperAdmin }) {
                 gap: 8,
                 paddingTop: 12,
                 marginTop: 12,
-                borderTop: "1px solid #F0EDE2",
+                borderTop: `1px solid ${T.divider}`,
               }}
             >
               <Button
@@ -2737,7 +3709,7 @@ function Shifts({ shifts, setShifts, employees, isSuperAdmin }) {
                 style={{ flex: 1, justifyContent: "center" }}
                 onClick={() => setModal({ mode: "edit", data: s })}
               >
-                <Pencil size={13} /> កែសម្រួល
+                <Pencil size={13} /> {t.edit}
               </Button>
               {isSuperAdmin && (
                 <Button
@@ -2746,7 +3718,7 @@ function Shifts({ shifts, setShifts, employees, isSuperAdmin }) {
                   style={{ flex: 1, justifyContent: "center" }}
                   onClick={() => setConfirmDel(s)}
                 >
-                  <Trash2 size={13} /> លុប
+                  <Trash2 size={13} /> {t.delete}
                 </Button>
               )}
             </div>
@@ -2783,6 +3755,7 @@ function Shifts({ shifts, setShifts, employees, isSuperAdmin }) {
    Attendance
 ----------------------------------------------------------------*/
 function SelfPunch({ emp, shift, attendance, setAttendance, officeLocation }) {
+  const { t, lang } = useLang();
   const today = todayStr();
   const rec = attendance.find(
     (a) => a.employeeId === emp.id && a.date === today,
@@ -2944,7 +3917,7 @@ function SelfPunch({ emp, shift, attendance, setAttendance, officeLocation }) {
           ) : (
             <LogIn size={18} />
           )}{" "}
-          ចុចចូលធ្វើការ
+          {t.att.checkIn}
         </Button>
       )}
       {rec && !rec.checkOut && (
@@ -2957,7 +3930,7 @@ function SelfPunch({ emp, shift, attendance, setAttendance, officeLocation }) {
               fontFamily: "'JetBrains Mono',monospace",
             }}
           >
-            ចូលធ្វើការម៉ោង {rec.checkIn} · <StatusPill status={rec.status} />
+            {t.att.checkIn} {rec.checkIn} · <StatusPill status={rec.status} />
           </p>
           <Button
             variant="danger-solid"
@@ -2990,7 +3963,8 @@ function SelfPunch({ emp, shift, attendance, setAttendance, officeLocation }) {
             color={T.forest}
             style={{ margin: "0 auto 8px" }}
           />
-          ថ្ងៃនេះបានបញ្ចប់ការងារ · ចូល {rec.checkIn} · ចេញ {rec.checkOut}
+          {t.att.checkOut} · {t.att.checkIn} {rec.checkIn} · {t.att.checkOut}{" "}
+          {rec.checkOut}
         </div>
       )}
     </Card>
@@ -3003,6 +3977,7 @@ function SelfPunch({ emp, shift, attendance, setAttendance, officeLocation }) {
    or out from the self-service clock.
 ----------------------------------------------------------------*/
 function OfficeLocationSettings({ officeLocation, setOfficeLocation }) {
+  const { t, lang } = useLang();
   const [open, setOpen] = useState(false);
   const [f, setF] = useState(
     officeLocation || { lat: "", lng: "", radius: 150 },
@@ -3150,7 +4125,7 @@ function OfficeLocationSettings({ officeLocation, setOfficeLocation }) {
               )}
             </div>
             <Button variant="accent" size="sm" onClick={save}>
-              រក្សាទុក
+              {t.save}
             </Button>
           </div>
         </div>
@@ -3160,6 +4135,7 @@ function OfficeLocationSettings({ officeLocation, setOfficeLocation }) {
 }
 
 function ManualAttendanceForm({ employees, onSave, onCancel }) {
+  const { t, lang } = useLang();
   const [f, setF] = useState({
     employeeId: employees[0]?.id || "",
     date: todayStr(),
@@ -3225,14 +4201,14 @@ function ManualAttendanceForm({ employees, onSave, onCancel }) {
         }}
       >
         <Button variant="ghost" onClick={onCancel}>
-          បោះបង់
+          {t.cancel}
         </Button>
         <Button
           variant="accent"
           onClick={() => onSave(f)}
           disabled={!f.employeeId}
         >
-          រក្សាទុក
+          {t.save}
         </Button>
       </div>
     </div>
@@ -3250,6 +4226,7 @@ function Attendance({
   officeLocation,
   setOfficeLocation,
 }) {
+  const { t, lang } = useLang();
   const [date, setDate] = useState(todayStr());
   const [modal, setModal] = useState(false);
   const [confirmDel, setConfirmDel] = useState(null);
@@ -3304,7 +4281,7 @@ function Attendance({
               fontSize: 14,
             }}
           >
-            ប្រវត្តិវត្តមានរបស់ខ្ញុំ
+            {t.nav.myAttendance}
           </h3>
           <div style={{ overflowX: "auto" }}>
             <table className="wf-table">
@@ -3313,7 +4290,7 @@ function Attendance({
                   <th>កាលបរិច្ឆេទ</th>
                   <th>ចូល</th>
                   <th>ចេញ</th>
-                  <th>ស្ថានភាព</th>
+                  <th>{t.status}</th>
                 </tr>
               </thead>
               <tbody>
@@ -3392,7 +4369,7 @@ function Attendance({
               <th>វេន</th>
               <th>ចូល</th>
               <th>ចេញ</th>
-              <th>ស្ថានភាព</th>
+              <th>{t.status}</th>
               <th></th>
             </tr>
           </thead>
@@ -3493,6 +4470,7 @@ function Attendance({
    Leave requests
 ----------------------------------------------------------------*/
 function LeaveRequestForm({ onSave, onCancel }) {
+  const { t, lang } = useLang();
   const [f, setF] = useState({
     type: "annual",
     startDate: todayStr(),
@@ -3527,7 +4505,7 @@ function LeaveRequestForm({ onSave, onCancel }) {
             marginBottom: 12,
           }}
         >
-          ថ្ងៃបញ្ចប់ត្រូវតែក្រោយថ្ងៃចាប់ផ្តើម
+          {t.lv.endDate + " " + t.lv.startDate}
         </p>
       )}
       <Field label="មូលហេតុ">
@@ -3551,7 +4529,7 @@ function LeaveRequestForm({ onSave, onCancel }) {
         }}
       >
         <Button variant="ghost" onClick={onCancel}>
-          បោះបង់
+          {t.cancel}
         </Button>
         <Button
           variant="accent"
@@ -3575,6 +4553,7 @@ function LeaveRequests({
   setAttendance,
   isSuperAdmin,
 }) {
+  const { t, lang } = useLang();
   const [modal, setModal] = useState(false);
   const [confirmDel, setConfirmDel] = useState(null);
   const empOf = (id) => employees.find((e) => e.id === id);
@@ -3655,18 +4634,18 @@ function LeaveRequests({
           }}
         >
           <Button variant="accent" onClick={() => setModal(true)}>
-            <Plus size={15} /> ស្នើសុំច្បាប់ឈប់សម្រាក
+            <Plus size={15} /> {t.lv.addBtn}
           </Button>
         </div>
         <Card style={{ overflowX: "auto" }}>
           <table className="wf-table">
             <thead>
               <tr>
-                <th>ប្រភេទ</th>
+                <th>{t.lv.type}</th>
                 <th>ចាប់ពី</th>
                 <th>ដល់</th>
-                <th>មូលហេតុ</th>
-                <th>ស្ថានភាព</th>
+                <th>{t.lv.reason}</th>
+                <th>{t.status}</th>
               </tr>
             </thead>
             <tbody>
@@ -3686,7 +4665,7 @@ function LeaveRequests({
               )}
               {mine.map((r) => (
                 <tr key={r.id}>
-                  <td>{LEAVE_TYPE_LABEL[r.type] || r.type}</td>
+                  <td>{getLeaveTypeLabel(lang)[r.type] || r.type}</td>
                   <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
                     {r.startDate}
                   </td>
@@ -3729,11 +4708,11 @@ function LeaveRequests({
           <thead>
             <tr>
               <th>បុគ្គលិក</th>
-              <th>ប្រភេទ</th>
+              <th>{t.lv.type}</th>
               <th>ចាប់ពី</th>
               <th>ដល់</th>
-              <th>មូលហេតុ</th>
-              <th>ស្ថានភាព</th>
+              <th>{t.lv.reason}</th>
+              <th>{t.status}</th>
               <th></th>
             </tr>
           </thead>
@@ -3787,7 +4766,7 @@ function LeaveRequests({
                       </div>
                     </div>
                   </td>
-                  <td>{LEAVE_TYPE_LABEL[r.type] || r.type}</td>
+                  <td>{getLeaveTypeLabel(lang)[r.type] || r.type}</td>
                   <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
                     {r.startDate}
                   </td>
@@ -3816,14 +4795,14 @@ function LeaveRequests({
                           variant="accent"
                           onClick={() => decide(r, "approved")}
                         >
-                          អនុម័ត
+                          {t.lv.approve}
                         </Button>
                         <Button
                           size="sm"
                           variant="danger"
                           onClick={() => decide(r, "rejected")}
                         >
-                          បដិសេធ
+                          {t.lv.reject}
                         </Button>
                       </div>
                     ) : (
@@ -3865,11 +4844,684 @@ function LeaveRequests({
 }
 
 /* ---------------------------------------------------------------
+   Overtime (OT) requests
+   Employees request OT ahead of time (date, hours, day type, reason).
+   Admins approve or reject — both decisions record who decided (name +
+   role) and stay visible to the employee. Rejections require a reason.
+   Approved requests feed OT pay into Payroll via computePayroll.
+----------------------------------------------------------------*/
+function OvertimeRequestForm({ onSave, onCancel }) {
+  const { t } = useLang();
+  const [f, setF] = useState({
+    date: todayStr(),
+    hours: "",
+    dayType: suggestDayType(todayStr()),
+    reason: "",
+  });
+  const set = (k) => (e) => {
+    const val = e.target.value;
+    if (k === "date") {
+      setF({ ...f, date: val, dayType: suggestDayType(val) });
+    } else {
+      setF({ ...f, [k]: val });
+    }
+  };
+  const hoursNum = Number(f.hours);
+  const invalid = !f.date || !hoursNum || hoursNum <= 0 || hoursNum > 16;
+  return (
+    <div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <Field label={t.ot.date}>
+          <Input type="date" value={f.date} onChange={set("date")} />
+        </Field>
+        <Field label={t.ot.hours}>
+          <Input
+            type="number"
+            min="0.5"
+            max="16"
+            step="0.5"
+            value={f.hours}
+            onChange={set("hours")}
+            placeholder="2"
+          />
+        </Field>
+      </div>
+      <Field label={t.ot.dayType}>
+        <Select value={f.dayType} onChange={set("dayType")}>
+          <option value="normal">{t.ot.dtNormal}</option>
+          <option value="weekend">{t.ot.dtWeekend}</option>
+          <option value="holiday">{t.ot.dtHoliday}</option>
+        </Select>
+      </Field>
+      <Field label={t.ot.reason}>
+        <textarea
+          className="wf-input"
+          rows={3}
+          style={{ resize: "vertical", fontFamily: "inherit" }}
+          value={f.reason}
+          onChange={set("reason")}
+          placeholder={t.ot.reasonPlaceholder}
+        />
+      </Field>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          marginTop: 16,
+          paddingTop: 14,
+          borderTop: `1px solid ${T.lineSoft}`,
+        }}
+      >
+        <Button variant="ghost" onClick={onCancel}>
+          {t.cancel}
+        </Button>
+        <Button
+          variant="accent"
+          onClick={() => onSave({ ...f, hours: hoursNum })}
+          disabled={invalid}
+        >
+          {t.ot.submit}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function OvertimeRejectModal({ onCancel, onConfirm }) {
+  const { t } = useLang();
+  const [reason, setReason] = useState("");
+  const trimmed = reason.trim();
+  return (
+    <Modal title={t.ot.rejectTitle} onClose={onCancel} width={420}>
+      <Field label={t.ot.rejectReason}>
+        <textarea
+          className="wf-input"
+          rows={3}
+          style={{ resize: "vertical", fontFamily: "inherit" }}
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          placeholder={t.ot.rejectReasonPlaceholder}
+        />
+      </Field>
+      {reason !== "" && !trimmed && (
+        <p
+          style={{
+            fontSize: 12.5,
+            color: T.rose,
+            marginTop: -8,
+            marginBottom: 12,
+          }}
+        >
+          {t.ot.rejectReasonRequired}
+        </p>
+      )}
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+        <Button variant="ghost" onClick={onCancel}>
+          {t.cancel}
+        </Button>
+        <Button
+          variant="danger-solid"
+          disabled={!trimmed}
+          onClick={() => onConfirm(trimmed)}
+        >
+          {t.ot.reject}
+        </Button>
+      </div>
+    </Modal>
+  );
+}
+
+function OvertimePolicySettings({ otPolicy, setOtPolicy }) {
+  const { t } = useLang();
+  const [open, setOpen] = useState(false);
+  const [f, setF] = useState(otPolicy);
+  useEffect(() => setF(otPolicy), [otPolicy]);
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const save = () => {
+    setOtPolicy({
+      rateNormal: Number(f.rateNormal) || DEFAULT_OT_POLICY.rateNormal,
+      rateWeekend: Number(f.rateWeekend) || DEFAULT_OT_POLICY.rateWeekend,
+      rateHoliday: Number(f.rateHoliday) || DEFAULT_OT_POLICY.rateHoliday,
+      hoursPerDay: Number(f.hoursPerDay) || DEFAULT_OT_POLICY.hoursPerDay,
+    });
+    setOpen(false);
+  };
+  return (
+    <Card style={{ padding: 16, marginBottom: 16 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          cursor: "pointer",
+        }}
+        onClick={() => setOpen(!open)}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Timer size={16} color={T.forest} />
+          <span style={{ fontWeight: 600, fontSize: 13.5, color: T.ink }}>
+            {t.ot.policyTitle}
+          </span>
+        </div>
+        <span
+          style={{
+            fontSize: 11.5,
+            color: T.textSoft,
+            fontFamily: "'JetBrains Mono',monospace",
+          }}
+        >
+          {otPolicy.rateNormal}x / {otPolicy.rateWeekend}x /{" "}
+          {otPolicy.rateHoliday}x
+        </span>
+      </div>
+      {open && (
+        <div
+          style={{
+            marginTop: 16,
+            paddingTop: 16,
+            borderTop: `1px solid ${T.lineSoft}`,
+          }}
+        >
+          <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
+            {t.ot.policyDesc}
+          </p>
+          <div
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
+          >
+            <Field label={t.ot.rateNormal}>
+              <Input
+                type="number"
+                step="0.1"
+                min="1"
+                value={f.rateNormal}
+                onChange={set("rateNormal")}
+              />
+            </Field>
+            <Field label={t.ot.rateWeekend}>
+              <Input
+                type="number"
+                step="0.1"
+                min="1"
+                value={f.rateWeekend}
+                onChange={set("rateWeekend")}
+              />
+            </Field>
+            <Field label={t.ot.rateHoliday}>
+              <Input
+                type="number"
+                step="0.1"
+                min="1"
+                value={f.rateHoliday}
+                onChange={set("rateHoliday")}
+              />
+            </Field>
+            <Field label={t.ot.hoursPerDay}>
+              <Input
+                type="number"
+                step="0.5"
+                min="1"
+                value={f.hoursPerDay}
+                onChange={set("hoursPerDay")}
+              />
+            </Field>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginTop: 6,
+            }}
+          >
+            <Button variant="accent" size="sm" onClick={save}>
+              {t.save}
+            </Button>
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+}
+
+// Lets an admin configure the tax/insurance deduction percentages applied
+// to every payslip, instead of the rates being hardcoded in computePayroll.
+function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
+  const { t } = useLang();
+  const [open, setOpen] = useState(false);
+  const [f, setF] = useState(payrollPolicy);
+  useEffect(() => setF(payrollPolicy), [payrollPolicy]);
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const save = () => {
+    setPayrollPolicy({
+      taxRate: Number(f.taxRate) || 0,
+      insuranceRate: Number(f.insuranceRate) || 0,
+    });
+    setOpen(false);
+  };
+  return (
+    <Card style={{ padding: 16, marginBottom: 16 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          cursor: "pointer",
+        }}
+        onClick={() => setOpen(!open)}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Receipt size={16} color={T.forest} />
+          <span style={{ fontWeight: 600, fontSize: 13.5, color: T.ink }}>
+            {t.pay.policyTitle}
+          </span>
+        </div>
+        <span
+          style={{
+            fontSize: 11.5,
+            color: T.textSoft,
+            fontFamily: "'JetBrains Mono',monospace",
+          }}
+        >
+          {payrollPolicy.taxRate}% / {payrollPolicy.insuranceRate}%
+        </span>
+      </div>
+      {open && (
+        <div
+          style={{
+            marginTop: 16,
+            paddingTop: 16,
+            borderTop: `1px solid ${T.lineSoft}`,
+          }}
+        >
+          <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
+            {t.pay.policyDesc}
+          </p>
+          <div
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
+          >
+            <Field label={t.pay.taxRateLabel}>
+              <Input
+                type="number"
+                step="0.1"
+                min="0"
+                value={f.taxRate}
+                onChange={set("taxRate")}
+              />
+            </Field>
+            <Field label={t.pay.insuranceRateLabel}>
+              <Input
+                type="number"
+                step="0.1"
+                min="0"
+                value={f.insuranceRate}
+                onChange={set("insuranceRate")}
+              />
+            </Field>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginTop: 6,
+            }}
+          >
+            <Button variant="accent" size="sm" onClick={save}>
+              {t.save}
+            </Button>
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+}
+
+// Small inline "decided by" line shown on both the admin and employee
+// views, so everyone sees the same approve/reject attribution.
+function OtDecisionNote({ r, admins }) {
+  const { t } = useLang();
+  if (r.status !== "approved" && r.status !== "rejected") return null;
+  const decider = admins.find((a) => a.id === r.decidedById);
+  const name = r.decidedByName || decider?.name || "—";
+  const roleLabel = ADMIN_ROLE_LABEL[r.decidedByRole] || r.decidedByRole || "";
+  return (
+    <div style={{ fontSize: 11.5, color: T.textSoft, marginTop: 3 }}>
+      {r.status === "approved" ? (
+        <span>
+          {t.ot.approvedBy} <strong>{name}</strong>
+          {roleLabel ? ` · ${roleLabel}` : ""}
+        </span>
+      ) : (
+        <span style={{ color: T.rose }}>
+          {t.ot.rejectedBy} <strong>{name}</strong>
+          {roleLabel ? ` · ${roleLabel}` : ""}
+          {r.decisionReason ? ` — ${r.decisionReason}` : ""}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function OvertimeRequests({
+  role,
+  currentAdmin,
+  currentEmp,
+  employees,
+  admins,
+  overtimeRequests,
+  setOvertimeRequests,
+  otPolicy,
+  setOtPolicy,
+  isSuperAdmin,
+}) {
+  const { t, lang } = useLang();
+  const [modal, setModal] = useState(false);
+  const [rejectFor, setRejectFor] = useState(null);
+  const [confirmDel, setConfirmDel] = useState(null);
+  const empOf = (id) => employees.find((e) => e.id === id);
+  const DAY_TYPE_LABEL = getDayTypeLabel(lang, t);
+
+  const approve = (req) => {
+    setOvertimeRequests(
+      overtimeRequests.map((r) =>
+        r.id === req.id
+          ? {
+              ...r,
+              status: "approved",
+              decidedById: currentAdmin?.id || null,
+              decidedByName: currentAdmin?.name || "",
+              decidedByRole: currentAdmin?.role || "",
+              decisionReason: "",
+              reviewedAt: new Date().toISOString(),
+            }
+          : r,
+      ),
+    );
+  };
+  const reject = (req, reason) => {
+    setOvertimeRequests(
+      overtimeRequests.map((r) =>
+        r.id === req.id
+          ? {
+              ...r,
+              status: "rejected",
+              decidedById: currentAdmin?.id || null,
+              decidedByName: currentAdmin?.name || "",
+              decidedByRole: currentAdmin?.role || "",
+              decisionReason: reason,
+              reviewedAt: new Date().toISOString(),
+            }
+          : r,
+      ),
+    );
+    setRejectFor(null);
+  };
+
+  const submit = (f) => {
+    if (!currentEmp) return;
+    setOvertimeRequests([
+      ...overtimeRequests,
+      {
+        id: uid("ot"),
+        employeeId: currentEmp.id,
+        date: f.date,
+        hours: f.hours,
+        dayType: f.dayType,
+        reason: f.reason.trim(),
+        status: "pending",
+        decidedById: null,
+        decidedByName: "",
+        decidedByRole: "",
+        decisionReason: "",
+        createdAt: new Date().toISOString(),
+        reviewedAt: null,
+      },
+    ]);
+    setModal(false);
+  };
+
+  if (role !== "admin" && currentEmp) {
+    const mine = overtimeRequests
+      .filter((r) => r.employeeId === currentEmp.id)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    return (
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: 16,
+          }}
+        >
+          <Button variant="accent" onClick={() => setModal(true)}>
+            <Plus size={15} /> {t.ot.addBtn}
+          </Button>
+        </div>
+        <Card style={{ overflowX: "auto" }}>
+          <table className="wf-table">
+            <thead>
+              <tr>
+                <th>{t.ot.date}</th>
+                <th>{t.ot.hours}</th>
+                <th>{t.ot.dayType}</th>
+                <th>{t.ot.reason}</th>
+                <th>{t.status}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {mine.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={5}
+                    style={{
+                      textAlign: "center",
+                      color: T.muted,
+                      padding: "24px 0",
+                    }}
+                  >
+                    {t.ot.noRequest}
+                  </td>
+                </tr>
+              )}
+              {mine.map((r) => (
+                <tr key={r.id}>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                    {r.date}
+                  </td>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                    {r.hours} {t.ot.hoursShort}
+                  </td>
+                  <td>{DAY_TYPE_LABEL[r.dayType] || r.dayType}</td>
+                  <td
+                    style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}
+                  >
+                    {r.reason || "—"}
+                  </td>
+                  <td>
+                    <StatusPill status={r.status} />
+                    <OtDecisionNote r={r} admins={admins} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+        {modal && (
+          <Modal title={t.ot.addBtn} onClose={() => setModal(false)}>
+            <OvertimeRequestForm
+              onSave={submit}
+              onCancel={() => setModal(false)}
+            />
+          </Modal>
+        )}
+      </div>
+    );
+  }
+
+  // Admin view — pending requests surfaced on top, newest first.
+  const sorted = [...overtimeRequests].sort((a, b) => {
+    if (a.status === "pending" && b.status !== "pending") return -1;
+    if (a.status !== "pending" && b.status === "pending") return 1;
+    return b.createdAt.localeCompare(a.createdAt);
+  });
+  return (
+    <div>
+      <OvertimePolicySettings otPolicy={otPolicy} setOtPolicy={setOtPolicy} />
+      <Card style={{ overflowX: "auto" }}>
+        <table className="wf-table">
+          <thead>
+            <tr>
+              <th>បុគ្គលិក</th>
+              <th>{t.ot.date}</th>
+              <th>{t.ot.hours}</th>
+              <th>{t.ot.dayType}</th>
+              <th>{t.ot.reason}</th>
+              <th>{t.status}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.length === 0 && (
+              <tr>
+                <td
+                  colSpan={7}
+                  style={{
+                    textAlign: "center",
+                    color: T.muted,
+                    padding: "24px 0",
+                  }}
+                >
+                  {t.ot.noRequest}
+                </td>
+              </tr>
+            )}
+            {sorted.map((r) => {
+              const emp = empOf(r.employeeId);
+              return (
+                <tr key={r.id}>
+                  <td>
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 10 }}
+                    >
+                      <Avatar
+                        name={emp?.name || "?"}
+                        photo={emp?.photo}
+                        size={30}
+                      />
+                      <div>
+                        <div
+                          style={{
+                            fontWeight: 500,
+                            color: T.ink,
+                            fontSize: 13,
+                          }}
+                        >
+                          {emp?.name || "—"}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 10.5,
+                            color: T.muted,
+                            fontFamily: "'JetBrains Mono',monospace",
+                          }}
+                        >
+                          {emp?.code}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                    {r.date}
+                  </td>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                    {r.hours} {t.ot.hoursShort}
+                  </td>
+                  <td>{DAY_TYPE_LABEL[r.dayType] || r.dayType}</td>
+                  <td
+                    style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}
+                  >
+                    {r.reason || "—"}
+                  </td>
+                  <td>
+                    <StatusPill status={r.status} />
+                    <OtDecisionNote r={r} admins={admins} />
+                  </td>
+                  <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                    {r.status === "pending" ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 6,
+                          justifyContent: "flex-end",
+                        }}
+                      >
+                        <Button
+                          size="sm"
+                          variant="accent"
+                          onClick={() => approve(r)}
+                        >
+                          <ThumbsUp size={13} /> {t.ot.approve}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          onClick={() => setRejectFor(r)}
+                        >
+                          <ThumbsDown size={13} /> {t.ot.reject}
+                        </Button>
+                      </div>
+                    ) : (
+                      isSuperAdmin && (
+                        <button
+                          onClick={() => setConfirmDel(r)}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            color: T.mutedLight,
+                          }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </Card>
+      {rejectFor && (
+        <OvertimeRejectModal
+          onCancel={() => setRejectFor(null)}
+          onConfirm={(reason) => reject(rejectFor, reason)}
+        />
+      )}
+      {confirmDel && (
+        <ConfirmDialog
+          text={t.ot.confirmDel}
+          onCancel={() => setConfirmDel(null)}
+          onConfirm={() => {
+            setOvertimeRequests(
+              overtimeRequests.filter((r) => r.id !== confirmDel.id),
+            );
+            setConfirmDel(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
    Admin accounts — superadmin only. Two permission levels:
    superadmin (full access, incl. deleting records and managing other
    admin accounts) and manager (day-to-day HR work, no deletes).
 ----------------------------------------------------------------*/
 function AdminAccountForm({ initial, onSave, onCancel }) {
+  const { t, lang } = useLang();
   const [f, setF] = useState(
     initial || { username: "", password: "", name: "", role: "manager" },
   );
@@ -3918,14 +5570,14 @@ function AdminAccountForm({ initial, onSave, onCancel }) {
         }}
       >
         <Button variant="ghost" onClick={onCancel}>
-          បោះបង់
+          {t.cancel}
         </Button>
         <Button
           variant="accent"
           onClick={() => onSave(f)}
           disabled={!f.name || !f.username || !f.password}
         >
-          រក្សាទុក
+          {t.save}
         </Button>
       </div>
     </div>
@@ -3933,6 +5585,7 @@ function AdminAccountForm({ initial, onSave, onCancel }) {
 }
 
 function AdminAccounts({ admins, setAdmins, currentAdminId }) {
+  const { t, lang } = useLang();
   const [modal, setModal] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
   const [error, setError] = useState("");
@@ -3978,14 +5631,14 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
             setModal({ mode: "add" });
           }}
         >
-          <Plus size={15} /> បន្ថែមគណនី
+          <Plus size={15} /> {t.admAcc.addBtn}
         </Button>
       </div>
       <Card style={{ overflowX: "auto" }}>
         <table className="wf-table">
           <thead>
             <tr>
-              <th>ឈ្មោះ</th>
+              <th>{t.emps.name}</th>
               <th>Username</th>
               <th>សិទ្ធិ</th>
               <th></th>
@@ -4120,7 +5773,14 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
    update their own contact info and photo, and change their PIN,
    without needing an admin to do it for them.
 ----------------------------------------------------------------*/
-const MAX_PHOTO_BYTES = 800 * 1024; // keep stored photos reasonably small
+// Raw uploads can be several MB; we still cap the original file size to
+// avoid hanging the browser while decoding huge images, but the value
+// actually persisted to the database is always the small compressed
+// square avatar produced below (a few KB), not the original file.
+const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+// Target size for the compressed square avatar we actually store.
+const AVATAR_MAX_DIM = 160;
+const AVATAR_JPEG_QUALITY = 0.72;
 
 function fileToDataUrl(file) {
   return new Promise((resolve, reject) => {
@@ -4131,6 +5791,39 @@ function fileToDataUrl(file) {
   });
 }
 
+// Reads an image file, downsizes+crops it to a small square, and returns a
+// compressed JPEG data URL. This keeps every stored employee photo to
+// roughly 15-40KB regardless of how large the original upload was, which
+// keeps `employees?select=*` (fetched on every page load) fast even as
+// more employees add profile photos.
+function fileToCompressedAvatarDataUrl(
+  file,
+  maxDim = AVATAR_MAX_DIM,
+  quality = AVATAR_JPEG_QUALITY,
+) {
+  return new Promise((resolve, reject) => {
+    const rawUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const side = Math.min(img.width, img.height);
+      const sx = (img.width - side) / 2;
+      const sy = (img.height - side) / 2;
+      const canvas = document.createElement("canvas");
+      canvas.width = maxDim;
+      canvas.height = maxDim;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, sx, sy, side, side, 0, 0, maxDim, maxDim);
+      URL.revokeObjectURL(rawUrl);
+      resolve(canvas.toDataURL("image/jpeg", quality));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(rawUrl);
+      reject(new Error("image-decode-failed"));
+    };
+    img.src = rawUrl;
+  });
+}
+
 function MyProfile({
   currentEmp,
   employees,
@@ -4138,10 +5831,13 @@ function MyProfile({
   departments,
   shifts,
 }) {
+  const { t, lang } = useLang();
   const [f, setF] = useState({
+    name: currentEmp.name || "",
     phone: currentEmp.phone || "",
     email: currentEmp.email || "",
   });
+  const [nameError, setNameError] = useState("");
   const [photoPreview, setPhotoPreview] = useState(currentEmp.photo || null);
   const [photoError, setPhotoError] = useState("");
   const [saved, setSaved] = useState(false);
@@ -4171,20 +5867,35 @@ function MyProfile({
       return;
     }
     if (file.size > MAX_PHOTO_BYTES) {
-      setPhotoError("រូបភាពធំពេក សូមជ្រើសរើសរូបតូចជាងនេះ (តិចជាង 800KB)");
+      setPhotoError("រូបភាពធំពេក សូមជ្រើសរើសរូបតូចជាងនេះ (តិចជាង 5MB)");
       return;
     }
     setPhotoError("");
-    const dataUrl = await fileToDataUrl(file);
-    setPhotoPreview(dataUrl);
-    setSaved(false);
+    try {
+      const dataUrl = await fileToCompressedAvatarDataUrl(file);
+      setPhotoPreview(dataUrl);
+      setSaved(false);
+    } catch {
+      setPhotoError("មិនអាចអានរូបភាពនេះបានទេ សូមសាកល្បងរូបភាពផ្សេង");
+    }
   };
 
   const saveProfile = () => {
+    if (!f.name.trim()) {
+      setNameError(t.settings.nameRequired);
+      return;
+    }
+    setNameError("");
     setEmployees(
       employees.map((e) =>
         e.id === currentEmp.id
-          ? { ...e, phone: f.phone, email: f.email, photo: photoPreview }
+          ? {
+              ...e,
+              name: f.name.trim(),
+              phone: f.phone,
+              email: f.email,
+              photo: photoPreview,
+            }
           : e,
       ),
     );
@@ -4229,10 +5940,14 @@ function MyProfile({
             marginBottom: 18,
           }}
         >
-          <Avatar name={currentEmp.name} photo={photoPreview} size={56} />
+          <Avatar
+            name={f.name || currentEmp.name}
+            photo={photoPreview}
+            size={56}
+          />
           <div style={{ minWidth: 0 }}>
             <div style={{ fontWeight: 700, color: T.ink, fontSize: 15 }}>
-              {currentEmp.name}
+              {f.name || currentEmp.name}
             </div>
             <div
               style={{
@@ -4264,13 +5979,41 @@ function MyProfile({
             {currentEmp.joined}
           </div>
         </div>
-        <Field label="រូបភាពប្រវត្តិរូប">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={onPhotoChange}
-            style={{ fontSize: 12.5 }}
+        <Field label={t.settings.nameLabel}>
+          <Input
+            value={f.name}
+            onChange={(e) => {
+              setF({ ...f, name: e.target.value });
+              setSaved(false);
+              setNameError("");
+            }}
+            placeholder={t.settings.namePlaceholder}
           />
+        </Field>
+        {nameError && (
+          <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 10 }}>
+            {nameError}
+          </p>
+        )}
+        <Field label="រូបភាពប្រវត្តិរូប">
+          <label
+            className="wf-btn wf-btn-ghost"
+            style={{ cursor: "pointer", display: "inline-flex" }}
+          >
+            <input
+              type="file"
+              accept="image/*"
+              onChange={onPhotoChange}
+              style={{
+                position: "absolute",
+                width: 1,
+                height: 1,
+                opacity: 0,
+                overflow: "hidden",
+              }}
+            />
+            <UserCircle2 size={14} /> ជ្រើសរើសរូបភាព
+          </label>
         </Field>
         {photoError && (
           <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 10 }}>
@@ -4294,11 +6037,11 @@ function MyProfile({
               marginBottom: 10,
             }}
           >
-            <CheckCircle2 size={14} /> បានរក្សាទុករួចរាល់
+            <CheckCircle2 size={14} /> {t.save}
           </p>
         )}
         <Button variant="accent" onClick={saveProfile}>
-          រក្សាទុកព័ត៌មាន
+          {t.save}
         </Button>
       </Card>
 
@@ -4379,6 +6122,416 @@ function MyProfile({
           ប្តូរកូដសម្ងាត់
         </Button>
       </Card>
+
+      <AppearanceCard />
+    </div>
+  );
+}
+
+function AppearanceCard() {
+  const { t } = useLang();
+  const { theme, setTheme } = useTheme();
+  return (
+    <Card style={{ padding: 20 }}>
+      <h3
+        style={{
+          fontFamily: "'Space Grotesk',sans-serif",
+          fontWeight: 600,
+          color: T.ink,
+          marginBottom: 4,
+          fontSize: 14,
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+        }}
+      >
+        {theme === "dark" ? <Moon size={16} /> : <Sun size={16} />}{" "}
+        {t.settings.appearance}
+      </h3>
+      <p style={{ fontSize: 12, color: T.muted, marginBottom: 16 }}>
+        {t.settings.appearanceDesc}
+      </p>
+      <div style={{ display: "flex", gap: 10 }}>
+        <button
+          className="wf-btn"
+          onClick={() => setTheme("light")}
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            background: theme === "light" ? T.ink : "transparent",
+            color: theme === "light" ? "#fff" : T.ink,
+            border: `1px solid ${T.line}`,
+          }}
+        >
+          <Sun size={14} /> {t.settings.lightMode}
+        </button>
+        <button
+          className="wf-btn"
+          onClick={() => setTheme("dark")}
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            background: theme === "dark" ? T.ink : "transparent",
+            color: theme === "dark" ? "#fff" : T.ink,
+            border: `1px solid ${T.line}`,
+          }}
+        >
+          <Moon size={14} /> {t.settings.darkMode}
+        </button>
+      </div>
+    </Card>
+  );
+}
+
+/* ---------------------------------------------------------------
+   Admin — My Settings (name, photo, appearance)
+----------------------------------------------------------------*/
+function AdminSettings({ currentAdmin, admins, setAdmins, isSuperAdmin }) {
+  const { t } = useLang();
+  const { theme, setTheme } = useTheme();
+  const { branding, setBranding } = useBranding();
+  const [f, setF] = useState({ name: currentAdmin.name || "" });
+  const [nameError, setNameError] = useState("");
+  const [photoPreview, setPhotoPreview] = useState(currentAdmin.photo || null);
+  const [photoError, setPhotoError] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  const [brandForm, setBrandForm] = useState({
+    name: branding.name || "",
+    logo: branding.logo || null,
+  });
+  const [brandLogoError, setBrandLogoError] = useState("");
+  const [brandSaved, setBrandSaved] = useState(false);
+
+  const onBrandLogoChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setBrandLogoError("សូមជ្រើសរើសឯកសាររូបភាព");
+      return;
+    }
+    if (file.size > MAX_PHOTO_BYTES) {
+      setBrandLogoError("រូបភាពធំពេក សូមជ្រើសរើសរូបតូចជាងនេះ (តិចជាង 5MB)");
+      return;
+    }
+    setBrandLogoError("");
+    try {
+      const dataUrl = await fileToCompressedAvatarDataUrl(file, 200, 0.85);
+      setBrandForm((prev) => ({ ...prev, logo: dataUrl }));
+      setBrandSaved(false);
+    } catch {
+      setBrandLogoError("មិនអាចអានរូបភាពនេះបានទេ សូមសាកល្បងរូបភាពផ្សេង");
+    }
+  };
+
+  const saveBranding = () => {
+    setBranding({ name: brandForm.name.trim(), logo: brandForm.logo || null });
+    setBrandSaved(true);
+  };
+
+  const onPhotoChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setPhotoError("សូមជ្រើសរើសឯកសាររូបភាព");
+      return;
+    }
+    if (file.size > MAX_PHOTO_BYTES) {
+      setPhotoError("រូបភាពធំពេក សូមជ្រើសរើសរូបតូចជាងនេះ (តិចជាង 5MB)");
+      return;
+    }
+    setPhotoError("");
+    try {
+      const dataUrl = await fileToCompressedAvatarDataUrl(file);
+      setPhotoPreview(dataUrl);
+      setSaved(false);
+    } catch {
+      setPhotoError("មិនអាចអានរូបភាពនេះបានទេ សូមសាកល្បងរូបភាពផ្សេង");
+    }
+  };
+
+  const save = () => {
+    if (!f.name.trim()) {
+      setNameError(t.settings.nameRequired);
+      return;
+    }
+    setNameError("");
+    setAdmins(
+      admins.map((a) =>
+        a.id === currentAdmin.id
+          ? { ...a, name: f.name.trim(), photo: photoPreview }
+          : a,
+      ),
+    );
+    setSaved(true);
+  };
+
+  return (
+    <div
+      className="wf-grid"
+      style={{ gridTemplateColumns: "repeat(auto-fit, minmax(320px,1fr))" }}
+    >
+      <Card style={{ padding: 20 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 14,
+            marginBottom: 18,
+          }}
+        >
+          <Avatar
+            name={f.name || currentAdmin.name}
+            photo={photoPreview}
+            size={56}
+          />
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontWeight: 700, color: T.ink, fontSize: 15 }}>
+              {f.name || currentAdmin.name}
+            </div>
+            <div
+              style={{
+                fontSize: 11.5,
+                color: T.muted,
+                fontFamily: "'JetBrains Mono',monospace",
+              }}
+            >
+              {ADMIN_ROLE_LABEL[currentAdmin.role]}
+            </div>
+          </div>
+        </div>
+        <Field label={t.settings.nameLabel}>
+          <Input
+            value={f.name}
+            onChange={(e) => {
+              setF({ ...f, name: e.target.value });
+              setSaved(false);
+              setNameError("");
+            }}
+            placeholder={t.settings.namePlaceholder}
+          />
+        </Field>
+        {nameError && (
+          <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 10 }}>
+            {nameError}
+          </p>
+        )}
+        <Field label={t.settings.photoLabel}>
+          <label
+            className="wf-btn wf-btn-ghost"
+            style={{ cursor: "pointer", display: "inline-flex" }}
+          >
+            <input
+              type="file"
+              accept="image/*"
+              onChange={onPhotoChange}
+              style={{
+                position: "absolute",
+                width: 1,
+                height: 1,
+                opacity: 0,
+                overflow: "hidden",
+              }}
+            />
+            <Camera size={14} /> {t.settings.choosePhoto}
+          </label>
+        </Field>
+        {photoError && (
+          <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 10 }}>
+            {photoError}
+          </p>
+        )}
+        {saved && (
+          <p
+            style={{
+              fontSize: 12.5,
+              color: T.forestText,
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              marginBottom: 10,
+            }}
+          >
+            <CheckCircle2 size={14} /> {t.settings.saved}
+          </p>
+        )}
+        <Button variant="accent" onClick={save}>
+          {t.save}
+        </Button>
+      </Card>
+
+      <Card style={{ padding: 20 }}>
+        <h3
+          style={{
+            fontFamily: "'Space Grotesk',sans-serif",
+            fontWeight: 600,
+            color: T.ink,
+            marginBottom: 4,
+            fontSize: 14,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          {theme === "dark" ? <Moon size={16} /> : <Sun size={16} />}{" "}
+          {t.settings.appearance}
+        </h3>
+        <p style={{ fontSize: 12, color: T.muted, marginBottom: 16 }}>
+          {t.settings.appearanceDesc}
+        </p>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button
+            className="wf-btn"
+            onClick={() => setTheme("light")}
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              background: theme === "light" ? T.ink : "transparent",
+              color: theme === "light" ? "#fff" : T.ink,
+              border: `1px solid ${T.line}`,
+            }}
+          >
+            <Sun size={14} /> {t.settings.lightMode}
+          </button>
+          <button
+            className="wf-btn"
+            onClick={() => setTheme("dark")}
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              background: theme === "dark" ? T.ink : "transparent",
+              color: theme === "dark" ? "#fff" : T.ink,
+              border: `1px solid ${T.line}`,
+            }}
+          >
+            <Moon size={14} /> {t.settings.darkMode}
+          </button>
+        </div>
+      </Card>
+
+      {isSuperAdmin && (
+        <Card style={{ padding: 20 }}>
+          <h3
+            style={{
+              fontFamily: "'Space Grotesk',sans-serif",
+              fontWeight: 600,
+              color: T.ink,
+              marginBottom: 4,
+              fontSize: 14,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <Building2 size={16} /> {t.settings.brandingTitle}
+          </h3>
+          <p style={{ fontSize: 12, color: T.muted, marginBottom: 16 }}>
+            {t.settings.brandingDesc}
+          </p>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 14,
+              marginBottom: 16,
+            }}
+          >
+            <div
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 14,
+                background: brandForm.logo
+                  ? "#fff"
+                  : `linear-gradient(145deg,${T.forest},${T.forestDark})`,
+                border: `1px solid ${T.line}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+                flexShrink: 0,
+                color: "#fff",
+                fontWeight: 700,
+                fontFamily: "'Space Grotesk',sans-serif",
+              }}
+            >
+              {brandForm.logo ? (
+                <img
+                  src={brandForm.logo}
+                  alt={brandForm.name || t.appName}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              ) : (
+                getInitials(brandForm.name || t.appName)
+              )}
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <label
+                className="wf-btn wf-btn-ghost"
+                style={{ cursor: "pointer", display: "inline-flex" }}
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={onBrandLogoChange}
+                  style={{
+                    position: "absolute",
+                    width: 1,
+                    height: 1,
+                    opacity: 0,
+                    overflow: "hidden",
+                  }}
+                />
+                <Camera size={14} /> {t.settings.chooseLogo}
+              </label>
+              {brandForm.logo && (
+                <button
+                  type="button"
+                  className="wf-btn wf-btn-ghost"
+                  onClick={() => {
+                    setBrandForm((prev) => ({ ...prev, logo: null }));
+                    setBrandSaved(false);
+                  }}
+                >
+                  <X size={14} /> {t.settings.removeLogo}
+                </button>
+              )}
+            </div>
+          </div>
+          {brandLogoError && (
+            <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 10 }}>
+              {brandLogoError}
+            </p>
+          )}
+          <Field label={t.settings.companyNameLabel}>
+            <Input
+              value={brandForm.name}
+              onChange={(e) => {
+                setBrandForm((prev) => ({ ...prev, name: e.target.value }));
+                setBrandSaved(false);
+              }}
+              placeholder={t.settings.companyNamePlaceholder}
+            />
+          </Field>
+          {brandSaved && (
+            <p
+              style={{
+                fontSize: 12.5,
+                color: T.forestText,
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+                marginBottom: 10,
+              }}
+            >
+              <CheckCircle2 size={14} /> {t.settings.brandingSaved}
+            </p>
+          )}
+          <Button variant="accent" onClick={saveBranding}>
+            {t.save}
+          </Button>
+        </Card>
+      )}
     </div>
   );
 }
@@ -4386,7 +6539,16 @@ function MyProfile({
 /* ---------------------------------------------------------------
    Payroll
 ----------------------------------------------------------------*/
-function Payslip({ emp, mk, attendance, onClose }) {
+function Payslip({
+  emp,
+  mk,
+  attendance,
+  overtimeRequests,
+  otPolicy,
+  payrollPolicy,
+  onClose,
+}) {
+  const { t, lang } = useLang();
   const {
     absentDays,
     leaveDays,
@@ -4394,8 +6556,19 @@ function Payslip({ emp, mk, attendance, onClose }) {
     absenceDeduction,
     tax,
     insurance,
+    taxRate,
+    insuranceRate,
+    otHours,
+    otPay,
     net,
-  } = computePayroll(emp, attendance, mk);
+  } = computePayroll(
+    emp,
+    attendance,
+    mk,
+    overtimeRequests,
+    otPolicy,
+    payrollPolicy,
+  );
   return (
     <Modal title="" onClose={onClose} width={460}>
       <div
@@ -4416,7 +6589,7 @@ function Payslip({ emp, mk, attendance, onClose }) {
             fontFamily: "'Space Grotesk',sans-serif",
           }}
         >
-          <Receipt size={20} /> សន្លឹកប្រាក់ខែ
+          <Receipt size={20} /> {t.nav.myPayroll}
         </div>
         <span
           style={{
@@ -4459,7 +6632,7 @@ function Payslip({ emp, mk, attendance, onClose }) {
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span style={{ color: T.textSoft }}>ប្រាក់ខែមូលដ្ឋាន</span>
+          <span style={{ color: T.textSoft }}>{t.pay.baseSalary}</span>
           <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
             {fmtMoney(emp.salary)}
           </span>
@@ -4473,7 +6646,7 @@ function Payslip({ emp, mk, attendance, onClose }) {
             }}
           >
             <span>
-              ដកប្រាក់ដោយសារអវត្តមាន ({absentDays} ថ្ងៃ × {fmtMoney(dailyRate)})
+              {t.pay.absentDed} ({absentDays} × {fmtMoney(dailyRate)})
             </span>
             <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
               -{fmtMoney(absenceDeduction)}
@@ -4489,7 +6662,7 @@ function Payslip({ emp, mk, attendance, onClose }) {
               fontSize: 12,
             }}
           >
-            <span>ថ្ងៃឈប់សម្រាក (មានប្រាក់ខែ)</span>
+            <span>{t.lv.approved}</span>
             <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
               {leaveDays} ថ្ងៃ
             </span>
@@ -4502,7 +6675,9 @@ function Payslip({ emp, mk, attendance, onClose }) {
             color: T.rose,
           }}
         >
-          <span>ពន្ធលើប្រាក់ខែ (5%)</span>
+          <span>
+            {t.pay.taxLabel} ({taxRate}%)
+          </span>
           <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
             -{fmtMoney(tax)}
           </span>
@@ -4514,25 +6689,43 @@ function Payslip({ emp, mk, attendance, onClose }) {
             color: T.rose,
           }}
         >
-          <span>ធានារ៉ាប់រង (2%)</span>
+          <span>
+            {t.pay.insuranceLabel} ({insuranceRate}%)
+          </span>
           <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
             -{fmtMoney(insurance)}
           </span>
         </div>
+        {otHours > 0 && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              color: T.forestText,
+            }}
+          >
+            <span>
+              {t.pay.otPay} ({otHours} {t.ot.hoursShort})
+            </span>
+            <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+              +{fmtMoney(otPay)}
+            </span>
+          </div>
+        )}
       </div>
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          background: T.ink,
+          background: BRAND.ink,
           color: "#fff",
           borderRadius: 10,
           padding: "12px 16px",
           marginTop: 16,
         }}
       >
-        <span style={{ fontWeight: 600, fontSize: 13 }}>ប្រាក់ខែសុទ្ធ</span>
+        <span style={{ fontWeight: 600, fontSize: 13 }}>{t.pay.netSalary}</span>
         <span
           style={{
             fontWeight: 700,
@@ -4554,7 +6747,12 @@ function Payroll({
   attendance,
   payrollPaid,
   setPayrollPaid,
+  overtimeRequests,
+  otPolicy,
+  payrollPolicy,
+  setPayrollPolicy,
 }) {
+  const { t, lang } = useLang();
   const currentMk = monthKey();
   const availableMonths = useMemo(() => {
     const set = new Set([currentMk]);
@@ -4576,7 +6774,16 @@ function Payroll({
     setPayrollPaid({ ...payrollPaid, [key]: !payrollPaid[key] });
   };
   const totalNet = list.reduce(
-    (sum, e) => sum + computePayroll(e, attendance, mk).net,
+    (sum, e) =>
+      sum +
+      computePayroll(
+        e,
+        attendance,
+        mk,
+        overtimeRequests,
+        otPolicy,
+        payrollPolicy,
+      ).net,
     0,
   );
 
@@ -4600,7 +6807,7 @@ function Payroll({
             letterSpacing: ".03em",
           }}
         >
-          ខែ
+          {lang === "en" ? "Month" : "ខែ"}
         </span>
         <Select
           value={mk}
@@ -4630,6 +6837,12 @@ function Payroll({
         )}
       </div>
       {role === "admin" && (
+        <PayrollPolicySettings
+          payrollPolicy={payrollPolicy}
+          setPayrollPolicy={setPayrollPolicy}
+        />
+      )}
+      {role === "admin" && (
         <Card
           accent={T.gold}
           style={{
@@ -4649,7 +6862,7 @@ function Payroll({
                 fontWeight: 700,
               }}
             >
-              ចំណាយប្រាក់ខែសរុប · {monthLabel(mk)}
+              {t.pay.totalPaid} · {monthLabel(mk)}
             </div>
             <div
               style={{
@@ -4669,17 +6882,24 @@ function Payroll({
         <table className="wf-table">
           <thead>
             <tr>
-              <th>បុគ្គលិក</th>
-              <th>ប្រាក់ខែមូលដ្ឋាន</th>
-              <th>ប្រាក់ខែសុទ្ធ</th>
-              <th>ស្ថានភាព</th>
+              <th>{t.employee}</th>
+              <th>{t.pay.baseSalary}</th>
+              <th>{t.pay.netSalary}</th>
+              <th>{t.status}</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             {list.map((e) => {
               const paid = !!payrollPaid[`${e.id}-${mk}`];
-              const { net, absentDays } = computePayroll(e, attendance, mk);
+              const { net, absentDays, otHours } = computePayroll(
+                e,
+                attendance,
+                mk,
+                overtimeRequests,
+                otPolicy,
+                payrollPolicy,
+              );
               return (
                 <tr key={e.id}>
                   <td>
@@ -4699,7 +6919,12 @@ function Payroll({
                         </div>
                         {absentDays > 0 && (
                           <div style={{ fontSize: 10.5, color: T.rose }}>
-                            អវត្តមាន {absentDays} ថ្ងៃ
+                            {t.att.absentDays} {absentDays}
+                          </div>
+                        )}
+                        {otHours > 0 && (
+                          <div style={{ fontSize: 10.5, color: T.forestText }}>
+                            {t.ot.totalOtHours}: {otHours} {t.ot.hoursShort}
                           </div>
                         )}
                       </div>
@@ -4733,7 +6958,7 @@ function Payroll({
                         marginRight: 12,
                       }}
                     >
-                      មើលសន្លឹក
+                      {t.pay.viewSlip}
                     </button>
                     {role === "admin" && (
                       <button
@@ -4747,7 +6972,7 @@ function Payroll({
                           color: T.forest,
                         }}
                       >
-                        {paid ? "ដកសញ្ញាបង់" : "សម្គាល់ថាបានបង់"}
+                        {paid ? t.pay.unmarkPaid : t.pay.markPaid}
                       </button>
                     )}
                   </td>
@@ -4762,6 +6987,9 @@ function Payroll({
           emp={slipFor}
           mk={mk}
           attendance={attendance}
+          overtimeRequests={overtimeRequests}
+          otPolicy={otPolicy}
+          payrollPolicy={payrollPolicy}
           onClose={() => setSlipFor(null)}
         />
       )}
@@ -4780,8 +7008,10 @@ function buildNavAdmin(n) {
     { id: "shifts", label: n.shifts, icon: Watch },
     { id: "attendance", label: n.attendance, icon: Clock },
     { id: "leave", label: n.leave, icon: CalendarDays },
+    { id: "ot", label: n.overtime, icon: Timer },
     { id: "payroll", label: n.payroll, icon: Wallet },
     { id: "admins", label: n.admins, icon: ShieldCheck, superadminOnly: true },
+    { id: "settings", label: n.settings, icon: Settings2 },
   ];
 }
 function buildNavEmployee(n) {
@@ -4789,6 +7019,7 @@ function buildNavEmployee(n) {
     { id: "dashboard", label: n.dashboard, icon: LayoutDashboard },
     { id: "attendance", label: n.myAttendance, icon: Clock },
     { id: "leave", label: n.myLeave, icon: CalendarDays },
+    { id: "ot", label: n.myOvertime, icon: Timer },
     { id: "payroll", label: n.myPayroll, icon: Wallet },
     { id: "profile", label: n.myProfile, icon: UserCircle2 },
   ];
@@ -4797,6 +7028,9 @@ function buildNavEmployee(n) {
 function AppInner() {
   useGlobalStyle();
   const { t } = useLang();
+  const [branding, setBranding, brandingReady] = useBrandingSettings();
+  const brandDisplayName = branding.name?.trim() || t.appName;
+  const { theme } = useTheme();
   const [departments, setDepartments, dReady] = useSupabaseArray(
     "departments",
     {
@@ -4895,8 +7129,46 @@ function AppInner() {
       }),
     },
   );
+  const [overtimeRequests, setOvertimeRequests, otrReady] = useSupabaseArray(
+    "overtime_requests",
+    {
+      fromDb: (r) => ({
+        id: r.id,
+        employeeId: r.employee_id,
+        date: r.date,
+        hours: r.hours,
+        dayType: r.day_type,
+        reason: r.reason,
+        status: r.status,
+        decidedById: r.decided_by_id,
+        decidedByName: r.decided_by_name,
+        decidedByRole: r.decided_by_role,
+        decisionReason: r.decision_reason,
+        createdAt: r.created_at,
+        reviewedAt: r.reviewed_at,
+      }),
+      toDb: (r) => ({
+        id: r.id,
+        employee_id: r.employeeId,
+        date: r.date,
+        hours: r.hours,
+        day_type: r.dayType,
+        reason: r.reason,
+        status: r.status,
+        decided_by_id: r.decidedById,
+        decided_by_name: r.decidedByName,
+        decided_by_role: r.decidedByRole,
+        decision_reason: r.decisionReason,
+        created_at: r.createdAt,
+        reviewed_at: r.reviewedAt,
+      }),
+    },
+  );
   const [admins, setAdmins, adminsReady] = useSupabaseArray("admins");
   const [officeLocation, setOfficeLocation, olReady] = useOfficeLocation();
+  const [otPolicy, setOtPolicy, otPolicyReady] = useOtPolicy();
+  const [payrollPolicy, setPayrollPolicy, payrollPolicyReady] =
+    usePayrollPolicy();
   // Session state stays personal (per device) on purpose — each phone
   // remembers only who is logged in on THAT phone, so employees never
   // see each other's login state.
@@ -4919,8 +7191,12 @@ function AppInner() {
     aReady &&
     pReady &&
     lrReady &&
+    otrReady &&
     adminsReady &&
     olReady &&
+    otPolicyReady &&
+    payrollPolicyReady &&
+    brandingReady &&
     sAdminReady &&
     sEmpReady;
   // Each portal only ever reads its own session — the admin URL never
@@ -4980,340 +7256,400 @@ function AppInner() {
   if (!loggedIn) {
     if (portal === "admin")
       return (
-        <AdminLoginScreen
-          admins={admins}
-          onLogin={(id) => setSessionAdmin(id)}
-          go={goPortal}
-        />
+        <BrandingContext.Provider value={{ branding, setBranding }}>
+          <AdminLoginScreen
+            admins={admins}
+            onLogin={(id) => setSessionAdmin(id)}
+            go={goPortal}
+          />
+        </BrandingContext.Provider>
       );
     return (
-      <EmployeeLoginScreen
-        employees={employees}
-        onLogin={(id) => setSessionEmployee(id)}
-        go={goPortal}
-      />
+      <BrandingContext.Provider value={{ branding, setBranding }}>
+        <EmployeeLoginScreen
+          employees={employees}
+          onLogin={(id) => setSessionEmployee(id)}
+          go={goPortal}
+        />
+      </BrandingContext.Provider>
     );
   }
 
   return (
-    <div className="wf-root">
-      <div
-        className={`wf-overlay-scrim ${navOpen ? "open" : ""}`}
-        onClick={() => setNavOpen(false)}
-      />
-      <aside className={`wf-sidebar ${navOpen ? "open" : ""}`}>
-        <div className="wf-sidebar-inner">
-          <div
-            style={{
-              padding: "18px 18px",
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              borderBottom: "1px solid rgba(255,255,255,0.1)",
-            }}
-          >
-            <div className="wf-logo-badge">WS</div>
-            <span
-              style={{
-                fontWeight: 600,
-                fontSize: 15,
-                fontFamily: "'Space Grotesk',sans-serif",
-              }}
-            >
-              Workforce Suite
-            </span>
-            <button
-              className="wf-menu-btn"
-              style={{ marginLeft: "auto", color: "rgba(255,255,255,0.6)" }}
-              onClick={() => setNavOpen(false)}
-            >
-              <X size={18} />
-            </button>
-          </div>
-          <nav
-            style={{
-              flex: 1,
-              minHeight: 0,
-              overflowY: "auto",
-              padding: "14px 10px",
-              display: "flex",
-              flexDirection: "column",
-              gap: 4,
-            }}
-          >
-            {nav.map((n) => (
-              <button
-                key={n.id}
-                className={`wf-nav-item ${page === n.id ? "active" : ""}`}
-                onClick={() => {
-                  setPage(n.id);
-                  setNavOpen(false);
-                }}
-              >
-                <n.icon size={17} /> {n.label}
-              </button>
-            ))}
-          </nav>
-          <div
-            style={{
-              padding: 12,
-              borderTop: "1px solid rgba(255,255,255,0.1)",
-            }}
-          >
+    <BrandingContext.Provider value={{ branding, setBranding }}>
+      <div className={`wf-root ${theme === "dark" ? "wf-dark" : ""}`}>
+        <div
+          className={`wf-overlay-scrim ${navOpen ? "open" : ""}`}
+          onClick={() => setNavOpen(false)}
+        />
+        <aside className={`wf-sidebar ${navOpen ? "open" : ""}`}>
+          <div className="wf-sidebar-inner">
             <div
               style={{
+                padding: "18px 18px",
                 display: "flex",
                 alignItems: "center",
                 gap: 10,
-                padding: "9px 10px",
-                marginBottom: 8,
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.07)",
-                borderRadius: 12,
+                borderBottom: "1px solid rgba(255,255,255,0.1)",
               }}
             >
+              <div className="wf-logo-badge">
+                {branding.logo ? (
+                  <img
+                    src={branding.logo}
+                    alt={brandDisplayName}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      borderRadius: "inherit",
+                    }}
+                  />
+                ) : (
+                  getInitials(brandDisplayName)
+                )}
+              </div>
+              <span
+                style={{
+                  fontWeight: 600,
+                  fontSize: 15,
+                  fontFamily: "'Space Grotesk',sans-serif",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {brandDisplayName}
+              </span>
+              <button
+                className="wf-menu-btn"
+                style={{ marginLeft: "auto", color: "rgba(255,255,255,0.6)" }}
+                onClick={() => setNavOpen(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <nav
+              style={{
+                flex: 1,
+                minHeight: 0,
+                overflowY: "auto",
+                padding: "14px 10px",
+                display: "flex",
+                flexDirection: "column",
+                gap: 4,
+              }}
+            >
+              {nav.map((n) => (
+                <button
+                  key={n.id}
+                  className={`wf-nav-item ${page === n.id ? "active" : ""}`}
+                  onClick={() => {
+                    setPage(n.id);
+                    setNavOpen(false);
+                  }}
+                >
+                  <n.icon size={17} /> {n.label}
+                </button>
+              ))}
+            </nav>
+            <div
+              style={{
+                padding: 12,
+                borderTop: "1px solid rgba(255,255,255,0.1)",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "9px 10px",
+                  marginBottom: 8,
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.07)",
+                  borderRadius: 12,
+                }}
+              >
+                <Avatar
+                  name={
+                    role === "admin"
+                      ? currentAdmin?.name || "?"
+                      : currentEmp?.name || "?"
+                  }
+                  photo={
+                    role === "admin" ? currentAdmin?.photo : currentEmp?.photo
+                  }
+                  size={34}
+                />
+                <div style={{ minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: "#fff",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {role === "admin" ? currentAdmin?.name : currentEmp?.name}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 10.5,
+                      color: "#7C8AA3",
+                      fontFamily: "'JetBrains Mono',monospace",
+                    }}
+                  >
+                    {role === "admin"
+                      ? ADMIN_ROLE_LABEL[currentAdmin?.role]
+                      : currentEmp?.code}
+                  </div>
+                </div>
+              </div>
+              <button
+                className="wf-nav-item"
+                style={{ color: "#E3B7BE" }}
+                onClick={() => {
+                  if (role === "admin") setSessionAdmin(null);
+                  else setSessionEmployee(null);
+                }}
+              >
+                <LogOut size={17} /> {t.logout}
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <div className="wf-main">
+          <header className="wf-header">
+            <button className="wf-menu-btn" onClick={() => setNavOpen(true)}>
+              <Menu size={20} />
+            </button>
+            <h1
+              style={{
+                fontFamily: "'Space Grotesk',sans-serif",
+                fontWeight: 600,
+                color: T.ink,
+                fontSize: 16,
+              }}
+            >
+              {nav.find((n) => n.id === page)?.label}
+            </h1>
+            <div
+              style={{
+                marginLeft: "auto",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              {role !== "admin" && currentEmp && (
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    background: T.forestSoft,
+                    color: T.forestText,
+                    padding: "5px 10px",
+                    borderRadius: 8,
+                  }}
+                >
+                  {t.employee}
+                </span>
+              )}
+              {role === "admin" && (
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    background: "#EDE7F6",
+                    color: "#4A3B7A",
+                    padding: "5px 10px",
+                    borderRadius: 8,
+                  }}
+                >
+                  {ADMIN_ROLE_LABEL[currentAdmin?.role]}
+                </span>
+              )}
+              <ThemeToggle variant="light" />
+              <LangToggle variant="light" />
+              <NotificationBell
+                role={role}
+                currentAdmin={currentAdmin}
+                currentEmp={currentEmp}
+                employees={employees}
+                shifts={shifts}
+                attendance={attendance}
+                leaveRequests={leaveRequests}
+                overtimeRequests={overtimeRequests}
+                setPage={setPage}
+              />
               <Avatar
                 name={
                   role === "admin"
                     ? currentAdmin?.name || "?"
                     : currentEmp?.name || "?"
                 }
-                photo={role === "admin" ? null : currentEmp?.photo}
-                size={34}
+                photo={
+                  role === "admin" ? currentAdmin?.photo : currentEmp?.photo
+                }
+                size={32}
               />
-              <div style={{ minWidth: 0 }}>
-                <div
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: "#fff",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {role === "admin" ? currentAdmin?.name : currentEmp?.name}
-                </div>
-                <div
-                  style={{
-                    fontSize: 10.5,
-                    color: "#7C8AA3",
-                    fontFamily: "'JetBrains Mono',monospace",
-                  }}
-                >
-                  {role === "admin"
-                    ? ADMIN_ROLE_LABEL[currentAdmin?.role]
-                    : currentEmp?.code}
-                </div>
-              </div>
             </div>
-            <button
-              className="wf-nav-item"
-              style={{ color: "#E3B7BE" }}
-              onClick={() => {
-                if (role === "admin") setSessionAdmin(null);
-                else setSessionEmployee(null);
-              }}
-            >
-              <LogOut size={17} /> {t.logout}
-            </button>
-          </div>
+          </header>
+
+          <main className="wf-content">
+            {employees.length === 0 &&
+              role === "admin" &&
+              page !== "employees" && (
+                <div
+                  style={{
+                    marginBottom: 16,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    background: T.goldSoft,
+                    color: T.goldText,
+                    fontSize: 13,
+                    padding: "10px 16px",
+                    borderRadius: 10,
+                  }}
+                >
+                  <AlertCircle size={16} /> {t.dash.noEmpWarn}
+                </div>
+              )}
+            {page === "dashboard" && (
+              <Dashboard
+                employees={employees}
+                departments={departments}
+                attendance={attendance}
+                payrollPaid={payrollPaid}
+                role={role}
+                currentEmp={currentEmp}
+                shifts={shifts}
+              />
+            )}
+            {page === "employees" && role === "admin" && (
+              <Employees
+                employees={employees}
+                departments={departments}
+                shifts={shifts}
+                setEmployees={setEmployees}
+                isSuperAdmin={isSuperAdmin}
+              />
+            )}
+            {page === "departments" && role === "admin" && (
+              <Departments
+                departments={departments}
+                setDepartments={setDepartments}
+                employees={employees}
+                isSuperAdmin={isSuperAdmin}
+              />
+            )}
+            {page === "shifts" && role === "admin" && (
+              <Shifts
+                shifts={shifts}
+                setShifts={setShifts}
+                employees={employees}
+                isSuperAdmin={isSuperAdmin}
+              />
+            )}
+            {page === "attendance" && (
+              <Attendance
+                role={role}
+                currentEmp={currentEmp}
+                employees={employees}
+                shifts={shifts}
+                attendance={attendance}
+                setAttendance={setAttendance}
+                isSuperAdmin={isSuperAdmin}
+                officeLocation={officeLocation}
+                setOfficeLocation={setOfficeLocation}
+              />
+            )}
+            {page === "leave" && (
+              <LeaveRequests
+                role={role}
+                currentEmp={currentEmp}
+                employees={employees}
+                leaveRequests={leaveRequests}
+                setLeaveRequests={setLeaveRequests}
+                attendance={attendance}
+                setAttendance={setAttendance}
+                isSuperAdmin={isSuperAdmin}
+              />
+            )}
+            {page === "ot" && (
+              <OvertimeRequests
+                role={role}
+                currentAdmin={currentAdmin}
+                currentEmp={currentEmp}
+                employees={employees}
+                admins={admins}
+                overtimeRequests={overtimeRequests}
+                setOvertimeRequests={setOvertimeRequests}
+                otPolicy={otPolicy}
+                setOtPolicy={setOtPolicy}
+                isSuperAdmin={isSuperAdmin}
+              />
+            )}
+            {page === "payroll" && (
+              <Payroll
+                role={role}
+                currentEmp={currentEmp}
+                employees={employees}
+                attendance={attendance}
+                payrollPaid={payrollPaid}
+                setPayrollPaid={setPayrollPaid}
+                overtimeRequests={overtimeRequests}
+                otPolicy={otPolicy}
+                payrollPolicy={payrollPolicy}
+                setPayrollPolicy={setPayrollPolicy}
+              />
+            )}
+            {page === "admins" && role === "admin" && isSuperAdmin && (
+              <AdminAccounts
+                admins={admins}
+                setAdmins={setAdmins}
+                currentAdminId={currentAdmin?.id}
+              />
+            )}
+            {page === "profile" && role !== "admin" && currentEmp && (
+              <MyProfile
+                currentEmp={currentEmp}
+                employees={employees}
+                setEmployees={setEmployees}
+                departments={departments}
+                shifts={shifts}
+              />
+            )}
+            {page === "settings" && role === "admin" && currentAdmin && (
+              <AdminSettings
+                currentAdmin={currentAdmin}
+                admins={admins}
+                setAdmins={setAdmins}
+                isSuperAdmin={isSuperAdmin}
+              />
+            )}
+          </main>
         </div>
-      </aside>
-
-      <div className="wf-main">
-        <header className="wf-header">
-          <button className="wf-menu-btn" onClick={() => setNavOpen(true)}>
-            <Menu size={20} />
-          </button>
-          <h1
-            style={{
-              fontFamily: "'Space Grotesk',sans-serif",
-              fontWeight: 600,
-              color: T.ink,
-              fontSize: 16,
-            }}
-          >
-            {nav.find((n) => n.id === page)?.label}
-          </h1>
-          <div
-            style={{
-              marginLeft: "auto",
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            {role !== "admin" && currentEmp && (
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  background: T.forestSoft,
-                  color: T.forestText,
-                  padding: "5px 10px",
-                  borderRadius: 8,
-                }}
-              >
-                {t.employee}
-              </span>
-            )}
-            {role === "admin" && (
-              <span
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  background: "#EDE7F6",
-                  color: "#4A3B7A",
-                  padding: "5px 10px",
-                  borderRadius: 8,
-                }}
-              >
-                {ADMIN_ROLE_LABEL[currentAdmin?.role]}
-              </span>
-            )}
-            <LangToggle variant="light" />
-            <NotificationBell
-              role={role}
-              currentAdmin={currentAdmin}
-              currentEmp={currentEmp}
-              employees={employees}
-              shifts={shifts}
-              attendance={attendance}
-              leaveRequests={leaveRequests}
-              setPage={setPage}
-            />
-            <Avatar
-              name={
-                role === "admin"
-                  ? currentAdmin?.name || "?"
-                  : currentEmp?.name || "?"
-              }
-              photo={role === "admin" ? null : currentEmp?.photo}
-              size={32}
-            />
-          </div>
-        </header>
-
-        <main className="wf-content">
-          {employees.length === 0 &&
-            role === "admin" &&
-            page !== "employees" && (
-              <div
-                style={{
-                  marginBottom: 16,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  background: T.goldSoft,
-                  color: T.goldText,
-                  fontSize: 13,
-                  padding: "10px 16px",
-                  borderRadius: 10,
-                }}
-              >
-                <AlertCircle size={16} /> មិនទាន់មានបុគ្គលិកទេ សូមចូលទៅផ្នែក
-                "បុគ្គលិក" ដើម្បីបន្ថែម
-              </div>
-            )}
-          {page === "dashboard" && (
-            <Dashboard
-              employees={employees}
-              departments={departments}
-              attendance={attendance}
-              payrollPaid={payrollPaid}
-              role={role}
-              currentEmp={currentEmp}
-            />
-          )}
-          {page === "employees" && role === "admin" && (
-            <Employees
-              employees={employees}
-              departments={departments}
-              shifts={shifts}
-              setEmployees={setEmployees}
-              isSuperAdmin={isSuperAdmin}
-            />
-          )}
-          {page === "departments" && role === "admin" && (
-            <Departments
-              departments={departments}
-              setDepartments={setDepartments}
-              employees={employees}
-              isSuperAdmin={isSuperAdmin}
-            />
-          )}
-          {page === "shifts" && role === "admin" && (
-            <Shifts
-              shifts={shifts}
-              setShifts={setShifts}
-              employees={employees}
-              isSuperAdmin={isSuperAdmin}
-            />
-          )}
-          {page === "attendance" && (
-            <Attendance
-              role={role}
-              currentEmp={currentEmp}
-              employees={employees}
-              shifts={shifts}
-              attendance={attendance}
-              setAttendance={setAttendance}
-              isSuperAdmin={isSuperAdmin}
-              officeLocation={officeLocation}
-              setOfficeLocation={setOfficeLocation}
-            />
-          )}
-          {page === "leave" && (
-            <LeaveRequests
-              role={role}
-              currentEmp={currentEmp}
-              employees={employees}
-              leaveRequests={leaveRequests}
-              setLeaveRequests={setLeaveRequests}
-              attendance={attendance}
-              setAttendance={setAttendance}
-              isSuperAdmin={isSuperAdmin}
-            />
-          )}
-          {page === "payroll" && (
-            <Payroll
-              role={role}
-              currentEmp={currentEmp}
-              employees={employees}
-              attendance={attendance}
-              payrollPaid={payrollPaid}
-              setPayrollPaid={setPayrollPaid}
-            />
-          )}
-          {page === "admins" && role === "admin" && isSuperAdmin && (
-            <AdminAccounts
-              admins={admins}
-              setAdmins={setAdmins}
-              currentAdminId={currentAdmin?.id}
-            />
-          )}
-          {page === "profile" && role !== "admin" && currentEmp && (
-            <MyProfile
-              currentEmp={currentEmp}
-              employees={employees}
-              setEmployees={setEmployees}
-              departments={departments}
-              shifts={shifts}
-            />
-          )}
-        </main>
       </div>
-    </div>
+    </BrandingContext.Provider>
   );
 }
 
 export default function App() {
   const [lang, setLang] = useLocalStorage("hrsuite:lang", "km");
   const t = LANG[lang] || LANG.km;
+  const [theme, setTheme] = useLocalStorage("hrsuite:theme", "light");
+  const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
   return (
     <LangContext.Provider value={{ lang, t, setLang }}>
-      <AppInner />
+      <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
+        <AppInner />
+      </ThemeContext.Provider>
     </LangContext.Provider>
   );
 }
