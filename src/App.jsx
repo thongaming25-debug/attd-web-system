@@ -694,6 +694,7 @@ const WORKING_DAYS_PER_MONTH = 26;
 ----------------------------------------------------------------*/
 const STYLE_ID = "wf-suite-style";
 const CSS = `
+*,*::before,*::after{box-sizing:border-box;}
 html,body,#root{height:100%;}
 :root{
   --wf-ink:#12203D; --wf-ink-dark:#0B1730; --wf-paper:#F5F2EA; --wf-card:#FFFFFF;
@@ -2181,9 +2182,14 @@ function ConfirmDialog({ text, onCancel, onConfirm }) {
 ----------------------------------------------------------------*/
 const LOGIN_CSS_ID = "wf-login-style";
 const LOGIN_CSS = `
-@keyframes wf-float-up { from { opacity:0; transform:translateY(24px) scale(.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+@keyframes wf-float-up { from { opacity:0; transform:translateY(28px) scale(.96); } to { opacity:1; transform:translateY(0) scale(1); } }
 @keyframes wf-bg-drift { 0%,100% { transform:translate(0,0) scale(1.05); } 50% { transform:translate(-20px, -14px) scale(1.08); } }
+@keyframes wf-bg-hue { 0%,100% { filter:hue-rotate(0deg); } 50% { filter:hue-rotate(12deg); } }
 @keyframes wf-pulse-ring { 0%,100% { transform:scale(1); opacity:.5; } 50% { transform:scale(1.12); opacity:.2; } }
+@keyframes wf-orb-a { 0%,100% { transform:translate(0,0) scale(1); } 33% { transform:translate(60px,-70px) scale(1.15); } 66% { transform:translate(-40px,40px) scale(.9); } }
+@keyframes wf-orb-b { 0%,100% { transform:translate(0,0) scale(1); } 50% { transform:translate(-70px,60px) scale(1.2); } }
+@keyframes wf-orb-c { 0%,100% { transform:translate(0,0) scale(1); } 40% { transform:translate(70px,50px) scale(.88); } 75% { transform:translate(-50px,-30px) scale(1.1); } }
+@keyframes wf-orb-d { 0%,100% { transform:translate(0,0) scale(1); } 45% { transform:translate(-55px,-50px) scale(1.12); } }
 .wf-login-root {
   display:flex; align-items:center; justify-content:center;
   min-height:100vh; min-height:100dvh; position:relative; overflow:hidden;
@@ -2194,7 +2200,33 @@ const LOGIN_CSS = `
   background: radial-gradient(ellipse 80% 60% at 20% 30%, rgba(46,111,78,0.18) 0%, transparent 60%),
               radial-gradient(ellipse 60% 80% at 80% 70%, rgba(62,92,138,0.15) 0%, transparent 60%),
               radial-gradient(ellipse 50% 40% at 60% 10%, rgba(192,138,46,0.10) 0%, transparent 60%);
-  animation: wf-bg-drift 14s ease-in-out infinite;
+  animation: wf-bg-drift 14s ease-in-out infinite, wf-bg-hue 22s ease-in-out infinite;
+  will-change: transform, filter;
+}
+.wf-login-orbs { position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.wf-login-orb {
+  position:absolute; border-radius:50%; filter:blur(50px); opacity:.55;
+  will-change: transform;
+}
+.wf-login-orb-1 {
+  width:260px; height:260px; top:8%; left:8%;
+  background:radial-gradient(circle,rgba(46,111,78,0.55),transparent 70%);
+  animation: wf-orb-a 16s ease-in-out infinite;
+}
+.wf-login-orb-2 {
+  width:320px; height:320px; bottom:6%; right:6%;
+  background:radial-gradient(circle,rgba(62,92,138,0.5),transparent 70%);
+  animation: wf-orb-b 20s ease-in-out infinite;
+}
+.wf-login-orb-3 {
+  width:200px; height:200px; top:55%; left:2%;
+  background:radial-gradient(circle,rgba(192,138,46,0.4),transparent 70%);
+  animation: wf-orb-c 18s ease-in-out infinite;
+}
+.wf-login-orb-4 {
+  width:180px; height:180px; top:4%; right:16%;
+  background:radial-gradient(circle,rgba(140,49,64,0.35),transparent 70%);
+  animation: wf-orb-d 15s ease-in-out infinite;
 }
 .wf-login-card {
   position:relative; z-index:2;
@@ -2204,7 +2236,7 @@ const LOGIN_CSS = `
   backdrop-filter:blur(24px);
   border-radius:24px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 32px 80px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.9);
-  animation: wf-float-up .45s cubic-bezier(.2,.9,.3,1) both;
+  animation: wf-float-up .6s cubic-bezier(.16,.9,.28,1) both;
 }
 .wf-login-logo-ring {
   width:64px; height:64px; border-radius:20px;
@@ -2224,21 +2256,23 @@ const LOGIN_CSS = `
   width:100%; padding:12px 14px; border-radius:12px;
   border:1.5px solid #E2DDD4; font-size:14px;
   background:#FDFCFA; color:${T.text}; outline:none;
-  font-family:inherit; transition:border-color .2s, box-shadow .2s, background .2s;
+  font-family:inherit; transition:border-color .25s ease, box-shadow .25s ease, background .25s ease, transform .15s ease;
   box-sizing:border-box;
 }
 .wf-login-input:focus {
   border-color:${T.forest}; background:#fff;
   box-shadow:0 0 0 4px rgba(46,111,78,0.12);
+  transform:translateY(-1px);
 }
 .wf-login-btn {
   width:100%; padding:13px; border:none; border-radius:14px;
   font-size:15px; font-weight:700; cursor:pointer; display:flex;
   align-items:center; justify-content:center; gap:8px;
-  font-family:inherit; transition:transform .15s, box-shadow .15s, filter .15s;
+  font-family:inherit; transition:transform .2s cubic-bezier(.2,.9,.3,1), box-shadow .2s ease, filter .2s ease;
   position:relative; overflow:hidden;
 }
-.wf-login-btn:active { transform:scale(.97); }
+.wf-login-btn:hover:not(:disabled) { transform:translateY(-1px); }
+.wf-login-btn:active:not(:disabled) { transform:scale(.97) translateY(0); }
 .wf-login-btn-emp {
   background:linear-gradient(135deg,${T.forest} 0%,${T.forestDark} 100%);
   color:#fff;
@@ -2273,6 +2307,23 @@ function useLoginStyle() {
       document.head.appendChild(tag);
     }
   }, []);
+}
+
+// Layered, slowly-drifting gradient blobs behind the login card. Purely
+// decorative (CSS animation only, no JS ticking) so it's cheap even on
+// low-end phones, but gives the screen a living, non-static feel.
+function LoginBackground() {
+  return (
+    <>
+      <div className="wf-login-bg" />
+      <div className="wf-login-orbs">
+        <div className="wf-login-orb wf-login-orb-1" />
+        <div className="wf-login-orb wf-login-orb-2" />
+        <div className="wf-login-orb wf-login-orb-3" />
+        <div className="wf-login-orb wf-login-orb-4" />
+      </div>
+    </>
+  );
 }
 
 function LoginField({ label, children }) {
@@ -2335,7 +2386,7 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
 
   return (
     <div className="wf-login-root">
-      <div className="wf-login-bg" />
+      <LoginBackground />
       <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
         <LangToggle />
       </div>
@@ -2467,7 +2518,7 @@ function AdminLoginScreen({ admins, onLogin, go }) {
 
   return (
     <div className="wf-login-root">
-      <div className="wf-login-bg" />
+      <LoginBackground />
       <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
         <LangToggle />
       </div>
@@ -7031,6 +7082,29 @@ function AppInner() {
   const [branding, setBranding, brandingReady] = useBrandingSettings();
   const brandDisplayName = branding.name?.trim() || t.appName;
   const { theme } = useTheme();
+
+  // The browser tab title/favicon live outside React (in the document
+  // head), so setting `branding` state alone doesn't touch them — push
+  // the custom name/logo into the tab explicitly whenever they change.
+  useEffect(() => {
+    if (!brandingReady) return;
+    document.title = brandDisplayName;
+  }, [brandingReady, brandDisplayName]);
+
+  useEffect(() => {
+    if (!brandingReady) return;
+    let link = document.querySelector("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.head.appendChild(link);
+    }
+    if (branding.logo) {
+      link.href = branding.logo;
+    }
+    // If no custom logo is set, leave whatever favicon index.html already
+    // defines (e.g. a default app icon) rather than clearing it.
+  }, [brandingReady, branding.logo]);
   const [departments, setDepartments, dReady] = useSupabaseArray(
     "departments",
     {
