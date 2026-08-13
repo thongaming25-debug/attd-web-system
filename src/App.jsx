@@ -1269,7 +1269,10 @@ function computePayroll(
 ----------------------------------------------------------------*/
 function normalizeHash(h) {
   const clean = (h || "").replace(/^#\/?/, "");
-  return clean === "employee" ? "employee" : "admin";
+  const [portalPart, ...rest] = clean.split("/");
+  const portal = portalPart === "employee" ? "employee" : "admin";
+  const page = rest.filter(Boolean).join("/") || null;
+  return { portal, page };
 }
 function usePortalRoute() {
   const [route, setRoute] = useState(() => normalizeHash(window.location.hash));
@@ -1278,10 +1281,24 @@ function usePortalRoute() {
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
-  const go = useCallback((next) => {
+  // Switching portals (admin <-> employee) is a real navigation, so it
+  // goes through location.hash like before and adds a history entry.
+  const goPortal = useCallback((next) => {
     window.location.hash = next ? `/${next}` : "";
   }, []);
-  return [route, go];
+  // Remembering which page we're on inside a portal uses replaceState
+  // instead of location.hash, so clicking around the sidebar doesn't
+  // spam the browser's back button — but the page still survives a
+  // refresh, because it's baked into the URL either way.
+  const setPage = useCallback((page) => {
+    setRoute((prev) => {
+      const next = { ...prev, page };
+      const hash = `#/${next.portal}${page ? `/${page}` : ""}`;
+      window.history.replaceState(null, "", hash);
+      return next;
+    });
+  }, []);
+  return [route.portal, route.page, goPortal, setPage];
 }
 
 /* ---------------------------------------------------------------
@@ -7254,9 +7271,12 @@ function AppInner() {
     K.SESSION_EMPLOYEE,
     null,
   );
-  const [page, setPage] = useState("dashboard");
   const [navOpen, setNavOpen] = useState(false);
-  const [portal, goPortal] = usePortalRoute();
+  const [portal, routedPage, goPortal, setPage] = usePortalRoute();
+  // Falls back to "dashboard" only when the URL has no page segment yet
+  // (e.g. a bare #/employee link) — otherwise refreshing always restores
+  // whatever page was open, for both the admin and staff portals.
+  const page = routedPage || "dashboard";
 
   const ready =
     dReady &&
