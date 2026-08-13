@@ -40,6 +40,142 @@ import {
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
+   Language / i18n  — add new keys here as needed
+----------------------------------------------------------------*/
+const LANG = {
+  km: {
+    appName: "Workforce Suite",
+    login: {
+      employeeId: "លេខសម្គាល់បុគ្គលិក",
+      employeeIdPlaceholder: "EMP-001",
+      pin: "កូដសម្ងាត់ (PIN)",
+      pinPlaceholder: "••••",
+      submit: "ចូលប្រើប្រព័ន្ធ",
+      adminSubmit: "ចូលជាអ្នកគ្រប់គ្រង",
+      username: "ឈ្មោះគណនី (Username)",
+      usernamePlaceholder: "admin",
+      password: "ពាក្យសម្ងាត់អ្នកគ្រប់គ្រង",
+      passwordPlaceholder: "••••••••",
+      adminTitle: "ចូលប្រើសម្រាប់អ្នកគ្រប់គ្រង",
+      employeePortal: "ចូលប្រើបុគ្គលិក",
+      demoLabel: "សម្រាប់សាកល្បង៖",
+      errNoEmp: "រកមិនឃើញលេខសម្គាល់បុគ្គលិកនេះទេ",
+      errInactive: "គណនីនេះមិនទាន់សកម្មទេ សូមទាក់ទង Admin",
+      errPin: "កូដសម្ងាត់ (PIN) មិនត្រឹមត្រូវទេ",
+      errNoAdmin: "រកមិនឃើញគណនីអ្នកគ្រប់គ្រងនេះទេ",
+      errPass: "ពាក្យសម្ងាត់មិនត្រឹមត្រូវទេ",
+      back: "ត្រឡប់ក្រោយ",
+      switchToAdmin: "អ្នកគ្រប់គ្រង? ចូលពីទីនេះ",
+    },
+    nav: {
+      dashboard: "ផ្ទាំងគ្រប់គ្រង",
+      employees: "បុគ្គលិក",
+      departments: "នាយកដ្ឋាន",
+      shifts: "វេនការងារ",
+      attendance: "វត្តមាន",
+      leave: "ច្បាប់ឈប់សម្រាក",
+      payroll: "ប្រាក់ខែ",
+      admins: "គណនីអ្នកគ្រប់គ្រង",
+      myAttendance: "វត្តមានរបស់ខ្ញុំ",
+      myLeave: "ច្បាប់ឈប់សម្រាករបស់ខ្ញុំ",
+      myPayroll: "ប្រាក់ខែរបស់ខ្ញុំ",
+      myProfile: "ប្រវត្តិរូបរបស់ខ្ញុំ",
+    },
+    logout: "ចាកចេញ",
+    notifications: "ការជូនដំណឹង",
+    markAllRead: "កំណត់ថាបានអានទាំងអស់",
+    noNotif: "មិនមានការជូនដំណឹងទេ",
+    confirmDelete: "បញ្ជាក់ការលុប",
+    cancel: "បោះបង់",
+    delete: "លុប",
+    employee: "បុគ្គលិក",
+  },
+  en: {
+    appName: "Workforce Suite",
+    login: {
+      employeeId: "Employee ID",
+      employeeIdPlaceholder: "EMP-001",
+      pin: "PIN Code",
+      pinPlaceholder: "••••",
+      submit: "Sign In",
+      adminSubmit: "Sign In as Admin",
+      username: "Username",
+      usernamePlaceholder: "admin",
+      password: "Admin Password",
+      passwordPlaceholder: "••••••••",
+      adminTitle: "Admin Login",
+      employeePortal: "Employee Portal",
+      demoLabel: "Demo credentials:",
+      errNoEmp: "Employee ID not found",
+      errInactive: "This account is inactive. Contact Admin.",
+      errPin: "Incorrect PIN code",
+      errNoAdmin: "Admin account not found",
+      errPass: "Incorrect password",
+      back: "Back",
+      switchToAdmin: "Admin? Sign in here",
+    },
+    nav: {
+      dashboard: "Dashboard",
+      employees: "Employees",
+      departments: "Departments",
+      shifts: "Shifts",
+      attendance: "Attendance",
+      leave: "Leave Requests",
+      payroll: "Payroll",
+      admins: "Admin Accounts",
+      myAttendance: "My Attendance",
+      myLeave: "My Leave",
+      myPayroll: "My Payroll",
+      myProfile: "My Profile",
+    },
+    logout: "Sign Out",
+    notifications: "Notifications",
+    markAllRead: "Mark all as read",
+    noNotif: "No notifications",
+    confirmDelete: "Confirm Delete",
+    cancel: "Cancel",
+    delete: "Delete",
+    employee: "Employee",
+  },
+};
+
+import React, { createContext, useContext as useCtx } from "react";
+const LangContext = createContext({
+  lang: "km",
+  t: LANG.km,
+  setLang: () => {},
+});
+const useLang = () => useCtx(LangContext);
+
+function LangToggle({ variant = "dark" }) {
+  const { lang, setLang } = useLang();
+  const isDark = variant === "dark";
+  return (
+    <button
+      onClick={() => setLang(lang === "km" ? "en" : "km")}
+      title="Switch language / ប្តូរភាសា"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 5,
+        background: isDark ? "rgba(255,255,255,0.10)" : T.paper,
+        border: `1px solid ${isDark ? "rgba(255,255,255,0.18)" : T.line}`,
+        borderRadius: 8,
+        color: isDark ? "#fff" : T.ink,
+        fontSize: 12,
+        fontWeight: 600,
+        padding: "5px 10px",
+        cursor: "pointer",
+        transition: "background .15s, border-color .15s",
+        backdropFilter: "blur(4px)",
+      }}
+    >
+      {lang === "km" ? "🇬🇧 EN" : "🇰🇭 KM"}
+    </button>
+  );
+}
+
+/* ---------------------------------------------------------------
    Tokens
 ----------------------------------------------------------------*/
 const T = {
@@ -1132,277 +1268,426 @@ function ConfirmDialog({ text, onCancel, onConfirm }) {
 }
 
 /* ---------------------------------------------------------------
-   Login screens — two fully separate pages/URLs:
-   #/employee  → employee portal, no admin option visible at all
-   #/admin     → admin portal, no employee option visible at all
+   Login screens — redesigned with smooth animations + language toggle
 ----------------------------------------------------------------*/
-function AuthShell({ children }) {
+const LOGIN_CSS_ID = "wf-login-style";
+const LOGIN_CSS = `
+@keyframes wf-float-up { from { opacity:0; transform:translateY(24px) scale(.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+@keyframes wf-bg-drift { 0%,100% { transform:translate(0,0) scale(1.05); } 50% { transform:translate(-20px, -14px) scale(1.08); } }
+@keyframes wf-pulse-ring { 0%,100% { transform:scale(1); opacity:.5; } 50% { transform:scale(1.12); opacity:.2; } }
+.wf-login-root {
+  display:flex; align-items:center; justify-content:center;
+  min-height:100vh; min-height:100dvh; position:relative; overflow:hidden;
+  background: linear-gradient(145deg, #0B1730 0%, #12203D 45%, #1a2e50 100%);
+}
+.wf-login-bg {
+  position:absolute; inset:-40px; z-index:0; pointer-events:none;
+  background: radial-gradient(ellipse 80% 60% at 20% 30%, rgba(46,111,78,0.18) 0%, transparent 60%),
+              radial-gradient(ellipse 60% 80% at 80% 70%, rgba(62,92,138,0.15) 0%, transparent 60%),
+              radial-gradient(ellipse 50% 40% at 60% 10%, rgba(192,138,46,0.10) 0%, transparent 60%);
+  animation: wf-bg-drift 14s ease-in-out infinite;
+}
+.wf-login-card {
+  position:relative; z-index:2;
+  width:100%; max-width:420px; margin:16px;
+  padding:36px 32px 28px;
+  background:rgba(255,255,255,0.97);
+  backdrop-filter:blur(24px);
+  border-radius:24px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 32px 80px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.9);
+  animation: wf-float-up .45s cubic-bezier(.2,.9,.3,1) both;
+}
+.wf-login-logo-ring {
+  width:64px; height:64px; border-radius:20px;
+  background:linear-gradient(145deg,${T.forest},${T.forestDark});
+  display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:20px; color:#fff;
+  font-family:'Space Grotesk',sans-serif;
+  box-shadow:0 4px 20px rgba(46,111,78,0.45), inset 0 1px 0 rgba(255,255,255,0.2);
+  position:relative;
+}
+.wf-login-logo-ring::before {
+  content:''; position:absolute; inset:-8px; border-radius:28px;
+  border:2px solid rgba(46,111,78,0.25);
+  animation: wf-pulse-ring 3s ease-in-out infinite;
+}
+.wf-login-input {
+  width:100%; padding:12px 14px; border-radius:12px;
+  border:1.5px solid #E2DDD4; font-size:14px;
+  background:#FDFCFA; color:${T.text}; outline:none;
+  font-family:inherit; transition:border-color .2s, box-shadow .2s, background .2s;
+  box-sizing:border-box;
+}
+.wf-login-input:focus {
+  border-color:${T.forest}; background:#fff;
+  box-shadow:0 0 0 4px rgba(46,111,78,0.12);
+}
+.wf-login-btn {
+  width:100%; padding:13px; border:none; border-radius:14px;
+  font-size:15px; font-weight:700; cursor:pointer; display:flex;
+  align-items:center; justify-content:center; gap:8px;
+  font-family:inherit; transition:transform .15s, box-shadow .15s, filter .15s;
+  position:relative; overflow:hidden;
+}
+.wf-login-btn:active { transform:scale(.97); }
+.wf-login-btn-emp {
+  background:linear-gradient(135deg,${T.forest} 0%,${T.forestDark} 100%);
+  color:#fff;
+  box-shadow:0 4px 16px rgba(46,111,78,0.35);
+}
+.wf-login-btn-emp:hover { box-shadow:0 6px 24px rgba(46,111,78,0.45); filter:brightness(1.06); }
+.wf-login-btn-adm {
+  background:linear-gradient(135deg,${T.ink} 0%,${T.inkDark} 100%);
+  color:#fff;
+  box-shadow:0 4px 16px rgba(18,32,61,0.35);
+}
+.wf-login-btn-adm:hover { box-shadow:0 6px 24px rgba(18,32,61,0.45); filter:brightness(1.1); }
+.wf-login-divider { display:flex; align-items:center; gap:10px; margin:18px 0; }
+.wf-login-divider::before,.wf-login-divider::after { content:''; flex:1; height:1px; background:#ECEAE3; }
+.wf-login-error {
+  display:flex; align-items:center; gap:7px; font-size:12.5px;
+  color:${T.rose}; background:${T.roseSoft}; border-radius:10px;
+  padding:9px 12px; margin-bottom:14px; border:1px solid #F0D4D8;
+}
+.wf-login-demo {
+  margin-top:20px; padding:11px 14px; background:#F7F5EE;
+  border-radius:12px; font-size:11px; color:${T.muted};
+  line-height:1.7; border:1px solid #EDE9DF;
+}
+`;
+function useLoginStyle() {
+  useEffect(() => {
+    if (!document.getElementById(LOGIN_CSS_ID)) {
+      const tag = document.createElement("style");
+      tag.id = LOGIN_CSS_ID;
+      tag.innerHTML = LOGIN_CSS;
+      document.head.appendChild(tag);
+    }
+  }, []);
+}
+
+function LoginField({ label, children }) {
   return (
-    <div
-      className="wf-root"
-      style={{
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: 640,
-        background: T.ink,
-      }}
-    >
+    <div style={{ marginBottom: 16 }}>
       <div
         style={{
-          width: "100%",
-          maxWidth: 380,
-          padding: "28px 26px",
-          background: "#fff",
-          borderRadius: 18,
-          boxShadow: "0 20px 60px rgba(0,0,0,0.35)",
+          fontSize: 11.5,
+          fontWeight: 700,
+          color: "#6B6455",
+          marginBottom: 7,
+          textTransform: "uppercase",
+          letterSpacing: ".04em",
         }}
       >
-        {children}
+        {label}
       </div>
+      {children}
     </div>
   );
 }
-function BackToChooser({ go }) {
-  return (
-    <button
-      onClick={() => go("employee")}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 6,
-        background: "none",
-        border: "none",
-        cursor: "pointer",
-        color: T.muted,
-        fontSize: 12,
-        fontWeight: 600,
-        marginBottom: 16,
-        padding: 0,
-      }}
-    >
-      <ArrowLeft size={14} /> ត្រឡប់ក្រោយ
-    </button>
-  );
-}
 
-function EmployeeLoginScreen({ employees, onLogin }) {
+function EmployeeLoginScreen({ employees, onLogin, go }) {
+  useLoginStyle();
+  const { t } = useLang();
+  const L = t.login;
   const [code, setCode] = useState("");
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    await new Promise((r) => setTimeout(r, 320));
     const emp = employees.find(
       (x) => x.code.trim().toLowerCase() === code.trim().toLowerCase(),
     );
     if (!emp) {
-      setError("រកមិនឃើញលេខសម្គាល់បុគ្គលិកនេះទេ");
+      setError(L.errNoEmp);
+      setLoading(false);
       return;
     }
     if (emp.status !== "active") {
-      setError("គណនីនេះមិនទាន់សកម្មទេ សូមទាក់ទង Admin");
+      setError(L.errInactive);
+      setLoading(false);
       return;
     }
     if ((emp.pin || "") !== pin.trim()) {
-      setError("កូដសម្ងាត់ (PIN) មិនត្រឹមត្រូវទេ");
+      setError(L.errPin);
+      setLoading(false);
       return;
     }
     setError("");
+    setLoading(false);
     onLogin(emp.id);
   };
 
   return (
-    <AuthShell>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-          marginBottom: 22,
-          justifyContent: "center",
-        }}
-      >
-        <div className="wf-logo-badge">WS</div>
-        <span
+    <div className="wf-login-root">
+      <div className="wf-login-bg" />
+      <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
+        <LangToggle />
+      </div>
+      <div className="wf-login-card">
+        <div
           style={{
-            fontWeight: 700,
-            fontSize: 17,
-            color: T.ink,
-            fontFamily: "'Space Grotesk',sans-serif",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            marginBottom: 28,
           }}
         >
-          Workforce Suite
-        </span>
-      </div>
-      <form onSubmit={submit}>
-        <Field label="លេខសម្គាល់បុគ្គលិក (Employee ID)">
-          <Input
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="EMP-001"
-            autoFocus
-          />
-        </Field>
-        <Field label="កូដសម្ងាត់ (PIN)">
-          <Input
-            value={pin}
-            onChange={(e) => setPin(e.target.value)}
-            placeholder="••••"
-            type="password"
-            inputMode="numeric"
-            maxLength={6}
-          />
-        </Field>
-        {error && (
-          <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 10 }}>
-            {error}
-          </p>
-        )}
-        <Button
-          variant="accent"
-          type="submit"
+          <div className="wf-login-logo-ring">WS</div>
+          <div
+            style={{
+              marginTop: 14,
+              fontFamily: "'Space Grotesk',sans-serif",
+              fontWeight: 700,
+              fontSize: 20,
+              color: T.ink,
+            }}
+          >
+            {t.appName}
+          </div>
+          <div style={{ fontSize: 13, color: T.muted, marginTop: 4 }}>
+            {L.employeePortal}
+          </div>
+        </div>
+        <form onSubmit={submit}>
+          <LoginField label={L.employeeId}>
+            <input
+              className="wf-login-input"
+              value={code}
+              onChange={(e) => {
+                setCode(e.target.value);
+                setError("");
+              }}
+              placeholder={L.employeeIdPlaceholder}
+              autoFocus
+            />
+          </LoginField>
+          <LoginField label={L.pin}>
+            <input
+              className="wf-login-input"
+              value={pin}
+              onChange={(e) => {
+                setPin(e.target.value);
+                setError("");
+              }}
+              placeholder={L.pinPlaceholder}
+              type="password"
+              inputMode="numeric"
+              maxLength={6}
+            />
+          </LoginField>
+          {error && (
+            <div className="wf-login-error">
+              <AlertCircle size={14} /> {error}
+            </div>
+          )}
+          <button
+            type="submit"
+            className="wf-login-btn wf-login-btn-emp"
+            disabled={loading}
+          >
+            {loading ? (
+              <Loader2
+                size={16}
+                style={{ animation: "spin 1s linear infinite" }}
+              />
+            ) : (
+              <LogIn size={16} />
+            )}
+            {loading ? "..." : L.submit}
+          </button>
+        </form>
+        <div className="wf-login-divider">
+          <span style={{ fontSize: 11.5, color: T.mutedLight }}>
+            {L.switchToAdmin}
+          </span>
+        </div>
+        <button
+          onClick={() => go("admin")}
           style={{
             width: "100%",
+            padding: "10px",
+            borderRadius: 12,
+            border: `1.5px solid ${T.line}`,
+            background: "transparent",
+            color: T.ink,
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
             justifyContent: "center",
-            padding: "11px 0",
-            fontSize: 14,
+            gap: 7,
+            transition: "background .15s",
           }}
+          onMouseOver={(e) => (e.currentTarget.style.background = T.paper)}
+          onMouseOut={(e) => (e.currentTarget.style.background = "transparent")}
         >
-          <LogIn size={16} /> ចូលប្រើប្រព័ន្ធ
-        </Button>
-      </form>
-      <div
-        style={{
-          marginTop: 18,
-          padding: "10px 12px",
-          background: T.paper,
-          borderRadius: 10,
-          fontSize: 11,
-          color: T.muted,
-          lineHeight: 1.6,
-        }}
-      >
-        <b style={{ color: T.textSoft }}>សម្រាប់សាកល្បង៖</b>
-        <br />
-        {employees
-          .slice(0, 3)
-          .map((e) => `${e.code}/${e.pin}`)
-          .join("  ·  ")}
+          <ShieldCheck size={15} color={T.muted} /> {L.adminTitle}
+        </button>
+        <div className="wf-login-demo">
+          <b style={{ color: T.textSoft }}>{L.demoLabel}</b>
+          <br />
+          {employees
+            .slice(0, 3)
+            .map((e) => `${e.code} / ${e.pin}`)
+            .join("  ·  ")}
+        </div>
       </div>
-    </AuthShell>
+    </div>
   );
 }
 
 function AdminLoginScreen({ admins, onLogin, go }) {
+  useLoginStyle();
+  const { t } = useLang();
+  const L = t.login;
   const [username, setUsername] = useState("");
   const [adminPass, setAdminPass] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    await new Promise((r) => setTimeout(r, 320));
     const acct = admins.find(
       (a) => a.username.trim().toLowerCase() === username.trim().toLowerCase(),
     );
     if (!acct) {
-      setError("រកមិនឃើញគណនីអ្នកគ្រប់គ្រងនេះទេ");
+      setError(L.errNoAdmin);
+      setLoading(false);
       return;
     }
     if (acct.password !== adminPass) {
-      setError("ពាក្យសម្ងាត់មិនត្រឹមត្រូវទេ");
+      setError(L.errPass);
+      setLoading(false);
       return;
     }
     setError("");
+    setLoading(false);
     onLogin(acct.id);
   };
 
   return (
-    <AuthShell>
-      <BackToChooser go={go} />
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-          marginBottom: 20,
-          justifyContent: "center",
-        }}
-      >
-        <div
+    <div className="wf-login-root">
+      <div className="wf-login-bg" />
+      <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
+        <LangToggle />
+      </div>
+      <div className="wf-login-card">
+        <button
+          onClick={() => go("employee")}
           style={{
-            width: 32,
-            height: 32,
-            borderRadius: 8,
-            background: "#EDE7F6",
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
+            gap: 6,
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            color: T.muted,
+            fontSize: 12.5,
+            fontWeight: 600,
+            marginBottom: 20,
+            padding: 0,
           }}
         >
-          <ShieldCheck size={17} color="#4A3B7A" />
+          <ArrowLeft size={14} /> {L.back}
+        </button>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            marginBottom: 28,
+          }}
+        >
+          <div
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: 20,
+              background: "linear-gradient(145deg,#5C4B9E,#3D3070)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 4px 20px rgba(92,75,158,0.4)",
+            }}
+          >
+            <ShieldCheck size={28} color="#fff" />
+          </div>
+          <div
+            style={{
+              marginTop: 14,
+              fontFamily: "'Space Grotesk',sans-serif",
+              fontWeight: 700,
+              fontSize: 20,
+              color: T.ink,
+            }}
+          >
+            {L.adminTitle}
+          </div>
+          <div style={{ fontSize: 13, color: T.muted, marginTop: 4 }}>
+            {t.appName}
+          </div>
         </div>
-        <span
-          style={{
-            fontWeight: 700,
-            fontSize: 16,
-            color: T.ink,
-            fontFamily: "'Space Grotesk',sans-serif",
-          }}
-        >
-          ចូលប្រើសម្រាប់អ្នកគ្រប់គ្រង
-        </span>
+        <form onSubmit={submit}>
+          <LoginField label={L.username}>
+            <input
+              className="wf-login-input"
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value);
+                setError("");
+              }}
+              placeholder={L.usernamePlaceholder}
+              autoFocus
+            />
+          </LoginField>
+          <LoginField label={L.password}>
+            <input
+              className="wf-login-input"
+              value={adminPass}
+              onChange={(e) => {
+                setAdminPass(e.target.value);
+                setError("");
+              }}
+              placeholder={L.passwordPlaceholder}
+              type="password"
+            />
+          </LoginField>
+          {error && (
+            <div className="wf-login-error">
+              <AlertCircle size={14} /> {error}
+            </div>
+          )}
+          <button
+            type="submit"
+            className="wf-login-btn wf-login-btn-adm"
+            disabled={loading}
+          >
+            {loading ? (
+              <Loader2
+                size={16}
+                style={{ animation: "spin 1s linear infinite" }}
+              />
+            ) : (
+              <ShieldCheck size={16} />
+            )}
+            {loading ? "..." : L.adminSubmit}
+          </button>
+        </form>
+        <div className="wf-login-demo">
+          <b style={{ color: T.textSoft }}>{L.demoLabel}</b>
+          <br />
+          {admins.map((a) => `${a.username} / ${a.password}`).join("  ·  ")}
+        </div>
       </div>
-      <form onSubmit={submit}>
-        <Field label="ឈ្មោះគណនី (Username)">
-          <Input
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="admin"
-            autoFocus
-          />
-        </Field>
-        <Field label="ពាក្យសម្ងាត់អ្នកគ្រប់គ្រង">
-          <Input
-            value={adminPass}
-            onChange={(e) => setAdminPass(e.target.value)}
-            placeholder="••••••••"
-            type="password"
-          />
-        </Field>
-        {error && (
-          <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 10 }}>
-            {error}
-          </p>
-        )}
-        <Button
-          variant="primary"
-          type="submit"
-          style={{
-            width: "100%",
-            justifyContent: "center",
-            padding: "11px 0",
-            fontSize: 14,
-          }}
-        >
-          <ShieldCheck size={16} /> ចូលជាអ្នកគ្រប់គ្រង
-        </Button>
-      </form>
-      <div
-        style={{
-          marginTop: 18,
-          padding: "10px 12px",
-          background: T.paper,
-          borderRadius: 10,
-          fontSize: 11,
-          color: T.muted,
-          lineHeight: 1.6,
-        }}
-      >
-        <b style={{ color: T.textSoft }}>សម្រាប់សាកល្បង៖</b>
-        <br />
-        {admins.map((a) => `${a.username}/${a.password}`).join("  ·  ")}
-      </div>
-    </AuthShell>
+    </div>
   );
 }
 
@@ -4486,32 +4771,31 @@ function Payroll({
 /* ---------------------------------------------------------------
    App shell
 ----------------------------------------------------------------*/
-const NAV_ADMIN = [
-  { id: "dashboard", label: "ផ្ទាំងគ្រប់គ្រង", icon: LayoutDashboard },
-  { id: "employees", label: "បុគ្គលិក", icon: Users },
-  { id: "departments", label: "នាយកដ្ឋាន", icon: Building2 },
-  { id: "shifts", label: "វេន", icon: Watch },
-  { id: "attendance", label: "វត្តមាន", icon: Clock },
-  { id: "leave", label: "ច្បាប់ឈប់សម្រាក", icon: CalendarDays },
-  { id: "payroll", label: "ប្រាក់ខែ", icon: Wallet },
-  // Superadmin-only — filtered out for manager accounts below.
-  {
-    id: "admins",
-    label: "គណនីអ្នកគ្រប់គ្រង",
-    icon: ShieldCheck,
-    superadminOnly: true,
-  },
-];
-const NAV_EMPLOYEE = [
-  { id: "dashboard", label: "ផ្ទាំងគ្រប់គ្រង", icon: LayoutDashboard },
-  { id: "attendance", label: "វត្តមានរបស់ខ្ញុំ", icon: Clock },
-  { id: "leave", label: "ច្បាប់ឈប់សម្រាករបស់ខ្ញុំ", icon: CalendarDays },
-  { id: "payroll", label: "ប្រាក់ខែរបស់ខ្ញុំ", icon: Wallet },
-  { id: "profile", label: "ប្រវត្តិរូបរបស់ខ្ញុំ", icon: UserCircle2 },
-];
+function buildNavAdmin(n) {
+  return [
+    { id: "dashboard", label: n.dashboard, icon: LayoutDashboard },
+    { id: "employees", label: n.employees, icon: Users },
+    { id: "departments", label: n.departments, icon: Building2 },
+    { id: "shifts", label: n.shifts, icon: Watch },
+    { id: "attendance", label: n.attendance, icon: Clock },
+    { id: "leave", label: n.leave, icon: CalendarDays },
+    { id: "payroll", label: n.payroll, icon: Wallet },
+    { id: "admins", label: n.admins, icon: ShieldCheck, superadminOnly: true },
+  ];
+}
+function buildNavEmployee(n) {
+  return [
+    { id: "dashboard", label: n.dashboard, icon: LayoutDashboard },
+    { id: "attendance", label: n.myAttendance, icon: Clock },
+    { id: "leave", label: n.myLeave, icon: CalendarDays },
+    { id: "payroll", label: n.myPayroll, icon: Wallet },
+    { id: "profile", label: n.myProfile, icon: UserCircle2 },
+  ];
+}
 
-export default function App() {
+function AppInner() {
   useGlobalStyle();
+  const { t } = useLang();
   const [departments, setDepartments, dReady] = useSupabaseArray(
     "departments",
     {
@@ -4658,8 +4942,8 @@ export default function App() {
   const loggedIn = role === "admin" || !!currentEmp;
   const nav =
     role === "admin"
-      ? NAV_ADMIN.filter((n) => !n.superadminOnly || isSuperAdmin)
-      : NAV_EMPLOYEE;
+      ? buildNavAdmin(t.nav).filter((n) => !n.superadminOnly || isSuperAdmin)
+      : buildNavEmployee(t.nav);
 
   useEffect(() => {
     if (loggedIn && !nav.find((n) => n.id === page)) setPage("dashboard");
@@ -4705,6 +4989,7 @@ export default function App() {
       <EmployeeLoginScreen
         employees={employees}
         onLogin={(id) => setSessionEmployee(id)}
+        go={goPortal}
       />
     );
   }
@@ -4829,7 +5114,7 @@ export default function App() {
                 else setSessionEmployee(null);
               }}
             >
-              <LogOut size={17} /> ចាកចេញ
+              <LogOut size={17} /> {t.logout}
             </button>
           </div>
         </div>
@@ -4869,7 +5154,7 @@ export default function App() {
                   borderRadius: 8,
                 }}
               >
-                បុគ្គលិក
+                {t.employee}
               </span>
             )}
             {role === "admin" && (
@@ -4886,6 +5171,7 @@ export default function App() {
                 {ADMIN_ROLE_LABEL[currentAdmin?.role]}
               </span>
             )}
+            <LangToggle variant="light" />
             <NotificationBell
               role={role}
               currentAdmin={currentAdmin}
@@ -5018,5 +5304,15 @@ export default function App() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function App() {
+  const [lang, setLang] = useLocalStorage("hrsuite:lang", "km");
+  const t = LANG[lang] || LANG.km;
+  return (
+    <LangContext.Provider value={{ lang, t, setLang }}>
+      <AppInner />
+    </LangContext.Provider>
   );
 }
