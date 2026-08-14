@@ -46,6 +46,8 @@ import {
   Moon,
   Settings2,
   Camera,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -199,6 +201,12 @@ const LANG = {
       rejected: "បានបដិសេធ",
       approve: "អនុម័ត",
       reject: "បដិសេធ",
+      approvedBy: "អនុម័តដោយ",
+      rejectedBy: "បដិសេធដោយ",
+      rejectTitle: "បដិសេធសំណើច្បាប់",
+      rejectReason: "មូលហេតុបដិសេធ",
+      rejectReasonPlaceholder: "សូមបញ្ជាក់មូលហេតុបដិសេធ...",
+      rejectReasonRequired: "សូមបញ្ចូលមូលហេតុបដិសេធ",
       confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបសំណើនេះ?",
       noRequest: "មិនទាន់មានសំណើទេ",
     },
@@ -440,6 +448,12 @@ const LANG = {
       rejected: "Rejected",
       approve: "Approve",
       reject: "Reject",
+      approvedBy: "Approved by",
+      rejectedBy: "Rejected by",
+      rejectTitle: "Reject Leave Request",
+      rejectReason: "Rejection Reason",
+      rejectReasonPlaceholder: "Please state the rejection reason...",
+      rejectReasonRequired: "Please enter a rejection reason",
       confirmDel: "Are you sure you want to delete this request?",
       noRequest: "No requests yet",
     },
@@ -743,6 +757,36 @@ html,body,#root{height:100%;}
 .wf-input{width:100%;padding:9px 12px;border-radius:10px;border:1px solid ${T.inputBorder};font-size:13px;background:${T.inputBg};color:${T.text};outline:none;font-family:inherit;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
 .wf-input:focus{border-color:${T.forest};box-shadow:0 0 0 3px rgba(46,111,78,0.15);}
 .wf-field-label{display:block;font-size:11px;font-weight:700;color:${T.fieldLabel};margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;}
+.wf-dp-wrap{position:relative;display:inline-block;width:100%;}
+.wf-dp-trigger{width:100%;padding:9px 12px;border-radius:10px;border:1px solid ${T.inputBorder};font-size:13px;background:${T.inputBg};color:${T.text};outline:none;font-family:inherit;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;text-align:left;}
+.wf-dp-trigger:hover{border-color:${T.forest};}
+.wf-dp-trigger.open{border-color:${T.forest};box-shadow:0 0 0 3px rgba(46,111,78,0.15);}
+.wf-dp-placeholder{color:${T.muted};}
+.wf-dp-pop{position:absolute;z-index:60;top:calc(100% + 6px);left:0;min-width:264px;background:${T.card};border:1px solid ${T.line};border-radius:14px;box-shadow:0 12px 32px rgba(18,32,61,0.18);padding:12px;animation:wf-pop .15s cubic-bezier(.2,.9,.3,1.2);}
+.wf-dp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.wf-dp-nav{background:none;border:none;cursor:pointer;color:${T.muted};display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;transition:background .12s ease,color .12s ease;flex-shrink:0;}
+.wf-dp-nav:hover{background:${T.tableHeadBg};color:${T.ink};}
+.wf-dp-title{font-size:13px;font-weight:700;color:${T.ink};font-family:'Space Grotesk',sans-serif;}
+.wf-dp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.wf-dp-dow{font-size:10px;font-weight:700;color:${T.muted};text-align:center;padding:4px 0;text-transform:uppercase;}
+.wf-dp-day{font-size:12.5px;text-align:center;padding:7px 0;border-radius:8px;cursor:pointer;color:${T.text};background:none;border:1px solid transparent;transition:background .12s ease,color .12s ease;}
+.wf-dp-day:hover{background:${T.tableHeadBg};}
+.wf-dp-day.outside{color:${T.mutedLight};}
+.wf-dp-day.today{border-color:${T.forest};font-weight:700;}
+.wf-dp-day.selected{background:${T.forest};color:#fff;font-weight:700;}
+.wf-dp-day.selected:hover{background:${T.forestDark};}
+.wf-dp-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid ${T.lineSoft};}
+.wf-dp-link{background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:${T.forestText};padding:2px 4px;border-radius:6px;}
+.wf-dp-link:hover{background:${T.forestSoft};}
+.wf-tp-pop{position:absolute;z-index:60;top:calc(100% + 6px);left:0;background:${T.card};border:1px solid ${T.line};border-radius:14px;box-shadow:0 12px 32px rgba(18,32,61,0.18);padding:10px;display:flex;flex-direction:column;animation:wf-pop .15s cubic-bezier(.2,.9,.3,1.2);}
+.wf-tp-cols{display:flex;align-items:center;gap:6px;}
+.wf-tp-col{width:50px;height:168px;overflow-y:auto;scroll-snap-type:y mandatory;border-radius:8px;background:${T.tableHeadBg};scrollbar-width:none;}
+.wf-tp-col::-webkit-scrollbar{width:0;height:0;}
+.wf-tp-pad{height:68px;flex-shrink:0;scroll-snap-align:none;}
+.wf-tp-item{scroll-snap-align:center;text-align:center;padding:8px 0;font-size:13px;font-family:'JetBrains Mono',monospace;color:${T.text};cursor:pointer;border-radius:6px;transition:background .12s ease,color .12s ease;}
+.wf-tp-item:hover{background:${T.line};}
+.wf-tp-item.selected{background:${T.forest};color:#fff;font-weight:700;}
+.wf-tp-sep{font-weight:700;color:${T.muted};padding-bottom:2px;}
 .wf-modal-overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(8,12,24,0.55);backdrop-filter:blur(2px);animation:wf-fade .15s ease;}
 .wf-modal{background:${T.card};border-radius:16px;box-shadow:0 24px 64px rgba(18,32,61,0.35);width:100%;max-height:90vh;overflow-y:auto;animation:wf-pop .18s cubic-bezier(.2,.9,.3,1.2);}
 .wf-modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid ${T.lineSoft};position:sticky;top:0;background:${T.card};border-radius:16px 16px 0 0;}
@@ -925,6 +969,23 @@ function initials(name) {
 }
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
+}
+const WEEKDAY_LABELS = ["អា", "ច", "អ", "ព", "ព្រ", "សុ", "ស"];
+// True if `dateStr` (YYYY-MM-DD) is a day off for `emp`, either because it
+// falls on one of their recurring weekly-off days or matches one of their
+// specific one-off days-off dates.
+function isDayOff(emp, dateStr) {
+  if (!emp || !dateStr) return false;
+  if (Array.isArray(emp.customDaysOff) && emp.customDaysOff.includes(dateStr))
+    return true;
+  if (Array.isArray(emp.weeklyOff) && emp.weeklyOff.length) {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    if (y && m && d) {
+      const dow = new Date(y, m - 1, d).getDay();
+      if (emp.weeklyOff.includes(dow)) return true;
+    }
+  }
+  return false;
 }
 function monthKey(d = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -2150,6 +2211,304 @@ function Input(props) {
 function Select(props) {
   return <select className="wf-input" {...props} />;
 }
+/* ---------------------------------------------------------------
+   Custom Date / Time pickers (replace native input[type=date/time])
+----------------------------------------------------------------*/
+function parseYMD(s) {
+  if (!s) return null;
+  const [y, m, d] = s.split("-").map(Number);
+  if (!y || !m || !d) return null;
+  return new Date(y, m - 1, d);
+}
+function fmtYMD(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+function fmtDateDisplay(s) {
+  const d = parseYMD(s);
+  if (!d) return "";
+  try {
+    return new Intl.DateTimeFormat("km-KH", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }).format(d);
+  } catch {
+    return s;
+  }
+}
+const DP_DOW = ["អា", "ច", "អ", "ព", "ព្រ", "សុ", "ស"];
+
+function useCloseOnOutside(ref, onClose) {
+  useEffect(() => {
+    function onDocClick(e) {
+      if (ref.current && !ref.current.contains(e.target)) onClose();
+    }
+    function onEsc(e) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onEsc);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onEsc);
+    };
+  }, [ref, onClose]);
+}
+
+function DatePicker({ value, onChange, placeholder, style, disabled }) {
+  const [open, setOpen] = useState(false);
+  const selected = parseYMD(value);
+  const [cursor, setCursor] = useState(() => selected || new Date());
+  const wrapRef = useRef(null);
+  useCloseOnOutside(wrapRef, () => setOpen(false));
+
+  useEffect(() => {
+    if (open) setCursor(selected || new Date());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  const fire = (d) => onChange && onChange({ target: { value: fmtYMD(d) } });
+
+  const year = cursor.getFullYear();
+  const month = cursor.getMonth();
+  const firstDow = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrevMonth = new Date(year, month, 0).getDate();
+  const totalCells = Math.ceil((firstDow + daysInMonth) / 7) * 7;
+  const today = todayStr();
+
+  const cells = [];
+  for (let i = 0; i < firstDow; i++) {
+    const day = daysInPrevMonth - firstDow + 1 + i;
+    cells.push({ day, outside: true, date: new Date(year, month - 1, day) });
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push({ day: d, outside: false, date: new Date(year, month, d) });
+  }
+  let nextDay = 1;
+  while (cells.length < totalCells) {
+    cells.push({
+      day: nextDay,
+      outside: true,
+      date: new Date(year, month + 1, nextDay),
+    });
+    nextDay++;
+  }
+
+  let monthTitle = `${year}-${month + 1}`;
+  try {
+    monthTitle = new Intl.DateTimeFormat("km-KH", {
+      year: "numeric",
+      month: "long",
+    }).format(cursor);
+  } catch {}
+
+  return (
+    <div className="wf-dp-wrap" ref={wrapRef} style={style}>
+      <button
+        type="button"
+        disabled={disabled}
+        className={`wf-dp-trigger${open ? " open" : ""}`}
+        onClick={() => !disabled && setOpen((o) => !o)}
+        style={disabled ? { opacity: 0.6, cursor: "not-allowed" } : undefined}
+      >
+        <span className={value ? "" : "wf-dp-placeholder"}>
+          {value ? fmtDateDisplay(value) : placeholder || "ជ្រើសរើសកាលបរិច្ឆេទ"}
+        </span>
+        <CalendarDays size={15} style={{ opacity: 0.55, flexShrink: 0 }} />
+      </button>
+      {open && !disabled && (
+        <div className="wf-dp-pop" onMouseDown={(e) => e.stopPropagation()}>
+          <div className="wf-dp-head">
+            <button
+              type="button"
+              className="wf-dp-nav"
+              onClick={() => setCursor(new Date(year, month - 1, 1))}
+            >
+              <ChevronLeft size={15} />
+            </button>
+            <span className="wf-dp-title">{monthTitle}</span>
+            <button
+              type="button"
+              className="wf-dp-nav"
+              onClick={() => setCursor(new Date(year, month + 1, 1))}
+            >
+              <ChevronRight size={15} />
+            </button>
+          </div>
+          <div className="wf-dp-grid">
+            {DP_DOW.map((w, i) => (
+              <div className="wf-dp-dow" key={i}>
+                {w}
+              </div>
+            ))}
+            {cells.map((c, i) => {
+              const ymd = fmtYMD(c.date);
+              const isSel = value && ymd === value;
+              const isToday = ymd === today;
+              return (
+                <button
+                  type="button"
+                  key={i}
+                  className={`wf-dp-day${c.outside ? " outside" : ""}${
+                    isToday ? " today" : ""
+                  }${isSel ? " selected" : ""}`}
+                  onClick={() => {
+                    fire(c.date);
+                    setOpen(false);
+                  }}
+                >
+                  {c.day}
+                </button>
+              );
+            })}
+          </div>
+          <div className="wf-dp-foot">
+            <button
+              type="button"
+              className="wf-dp-link"
+              onClick={() => {
+                onChange && onChange({ target: { value: "" } });
+                setOpen(false);
+              }}
+            >
+              សម្អាត
+            </button>
+            <button
+              type="button"
+              className="wf-dp-link"
+              onClick={() => {
+                fire(new Date());
+                setOpen(false);
+              }}
+            >
+              ថ្ងៃនេះ
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function parseHM(s) {
+  if (!s) return null;
+  const [h, m] = String(s).split(":").map(Number);
+  if (Number.isNaN(h) || Number.isNaN(m)) return null;
+  return { h, m };
+}
+function fmtHM(h, m) {
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+const TP_HOURS = Array.from({ length: 24 }, (_, i) => i);
+const TP_MINUTES = Array.from({ length: 60 }, (_, i) => i);
+
+function TimePicker({ value, onChange, placeholder, style, disabled }) {
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef(null);
+  const hourColRef = useRef(null);
+  const minColRef = useRef(null);
+  const parsed = parseHM(value);
+  useCloseOnOutside(wrapRef, () => setOpen(false));
+
+  useEffect(() => {
+    if (!open) return;
+    const h = parsed ? parsed.h : 9;
+    const m = parsed ? parsed.m : 0;
+    requestAnimationFrame(() => {
+      hourColRef.current
+        ?.querySelector(`[data-v="${h}"]`)
+        ?.scrollIntoView({ block: "center" });
+      minColRef.current
+        ?.querySelector(`[data-v="${m}"]`)
+        ?.scrollIntoView({ block: "center" });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  const fire = (h, m) =>
+    onChange && onChange({ target: { value: fmtHM(h, m) } });
+
+  return (
+    <div className="wf-dp-wrap" ref={wrapRef} style={style}>
+      <button
+        type="button"
+        disabled={disabled}
+        className={`wf-dp-trigger${open ? " open" : ""}`}
+        onClick={() => !disabled && setOpen((o) => !o)}
+        style={disabled ? { opacity: 0.6, cursor: "not-allowed" } : undefined}
+      >
+        <span className={value ? "" : "wf-dp-placeholder"}>
+          {value || placeholder || "ម៉ោង"}
+        </span>
+        <Clock size={15} style={{ opacity: 0.55, flexShrink: 0 }} />
+      </button>
+      {open && !disabled && (
+        <div className="wf-tp-pop" onMouseDown={(e) => e.stopPropagation()}>
+          <div className="wf-tp-cols">
+            <div className="wf-tp-col" ref={hourColRef}>
+              <div className="wf-tp-pad" />
+              {TP_HOURS.map((h) => (
+                <div
+                  key={h}
+                  data-v={h}
+                  className={`wf-tp-item${
+                    parsed && parsed.h === h ? " selected" : ""
+                  }`}
+                  onClick={() => fire(h, parsed ? parsed.m : 0)}
+                >
+                  {String(h).padStart(2, "0")}
+                </div>
+              ))}
+              <div className="wf-tp-pad" />
+            </div>
+            <div className="wf-tp-sep">:</div>
+            <div className="wf-tp-col" ref={minColRef}>
+              <div className="wf-tp-pad" />
+              {TP_MINUTES.map((m) => (
+                <div
+                  key={m}
+                  data-v={m}
+                  className={`wf-tp-item${
+                    parsed && parsed.m === m ? " selected" : ""
+                  }`}
+                  onClick={() => fire(parsed ? parsed.h : 9, m)}
+                >
+                  {String(m).padStart(2, "0")}
+                </div>
+              ))}
+              <div className="wf-tp-pad" />
+            </div>
+          </div>
+          <div className="wf-dp-foot">
+            <button
+              type="button"
+              className="wf-dp-link"
+              onClick={() => {
+                onChange && onChange({ target: { value: "" } });
+                setOpen(false);
+              }}
+            >
+              សម្អាត
+            </button>
+            <button
+              type="button"
+              className="wf-dp-link"
+              onClick={() => {
+                const now = new Date();
+                fire(now.getHours(), now.getMinutes());
+                setOpen(false);
+              }}
+            >
+              ឥឡូវ
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ConfirmDialog({ text, onCancel, onConfirm }) {
   const { t } = useLang();
   return (
@@ -3042,7 +3401,14 @@ function Dashboard({
 /* ---------------------------------------------------------------
    Employees
 ----------------------------------------------------------------*/
-function EmployeeForm({ initial, departments, shifts, onSave, onCancel }) {
+function EmployeeForm({
+  initial,
+  departments,
+  shifts,
+  offices,
+  onSave,
+  onCancel,
+}) {
   const { t, lang } = useLang();
   const [f, setF] = useState(
     initial || {
@@ -3051,6 +3417,9 @@ function EmployeeForm({ initial, departments, shifts, onSave, onCancel }) {
       name: "",
       deptId: departments[0]?.id || "",
       shiftId: shifts[0]?.id || "",
+      officeId: "",
+      weeklyOff: [],
+      customDaysOff: [],
       role: "",
       email: "",
       phone: "",
@@ -3059,7 +3428,30 @@ function EmployeeForm({ initial, departments, shifts, onSave, onCancel }) {
       joined: todayStr(),
     },
   );
+  const [newOffDate, setNewOffDate] = useState("");
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const toggleWeeklyOff = (dow) => {
+    const cur = f.weeklyOff || [];
+    setF({
+      ...f,
+      weeklyOff: cur.includes(dow)
+        ? cur.filter((d) => d !== dow)
+        : [...cur, dow].sort(),
+    });
+  };
+  const addCustomDayOff = () => {
+    if (!newOffDate) return;
+    const cur = f.customDaysOff || [];
+    if (cur.includes(newOffDate)) return;
+    setF({ ...f, customDaysOff: [...cur, newOffDate].sort() });
+    setNewOffDate("");
+  };
+  const removeCustomDayOff = (dateStr) => {
+    setF({
+      ...f,
+      customDaysOff: (f.customDaysOff || []).filter((d) => d !== dateStr),
+    });
+  };
   return (
     <div>
       <Field label={t.emps.name}>
@@ -3153,11 +3545,93 @@ function EmployeeForm({ initial, departments, shifts, onSave, onCancel }) {
         </Field>
       </div>
       <Field label={t.emps.joined}>
-        <Input
-          type="date"
-          value={f.joined || todayStr()}
-          onChange={set("joined")}
-        />
+        <DatePicker value={f.joined || todayStr()} onChange={set("joined")} />
+      </Field>
+      <Field label="សាខា (Branch)">
+        <Select value={f.officeId || ""} onChange={set("officeId")}>
+          <option value="">មិនទាន់កំណត់</option>
+          {(offices || []).map((o) => (
+            <option key={o.id} value={o.id}>
+              {o.name}
+            </option>
+          ))}
+        </Select>
+      </Field>
+      <Field label="ថ្ងៃឈប់សម្រាកប្រចាំសប្តាហ៍">
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          {WEEKDAY_LABELS.map((label, dow) => {
+            const active = (f.weeklyOff || []).includes(dow);
+            return (
+              <button
+                type="button"
+                key={dow}
+                onClick={() => toggleWeeklyOff(dow)}
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: 10,
+                  border: `1px solid ${active ? T.forest : T.line}`,
+                  background: active ? T.forest : T.inputBg,
+                  color: active ? "#fff" : T.text,
+                  fontWeight: 700,
+                  fontSize: 12.5,
+                  cursor: "pointer",
+                  transition: "background .12s ease,border-color .12s ease",
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+      <Field label="ថ្ងៃឈប់សម្រាកពិសេស (កាលបរិច្ឆេទជាក់លាក់)">
+        <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+          <DatePicker
+            style={{ flex: 1 }}
+            value={newOffDate}
+            onChange={(e) => setNewOffDate(e.target.value)}
+          />
+          <Button type="button" variant="ghost" onClick={addCustomDayOff}>
+            <Plus size={14} /> បន្ថែម
+          </Button>
+        </div>
+        {(f.customDaysOff || []).length > 0 && (
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {(f.customDaysOff || []).map((d) => (
+              <span
+                key={d}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 5,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: T.forestText,
+                  background: T.forestSoft,
+                  padding: "5px 8px 5px 10px",
+                  borderRadius: 999,
+                }}
+              >
+                {fmtDateDisplay(d)}
+                <button
+                  type="button"
+                  onClick={() => removeCustomDayOff(d)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "inherit",
+                    display: "flex",
+                    padding: 0,
+                  }}
+                >
+                  <X size={12} />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
       </Field>
       <div
         style={{
@@ -3188,6 +3662,7 @@ function Employees({
   employees,
   departments,
   shifts,
+  offices,
   setEmployees,
   isSuperAdmin,
 }) {
@@ -3195,11 +3670,15 @@ function Employees({
   const [modal, setModal] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
   const [query, setQuery] = useState("");
-  const filtered = employees.filter((e) =>
-    (e.name + e.code + e.role).toLowerCase().includes(query.toLowerCase()),
+  const [branchFilter, setBranchFilter] = useState("");
+  const filtered = employees.filter(
+    (e) =>
+      (e.name + e.code + e.role).toLowerCase().includes(query.toLowerCase()) &&
+      (!branchFilter || e.officeId === branchFilter),
   );
   const deptName = (id) => departments.find((d) => d.id === id)?.name || "—";
   const shiftOf = (id) => shifts.find((s) => s.id === id);
+  const officeName = (id) => offices.find((o) => o.id === id)?.name || null;
 
   const save = (data) => {
     if (modal.mode === "add")
@@ -3253,6 +3732,20 @@ function Employees({
             onChange={(e) => setQuery(e.target.value)}
           />
         </div>
+        {offices && offices.length > 0 && (
+          <Select
+            style={{ maxWidth: 180 }}
+            value={branchFilter}
+            onChange={(e) => setBranchFilter(e.target.value)}
+          >
+            <option value="">គ្រប់សាខា</option>
+            {offices.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.name}
+              </option>
+            ))}
+          </Select>
+        )}
         <Button variant="accent" onClick={() => setModal({ mode: "add" })}>
           <Plus size={15} /> {t.emps.addBtn}
         </Button>
@@ -3305,6 +3798,18 @@ function Employees({
                 🏢 {deptName(e.deptId)} · {e.role}
               </div>
               <div>⏰ {shiftLabel(shiftOf(e.shiftId))}</div>
+              {officeName(e.officeId) && <div>🏬 {officeName(e.officeId)}</div>}
+              {((e.weeklyOff && e.weeklyOff.length > 0) ||
+                (e.customDaysOff && e.customDaysOff.length > 0)) && (
+                <div style={{ color: T.rose }}>
+                  🛌{" "}
+                  {(e.weeklyOff || []).map((d) => WEEKDAY_LABELS[d]).join(" ")}
+                  {e.weeklyOff?.length && e.customDaysOff?.length ? " · " : ""}
+                  {e.customDaysOff?.length
+                    ? `${e.customDaysOff.length} ថ្ងៃពិសេស`
+                    : ""}
+                </div>
+              )}
               <div
                 style={{
                   overflow: "hidden",
@@ -3389,6 +3894,7 @@ function Employees({
             initial={modal.data}
             departments={departments}
             shifts={shifts}
+            offices={offices}
             onSave={save}
             onCancel={() => setModal(null)}
           />
@@ -3615,10 +4121,10 @@ function ShiftForm({ initial, onSave, onCancel }) {
       </Field>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         <Field label="ម៉ោងចូល">
-          <Input type="time" value={f.start} onChange={set("start")} />
+          <TimePicker value={f.start} onChange={set("start")} />
         </Field>
         <Field label="ម៉ោងចេញ">
-          <Input type="time" value={f.end} onChange={set("end")} />
+          <TimePicker value={f.end} onChange={set("end")} />
         </Field>
       </div>
       {f.end <= f.start && f.start && f.end && (
@@ -3805,7 +4311,9 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
   );
   const [locBusy, setLocBusy] = useState(false);
   const [locError, setLocError] = useState("");
+  const [branchWarning, setBranchWarning] = useState("");
   const hasOffices = offices && offices.length > 0;
+  const todayIsDayOff = isDayOff(emp, today);
 
   // If one or more office branches (each with lat/lng + radius) are
   // configured, require the employee's current GPS position to fall
@@ -3816,6 +4324,7 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
   const verifyLocation = async () => {
     if (!hasOffices) return null; // no geofence configured — skip check
     setLocError("");
+    setBranchWarning("");
     setLocBusy(true);
     try {
       const coords = await getCurrentPosition();
@@ -3836,6 +4345,13 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
             : "មិនអាចផ្ទៀងផ្ទាត់ទីតាំងបានទេ",
         );
         return null;
+      }
+      if (emp.officeId && match.office.id !== emp.officeId) {
+        setBranchWarning(
+          `⚠️ អ្នកកំពុងចុះឈ្មោះនៅសាខា "${match.office.name}" ប៉ុន្តែអ្នកត្រូវបានកំណត់ឲ្យធ្វើការនៅសាខាផ្សេង`,
+        );
+      } else {
+        setBranchWarning("");
       }
       return {
         lat: coords.latitude,
@@ -3861,7 +4377,32 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
       if (!loc) return;
     }
     const t = timeNow();
-    const status = isLateForShift(t, shift) ? "late" : "present";
+    // Re-fetch the employee's *current* shift assignment right before
+    // computing lateness. `shift` here is whatever was loaded into this
+    // browser tab when the page opened — if an admin reassigned the
+    // employee to a different shift after that (e.g. moments before this
+    // punch), the in-memory value would be stale and give the wrong
+    // late/present result. A fresh read avoids that.
+    let effectiveShift = shift;
+    try {
+      const { data: freshEmp } = await supabase
+        .from("employees")
+        .select("shift_id")
+        .eq("id", emp.id)
+        .maybeSingle();
+      if (freshEmp && freshEmp.shift_id !== emp.shiftId) {
+        const { data: freshShift } = await supabase
+          .from("shifts")
+          .select("*")
+          .eq("id", freshEmp.shift_id)
+          .maybeSingle();
+        if (freshShift) effectiveShift = freshShift;
+      }
+    } catch {
+      // If the re-fetch fails (offline, etc.), fall back to the shift
+      // already in memory rather than blocking the punch.
+    }
+    const status = isLateForShift(t, effectiveShift) ? "late" : "present";
     setAttendance([
       ...attendance,
       {
@@ -3941,6 +4482,43 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
           <MapPin size={12} /> ត្រូវការទីតាំង GPS នៅជិតសាខាមួយក្នុងចំណោម{" "}
           {offices.length} សាខា
         </div>
+      )}
+      {todayIsDayOff && (
+        <p
+          style={{
+            fontSize: 12.5,
+            fontWeight: 600,
+            color: T.goldText,
+            background: T.goldSoft,
+            padding: "8px 12px",
+            borderRadius: 10,
+            marginBottom: 12,
+            maxWidth: 320,
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
+        >
+          🛌 ថ្ងៃនេះជាថ្ងៃឈប់សម្រាករបស់អ្នក —
+          អ្នកនៅតែអាចចុះឈ្មោះបានប្រសិនបើអ្នកមកធ្វើការ
+        </p>
+      )}
+      {branchWarning && (
+        <p
+          style={{
+            fontSize: 12.5,
+            fontWeight: 600,
+            color: T.goldText,
+            background: T.goldSoft,
+            padding: "8px 12px",
+            borderRadius: 10,
+            marginBottom: 12,
+            maxWidth: 320,
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
+        >
+          {branchWarning}
+        </p>
       )}
       {locError && (
         <p
@@ -4325,29 +4903,70 @@ function OfficeLocationSettings({ offices, setOffices }) {
   );
 }
 
-function ManualAttendanceForm({ employees, onSave, onCancel }) {
+function ManualAttendanceForm({ employees, initial, onSave, onCancel }) {
   const { t, lang } = useLang();
-  const [f, setF] = useState({
-    employeeId: employees[0]?.id || "",
-    date: todayStr(),
-    checkIn: "08:00",
-    checkOut: "",
-    status: "present",
-  });
+  const editing = !!initial;
+  const [f, setF] = useState(
+    initial
+      ? {
+          employeeId: initial.employeeId,
+          date: initial.date,
+          checkIn: initial.checkIn || "08:00",
+          checkOut: initial.checkOut || "",
+          status: initial.status,
+        }
+      : {
+          employeeId: employees[0]?.id || "",
+          date: todayStr(),
+          checkIn: "08:00",
+          checkOut: "",
+          status: "present",
+        },
+  );
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const emp = employees.find((e) => e.id === f.employeeId);
   return (
     <div>
       <Field label="បុគ្គលិក">
-        <Select value={f.employeeId} onChange={set("employeeId")}>
-          {employees.map((e) => (
-            <option key={e.id} value={e.id}>
-              {e.name} ({e.code})
-            </option>
-          ))}
-        </Select>
+        {editing ? (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "9px 12px",
+              background: T.paper,
+              borderRadius: 10,
+            }}
+          >
+            <Avatar name={emp?.name} photo={emp?.photo} size={26} />
+            <div>
+              <div style={{ fontWeight: 600, fontSize: 13, color: T.ink }}>
+                {emp?.name}
+              </div>
+              <div
+                style={{
+                  fontSize: 10.5,
+                  color: T.muted,
+                  fontFamily: "'JetBrains Mono',monospace",
+                }}
+              >
+                {emp?.code}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <Select value={f.employeeId} onChange={set("employeeId")}>
+            {employees.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.name} ({e.code})
+              </option>
+            ))}
+          </Select>
+        )}
       </Field>
       <Field label="កាលបរិច្ឆេទ">
-        <Input type="date" value={f.date} onChange={set("date")} />
+        <DatePicker value={f.date} onChange={set("date")} disabled={editing} />
       </Field>
       <Field label="ស្ថានភាព">
         <Select
@@ -4374,10 +4993,10 @@ function ManualAttendanceForm({ employees, onSave, onCancel }) {
           style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
         >
           <Field label="ម៉ោងចូល">
-            <Input type="time" value={f.checkIn} onChange={set("checkIn")} />
+            <TimePicker value={f.checkIn} onChange={set("checkIn")} />
           </Field>
           <Field label="ម៉ោងចេញ">
-            <Input type="time" value={f.checkOut} onChange={set("checkOut")} />
+            <TimePicker value={f.checkOut} onChange={set("checkOut")} />
           </Field>
         </div>
       )}
@@ -4420,6 +5039,7 @@ function Attendance({
   const { t, lang } = useLang();
   const [date, setDate] = useState(todayStr());
   const [modal, setModal] = useState(false);
+  const [editRecord, setEditRecord] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
   const dayRecords = attendance.filter((a) => a.date === date);
   const activeEmployees = employees.filter((e) => e.status === "active");
@@ -4447,6 +5067,7 @@ function Attendance({
         { id: uid("a"), ...f, checkOut: f.checkOut || null },
       ]);
     setModal(false);
+    setEditRecord(null);
   };
 
   if (role !== "admin" && currentEmp) {
@@ -4543,15 +5164,19 @@ function Attendance({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <CalendarDays size={16} color={T.muted} />
-          <Input
-            type="date"
-            style={{ width: "auto" }}
+          <DatePicker
+            style={{ width: 168 }}
             value={date}
             onChange={(e) => setDate(e.target.value)}
           />
         </div>
-        <Button variant="accent" onClick={() => setModal(true)}>
+        <Button
+          variant="accent"
+          onClick={() => {
+            setEditRecord(null);
+            setModal(true);
+          }}
+        >
           <Plus size={15} /> កត់ត្រាដោយដៃ
         </Button>
       </div>
@@ -4624,9 +5249,26 @@ function Attendance({
                   )}
                 </td>
                 <td style={{ textAlign: "right" }}>
-                  {rec && isSuperAdmin && (
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 10,
+                      justifyContent: "flex-end",
+                    }}
+                  >
                     <button
-                      onClick={() => setConfirmDel(rec)}
+                      onClick={() => {
+                        setEditRecord(
+                          rec || {
+                            employeeId: emp.id,
+                            date,
+                            checkIn: "08:00",
+                            checkOut: "",
+                            status: "present",
+                          },
+                        );
+                        setModal(true);
+                      }}
                       style={{
                         background: "none",
                         border: "none",
@@ -4634,9 +5276,22 @@ function Attendance({
                         color: T.mutedLight,
                       }}
                     >
-                      <Trash2 size={14} />
+                      <Pencil size={14} />
                     </button>
-                  )}
+                    {rec && isSuperAdmin && (
+                      <button
+                        onClick={() => setConfirmDel(rec)}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          color: T.mutedLight,
+                        }}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
@@ -4644,11 +5299,21 @@ function Attendance({
         </table>
       </Card>
       {modal && (
-        <Modal title="កត់ត្រាវត្តមានដោយដៃ" onClose={() => setModal(false)}>
+        <Modal
+          title={editRecord?.id ? "កែសម្រួលវត្តមាន" : "កត់ត្រាវត្តមានដោយដៃ"}
+          onClose={() => {
+            setModal(false);
+            setEditRecord(null);
+          }}
+        >
           <ManualAttendanceForm
             employees={activeEmployees}
+            initial={editRecord}
             onSave={save}
-            onCancel={() => setModal(false)}
+            onCancel={() => {
+              setModal(false);
+              setEditRecord(null);
+            }}
           />
         </Modal>
       )}
@@ -4690,10 +5355,10 @@ function LeaveRequestForm({ onSave, onCancel }) {
       </Field>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         <Field label="ចាប់ពីថ្ងៃ">
-          <Input type="date" value={f.startDate} onChange={set("startDate")} />
+          <DatePicker value={f.startDate} onChange={set("startDate")} />
         </Field>
         <Field label="ដល់ថ្ងៃ">
-          <Input type="date" value={f.endDate} onChange={set("endDate")} />
+          <DatePicker value={f.endDate} onChange={set("endDate")} />
         </Field>
       </div>
       {invalidRange && (
@@ -4743,10 +5408,82 @@ function LeaveRequestForm({ onSave, onCancel }) {
   );
 }
 
+// Small inline "decided by" line shown on both the admin and employee
+// views, so everyone sees the same approve/reject attribution.
+function LeaveDecisionNote({ r, admins }) {
+  const { t } = useLang();
+  if (r.status !== "approved" && r.status !== "rejected") return null;
+  const decider = admins.find((a) => a.id === r.decidedById);
+  const name = r.decidedByName || decider?.name || "—";
+  const roleLabel = ADMIN_ROLE_LABEL[r.decidedByRole] || r.decidedByRole || "";
+  return (
+    <div style={{ fontSize: 11.5, color: T.textSoft, marginTop: 3 }}>
+      {r.status === "approved" ? (
+        <span>
+          {t.lv.approvedBy} <strong>{name}</strong>
+          {roleLabel ? ` · ${roleLabel}` : ""}
+        </span>
+      ) : (
+        <span style={{ color: T.rose }}>
+          {t.lv.rejectedBy} <strong>{name}</strong>
+          {roleLabel ? ` · ${roleLabel}` : ""}
+          {r.decisionReason ? ` — ${r.decisionReason}` : ""}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function LeaveRejectModal({ onCancel, onConfirm }) {
+  const { t } = useLang();
+  const [reason, setReason] = useState("");
+  const trimmed = reason.trim();
+  return (
+    <Modal title={t.lv.rejectTitle} onClose={onCancel} width={420}>
+      <Field label={t.lv.rejectReason}>
+        <textarea
+          className="wf-input"
+          rows={3}
+          style={{ resize: "vertical", fontFamily: "inherit" }}
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          placeholder={t.lv.rejectReasonPlaceholder}
+        />
+      </Field>
+      {reason !== "" && !trimmed && (
+        <p
+          style={{
+            fontSize: 12.5,
+            color: T.rose,
+            marginTop: -8,
+            marginBottom: 12,
+          }}
+        >
+          {t.lv.rejectReasonRequired}
+        </p>
+      )}
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+        <Button variant="ghost" onClick={onCancel}>
+          {t.cancel}
+        </Button>
+        <Button
+          variant="danger-solid"
+          disabled={!trimmed}
+          onClick={() => onConfirm(trimmed)}
+        >
+          {t.lv.reject}
+        </Button>
+      </div>
+    </Modal>
+  );
+}
+
 function LeaveRequests({
   role,
+  currentAdmin,
   currentEmp,
   employees,
+  admins,
   leaveRequests,
   setLeaveRequests,
   attendance,
@@ -4755,12 +5492,17 @@ function LeaveRequests({
 }) {
   const { t, lang } = useLang();
   const [modal, setModal] = useState(false);
+  const [rejectFor, setRejectFor] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
   const empOf = (id) => employees.find((e) => e.id === id);
 
   // Approving a request marks every day in its range as paid leave in
   // attendance, so payroll (which already treats "leave" as paid) picks
   // it up automatically — no separate payroll logic needed.
+  // Days the employee has already actually checked into (e.g. a same-day
+  // leave request approved after they clocked in that morning, or a
+  // leave range that overlaps a day they already worked) are left alone
+  // — approving leave elsewhere must never erase real attendance.
   const applyLeaveToAttendance = (req) => {
     const days = dateRange(req.startDate, req.endDate);
     let next = attendance;
@@ -4768,6 +5510,7 @@ function LeaveRequests({
       const existing = next.find(
         (a) => a.employeeId === req.employeeId && a.date === d,
       );
+      if (existing && existing.checkIn) continue;
       if (existing) {
         next = next.map((a) =>
           a.id === existing.id
@@ -4791,15 +5534,41 @@ function LeaveRequests({
     setAttendance(next);
   };
 
-  const decide = (req, status) => {
+  const approve = (req) => {
     setLeaveRequests(
       leaveRequests.map((r) =>
         r.id === req.id
-          ? { ...r, status, reviewedAt: new Date().toISOString() }
+          ? {
+              ...r,
+              status: "approved",
+              decidedById: currentAdmin?.id || null,
+              decidedByName: currentAdmin?.name || "",
+              decidedByRole: currentAdmin?.role || "",
+              decisionReason: "",
+              reviewedAt: new Date().toISOString(),
+            }
           : r,
       ),
     );
-    if (status === "approved") applyLeaveToAttendance(req);
+    applyLeaveToAttendance(req);
+  };
+  const reject = (req, reason) => {
+    setLeaveRequests(
+      leaveRequests.map((r) =>
+        r.id === req.id
+          ? {
+              ...r,
+              status: "rejected",
+              decidedById: currentAdmin?.id || null,
+              decidedByName: currentAdmin?.name || "",
+              decidedByRole: currentAdmin?.role || "",
+              decisionReason: reason,
+              reviewedAt: new Date().toISOString(),
+            }
+          : r,
+      ),
+    );
+    setRejectFor(null);
   };
 
   const submit = (f) => {
@@ -4877,6 +5646,7 @@ function LeaveRequests({
                   </td>
                   <td>
                     <StatusPill status={r.status} />
+                    <LeaveDecisionNote r={r} admins={admins} />
                   </td>
                 </tr>
               ))}
@@ -4980,6 +5750,7 @@ function LeaveRequests({
                   </td>
                   <td>
                     <StatusPill status={r.status} />
+                    <LeaveDecisionNote r={r} admins={admins} />
                   </td>
                   <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                     {r.status === "pending" ? (
@@ -4993,14 +5764,14 @@ function LeaveRequests({
                         <Button
                           size="sm"
                           variant="accent"
-                          onClick={() => decide(r, "approved")}
+                          onClick={() => approve(r)}
                         >
                           {t.lv.approve}
                         </Button>
                         <Button
                           size="sm"
                           variant="danger"
-                          onClick={() => decide(r, "rejected")}
+                          onClick={() => setRejectFor(r)}
                         >
                           {t.lv.reject}
                         </Button>
@@ -5027,6 +5798,12 @@ function LeaveRequests({
           </tbody>
         </table>
       </Card>
+      {rejectFor && (
+        <LeaveRejectModal
+          onCancel={() => setRejectFor(null)}
+          onConfirm={(reason) => reject(rejectFor, reason)}
+        />
+      )}
       {confirmDel && (
         <ConfirmDialog
           text="តើអ្នកពិតជាចង់លុបសំណើនេះមែនទេ?"
@@ -5072,7 +5849,7 @@ function OvertimeRequestForm({ onSave, onCancel }) {
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         <Field label={t.ot.date}>
-          <Input type="date" value={f.date} onChange={set("date")} />
+          <DatePicker value={f.date} onChange={set("date")} />
         </Field>
         <Field label={t.ot.hours}>
           <Input
@@ -7279,6 +8056,9 @@ function AppInner() {
       name: r.name,
       deptId: r.dept_id,
       shiftId: r.shift_id,
+      officeId: r.office_id,
+      weeklyOff: r.weekly_off || [],
+      customDaysOff: r.custom_days_off || [],
       role: r.role,
       email: r.email,
       phone: r.phone,
@@ -7294,6 +8074,9 @@ function AppInner() {
       name: r.name,
       dept_id: r.deptId,
       shift_id: r.shiftId,
+      office_id: r.officeId || null,
+      weekly_off: r.weeklyOff || [],
+      custom_days_off: r.customDaysOff || [],
       role: r.role,
       email: r.email,
       phone: r.phone,
@@ -7339,6 +8122,11 @@ function AppInner() {
         reason: r.reason,
         status: r.status,
         createdAt: r.created_at,
+        decidedById: r.decided_by_id,
+        decidedByName: r.decided_by_name,
+        decidedByRole: r.decided_by_role,
+        decisionReason: r.decision_reason,
+        reviewedAt: r.reviewed_at,
       }),
       toDb: (r) => ({
         id: r.id,
@@ -7349,6 +8137,11 @@ function AppInner() {
         reason: r.reason,
         status: r.status,
         created_at: r.createdAt,
+        decided_by_id: r.decidedById,
+        decided_by_name: r.decidedByName,
+        decided_by_role: r.decidedByRole,
+        decision_reason: r.decisionReason,
+        reviewed_at: r.reviewedAt,
       }),
     },
   );
@@ -7778,6 +8571,7 @@ function AppInner() {
                 employees={employees}
                 departments={departments}
                 shifts={shifts}
+                offices={offices}
                 setEmployees={setEmployees}
                 isSuperAdmin={isSuperAdmin}
               />
@@ -7814,8 +8608,10 @@ function AppInner() {
             {page === "leave" && (
               <LeaveRequests
                 role={role}
+                currentAdmin={currentAdmin}
                 currentEmp={currentEmp}
                 employees={employees}
+                admins={admins}
                 leaveRequests={leaveRequests}
                 setLeaveRequests={setLeaveRequests}
                 attendance={attendance}
