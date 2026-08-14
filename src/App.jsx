@@ -48,6 +48,9 @@ import {
   Camera,
   ChevronLeft,
   ChevronRight,
+  Download,
+  Star,
+  Megaphone,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -80,6 +83,7 @@ const LANG = {
     },
     nav: {
       dashboard: "ផ្ទាំងគ្រប់គ្រង",
+      announcements: "សេចក្តីប្រកាស",
       employees: "បុគ្គលិក",
       departments: "នាយកដ្ឋាន",
       shifts: "វេនការងារ",
@@ -87,11 +91,13 @@ const LANG = {
       leave: "ច្បាប់ឈប់សម្រាក",
       overtime: "ការងារបន្ថែម (OT)",
       payroll: "ប្រាក់ខែ",
+      performance: "ការវាយតម្លៃការងារ",
       admins: "គណនីអ្នកគ្រប់គ្រង",
       myAttendance: "វត្តមានរបស់ខ្ញុំ",
       myLeave: "ច្បាប់ឈប់សម្រាករបស់ខ្ញុំ",
       myOvertime: "ការងារបន្ថែម (OT) របស់ខ្ញុំ",
       myPayroll: "ប្រាក់ខែរបស់ខ្ញុំ",
+      myPerformance: "ការវាយតម្លៃការងាររបស់ខ្ញុំ",
       myProfile: "ប្រវត្តិរូបរបស់ខ្ញុំ",
       settings: "ការកំណត់",
     },
@@ -163,6 +169,7 @@ const LANG = {
       inactive: "អសកម្ម",
       confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបបុគ្គលិកនេះ?",
       noEmp: "មិនទាន់មានបុគ្គលិកទេ",
+      printBadge: "បោះពុម្ពកាតសម្គាល់",
     },
     sh: {
       addBtn: "បន្ថែមវេន",
@@ -259,6 +266,40 @@ const LANG = {
         "កំណត់អត្រាភាគរយពន្ធលើប្រាក់ខែ និងធានារ៉ាប់រង ដែលនឹងកាត់ចេញពីប្រាក់ខែមូលដ្ឋានរបស់បុគ្គលិកទាំងអស់។",
       taxRateLabel: "អត្រាពន្ធលើប្រាក់ខែ (%)",
       insuranceRateLabel: "អត្រាធានារ៉ាប់រង (%)",
+      downloadPdf: "ទាញយក PDF",
+      payslipTitle: "សន្លឹកប្រាក់ខែ",
+      payPeriod: "រយៈពេលបើកប្រាក់ខែ",
+      generatedOn: "បង្កើតនៅថ្ងៃ",
+    },
+    pr: {
+      addBtn: "បន្ថែមការវាយតម្លៃ",
+      editTitle: "កែសម្រួលការវាយតម្លៃ",
+      addTitle: "បន្ថែមការវាយតម្លៃការងារ",
+      employee: "បុគ្គលិក",
+      period: "រយៈពេលវាយតម្លៃ",
+      periodPlaceholder: "ឧ. ត្រីមាសទី១ ឆ្នាំ២០២៦",
+      rating: "ការវាយតម្លៃ (ផ្កាយ)",
+      strengths: "ចំណុចខ្លាំង",
+      strengthsPlaceholder: "សរសេរចំណុចខ្លាំងរបស់បុគ្គលិក...",
+      improvements: "ចំណុចត្រូវកែលម្អ",
+      improvementsPlaceholder: "សរសេរចំណុចដែលគួរកែលម្អ...",
+      reviewedBy: "វាយតម្លៃដោយ",
+      confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបការវាយតម្លៃនេះ?",
+      noReview: "មិនទាន់មានការវាយតម្លៃទេ",
+      notifTitle: "អ្នកទទួលបានការវាយតម្លៃការងារថ្មី",
+    },
+    ann: {
+      addBtn: "បង្កើតសេចក្តីប្រកាស",
+      editTitle: "កែសម្រួលសេចក្តីប្រកាស",
+      addTitle: "សេចក្តីប្រកាសថ្មី",
+      titleLabel: "ចំណងជើង",
+      titlePlaceholder: "ឧ. ថ្ងៃឈប់សម្រាកចុងឆ្នាំ",
+      bodyLabel: "ខ្លឹមសារ",
+      bodyPlaceholder: "សរសេរខ្លឹមសារសេចក្តីប្រកាស...",
+      postedBy: "ប្រកាសដោយ",
+      confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបសេចក្តីប្រកាសនេះ?",
+      noAnn: "មិនទាន់មានសេចក្តីប្រកាសទេ",
+      notifTitle: "សេចក្តីប្រកាសថ្មីពីក្រុមហ៊ុន",
     },
     admAcc: {
       addBtn: "បន្ថែមអ្នកគ្រប់គ្រង",
@@ -327,6 +368,7 @@ const LANG = {
     },
     nav: {
       dashboard: "Dashboard",
+      announcements: "Announcements",
       employees: "Employees",
       departments: "Departments",
       shifts: "Shifts",
@@ -334,11 +376,13 @@ const LANG = {
       leave: "Leave Requests",
       overtime: "Overtime (OT)",
       payroll: "Payroll",
+      performance: "Performance Reviews",
       admins: "Admin Accounts",
       myAttendance: "My Attendance",
       myLeave: "My Leave",
       myOvertime: "My Overtime (OT)",
       myPayroll: "My Payroll",
+      myPerformance: "My Performance Reviews",
       myProfile: "My Profile",
       settings: "Settings",
     },
@@ -410,6 +454,7 @@ const LANG = {
       inactive: "Inactive",
       confirmDel: "Are you sure you want to delete this employee?",
       noEmp: "No employees yet",
+      printBadge: "Print ID Badge",
     },
     sh: {
       addBtn: "Add Shift",
@@ -506,6 +551,40 @@ const LANG = {
         "Set the tax and insurance percentage rates deducted from every employee's base salary.",
       taxRateLabel: "Tax Rate (%)",
       insuranceRateLabel: "Insurance Rate (%)",
+      downloadPdf: "Download PDF",
+      payslipTitle: "Payslip",
+      payPeriod: "Pay Period",
+      generatedOn: "Generated on",
+    },
+    pr: {
+      addBtn: "Add Review",
+      editTitle: "Edit Review",
+      addTitle: "Add Performance Review",
+      employee: "Employee",
+      period: "Review Period",
+      periodPlaceholder: "e.g. Q1 2026",
+      rating: "Rating (stars)",
+      strengths: "Strengths",
+      strengthsPlaceholder: "Note the employee's strengths...",
+      improvements: "Areas to Improve",
+      improvementsPlaceholder: "Note areas for improvement...",
+      reviewedBy: "Reviewed by",
+      confirmDel: "Are you sure you want to delete this review?",
+      noReview: "No reviews yet",
+      notifTitle: "You received a new performance review",
+    },
+    ann: {
+      addBtn: "New Announcement",
+      editTitle: "Edit Announcement",
+      addTitle: "New Announcement",
+      titleLabel: "Title",
+      titlePlaceholder: "e.g. Year-end holiday schedule",
+      bodyLabel: "Message",
+      bodyPlaceholder: "Write the announcement...",
+      postedBy: "Posted by",
+      confirmDel: "Are you sure you want to delete this announcement?",
+      noAnn: "No announcements yet",
+      notifTitle: "New company announcement",
     },
     admAcc: {
       addBtn: "Add Admin",
@@ -1117,6 +1196,8 @@ function buildNotifications({
   attendance,
   leaveRequests,
   overtimeRequests = [],
+  performanceReviews = [],
+  announcements = [],
   lang = "km",
 }) {
   const LEAVE_TYPE_LABEL = getLeaveTypeLabel(lang);
@@ -1217,6 +1298,30 @@ function buildNotifications({
           time: r.reviewedAt,
         });
       });
+    performanceReviews
+      .filter((r) => r.employeeId === currentEmp.id)
+      .forEach((r) => {
+        list.push({
+          id: `pr-new-${r.id}`,
+          page: "review",
+          tone: "gold",
+          title: en
+            ? "You received a new performance review"
+            : "អ្នកទទួលបានការវាយតម្លៃការងារថ្មី",
+          message: r.period,
+          time: r.createdAt,
+        });
+      });
+    announcements.forEach((a) => {
+      list.push({
+        id: `ann-new-${a.id}`,
+        page: "announcements",
+        tone: "gold",
+        title: en ? "New company announcement" : "សេចក្តីប្រកាសថ្មីពីក្រុមហ៊ុន",
+        message: a.title,
+        time: a.createdAt,
+      });
+    });
   }
   return list.sort((a, b) => (b.time || "").localeCompare(a.time || ""));
 }
@@ -1972,6 +2077,8 @@ function NotificationBell({
   attendance,
   leaveRequests,
   overtimeRequests,
+  performanceReviews,
+  announcements,
   setPage,
 }) {
   const { t, lang } = useLang();
@@ -1997,6 +2104,8 @@ function NotificationBell({
         attendance,
         leaveRequests,
         overtimeRequests,
+        performanceReviews,
+        announcements,
         lang,
       }),
     [
@@ -2007,6 +2116,8 @@ function NotificationBell({
       attendance,
       leaveRequests,
       overtimeRequests,
+      performanceReviews,
+      announcements,
     ],
   );
   const unread = notifications.filter((n) => !readIds.includes(n.id));
@@ -3705,6 +3816,7 @@ function Employees({
   isSuperAdmin,
 }) {
   const { t, lang } = useLang();
+  const { branding } = useBranding();
   const [modal, setModal] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
   const [query, setQuery] = useState("");
@@ -3905,6 +4017,27 @@ function Employees({
                 </Button>
               )}
             </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              style={{ width: "100%", justifyContent: "center", marginTop: 8 }}
+              onClick={() =>
+                printEmployeeBadge({
+                  t,
+                  brandName: branding?.name?.trim() || t.appName,
+                  brandLogo: branding?.logo || null,
+                  emp: e,
+                  deptLabel: deptName(e.deptId),
+                  roleLabel: e.role,
+                  shiftText: shiftLabel(shiftOf(e.shiftId)),
+                  officeText: officeName(e.officeId),
+                  statusLabel:
+                    e.status === "active" ? t.emps.active : t.emps.inactive,
+                })
+              }
+            >
+              <BadgeCheck size={13} /> {t.emps.printBadge}
+            </Button>
           </Card>
         ))}
         {filtered.length === 0 && (
@@ -6616,6 +6749,626 @@ function OvertimeRequests({
 }
 
 /* ---------------------------------------------------------------
+   Announcements — admin posts company-wide messages that every
+   employee (and admin) sees in a shared feed, newest first.
+----------------------------------------------------------------*/
+function AnnouncementForm({ initial, onSave, onCancel }) {
+  const { t } = useLang();
+  const [f, setF] = useState(initial || { title: "", body: "" });
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const invalid = !f.title.trim() || !f.body.trim();
+  return (
+    <div>
+      <Field label={t.ann.titleLabel}>
+        <Input
+          value={f.title}
+          onChange={set("title")}
+          placeholder={t.ann.titlePlaceholder}
+        />
+      </Field>
+      <Field label={t.ann.bodyLabel}>
+        <textarea
+          className="wf-input"
+          rows={5}
+          style={{ resize: "vertical", fontFamily: "inherit" }}
+          value={f.body}
+          onChange={set("body")}
+          placeholder={t.ann.bodyPlaceholder}
+        />
+      </Field>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          marginTop: 16,
+          paddingTop: 14,
+          borderTop: `1px solid ${T.lineSoft}`,
+        }}
+      >
+        <Button variant="ghost" onClick={onCancel}>
+          {t.cancel}
+        </Button>
+        <Button
+          variant="accent"
+          onClick={() => onSave({ title: f.title.trim(), body: f.body.trim() })}
+          disabled={invalid}
+        >
+          {t.save}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function Announcements({
+  role,
+  currentAdmin,
+  announcements,
+  setAnnouncements,
+  isSuperAdmin,
+}) {
+  const { t, lang } = useLang();
+  const [modal, setModal] = useState(null);
+  const [confirmDel, setConfirmDel] = useState(null);
+
+  const save = (f) => {
+    if (modal.mode === "add") {
+      setAnnouncements([
+        ...announcements,
+        {
+          id: uid("ann"),
+          title: f.title,
+          body: f.body,
+          createdById: currentAdmin?.id || null,
+          createdByName: currentAdmin?.name || "",
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+    } else {
+      setAnnouncements(
+        announcements.map((a) =>
+          a.id === modal.data.id ? { ...a, title: f.title, body: f.body } : a,
+        ),
+      );
+    }
+    setModal(null);
+  };
+
+  const sorted = [...announcements].sort((a, b) =>
+    b.createdAt.localeCompare(a.createdAt),
+  );
+
+  return (
+    <div>
+      {role === "admin" && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: 16,
+          }}
+        >
+          <Button variant="accent" onClick={() => setModal({ mode: "add" })}>
+            <Plus size={15} /> {t.ann.addBtn}
+          </Button>
+        </div>
+      )}
+      {sorted.length === 0 && (
+        <Card
+          style={{
+            textAlign: "center",
+            padding: "32px 0",
+            color: T.muted,
+            fontSize: 13,
+          }}
+        >
+          {t.ann.noAnn}
+        </Card>
+      )}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {sorted.map((a) => (
+          <Card key={a.id} style={{ padding: 16 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                gap: 10,
+                marginBottom: 8,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontWeight: 700,
+                  color: T.ink,
+                  fontSize: 14,
+                }}
+              >
+                <Megaphone size={16} color={T.goldText} /> {a.title}
+              </div>
+              {role === "admin" && (
+                <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                  <button
+                    onClick={() => setModal({ mode: "edit", data: a })}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: T.mutedLight,
+                    }}
+                  >
+                    <Pencil size={14} />
+                  </button>
+                  {isSuperAdmin && (
+                    <button
+                      onClick={() => setConfirmDel(a)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        color: T.mutedLight,
+                      }}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+            <div
+              style={{
+                fontSize: 13,
+                color: T.textSoft,
+                whiteSpace: "pre-wrap",
+                marginBottom: 10,
+              }}
+            >
+              {a.body}
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                fontSize: 11,
+                color: T.muted,
+              }}
+            >
+              <span>
+                {t.ann.postedBy} {a.createdByName || "—"}
+              </span>
+              <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                {timeAgoLabel(a.createdAt)}
+              </span>
+            </div>
+          </Card>
+        ))}
+      </div>
+      {modal && (
+        <Modal
+          title={modal.mode === "add" ? t.ann.addTitle : t.ann.editTitle}
+          onClose={() => setModal(null)}
+        >
+          <AnnouncementForm
+            initial={modal.data}
+            onSave={save}
+            onCancel={() => setModal(null)}
+          />
+        </Modal>
+      )}
+      {confirmDel && (
+        <ConfirmDialog
+          text={t.ann.confirmDel}
+          onCancel={() => setConfirmDel(null)}
+          onConfirm={() => {
+            setAnnouncements(
+              announcements.filter((a) => a.id !== confirmDel.id),
+            );
+            setConfirmDel(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   Performance reviews — admin writes periodic reviews (rating +
+   notes) for each employee; employees can view their own history
+   read-only.
+----------------------------------------------------------------*/
+function RatingStars({ value, onChange, size = 16 }) {
+  const stars = [1, 2, 3, 4, 5];
+  return (
+    <div style={{ display: "flex", gap: 4 }}>
+      {stars.map((n) => (
+        <span
+          key={n}
+          onClick={onChange ? () => onChange(n) : undefined}
+          style={{
+            cursor: onChange ? "pointer" : "default",
+            lineHeight: 0,
+          }}
+        >
+          <Star
+            size={size}
+            fill={n <= value ? "#D9A441" : "none"}
+            color={n <= value ? "#D9A441" : T.mutedLight}
+            strokeWidth={1.75}
+          />
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function PerformanceReviewForm({ initial, employees, onSave, onCancel }) {
+  const { t } = useLang();
+  const [f, setF] = useState(
+    initial || {
+      employeeId: employees[0]?.id || "",
+      period: "",
+      rating: 5,
+      strengths: "",
+      improvements: "",
+    },
+  );
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const invalid = !f.employeeId || !f.period.trim();
+  return (
+    <div>
+      <Field label={t.pr.employee}>
+        <Select
+          value={f.employeeId}
+          onChange={set("employeeId")}
+          disabled={!!initial}
+        >
+          {employees.map((e) => (
+            <option key={e.id} value={e.id}>
+              {e.name} ({e.code})
+            </option>
+          ))}
+        </Select>
+      </Field>
+      <Field label={t.pr.period}>
+        <Input
+          value={f.period}
+          onChange={set("period")}
+          placeholder={t.pr.periodPlaceholder}
+        />
+      </Field>
+      <Field label={t.pr.rating}>
+        <RatingStars
+          value={f.rating}
+          onChange={(n) => setF({ ...f, rating: n })}
+          size={22}
+        />
+      </Field>
+      <Field label={t.pr.strengths}>
+        <textarea
+          className="wf-input"
+          rows={3}
+          style={{ resize: "vertical", fontFamily: "inherit" }}
+          value={f.strengths}
+          onChange={set("strengths")}
+          placeholder={t.pr.strengthsPlaceholder}
+        />
+      </Field>
+      <Field label={t.pr.improvements}>
+        <textarea
+          className="wf-input"
+          rows={3}
+          style={{ resize: "vertical", fontFamily: "inherit" }}
+          value={f.improvements}
+          onChange={set("improvements")}
+          placeholder={t.pr.improvementsPlaceholder}
+        />
+      </Field>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          marginTop: 16,
+          paddingTop: 14,
+          borderTop: `1px solid ${T.lineSoft}`,
+        }}
+      >
+        <Button variant="ghost" onClick={onCancel}>
+          {t.cancel}
+        </Button>
+        <Button
+          variant="accent"
+          onClick={() =>
+            onSave({
+              ...f,
+              period: f.period.trim(),
+              strengths: f.strengths.trim(),
+              improvements: f.improvements.trim(),
+            })
+          }
+          disabled={invalid}
+        >
+          {t.save}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function PerformanceReviews({
+  role,
+  currentAdmin,
+  currentEmp,
+  employees,
+  performanceReviews,
+  setPerformanceReviews,
+  isSuperAdmin,
+}) {
+  const { t } = useLang();
+  const [modal, setModal] = useState(null);
+  const [confirmDel, setConfirmDel] = useState(null);
+  const empOf = (id) => employees.find((e) => e.id === id);
+
+  const save = (f) => {
+    if (modal.mode === "add") {
+      setPerformanceReviews([
+        ...performanceReviews,
+        {
+          id: uid("pr"),
+          employeeId: f.employeeId,
+          period: f.period,
+          rating: f.rating,
+          strengths: f.strengths,
+          improvements: f.improvements,
+          reviewedById: currentAdmin?.id || null,
+          reviewedByName: currentAdmin?.name || "",
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+    } else {
+      setPerformanceReviews(
+        performanceReviews.map((r) =>
+          r.id === modal.data.id
+            ? {
+                ...r,
+                period: f.period,
+                rating: f.rating,
+                strengths: f.strengths,
+                improvements: f.improvements,
+              }
+            : r,
+        ),
+      );
+    }
+    setModal(null);
+  };
+
+  if (role !== "admin" && currentEmp) {
+    const mine = performanceReviews
+      .filter((r) => r.employeeId === currentEmp.id)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    return (
+      <div>
+        {mine.length === 0 && (
+          <Card
+            style={{
+              textAlign: "center",
+              padding: "32px 0",
+              color: T.muted,
+              fontSize: 13,
+            }}
+          >
+            {t.pr.noReview}
+          </Card>
+        )}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {mine.map((r) => (
+            <Card key={r.id} style={{ padding: 16 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: 8,
+                }}
+              >
+                <span style={{ fontWeight: 600, color: T.ink, fontSize: 13 }}>
+                  {r.period}
+                </span>
+                <RatingStars value={r.rating} />
+              </div>
+              {r.strengths && (
+                <div
+                  style={{ fontSize: 12.5, color: T.textSoft, marginBottom: 6 }}
+                >
+                  <strong style={{ color: T.forestText }}>
+                    {t.pr.strengths}:
+                  </strong>{" "}
+                  {r.strengths}
+                </div>
+              )}
+              {r.improvements && (
+                <div
+                  style={{ fontSize: 12.5, color: T.textSoft, marginBottom: 6 }}
+                >
+                  <strong style={{ color: T.goldText }}>
+                    {t.pr.improvements}:
+                  </strong>{" "}
+                  {r.improvements}
+                </div>
+              )}
+              <div style={{ fontSize: 11, color: T.muted, marginTop: 8 }}>
+                {t.pr.reviewedBy} {r.reviewedByName || "—"}
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const sorted = [...performanceReviews].sort((a, b) =>
+    b.createdAt.localeCompare(a.createdAt),
+  );
+  return (
+    <div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: 16,
+        }}
+      >
+        <Button
+          variant="accent"
+          onClick={() => setModal({ mode: "add" })}
+          disabled={employees.length === 0}
+        >
+          <Plus size={15} /> {t.pr.addBtn}
+        </Button>
+      </div>
+      <Card style={{ overflowX: "auto" }}>
+        <table className="wf-table">
+          <thead>
+            <tr>
+              <th>{t.pr.employee}</th>
+              <th>{t.pr.period}</th>
+              <th>{t.pr.rating}</th>
+              <th>{t.pr.reviewedBy}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.length === 0 && (
+              <tr>
+                <td
+                  colSpan={5}
+                  style={{
+                    textAlign: "center",
+                    color: T.muted,
+                    padding: "24px 0",
+                  }}
+                >
+                  {t.pr.noReview}
+                </td>
+              </tr>
+            )}
+            {sorted.map((r) => {
+              const emp = empOf(r.employeeId);
+              return (
+                <tr key={r.id}>
+                  <td>
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 10 }}
+                    >
+                      <Avatar
+                        name={emp?.name || "?"}
+                        photo={emp?.photo}
+                        size={30}
+                      />
+                      <div>
+                        <div
+                          style={{
+                            fontWeight: 500,
+                            color: T.ink,
+                            fontSize: 13,
+                          }}
+                        >
+                          {emp?.name || "—"}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 10.5,
+                            color: T.muted,
+                            fontFamily: "'JetBrains Mono',monospace",
+                          }}
+                        >
+                          {emp?.code}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ fontSize: 12.5 }}>{r.period}</td>
+                  <td>
+                    <RatingStars value={r.rating} size={14} />
+                  </td>
+                  <td style={{ fontSize: 12, color: T.textSoft }}>
+                    {r.reviewedByName || "—"}
+                  </td>
+                  <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 6,
+                        justifyContent: "flex-end",
+                      }}
+                    >
+                      <button
+                        onClick={() => setModal({ mode: "edit", data: r })}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          color: T.mutedLight,
+                        }}
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      {isSuperAdmin && (
+                        <button
+                          onClick={() => setConfirmDel(r)}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            color: T.mutedLight,
+                          }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </Card>
+      {modal && (
+        <Modal
+          title={modal.mode === "add" ? t.pr.addTitle : t.pr.editTitle}
+          onClose={() => setModal(null)}
+        >
+          <PerformanceReviewForm
+            initial={modal.data}
+            employees={employees}
+            onSave={save}
+            onCancel={() => setModal(null)}
+          />
+        </Modal>
+      )}
+      {confirmDel && (
+        <ConfirmDialog
+          text={t.pr.confirmDel}
+          onCancel={() => setConfirmDel(null)}
+          onConfirm={() => {
+            setPerformanceReviews(
+              performanceReviews.filter((r) => r.id !== confirmDel.id),
+            );
+            setConfirmDel(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
    Admin accounts — superadmin only. Two permission levels:
    superadmin (full access, incl. deleting records and managing other
    admin accounts) and manager (day-to-day HR work, no deletes).
@@ -7639,6 +8392,278 @@ function AdminSettings({ currentAdmin, admins, setAdmins, isSuperAdmin }) {
 /* ---------------------------------------------------------------
    Payroll
 ----------------------------------------------------------------*/
+function escapeHtml(s) {
+  return String(s ?? "").replace(
+    /[&<>"']/g,
+    (c) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[c],
+  );
+}
+
+// Builds a standalone, print-ready payslip document and opens the
+// browser's print dialog on it. The user can choose "Save as PDF" as
+// the destination — this avoids pulling in a PDF-generation library
+// just for a single printable document.
+function printPayslip({
+  t,
+  brandName,
+  brandLogo,
+  emp,
+  mk,
+  rows, // [{ label, value, tone: "neg"|"pos"|undefined }]
+  net,
+}) {
+  const win = window.open("", "_blank", "width=480,height=720");
+  if (!win) {
+    alert("Please allow pop-ups to download the payslip.");
+    return;
+  }
+  const rowsHtml = rows
+    .map(
+      (r) => `
+      <div class="row${r.tone ? " " + r.tone : ""}">
+        <span>${escapeHtml(r.label)}</span>
+        <span class="mono">${r.tone === "neg" ? "-" : r.tone === "pos" ? "+" : ""}${escapeHtml(r.value)}</span>
+      </div>`,
+    )
+    .join("");
+  const generatedOn = new Date().toLocaleDateString();
+  const html = `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>${escapeHtml(t.pay.payslipTitle)} — ${escapeHtml(emp.name)} — ${escapeHtml(mk)}</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans Khmer', 'Segoe UI', Arial, sans-serif;
+    color: #16213a;
+    margin: 0;
+    padding: 32px;
+    background: #fff;
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #16213a;
+    margin-bottom: 20px;
+  }
+  .header img { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; }
+  .brand { font-size: 16px; font-weight: 700; }
+  .title { font-size: 13px; color: #6b7280; margin-top: 2px; }
+  .empbox {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+  }
+  .empname { font-size: 14px; font-weight: 600; }
+  .empsub { font-size: 11px; color: #6b7280; margin-top: 2px; }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 6px 0;
+  }
+  .row.neg { color: #b3261e; }
+  .row.pos { color: #1b6e4c; }
+  .mono { font-family: 'Consolas', 'Courier New', monospace; }
+  .net {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #16213a;
+    color: #fff;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-top: 16px;
+  }
+  .net .label { font-size: 13px; font-weight: 600; }
+  .net .value { font-size: 19px; font-weight: 700; font-family: 'Consolas', 'Courier New', monospace; }
+  .footer {
+    margin-top: 28px;
+    font-size: 10px;
+    color: #9ca3af;
+    text-align: center;
+  }
+  @media print {
+    body { padding: 0 24px; }
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    ${brandLogo ? `<img src="${escapeHtml(brandLogo)}" />` : ""}
+    <div>
+      <div class="brand">${escapeHtml(brandName)}</div>
+      <div class="title">${escapeHtml(t.pay.payslipTitle)} · ${escapeHtml(t.pay.payPeriod)}: ${escapeHtml(monthLabel(mk))}</div>
+    </div>
+  </div>
+  <div class="empbox">
+    <div class="empname">${escapeHtml(emp.name)}</div>
+    <div class="empsub">${escapeHtml(emp.code)} · ${escapeHtml(emp.role || "")}</div>
+  </div>
+  <div>${rowsHtml}</div>
+  <div class="net">
+    <span class="label">${escapeHtml(t.pay.netSalary)}</span>
+    <span class="value">${escapeHtml(net)}</span>
+  </div>
+  <div class="footer">${escapeHtml(t.pay.generatedOn)}: ${escapeHtml(generatedOn)}</div>
+</body>
+</html>`;
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  // Give the new document a moment to lay out (esp. any logo image)
+  // before invoking print, so nothing is cut off blank.
+  setTimeout(() => {
+    win.print();
+  }, 350);
+}
+
+// Builds a small, wearable-badge-sized printable ID card for one employee.
+// Deliberately excludes sensitive fields (salary, PIN, phone, email) —
+// this is meant to be worn/displayed, not a payroll or login document.
+function printEmployeeBadge({
+  t,
+  brandName,
+  brandLogo,
+  emp,
+  deptLabel,
+  roleLabel,
+  shiftText,
+  officeText,
+  statusLabel,
+}) {
+  const win = window.open("", "_blank", "width=420,height=620");
+  if (!win) {
+    alert("Please allow pop-ups to print the badge.");
+    return;
+  }
+  const initials = getInitials(emp.name);
+  const photoHtml = emp.photo
+    ? `<img class="photo" src="${escapeHtml(emp.photo)}" />`
+    : `<div class="photo initials">${escapeHtml(initials)}</div>`;
+  const html = `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>${escapeHtml(emp.name)} — ID Badge</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans Khmer', 'Segoe UI', Arial, sans-serif;
+    color: #16213a;
+    margin: 0;
+    padding: 28px;
+    background: #f4f1ea;
+    display: flex;
+    justify-content: center;
+  }
+  .badge {
+    width: 320px;
+    background: #fff;
+    border-radius: 18px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+  .badge-header {
+    background: #16213a;
+    color: #fff;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .badge-header img { width: 22px; height: 22px; border-radius: 6px; object-fit: cover; }
+  .badge-header .brand { font-size: 13px; font-weight: 700; }
+  .badge-body { padding: 22px 18px; text-align: center; }
+  .photo {
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 14px;
+    display: block;
+    border: 3px solid #f4f1ea;
+  }
+  .photo.initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #16213a;
+    color: #fff;
+    font-size: 30px;
+    font-weight: 700;
+  }
+  .name { font-size: 17px; font-weight: 700; }
+  .code {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+  }
+  .status {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #1b6e4c;
+    background: #e4f3ea;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .divider { border-top: 1px dashed #e5e7eb; margin: 16px 0; }
+  .info { text-align: left; font-size: 12px; display: flex; flex-direction: column; gap: 7px; }
+  .info .line { display: flex; gap: 6px; }
+  .info .label { color: #9ca3af; min-width: 78px; }
+  .info .value { font-weight: 600; }
+  @media print {
+    body { background: #fff; padding: 0; }
+  }
+</style>
+</head>
+<body>
+  <div class="badge">
+    <div class="badge-header">
+      ${brandLogo ? `<img src="${escapeHtml(brandLogo)}" />` : ""}
+      <span class="brand">${escapeHtml(brandName)}</span>
+    </div>
+    <div class="badge-body">
+      ${photoHtml}
+      <div class="name">${escapeHtml(emp.name)}</div>
+      <div class="code">${escapeHtml(emp.code)}</div>
+      <div class="status">${escapeHtml(statusLabel)}</div>
+      <div class="divider"></div>
+      <div class="info">
+        <div class="line"><span class="label">${escapeHtml(t.emps.dept)}</span><span class="value">${escapeHtml(deptLabel)}</span></div>
+        <div class="line"><span class="label">${escapeHtml(t.emps.role)}</span><span class="value">${escapeHtml(roleLabel)}</span></div>
+        <div class="line"><span class="label">${escapeHtml(t.emps.shift)}</span><span class="value">${escapeHtml(shiftText)}</span></div>
+        ${officeText ? `<div class="line"><span class="label">&#127974;</span><span class="value">${escapeHtml(officeText)}</span></div>` : ""}
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(() => {
+    win.print();
+  }, 350);
+}
+
 function Payslip({
   emp,
   mk,
@@ -7649,6 +8674,7 @@ function Payslip({
   onClose,
 }) {
   const { t, lang } = useLang();
+  const { branding } = useBranding();
   const {
     absentDays,
     leaveDays,
@@ -7669,6 +8695,51 @@ function Payslip({
     otPolicy,
     payrollPolicy,
   );
+  const handleDownload = () => {
+    const rows = [
+      { label: t.pay.baseSalary, value: fmtMoney(emp.salary) },
+      ...(absentDays > 0
+        ? [
+            {
+              label: `${t.pay.absentDed} (${absentDays} × ${fmtMoney(dailyRate)})`,
+              value: fmtMoney(absenceDeduction),
+              tone: "neg",
+            },
+          ]
+        : []),
+      ...(leaveDays > 0
+        ? [{ label: t.lv.approved, value: `${leaveDays} ថ្ងៃ` }]
+        : []),
+      {
+        label: `${t.pay.taxLabel} (${taxRate}%)`,
+        value: fmtMoney(tax),
+        tone: "neg",
+      },
+      {
+        label: `${t.pay.insuranceLabel} (${insuranceRate}%)`,
+        value: fmtMoney(insurance),
+        tone: "neg",
+      },
+      ...(otHours > 0
+        ? [
+            {
+              label: `${t.pay.otPay} (${otHours} ${t.ot.hoursShort})`,
+              value: fmtMoney(otPay),
+              tone: "pos",
+            },
+          ]
+        : []),
+    ];
+    printPayslip({
+      t,
+      brandName: branding?.name?.trim() || t.appName,
+      brandLogo: branding?.logo || null,
+      emp,
+      mk,
+      rows,
+      net: fmtMoney(net),
+    });
+  };
   return (
     <Modal title="" onClose={onClose} width={460}>
       <div
@@ -7836,6 +8907,13 @@ function Payslip({
           {fmtMoney(net)}
         </span>
       </div>
+      <Button
+        variant="ghost"
+        style={{ width: "100%", marginTop: 12, justifyContent: "center" }}
+        onClick={handleDownload}
+      >
+        <Download size={16} /> {t.pay.downloadPdf}
+      </Button>
     </Modal>
   );
 }
@@ -8103,6 +9181,7 @@ function Payroll({
 function buildNavAdmin(n) {
   return [
     { id: "dashboard", label: n.dashboard, icon: LayoutDashboard },
+    { id: "announcements", label: n.announcements, icon: Megaphone },
     { id: "employees", label: n.employees, icon: Users },
     { id: "departments", label: n.departments, icon: Building2 },
     { id: "shifts", label: n.shifts, icon: Watch },
@@ -8110,6 +9189,7 @@ function buildNavAdmin(n) {
     { id: "leave", label: n.leave, icon: CalendarDays },
     { id: "ot", label: n.overtime, icon: Timer },
     { id: "payroll", label: n.payroll, icon: Wallet },
+    { id: "review", label: n.performance, icon: Star },
     { id: "admins", label: n.admins, icon: ShieldCheck, superadminOnly: true },
     { id: "settings", label: n.settings, icon: Settings2 },
   ];
@@ -8117,10 +9197,12 @@ function buildNavAdmin(n) {
 function buildNavEmployee(n) {
   return [
     { id: "dashboard", label: n.dashboard, icon: LayoutDashboard },
+    { id: "announcements", label: n.announcements, icon: Megaphone },
     { id: "attendance", label: n.myAttendance, icon: Clock },
     { id: "leave", label: n.myLeave, icon: CalendarDays },
     { id: "ot", label: n.myOvertime, icon: Timer },
     { id: "payroll", label: n.myPayroll, icon: Wallet },
+    { id: "review", label: n.myPerformance, icon: Star },
     { id: "profile", label: n.myProfile, icon: UserCircle2 },
   ];
 }
@@ -8304,6 +9386,54 @@ function AppInner() {
         decision_reason: r.decisionReason,
         created_at: r.createdAt,
         reviewed_at: r.reviewedAt,
+      }),
+    },
+  );
+  const [performanceReviews, setPerformanceReviews, prReady] = useSupabaseArray(
+    "performance_reviews",
+    {
+      fromDb: (r) => ({
+        id: r.id,
+        employeeId: r.employee_id,
+        period: r.period,
+        rating: r.rating,
+        strengths: r.strengths,
+        improvements: r.improvements,
+        reviewedById: r.reviewed_by_id,
+        reviewedByName: r.reviewed_by_name,
+        createdAt: r.created_at,
+      }),
+      toDb: (r) => ({
+        id: r.id,
+        employee_id: r.employeeId,
+        period: r.period,
+        rating: r.rating,
+        strengths: r.strengths,
+        improvements: r.improvements,
+        reviewed_by_id: r.reviewedById,
+        reviewed_by_name: r.reviewedByName,
+        created_at: r.createdAt,
+      }),
+    },
+  );
+  const [announcements, setAnnouncements, annReady] = useSupabaseArray(
+    "announcements",
+    {
+      fromDb: (r) => ({
+        id: r.id,
+        title: r.title,
+        body: r.body,
+        createdById: r.created_by_id,
+        createdByName: r.created_by_name,
+        createdAt: r.created_at,
+      }),
+      toDb: (r) => ({
+        id: r.id,
+        title: r.title,
+        body: r.body,
+        created_by_id: r.createdById,
+        created_by_name: r.createdByName,
+        created_at: r.createdAt,
       }),
     },
   );
@@ -8646,6 +9776,8 @@ function AppInner() {
                 attendance={attendance}
                 leaveRequests={leaveRequests}
                 overtimeRequests={overtimeRequests}
+                performanceReviews={performanceReviews}
+                announcements={announcements}
                 setPage={setPage}
               />
               <Avatar
@@ -8691,6 +9823,15 @@ function AppInner() {
                 role={role}
                 currentEmp={currentEmp}
                 shifts={shifts}
+              />
+            )}
+            {page === "announcements" && (
+              <Announcements
+                role={role}
+                currentAdmin={currentAdmin}
+                announcements={announcements}
+                setAnnouncements={setAnnouncements}
+                isSuperAdmin={isSuperAdmin}
               />
             )}
             {page === "employees" && role === "admin" && (
@@ -8772,6 +9913,17 @@ function AppInner() {
                 otPolicy={otPolicy}
                 payrollPolicy={payrollPolicy}
                 setPayrollPolicy={setPayrollPolicy}
+              />
+            )}
+            {page === "review" && (
+              <PerformanceReviews
+                role={role}
+                currentAdmin={currentAdmin}
+                currentEmp={currentEmp}
+                employees={employees}
+                performanceReviews={performanceReviews}
+                setPerformanceReviews={setPerformanceReviews}
+                isSuperAdmin={isSuperAdmin}
               />
             )}
             {page === "admins" && role === "admin" && isSuperAdmin && (
