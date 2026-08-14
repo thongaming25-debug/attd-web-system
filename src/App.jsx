@@ -987,6 +987,34 @@ function isDayOff(emp, dateStr) {
   }
   return false;
 }
+const DEFAULT_ANNUAL_LEAVE_DAYS = 18;
+// Number of *approved* "annual" leave days an employee has used within
+// `year` (defaults to the current year). Counts every calendar day in
+// each approved request's range that falls inside that year, so a
+// request spanning New Year's is split correctly across both years.
+function usedAnnualLeaveDays(employeeId, leaveRequests, year) {
+  const y = year || new Date().getFullYear();
+  return leaveRequests
+    .filter(
+      (r) =>
+        r.employeeId === employeeId &&
+        r.type === "annual" &&
+        r.status === "approved",
+    )
+    .reduce((sum, r) => {
+      const days = dateRange(r.startDate, r.endDate).filter(
+        (d) => d.slice(0, 4) === String(y),
+      );
+      return sum + days.length;
+    }, 0);
+}
+function annualLeaveBalance(emp, leaveRequests, year) {
+  const quota = Number.isFinite(emp?.annualLeaveDays)
+    ? emp.annualLeaveDays
+    : DEFAULT_ANNUAL_LEAVE_DAYS;
+  const used = usedAnnualLeaveDays(emp?.id, leaveRequests, year);
+  return { quota, used, remaining: quota - used };
+}
 function monthKey(d = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
@@ -3420,6 +3448,7 @@ function EmployeeForm({
       officeId: "",
       weeklyOff: [],
       customDaysOff: [],
+      annualLeaveDays: DEFAULT_ANNUAL_LEAVE_DAYS,
       role: "",
       email: "",
       phone: "",
@@ -3557,6 +3586,15 @@ function EmployeeForm({
           ))}
         </Select>
       </Field>
+      <Field label="ថ្ងៃច្បាប់ប្រចាំឆ្នាំ (ថ្ងៃ/ឆ្នាំ)">
+        <Input
+          type="number"
+          min={0}
+          value={f.annualLeaveDays ?? DEFAULT_ANNUAL_LEAVE_DAYS}
+          onChange={set("annualLeaveDays")}
+          placeholder={String(DEFAULT_ANNUAL_LEAVE_DAYS)}
+        />
+      </Field>
       <Field label="ថ្ងៃឈប់សម្រាកប្រចាំសប្តាហ៍">
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {WEEKDAY_LABELS.map((label, dow) => {
@@ -3681,17 +3719,16 @@ function Employees({
   const officeName = (id) => offices.find((o) => o.id === id)?.name || null;
 
   const save = (data) => {
+    const clean = {
+      ...data,
+      salary: Number(data.salary) || 0,
+      annualLeaveDays: Number.isFinite(Number(data.annualLeaveDays))
+        ? Number(data.annualLeaveDays)
+        : DEFAULT_ANNUAL_LEAVE_DAYS,
+    };
     if (modal.mode === "add")
-      setEmployees([
-        ...employees,
-        { ...data, id: uid("e"), salary: Number(data.salary) || 0 },
-      ]);
-    else
-      setEmployees(
-        employees.map((e) =>
-          e.id === data.id ? { ...data, salary: Number(data.salary) || 0 } : e,
-        ),
-      );
+      setEmployees([...employees, { ...clean, id: uid("e") }]);
+    else setEmployees(employees.map((e) => (e.id === clean.id ? clean : e)));
     setModal(null);
   };
 
@@ -5334,7 +5371,7 @@ function Attendance({
 /* ---------------------------------------------------------------
    Leave requests
 ----------------------------------------------------------------*/
-function LeaveRequestForm({ onSave, onCancel }) {
+function LeaveRequestForm({ onSave, onCancel, remaining }) {
   const { t, lang } = useLang();
   const [f, setF] = useState({
     type: "annual",
@@ -5344,6 +5381,13 @@ function LeaveRequestForm({ onSave, onCancel }) {
   });
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   const invalidRange = f.endDate < f.startDate;
+  const requestedDays = invalidRange
+    ? 0
+    : dateRange(f.startDate, f.endDate).length;
+  const overQuota =
+    f.type === "annual" &&
+    typeof remaining === "number" &&
+    requestedDays > remaining;
   return (
     <div>
       <Field label="ប្រភេទច្បាប់">
@@ -5353,6 +5397,18 @@ function LeaveRequestForm({ onSave, onCancel }) {
           <option value="other">ផ្សេងៗ</option>
         </Select>
       </Field>
+      {f.type === "annual" && typeof remaining === "number" && (
+        <p
+          style={{
+            fontSize: 12,
+            color: T.muted,
+            marginTop: -8,
+            marginBottom: 12,
+          }}
+        >
+          នៅសល់ {remaining} ថ្ងៃច្បាប់ប្រចាំឆ្នាំ
+        </p>
+      )}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         <Field label="ចាប់ពីថ្ងៃ">
           <DatePicker value={f.startDate} onChange={set("startDate")} />
@@ -5371,6 +5427,23 @@ function LeaveRequestForm({ onSave, onCancel }) {
           }}
         >
           {t.lv.endDate + " " + t.lv.startDate}
+        </p>
+      )}
+      {overQuota && (
+        <p
+          style={{
+            fontSize: 12.5,
+            fontWeight: 600,
+            color: T.goldText,
+            background: T.goldSoft,
+            padding: "8px 12px",
+            borderRadius: 10,
+            marginBottom: 12,
+          }}
+        >
+          ⚠️ សំណើនេះ ({requestedDays} ថ្ងៃ)
+          លើសពីសមតុល្យច្បាប់ប្រចាំឆ្នាំដែលនៅសល់ ({remaining} ថ្ងៃ) —
+          អ្នកនៅតែអាចដាក់ស្នើបាន តែសូមរង់ចាំការសម្រេចពី admin
         </p>
       )}
       <Field label="មូលហេតុ">
@@ -5593,8 +5666,49 @@ function LeaveRequests({
     const mine = leaveRequests
       .filter((r) => r.employeeId === currentEmp.id)
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const bal = annualLeaveBalance(currentEmp, leaveRequests);
     return (
       <div>
+        <Card
+          accent={bal.remaining <= 0 ? T.rose : T.forest}
+          style={{
+            padding: "14px 18px",
+            marginBottom: 16,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 8,
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: ".04em",
+                color: T.muted,
+                marginBottom: 2,
+              }}
+            >
+              ថ្ងៃច្បាប់ប្រចាំឆ្នាំ {new Date().getFullYear()}
+            </div>
+            <div style={{ fontSize: 13, color: T.textSoft }}>
+              បានប្រើ {bal.used} ក្នុងចំណោម {bal.quota} ថ្ងៃ
+            </div>
+          </div>
+          <div
+            style={{
+              fontSize: 22,
+              fontWeight: 700,
+              fontFamily: "'Space Grotesk',sans-serif",
+              color: bal.remaining <= 0 ? T.rose : T.forestText,
+            }}
+          >
+            នៅសល់ {bal.remaining} ថ្ងៃ
+          </div>
+        </Card>
         <div
           style={{
             display: "flex",
@@ -5656,6 +5770,7 @@ function LeaveRequests({
         {modal && (
           <Modal title="ស្នើសុំច្បាប់ឈប់សម្រាក" onClose={() => setModal(false)}>
             <LeaveRequestForm
+              remaining={bal.remaining}
               onSave={submit}
               onCancel={() => setModal(false)}
             />
@@ -5736,7 +5851,15 @@ function LeaveRequests({
                       </div>
                     </div>
                   </td>
-                  <td>{getLeaveTypeLabel(lang)[r.type] || r.type}</td>
+                  <td>
+                    {getLeaveTypeLabel(lang)[r.type] || r.type}
+                    {r.type === "annual" && emp && (
+                      <div style={{ fontSize: 10.5, color: T.muted }}>
+                        នៅសល់ {annualLeaveBalance(emp, leaveRequests).remaining}{" "}
+                        ថ្ងៃ
+                      </div>
+                    )}
+                  </td>
                   <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
                     {r.startDate}
                   </td>
@@ -8059,6 +8182,7 @@ function AppInner() {
       officeId: r.office_id,
       weeklyOff: r.weekly_off || [],
       customDaysOff: r.custom_days_off || [],
+      annualLeaveDays: r.annual_leave_days ?? DEFAULT_ANNUAL_LEAVE_DAYS,
       role: r.role,
       email: r.email,
       phone: r.phone,
@@ -8077,6 +8201,9 @@ function AppInner() {
       office_id: r.officeId || null,
       weekly_off: r.weeklyOff || [],
       custom_days_off: r.customDaysOff || [],
+      annual_leave_days: Number.isFinite(r.annualLeaveDays)
+        ? r.annualLeaveDays
+        : DEFAULT_ANNUAL_LEAVE_DAYS,
       role: r.role,
       email: r.email,
       phone: r.phone,
