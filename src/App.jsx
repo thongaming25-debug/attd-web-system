@@ -1147,6 +1147,31 @@ function distanceMeters(lat1, lng1, lat2, lng2) {
     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
+// Given a list of offices [{id, name, lat, lng, radius}] and a coordinate,
+// returns the closest office whose radius actually contains the point
+// (i.e. { office, distance } for a valid punch), or null if the point
+// falls outside every configured office's geofence.
+function findMatchingOffice(offices, lat, lng) {
+  let best = null;
+  for (const o of offices) {
+    const dist = distanceMeters(lat, lng, o.lat, o.lng);
+    if (dist <= o.radius && (!best || dist < best.distance)) {
+      best = { office: o, distance: Math.round(dist) };
+    }
+  }
+  return best;
+}
+// Like findMatchingOffice but ignores the radius — used only to build a
+// helpful "you're Xm from Office Y" message when no office matched.
+function nearestOffice(offices, lat, lng) {
+  let best = null;
+  for (const o of offices) {
+    const dist = distanceMeters(lat, lng, o.lat, o.lng);
+    if (!best || dist < best.distance)
+      best = { office: o, distance: Math.round(dist) };
+  }
+  return best;
+}
 // Promise wrapper around the browser geolocation API.
 function getCurrentPosition(options) {
   return new Promise((resolve, reject) => {
@@ -1456,56 +1481,6 @@ function usePayrollPaid() {
             error.message,
           );
       }
-    })();
-  }, []);
-
-  return [value, setValue, ready];
-}
-
-// office_location is a single settings row (id = 1). null means "not set".
-function useOfficeLocation() {
-  const [value, setValueState] = useState(null);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const { data, error } = await supabase
-        .from("office_location")
-        .select("*")
-        .eq("id", 1)
-        .maybeSingle();
-      if (cancelled) return;
-      if (error) {
-        console.error(
-          "[supabase] failed to load office_location:",
-          error.message,
-        );
-        setValueState(null);
-      } else if (data && data.lat != null) {
-        setValueState({ lat: data.lat, lng: data.lng, radius: data.radius });
-      } else {
-        setValueState(null);
-      }
-      setReady(true);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const setValue = useCallback((next) => {
-    setValueState(next);
-    (async () => {
-      const row = next
-        ? { id: 1, lat: next.lat, lng: next.lng, radius: next.radius }
-        : { id: 1, lat: null, lng: null, radius: null };
-      const { error } = await supabase.from("office_location").upsert(row);
-      if (error)
-        console.error(
-          "[supabase] save failed on office_location:",
-          error.message,
-        );
     })();
   }, []);
 
@@ -3822,7 +3797,7 @@ function Shifts({ shifts, setShifts, employees, isSuperAdmin }) {
 /* ---------------------------------------------------------------
    Attendance
 ----------------------------------------------------------------*/
-function SelfPunch({ emp, shift, attendance, setAttendance, officeLocation }) {
+function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
   const { t, lang } = useLang();
   const today = todayStr();
   const rec = attendance.find(
@@ -3830,33 +3805,44 @@ function SelfPunch({ emp, shift, attendance, setAttendance, officeLocation }) {
   );
   const [locBusy, setLocBusy] = useState(false);
   const [locError, setLocError] = useState("");
+  const hasOffices = offices && offices.length > 0;
 
-  // If an office location + radius is configured, require the employee's
-  // current GPS position to fall within it before allowing a punch.
-  // Returns the coords to attach to the attendance record, or null if the
-  // punch should be blocked (locError is set in that case).
+  // If one or more office branches (each with lat/lng + radius) are
+  // configured, require the employee's current GPS position to fall
+  // within at least one of them before allowing a punch. Returns
+  // { lat, lng, distance, officeId, officeName } for the closest matching
+  // branch to attach to the attendance record, or null if the punch
+  // should be blocked (locError is set in that case).
   const verifyLocation = async () => {
-    if (!officeLocation) return null; // no geofence configured — skip check
+    if (!hasOffices) return null; // no geofence configured — skip check
     setLocError("");
     setLocBusy(true);
     try {
       const coords = await getCurrentPosition();
-      const dist = distanceMeters(
+      const match = findMatchingOffice(
+        offices,
         coords.latitude,
         coords.longitude,
-        officeLocation.lat,
-        officeLocation.lng,
       );
-      if (dist > officeLocation.radius) {
+      if (!match) {
+        const nearest = nearestOffice(
+          offices,
+          coords.latitude,
+          coords.longitude,
+        );
         setLocError(
-          `អ្នកនៅឆ្ងាយពីការិយាល័យ ${Math.round(dist)}m (កំណត់អនុញ្ញាត ${officeLocation.radius}m) — មិនអាចចុះឈ្មោះបានទេ`,
+          nearest
+            ? `អ្នកនៅឆ្ងាយពីការិយាល័យ "${nearest.office.name}" ${nearest.distance}m (កំណត់អនុញ្ញាត ${nearest.office.radius}m) — មិនអាចចុះឈ្មោះបានទេ`
+            : "មិនអាចផ្ទៀងផ្ទាត់ទីតាំងបានទេ",
         );
         return null;
       }
       return {
         lat: coords.latitude,
         lng: coords.longitude,
-        distance: Math.round(dist),
+        distance: match.distance,
+        officeId: match.office.id,
+        officeName: match.office.name,
       };
     } catch {
       setLocError(
@@ -3870,7 +3856,7 @@ function SelfPunch({ emp, shift, attendance, setAttendance, officeLocation }) {
 
   const punchIn = async () => {
     let loc = null;
-    if (officeLocation) {
+    if (hasOffices) {
       loc = await verifyLocation();
       if (!loc) return;
     }
@@ -3891,7 +3877,7 @@ function SelfPunch({ emp, shift, attendance, setAttendance, officeLocation }) {
   };
   const punchOut = async () => {
     let loc = null;
-    if (officeLocation) {
+    if (hasOffices) {
       loc = await verifyLocation();
       if (!loc) return;
     }
@@ -3940,7 +3926,7 @@ function SelfPunch({ emp, shift, attendance, setAttendance, officeLocation }) {
         </div>
       )}
       {!shift && <div style={{ marginBottom: 16 }} />}
-      {officeLocation && (
+      {hasOffices && (
         <div
           style={{
             display: "flex",
@@ -3952,8 +3938,8 @@ function SelfPunch({ emp, shift, attendance, setAttendance, officeLocation }) {
             marginBottom: 12,
           }}
         >
-          <MapPin size={12} /> ត្រូវការទីតាំង GPS ក្នុងចម្ងាយ{" "}
-          {officeLocation.radius}m ពីការិយាល័យ
+          <MapPin size={12} /> ត្រូវការទីតាំង GPS នៅជិតសាខាមួយក្នុងចំណោម{" "}
+          {offices.length} សាខា
         </div>
       )}
       {locError && (
@@ -3999,6 +3985,21 @@ function SelfPunch({ emp, shift, attendance, setAttendance, officeLocation }) {
             }}
           >
             {t.att.checkIn} {rec.checkIn} · <StatusPill status={rec.status} />
+            {rec.checkInLoc?.officeName && (
+              <>
+                {" "}
+                ·{" "}
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 3,
+                  }}
+                >
+                  <MapPin size={11} /> {rec.checkInLoc.officeName}
+                </span>
+              </>
+            )}
           </p>
           <Button
             variant="danger-solid"
@@ -4033,6 +4034,17 @@ function SelfPunch({ emp, shift, attendance, setAttendance, officeLocation }) {
           />
           {t.att.checkOut} · {t.att.checkIn} {rec.checkIn} · {t.att.checkOut}{" "}
           {rec.checkOut}
+          {rec.checkOutLoc?.officeName && (
+            <>
+              {" "}
+              ·{" "}
+              <span
+                style={{ display: "inline-flex", alignItems: "center", gap: 3 }}
+              >
+                <MapPin size={11} /> {rec.checkOutLoc.officeName}
+              </span>
+            </>
+          )}
         </div>
       )}
     </Card>
@@ -4044,11 +4056,19 @@ function SelfPunch({ emp, shift, attendance, setAttendance, officeLocation }) {
    employees must be within `radius` meters of (lat, lng) to punch in
    or out from the self-service clock.
 ----------------------------------------------------------------*/
-function OfficeLocationSettings({ officeLocation, setOfficeLocation }) {
-  const { t, lang } = useLang();
-  const [open, setOpen] = useState(false);
+// Add/edit form for a single office branch. Used inside a Modal by
+// OfficeLocationSettings below.
+function OfficeForm({ initial, onSave, onCancel }) {
+  const { t } = useLang();
   const [f, setF] = useState(
-    officeLocation || { lat: "", lng: "", radius: 150 },
+    initial
+      ? {
+          name: initial.name,
+          lat: initial.lat,
+          lng: initial.lng,
+          radius: initial.radius,
+        }
+      : { name: "", lat: "", lng: "", radius: 150 },
   );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -4059,11 +4079,11 @@ function OfficeLocationSettings({ officeLocation, setOfficeLocation }) {
     setBusy(true);
     try {
       const coords = await getCurrentPosition();
-      setF({
-        ...f,
+      setF((prev) => ({
+        ...prev,
         lat: coords.latitude.toFixed(6),
         lng: coords.longitude.toFixed(6),
-      });
+      }));
     } catch {
       setError("មិនអាចទាញយកទីតាំង GPS បច្ចុប្បន្នបានទេ");
     } finally {
@@ -4071,17 +4091,103 @@ function OfficeLocationSettings({ officeLocation, setOfficeLocation }) {
     }
   };
 
-  const save = () => {
+  const submit = () => {
+    const name = f.name.trim();
     const lat = Number(f.lat);
     const lng = Number(f.lng);
     const radius = Number(f.radius);
+    if (!name) {
+      setError("សូមបញ្ចូលឈ្មោះសាខា/ការិយាល័យ");
+      return;
+    }
     if (!lat || !lng || !radius) {
       setError("សូមបំពេញកូអរដោនេ និងកាំឲ្យត្រឹមត្រូវ");
       return;
     }
     setError("");
-    setOfficeLocation({ lat, lng, radius });
-    setOpen(false);
+    onSave({ name, lat, lng, radius });
+  };
+
+  return (
+    <div>
+      <Field label="ឈ្មោះសាខា / ការិយាល័យ">
+        <Input
+          value={f.name}
+          onChange={set("name")}
+          placeholder="ការិយាល័យកណ្តាល, សាខាទួលគោក..."
+        />
+      </Field>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <Field label="Latitude">
+          <Input value={f.lat} onChange={set("lat")} placeholder="11.5564" />
+        </Field>
+        <Field label="Longitude">
+          <Input value={f.lng} onChange={set("lng")} placeholder="104.9282" />
+        </Field>
+      </div>
+      <Field label="កាំអនុញ្ញាត (ម៉ែត្រ)">
+        <Input
+          type="number"
+          value={f.radius}
+          onChange={set("radius")}
+          placeholder="150"
+        />
+      </Field>
+      {error && (
+        <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 10 }}>
+          {error}
+        </p>
+      )}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 8,
+          marginTop: 6,
+          paddingTop: 14,
+          borderTop: `1px solid ${T.lineSoft}`,
+        }}
+      >
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={useCurrentLocation}
+          disabled={busy}
+        >
+          <MapPin size={13} /> ប្រើទីតាំងបច្ចុប្បន្ន
+        </Button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <Button variant="ghost" size="sm" onClick={onCancel}>
+            {t.cancel}
+          </Button>
+          <Button variant="accent" size="sm" onClick={submit}>
+            {t.save}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Manages the list of office branches used to geofence self-service
+// check-in/check-out. Each branch has its own name, lat/lng, and radius —
+// an employee's punch is accepted if they're within range of ANY branch,
+// and the matched branch's name is stamped onto the attendance record.
+function OfficeLocationSettings({ offices, setOffices }) {
+  const { t } = useLang();
+  const [open, setOpen] = useState(false);
+  const [formOpen, setFormOpen] = useState(null); // null | "add" | <office being edited>
+  const [confirmDel, setConfirmDel] = useState(null);
+
+  const saveOffice = (data) => {
+    if (formOpen === "add") {
+      setOffices([...offices, { ...data, id: uid("off") }]);
+    } else {
+      setOffices(
+        offices.map((o) => (o.id === formOpen.id ? { ...o, ...data } : o)),
+      );
+    }
+    setFormOpen(null);
   };
 
   return (
@@ -4099,25 +4205,17 @@ function OfficeLocationSettings({ officeLocation, setOfficeLocation }) {
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <MapPin size={16} color={T.forest} />
           <span style={{ fontWeight: 600, fontSize: 13.5, color: T.ink }}>
-            ការការពារទីតាំង GPS សម្រាប់ Check-in
+            ការការពារទីតាំង GPS សម្រាប់ Check-in (ច្រើនសាខា)
           </span>
         </div>
-        {officeLocation ? (
-          <span
-            style={{
-              fontSize: 11.5,
-              color: T.textSoft,
-              fontFamily: "'JetBrains Mono',monospace",
-            }}
-          >
-            {officeLocation.lat.toFixed(4)}, {officeLocation.lng.toFixed(4)} ·{" "}
-            {officeLocation.radius}m
-          </span>
-        ) : (
-          <span style={{ fontSize: 11.5, color: T.mutedLight }}>
-            មិនទាន់កំណត់
-          </span>
-        )}
+        <span
+          style={{
+            fontSize: 11.5,
+            color: offices.length ? T.textSoft : T.mutedLight,
+          }}
+        >
+          {offices.length > 0 ? `${offices.length} សាខា` : "មិនទាន់កំណត់"}
+        </span>
       </div>
       {open && (
         <div
@@ -4128,75 +4226,100 @@ function OfficeLocationSettings({ officeLocation, setOfficeLocation }) {
           }}
         >
           <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
-            កំណត់ទីតាំងការិយាល័យ ដើម្បីតម្រូវឲ្យបុគ្គលិកនៅជិតកន្លែងធ្វើការ
-            ពេលចុច check-in/check-out ដោយខ្លួនឯង។
+            កំណត់ទីតាំងសាខានីមួយៗ ដើម្បីតម្រូវឲ្យបុគ្គលិកនៅជិតសាខាមួយណាមួយ
+            ពេលចុច check-in/check-out ដោយខ្លួនឯង។ ឈ្មោះសាខាដែលបុគ្គលិកចូលជិត
+            នឹងត្រូវបានកត់ត្រាទុកជាមួយកំណត់ត្រាវត្តមានរបស់គេ។
+            បើមិនបន្ថែមសាខាណាមួយទេ ការការពារទីតាំងនឹងមិនដំណើរការទេ។
           </p>
-          <div
-            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
-          >
-            <Field label="Latitude">
-              <Input
-                value={f.lat}
-                onChange={set("lat")}
-                placeholder="11.5564"
-              />
-            </Field>
-            <Field label="Longitude">
-              <Input
-                value={f.lng}
-                onChange={set("lng")}
-                placeholder="104.9282"
-              />
-            </Field>
-          </div>
-          <Field label="កាំអនុញ្ញាត (ម៉ែត្រ)">
-            <Input
-              type="number"
-              value={f.radius}
-              onChange={set("radius")}
-              placeholder="150"
-            />
-          </Field>
-          {error && (
-            <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 10 }}>
-              {error}
+          {offices.length === 0 && (
+            <p style={{ fontSize: 12, color: T.mutedLight, marginBottom: 12 }}>
+              មិនទាន់មានសាខាទេ
             </p>
           )}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: 8,
-              marginTop: 6,
-            }}
-          >
-            <div style={{ display: "flex", gap: 8 }}>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={useCurrentLocation}
-                disabled={busy}
-              >
-                <MapPin size={13} /> ប្រើទីតាំងបច្ចុប្បន្ន
-              </Button>
-              {officeLocation && (
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={() => {
-                    setOfficeLocation(null);
-                    setF({ lat: "", lng: "", radius: 150 });
+          {offices.map((o) => (
+            <div
+              key={o.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 8,
+                padding: "9px 0",
+                borderBottom: `1px solid ${T.lineSoft}`,
+              }}
+            >
+              <div>
+                <div style={{ fontWeight: 600, fontSize: 13, color: T.ink }}>
+                  {o.name}
+                </div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: T.muted,
+                    fontFamily: "'JetBrains Mono',monospace",
                   }}
                 >
-                  បិទការការពារទីតាំង
-                </Button>
-              )}
+                  {o.lat.toFixed(4)}, {o.lng.toFixed(4)} · {o.radius}m
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button
+                  onClick={() => setFormOpen(o)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: T.muted,
+                  }}
+                >
+                  <Pencil size={14} />
+                </button>
+                <button
+                  onClick={() => setConfirmDel(o)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: T.rose,
+                  }}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
             </div>
-            <Button variant="accent" size="sm" onClick={save}>
-              {t.save}
+          ))}
+          <div style={{ marginTop: 12 }}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setFormOpen("add")}
+            >
+              <Plus size={13} /> បន្ថែមសាខា
             </Button>
           </div>
         </div>
+      )}
+      {formOpen && (
+        <Modal
+          title={formOpen === "add" ? "បន្ថែមសាខា" : "កែសម្រួលសាខា"}
+          onClose={() => setFormOpen(null)}
+        >
+          <OfficeForm
+            initial={formOpen === "add" ? null : formOpen}
+            onSave={saveOffice}
+            onCancel={() => setFormOpen(null)}
+          />
+        </Modal>
+      )}
+      {confirmDel && (
+        <ConfirmDialog
+          text={`តើអ្នកពិតជាចង់លុបសាខា "${confirmDel.name}" មែនទេ?`}
+          onCancel={() => setConfirmDel(null)}
+          onConfirm={() => {
+            setOffices(offices.filter((o) => o.id !== confirmDel.id));
+            setConfirmDel(null);
+          }}
+        />
       )}
     </Card>
   );
@@ -4291,8 +4414,8 @@ function Attendance({
   attendance,
   setAttendance,
   isSuperAdmin,
-  officeLocation,
-  setOfficeLocation,
+  offices,
+  setOffices,
 }) {
   const { t, lang } = useLang();
   const [date, setDate] = useState(todayStr());
@@ -4337,7 +4460,7 @@ function Attendance({
           shift={shiftOf(currentEmp.shiftId)}
           attendance={attendance}
           setAttendance={setAttendance}
-          officeLocation={officeLocation}
+          offices={offices}
         />
         <Card style={{ padding: 16 }}>
           <h3
@@ -4358,6 +4481,7 @@ function Attendance({
                   <th>កាលបរិច្ឆេទ</th>
                   <th>ចូល</th>
                   <th>ចេញ</th>
+                  <th>សាខា</th>
                   <th>{t.status}</th>
                 </tr>
               </thead>
@@ -4365,7 +4489,7 @@ function Attendance({
                 {myHistory.length === 0 && (
                   <tr>
                     <td
-                      colSpan={4}
+                      colSpan={5}
                       style={{
                         textAlign: "center",
                         color: T.muted,
@@ -4387,6 +4511,11 @@ function Attendance({
                     <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
                       {a.checkOut || "—"}
                     </td>
+                    <td style={{ fontSize: 11.5, color: T.muted }}>
+                      {a.checkInLoc?.officeName ||
+                        a.checkOutLoc?.officeName ||
+                        "—"}
+                    </td>
                     <td>
                       <StatusPill status={a.status} />
                     </td>
@@ -4402,10 +4531,7 @@ function Attendance({
 
   return (
     <div>
-      <OfficeLocationSettings
-        officeLocation={officeLocation}
-        setOfficeLocation={setOfficeLocation}
-      />
+      <OfficeLocationSettings offices={offices} setOffices={setOffices} />
       <div
         style={{
           display: "flex",
@@ -4437,6 +4563,7 @@ function Attendance({
               <th>វេន</th>
               <th>ចូល</th>
               <th>ចេញ</th>
+              <th>សាខា</th>
               <th>{t.status}</th>
               <th></th>
             </tr>
@@ -4481,6 +4608,11 @@ function Attendance({
                 </td>
                 <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
                   {rec?.checkOut || "—"}
+                </td>
+                <td style={{ fontSize: 11.5, color: T.muted }}>
+                  {rec?.checkInLoc?.officeName ||
+                    rec?.checkOutLoc?.officeName ||
+                    "—"}
                 </td>
                 <td>
                   {rec ? (
@@ -7256,7 +7388,23 @@ function AppInner() {
     },
   );
   const [admins, setAdmins, adminsReady] = useSupabaseArray("admins");
-  const [officeLocation, setOfficeLocation, olReady] = useOfficeLocation();
+  const [offices, setOffices, officesReady] = useSupabaseArray("offices", {
+    fromDb: (r) => ({
+      id: r.id,
+      name: r.name,
+      lat: Number(r.lat),
+      lng: Number(r.lng),
+      radius: Number(r.radius),
+    }),
+    toDb: (r) => ({
+      id: r.id,
+      name: r.name,
+      lat: r.lat,
+      lng: r.lng,
+      radius: r.radius,
+    }),
+    orderBy: "name",
+  });
   const [otPolicy, setOtPolicy, otPolicyReady] = useOtPolicy();
   const [payrollPolicy, setPayrollPolicy, payrollPolicyReady] =
     usePayrollPolicy();
@@ -7659,8 +7807,8 @@ function AppInner() {
                 attendance={attendance}
                 setAttendance={setAttendance}
                 isSuperAdmin={isSuperAdmin}
-                officeLocation={officeLocation}
-                setOfficeLocation={setOfficeLocation}
+                offices={offices}
+                setOffices={setOffices}
               />
             )}
             {page === "leave" && (
