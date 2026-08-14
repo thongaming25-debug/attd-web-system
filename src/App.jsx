@@ -7435,7 +7435,7 @@ function AppInner() {
     lrReady &&
     otrReady &&
     adminsReady &&
-    olReady &&
+    officesReady &&
     otPolicyReady &&
     payrollPolicyReady &&
     brandingReady &&
