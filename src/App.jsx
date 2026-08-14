@@ -51,6 +51,9 @@ import {
   Download,
   Star,
   Megaphone,
+  FileText,
+  Paperclip,
+  Upload,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -98,6 +101,7 @@ const LANG = {
       myOvertime: "ការងារបន្ថែម (OT) របស់ខ្ញុំ",
       myPayroll: "ប្រាក់ខែរបស់ខ្ញុំ",
       myPerformance: "ការវាយតម្លៃការងាររបស់ខ្ញុំ",
+      myDocuments: "ឯកសាររបស់ខ្ញុំ",
       myProfile: "ប្រវត្តិរូបរបស់ខ្ញុំ",
       settings: "ការកំណត់",
     },
@@ -116,6 +120,7 @@ const LANG = {
     status: "ស្ថានភាព",
     actions: "សកម្មភាព",
     noData: "មិនមានទិន្នន័យ",
+    exportCsv: "នាំចេញ CSV",
     dash: {
       welcome: "សូមអញ្ជើញ",
       totalEmp: "បុគ្គលិកសរុប",
@@ -301,6 +306,22 @@ const LANG = {
       noAnn: "មិនទាន់មានសេចក្តីប្រកាសទេ",
       notifTitle: "សេចក្តីប្រកាសថ្មីពីក្រុមហ៊ុន",
     },
+    doc: {
+      title: "ឯកសារបុគ្គលិក",
+      addBtn: "ផ្ទុកឯកសារ",
+      category: "ប្រភេទឯកសារ",
+      catCv: "ប្រវត្តិរូបសង្ខេប (CV)",
+      catContract: "កិច្ចសន្យា",
+      catId: "អត្តសញ្ញាណប័ណ្ណ",
+      catOther: "ផ្សេងៗ",
+      chooseFile: "ជ្រើសរើសឯកសារ",
+      uploadedBy: "ផ្ទុកឡើងដោយ",
+      confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបឯកសារនេះ?",
+      noDocs: "មិនទាន់មានឯកសារទេ",
+      tooLarge: "ឯកសារធំពេក សូមជ្រើសរើសឯកសារតូចជាងនេះ (តិចជាង 4MB)",
+      view: "មើល/ទាញយក",
+      myTitle: "ឯកសាររបស់ខ្ញុំ",
+    },
     admAcc: {
       addBtn: "បន្ថែមអ្នកគ្រប់គ្រង",
       editTitle: "កែសម្រួលអ្នកគ្រប់គ្រង",
@@ -383,6 +404,7 @@ const LANG = {
       myOvertime: "My Overtime (OT)",
       myPayroll: "My Payroll",
       myPerformance: "My Performance Reviews",
+      myDocuments: "My Documents",
       myProfile: "My Profile",
       settings: "Settings",
     },
@@ -401,6 +423,7 @@ const LANG = {
     status: "Status",
     actions: "Actions",
     noData: "No data",
+    exportCsv: "Export CSV",
     dash: {
       welcome: "Welcome",
       totalEmp: "Total Employees",
@@ -585,6 +608,22 @@ const LANG = {
       confirmDel: "Are you sure you want to delete this announcement?",
       noAnn: "No announcements yet",
       notifTitle: "New company announcement",
+    },
+    doc: {
+      title: "Employee Documents",
+      addBtn: "Upload Document",
+      category: "Document Type",
+      catCv: "CV / Resume",
+      catContract: "Contract",
+      catId: "ID Card",
+      catOther: "Other",
+      chooseFile: "Choose File",
+      uploadedBy: "Uploaded by",
+      confirmDel: "Are you sure you want to delete this document?",
+      noDocs: "No documents yet",
+      tooLarge: "File too large — please choose a file under 4MB",
+      view: "View / Download",
+      myTitle: "My Documents",
     },
     admAcc: {
       addBtn: "Add Admin",
@@ -3814,11 +3853,15 @@ function Employees({
   offices,
   setEmployees,
   isSuperAdmin,
+  currentAdmin,
+  documents,
+  setDocuments,
 }) {
   const { t, lang } = useLang();
   const { branding } = useBranding();
   const [modal, setModal] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
+  const [docsFor, setDocsFor] = useState(null);
   const [query, setQuery] = useState("");
   const [branchFilter, setBranchFilter] = useState("");
   const filtered = employees.filter(
@@ -3895,6 +3938,40 @@ function Employees({
             ))}
           </Select>
         )}
+        <Button
+          variant="ghost"
+          onClick={() =>
+            exportCsv(
+              `employees-${todayStr()}.csv`,
+              [
+                t.emps.name,
+                t.emps.code,
+                t.emps.dept,
+                t.emps.role,
+                t.emps.shift,
+                t.emps.phone,
+                t.emps.email,
+                t.emps.salary,
+                t.emps.joined,
+                t.status,
+              ],
+              filtered.map((e) => [
+                e.name,
+                e.code,
+                deptName(e.deptId),
+                e.role,
+                shiftLabel(shiftOf(e.shiftId)),
+                e.phone,
+                e.email,
+                e.salary,
+                e.joined,
+                e.status === "active" ? t.emps.active : t.emps.inactive,
+              ]),
+            )
+          }
+        >
+          <Download size={15} /> {t.exportCsv}
+        </Button>
         <Button variant="accent" onClick={() => setModal({ mode: "add" })}>
           <Plus size={15} /> {t.emps.addBtn}
         </Button>
@@ -4038,6 +4115,14 @@ function Employees({
             >
               <BadgeCheck size={13} /> {t.emps.printBadge}
             </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              style={{ width: "100%", justifyContent: "center", marginTop: 8 }}
+              onClick={() => setDocsFor(e)}
+            >
+              <FileText size={13} /> {t.doc.title}
+            </Button>
           </Card>
         ))}
         {filtered.length === 0 && (
@@ -4078,6 +4163,16 @@ function Employees({
             setEmployees(employees.filter((e) => e.id !== confirmDel.id));
             setConfirmDel(null);
           }}
+        />
+      )}
+      {docsFor && (
+        <EmployeeDocumentsModal
+          emp={docsFor}
+          currentAdmin={currentAdmin}
+          documents={documents}
+          setDocuments={setDocuments}
+          isSuperAdmin={isSuperAdmin}
+          onClose={() => setDocsFor(null)}
         />
       )}
     </div>
@@ -5340,15 +5435,35 @@ function Attendance({
             onChange={(e) => setDate(e.target.value)}
           />
         </div>
-        <Button
-          variant="accent"
-          onClick={() => {
-            setEditRecord(null);
-            setModal(true);
-          }}
-        >
-          <Plus size={15} /> កត់ត្រាដោយដៃ
-        </Button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <Button
+            variant="ghost"
+            onClick={() =>
+              exportCsv(
+                `attendance-${date}.csv`,
+                [t.employee, "Code", "Check In", "Check Out", t.status],
+                rows.map(({ emp, rec }) => [
+                  emp.name,
+                  emp.code,
+                  rec?.checkIn || "",
+                  rec?.checkOut || "",
+                  rec?.status || "absent",
+                ]),
+              )
+            }
+          >
+            <Download size={15} /> {t.exportCsv}
+          </Button>
+          <Button
+            variant="accent"
+            onClick={() => {
+              setEditRecord(null);
+              setModal(true);
+            }}
+          >
+            <Plus size={15} /> កត់ត្រាដោយដៃ
+          </Button>
+        </div>
       </div>
       <Card style={{ overflowX: "auto" }}>
         <table className="wf-table">
@@ -7369,6 +7484,309 @@ function PerformanceReviews({
 }
 
 /* ---------------------------------------------------------------
+   Employee documents — admin uploads/manages files (CV, contract,
+   ID card, etc.) per employee. Files are read client-side and
+   stored as base64 data URLs (no external storage bucket needed),
+   so uploads are capped to keep row sizes reasonable.
+----------------------------------------------------------------*/
+const MAX_DOC_BYTES = 4 * 1024 * 1024;
+
+function getDocCategoryLabel(t) {
+  return {
+    cv: t.doc.catCv,
+    contract: t.doc.catContract,
+    id: t.doc.catId,
+    other: t.doc.catOther,
+  };
+}
+
+function DocUploadRow({ emp, currentAdmin, documents, setDocuments, t }) {
+  const [category, setCategory] = useState("cv");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const inputRef = useRef(null);
+
+  const onFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError("");
+    if (file.size > MAX_DOC_BYTES) {
+      setError(t.doc.tooLarge);
+      e.target.value = "";
+      return;
+    }
+    setBusy(true);
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      setDocuments([
+        ...documents,
+        {
+          id: uid("doc"),
+          employeeId: emp.id,
+          category,
+          fileName: file.name,
+          mimeType: file.type || "application/octet-stream",
+          dataUrl,
+          uploadedByName: currentAdmin?.name || "",
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+    } finally {
+      setBusy(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  };
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 8,
+        alignItems: "flex-end",
+        marginBottom: 16,
+        flexWrap: "wrap",
+      }}
+    >
+      <Field label={t.doc.category}>
+        <Select value={category} onChange={(e) => setCategory(e.target.value)}>
+          <option value="cv">{t.doc.catCv}</option>
+          <option value="contract">{t.doc.catContract}</option>
+          <option value="id">{t.doc.catId}</option>
+          <option value="other">{t.doc.catOther}</option>
+        </Select>
+      </Field>
+      <div>
+        <input
+          ref={inputRef}
+          type="file"
+          id="doc-upload-input"
+          style={{ display: "none" }}
+          onChange={onFile}
+        />
+        <Button
+          variant="ghost"
+          disabled={busy}
+          onClick={() => inputRef.current?.click()}
+        >
+          {busy ? (
+            <Loader2
+              size={15}
+              style={{ animation: "spin 1s linear infinite" }}
+            />
+          ) : (
+            <Upload size={15} />
+          )}{" "}
+          {t.doc.chooseFile}
+        </Button>
+      </div>
+      {error && <span style={{ fontSize: 12, color: T.rose }}>{error}</span>}
+    </div>
+  );
+}
+
+function EmployeeDocumentsModal({
+  emp,
+  currentAdmin,
+  documents,
+  setDocuments,
+  isSuperAdmin,
+  onClose,
+}) {
+  const { t } = useLang();
+  const [confirmDel, setConfirmDel] = useState(null);
+  const CAT_LABEL = getDocCategoryLabel(t);
+  const mine = documents
+    .filter((d) => d.employeeId === emp.id)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+  return (
+    <Modal title={`${t.doc.title} · ${emp.name}`} onClose={onClose} width={520}>
+      <DocUploadRow
+        emp={emp}
+        currentAdmin={currentAdmin}
+        documents={documents}
+        setDocuments={setDocuments}
+        t={t}
+      />
+      {mine.length === 0 && (
+        <div
+          style={{
+            textAlign: "center",
+            color: T.muted,
+            fontSize: 13,
+            padding: "20px 0",
+          }}
+        >
+          {t.doc.noDocs}
+        </div>
+      )}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {mine.map((d) => (
+          <div
+            key={d.id}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 10,
+              padding: "10px 12px",
+              border: `1px solid ${T.lineSoft}`,
+              borderRadius: 10,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                minWidth: 0,
+              }}
+            >
+              <FileText
+                size={18}
+                color={T.forestText}
+                style={{ flexShrink: 0 }}
+              />
+              <div style={{ minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    color: T.ink,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {d.fileName}
+                </div>
+                <div style={{ fontSize: 10.5, color: T.muted }}>
+                  {CAT_LABEL[d.category] || d.category} · {t.doc.uploadedBy}{" "}
+                  {d.uploadedByName || "—"}
+                </div>
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+              <a
+                href={d.dataUrl}
+                download={d.fileName}
+                target="_blank"
+                rel="noreferrer"
+                style={{ color: T.forestText }}
+              >
+                <Download size={16} />
+              </a>
+              {isSuperAdmin && (
+                <button
+                  onClick={() => setConfirmDel(d)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: T.mutedLight,
+                  }}
+                >
+                  <Trash2 size={16} />
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+      {confirmDel && (
+        <ConfirmDialog
+          text={t.doc.confirmDel}
+          onCancel={() => setConfirmDel(null)}
+          onConfirm={() => {
+            setDocuments(documents.filter((d) => d.id !== confirmDel.id));
+            setConfirmDel(null);
+          }}
+        />
+      )}
+    </Modal>
+  );
+}
+
+function MyDocuments({ currentEmp, documents }) {
+  const { t } = useLang();
+  const CAT_LABEL = getDocCategoryLabel(t);
+  const mine = documents
+    .filter((d) => d.employeeId === currentEmp.id)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return (
+    <div>
+      {mine.length === 0 && (
+        <Card
+          style={{
+            textAlign: "center",
+            padding: "32px 0",
+            color: T.muted,
+            fontSize: 13,
+          }}
+        >
+          {t.doc.noDocs}
+        </Card>
+      )}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {mine.map((d) => (
+          <Card
+            key={d.id}
+            style={{
+              padding: "12px 16px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 10,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                minWidth: 0,
+              }}
+            >
+              <FileText
+                size={18}
+                color={T.forestText}
+                style={{ flexShrink: 0 }}
+              />
+              <div style={{ minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: T.ink,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {d.fileName}
+                </div>
+                <div style={{ fontSize: 11, color: T.muted }}>
+                  {CAT_LABEL[d.category] || d.category}
+                </div>
+              </div>
+            </div>
+            <a
+              href={d.dataUrl}
+              download={d.fileName}
+              target="_blank"
+              rel="noreferrer"
+              style={{ color: T.forestText, flexShrink: 0 }}
+            >
+              <Download size={18} />
+            </a>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
    Admin accounts — superadmin only. Two permission levels:
    superadmin (full access, incl. deleting records and managing other
    admin accounts) and manager (day-to-day HR work, no deletes).
@@ -8392,6 +8810,30 @@ function AdminSettings({ currentAdmin, admins, setAdmins, isSuperAdmin }) {
 /* ---------------------------------------------------------------
    Payroll
 ----------------------------------------------------------------*/
+// Builds a CSV file from headers + row arrays and triggers a browser
+// download. A UTF-8 BOM is prepended so Excel opens Khmer text
+// correctly instead of mangling it as another encoding.
+function exportCsv(filename, headers, rows) {
+  const escapeCell = (v) => {
+    const s = v === null || v === undefined ? "" : String(v);
+    if (/[",\n\r]/.test(s)) {
+      return `"${s.replace(/"/g, '""')}"`;
+    }
+    return s;
+  };
+  const lines = [headers, ...rows].map((row) => row.map(escapeCell).join(","));
+  const csv = "\uFEFF" + lines.join("\r\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 function escapeHtml(s) {
   return String(s ?? "").replace(
     /[&<>"']/g,
@@ -9013,6 +9455,50 @@ function Payroll({
             កំពុងមើលប្រវត្តិខែមុន
           </span>
         )}
+        {role === "admin" && (
+          <Button
+            variant="ghost"
+            style={{ marginLeft: "auto" }}
+            onClick={() =>
+              exportCsv(
+                `payroll-${mk}.csv`,
+                [
+                  t.employee,
+                  "Code",
+                  t.pay.baseSalary,
+                  t.pay.otPay,
+                  t.pay.taxLabel,
+                  t.pay.insuranceLabel,
+                  t.pay.netSalary,
+                  t.status,
+                ],
+                list.map((e) => {
+                  const paid = !!payrollPaid[`${e.id}-${mk}`];
+                  const { net, otPay, tax, insurance } = computePayroll(
+                    e,
+                    attendance,
+                    mk,
+                    overtimeRequests,
+                    otPolicy,
+                    payrollPolicy,
+                  );
+                  return [
+                    e.name,
+                    e.code,
+                    e.salary,
+                    otPay,
+                    tax,
+                    insurance,
+                    net,
+                    paid ? t.pay.paid : t.pay.unpaid,
+                  ];
+                }),
+              )
+            }
+          >
+            <Download size={15} /> {t.exportCsv}
+          </Button>
+        )}
       </div>
       {role === "admin" && (
         <PayrollPolicySettings
@@ -9203,6 +9689,7 @@ function buildNavEmployee(n) {
     { id: "ot", label: n.myOvertime, icon: Timer },
     { id: "payroll", label: n.myPayroll, icon: Wallet },
     { id: "review", label: n.myPerformance, icon: Star },
+    { id: "documents", label: n.myDocuments, icon: FileText },
     { id: "profile", label: n.myProfile, icon: UserCircle2 },
   ];
 }
@@ -9433,6 +9920,31 @@ function AppInner() {
         body: r.body,
         created_by_id: r.createdById,
         created_by_name: r.createdByName,
+        created_at: r.createdAt,
+      }),
+    },
+  );
+  const [documents, setDocuments, docsReady] = useSupabaseArray(
+    "employee_documents",
+    {
+      fromDb: (r) => ({
+        id: r.id,
+        employeeId: r.employee_id,
+        category: r.category,
+        fileName: r.file_name,
+        mimeType: r.mime_type,
+        dataUrl: r.data_url,
+        uploadedByName: r.uploaded_by_name,
+        createdAt: r.created_at,
+      }),
+      toDb: (r) => ({
+        id: r.id,
+        employee_id: r.employeeId,
+        category: r.category,
+        file_name: r.fileName,
+        mime_type: r.mimeType,
+        data_url: r.dataUrl,
+        uploaded_by_name: r.uploadedByName,
         created_at: r.createdAt,
       }),
     },
@@ -9842,6 +10354,9 @@ function AppInner() {
                 offices={offices}
                 setEmployees={setEmployees}
                 isSuperAdmin={isSuperAdmin}
+                currentAdmin={currentAdmin}
+                documents={documents}
+                setDocuments={setDocuments}
               />
             )}
             {page === "departments" && role === "admin" && (
@@ -9925,6 +10440,9 @@ function AppInner() {
                 setPerformanceReviews={setPerformanceReviews}
                 isSuperAdmin={isSuperAdmin}
               />
+            )}
+            {page === "documents" && role !== "admin" && currentEmp && (
+              <MyDocuments currentEmp={currentEmp} documents={documents} />
             )}
             {page === "admins" && role === "admin" && isSuperAdmin && (
               <AdminAccounts
