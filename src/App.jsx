@@ -1943,6 +1943,73 @@ function useSupabaseArray(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [table]);
 
+  // Live sync: without this, admin and staff only ever see what was on the
+  // table at the moment their tab loaded — a staff check-in, an admin's
+  // leave-request decision, a new announcement, etc. would sit invisible on
+  // every other open tab until someone manually reloaded the page. This
+  // subscribes to Postgres changes on this table and folds each remote
+  // insert/update/delete into local state as it happens, so every open
+  // admin and staff screen stays live without polling or a manual refresh.
+  // Requires realtime to be enabled for the table in Supabase (Database →
+  // Replication, or `alter publication supabase_realtime add table <name>;`).
+  useEffect(() => {
+    if (!ready) return; // wait for the initial load so we don't race it
+    const sortIfNeeded = (rows) => {
+      if (!orderBy) return rows;
+      const sorted = rows.slice().sort((a, b) => {
+        const av = a?.[orderBy];
+        const bv = b?.[orderBy];
+        if (av == null && bv == null) return 0;
+        if (av == null) return -1;
+        if (bv == null) return 1;
+        return av < bv ? -1 : av > bv ? 1 : 0;
+      });
+      return sorted;
+    };
+    let channel;
+    try {
+      channel = supabase
+        .channel(`realtime:${table}`)
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table },
+          (payload) => {
+            setValueState((current) => {
+              let next;
+              if (payload.eventType === "DELETE") {
+                const deletedId = payload.old?.id;
+                next = current.filter((r) => r.id !== deletedId);
+              } else {
+                const row = mapFromDb(payload.new);
+                const idx = current.findIndex((r) => r.id === row.id);
+                next =
+                  idx === -1
+                    ? [...current, row]
+                    : current.map((r, i) => (i === idx ? row : r));
+                next = sortIfNeeded(next);
+              }
+              // Keep the local-edit baseline in sync so this remote-origin
+              // change isn't mistaken for a pending local edit next time
+              // setValue() runs its create/update/delete diff — otherwise
+              // a change made on another device would look, to this tab,
+              // like something *it* just created/edited and get pushed
+              // straight back to Supabase (and logged to the audit trail
+              // a second time, credited to the wrong device).
+              prevRef.current = next;
+              return next;
+            });
+          },
+        )
+        .subscribe();
+    } catch (err) {
+      console.error(`[supabase] realtime subscribe failed for ${table}:`, err);
+    }
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [table, ready]);
+
   const setValue = useCallback(
     (next) => {
       const prev = prevRef.current;
@@ -2065,6 +2132,45 @@ function usePayrollPaid() {
       cancelled = true;
     };
   }, []);
+
+  // Same live-sync reasoning as useSupabaseArray above: without this, a
+  // "mark as paid" done by one admin stays invisible to any other admin
+  // tab until it's reloaded.
+  useEffect(() => {
+    if (!ready) return;
+    let channel;
+    try {
+      channel = supabase
+        .channel("realtime:payroll_paid")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "payroll_paid" },
+          (payload) => {
+            setValueState((current) => {
+              const row =
+                payload.eventType === "DELETE" ? payload.old : payload.new;
+              if (!row) return current;
+              const key = `${row.employee_id}-${row.month}`;
+              const next = { ...current };
+              if (payload.eventType === "DELETE") delete next[key];
+              else next[key] = row.paid;
+              prevRef.current = next;
+              return next;
+            });
+          },
+        )
+        .subscribe();
+    } catch (err) {
+      console.error(
+        "[supabase] realtime subscribe failed for payroll_paid:",
+        err,
+      );
+    }
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready]);
 
   const setValue = useCallback((next) => {
     const prev = prevRef.current;
