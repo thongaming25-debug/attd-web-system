@@ -55,6 +55,8 @@ import {
   Paperclip,
   Upload,
   CalendarClock,
+  History,
+  RefreshCw,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -108,6 +110,7 @@ const LANG = {
       myAttCorrection: "ស្នើសុំកែតម្រូវវត្តមាន",
       myProfile: "ប្រវត្តិរូបរបស់ខ្ញុំ",
       settings: "ការកំណត់",
+      audits: "កំណត់ត្រាសកម្មភាព",
     },
     logout: "ចាកចេញ",
     notifications: "ការជូនដំណឹង",
@@ -125,6 +128,7 @@ const LANG = {
     actions: "សកម្មភាព",
     noData: "មិនមានទិន្នន័យ",
     exportCsv: "នាំចេញ CSV",
+    pagination: { of: "នៃ" },
     dash: {
       welcome: "សូមអញ្ជើញ",
       totalEmp: "បុគ្គលិកសរុប",
@@ -397,6 +401,7 @@ const LANG = {
       darkMode: "ងងឹត (Dark)",
       appearanceDesc: "ប្តូររូបរាងទំព័រសម្រាប់ឧបករណ៍នេះ",
       saved: "បានរក្សាទុកដោយជោគជ័យ",
+      saveFailed: "រក្សាទុកមិនបានសម្រេច៖",
       nameRequired: "សូមបញ្ចូលឈ្មោះ",
       brandingTitle: "ម៉ាកយីហោក្រុមហ៊ុន",
       brandingDesc:
@@ -407,6 +412,42 @@ const LANG = {
       chooseLogo: "ជ្រើសរើសឡូហ្គោ",
       removeLogo: "លុបឡូហ្គោ",
       brandingSaved: "បានរក្សាទុកម៉ាកយីហោដោយជោគជ័យ",
+    },
+    audit: {
+      title: "កំណត់ត្រាសកម្មភាព",
+      subtitle: "តាមដានថាអ្នកណាបានកែប្រែអ្វី និងនៅពេលណា",
+      refresh: "ផ្ទុកឡើងវិញ",
+      time: "ពេលវេលា",
+      actor: "អ្នកអនុវត្ត",
+      action: "សកម្មភាព",
+      entity: "ធាតុទិន្នន័យ",
+      details: "ព័ត៌មានលម្អិត",
+      noLogs: "មិនទាន់មានកំណត់ត្រាទេ",
+      loading: "កំពុងផ្ទុក...",
+      filterTable: "ត្រងតាមប្រភេទ",
+      allTables: "ទាំងអស់",
+      actionCreate: "បានបង្កើត",
+      actionUpdate: "បានកែប្រែ",
+      actionDelete: "បានលុប",
+      actionLogin: "បានចូលប្រព័ន្ធ",
+      actionLogout: "បានចាកចេញ",
+      changedFrom: "ពី",
+      changedTo: "ទៅ",
+      unknownActor: "មិនស្គាល់",
+      tables: {
+        departments: "នាយកដ្ឋាន",
+        employees: "បុគ្គលិក",
+        shifts: "វេនការងារ",
+        holidays: "ថ្ងៃឈប់សម្រាកជាតិ",
+        leave_requests: "ច្បាប់ឈប់សម្រាក",
+        overtime_requests: "ការងារបន្ថែម (OT)",
+        performance_reviews: "ការវាយតម្លៃការងារ",
+        announcements: "សេចក្តីប្រកាស",
+        admins: "គណនីអ្នកគ្រប់គ្រង",
+        offices: "ទីតាំងការិយាល័យ",
+        attendance_corrections: "សំណើកែតម្រូវវត្តមាន",
+        employee_documents: "ឯកសារបុគ្គលិក",
+      },
     },
   },
   en: {
@@ -456,6 +497,7 @@ const LANG = {
       myAttCorrection: "Attendance Correction",
       myProfile: "My Profile",
       settings: "Settings",
+      audits: "Audit Log",
     },
     logout: "Sign Out",
     notifications: "Notifications",
@@ -473,6 +515,7 @@ const LANG = {
     actions: "Actions",
     noData: "No data",
     exportCsv: "Export CSV",
+    pagination: { of: "of" },
     dash: {
       welcome: "Welcome",
       totalEmp: "Total Employees",
@@ -745,6 +788,7 @@ const LANG = {
       darkMode: "Dark",
       appearanceDesc: "Switch the theme for this device",
       saved: "Saved successfully",
+      saveFailed: "Save failed:",
       nameRequired: "Please enter a name",
       brandingTitle: "Company Branding",
       brandingDesc:
@@ -755,6 +799,42 @@ const LANG = {
       chooseLogo: "Choose Logo",
       removeLogo: "Remove Logo",
       brandingSaved: "Branding saved successfully",
+    },
+    audit: {
+      title: "Audit Log",
+      subtitle: "Track who changed what, and when",
+      refresh: "Refresh",
+      time: "Time",
+      actor: "Actor",
+      action: "Action",
+      entity: "Entity",
+      details: "Details",
+      noLogs: "No log entries yet",
+      loading: "Loading...",
+      filterTable: "Filter by type",
+      allTables: "All",
+      actionCreate: "Created",
+      actionUpdate: "Updated",
+      actionDelete: "Deleted",
+      actionLogin: "Logged in",
+      actionLogout: "Logged out",
+      changedFrom: "from",
+      changedTo: "to",
+      unknownActor: "Unknown",
+      tables: {
+        departments: "Department",
+        employees: "Employee",
+        shifts: "Shift",
+        holidays: "Holiday",
+        leave_requests: "Leave Request",
+        overtime_requests: "Overtime (OT)",
+        performance_reviews: "Performance Review",
+        announcements: "Announcement",
+        admins: "Admin Account",
+        offices: "Office Location",
+        attendance_corrections: "Attendance Correction",
+        employee_documents: "Employee Document",
+      },
     },
   },
 };
@@ -905,9 +985,20 @@ const PALETTE = [
 // with different permission levels.
 const ADMIN_PASSWORD = "admin123";
 const ADMIN_ROLE_LABEL = {
-  superadmin: "អ្នកគ្រប់គ្រងជាន់ខ្ពស់",
-  manager: "អ្នកគ្រប់គ្រង HR",
+  km: {
+    superadmin: "អ្នកគ្រប់គ្រងជាន់ខ្ពស់",
+    manager: "អ្នកគ្រប់គ្រង HR",
+  },
+  en: {
+    superadmin: "Super Admin",
+    manager: "HR Manager",
+  },
 };
+// Admin role names follow the app's km/en language toggle (like every
+// other label) rather than being hardcoded to Khmer everywhere.
+function adminRoleLabel(role, lang) {
+  return (ADMIN_ROLE_LABEL[lang] || ADMIN_ROLE_LABEL.km)[role] || role || "";
+}
 // Standard working days used to derive a daily rate from monthly salary
 // when calculating unpaid-absence deductions in payroll.
 const WORKING_DAYS_PER_MONTH = 26;
@@ -1024,7 +1115,9 @@ html,body,#root{height:100%;}
   .wf-overlay-scrim.open{display:block;position:absolute;inset:0;background:rgba(18,32,61,0.45);z-index:35;backdrop-filter:blur(1px);}
   .wf-header{padding:12px 16px;}
   .wf-content{padding:16px;}
+  .wf-role-badge{display:none;}
 }
+.wf-role-badge{white-space:nowrap;flex-shrink:0;}
 `;
 function useGlobalStyle() {
   useEffect(() => {
@@ -1200,17 +1293,19 @@ function isDayOff(emp, dateStr) {
   return false;
 }
 const DEFAULT_ANNUAL_LEAVE_DAYS = 18;
-// Number of *approved* "annual" leave days an employee has used within
-// `year` (defaults to the current year). Counts every calendar day in
-// each approved request's range that falls inside that year, so a
-// request spanning New Year's is split correctly across both years.
-function usedAnnualLeaveDays(employeeId, leaveRequests, year) {
+const DEFAULT_SICK_LEAVE_DAYS = 7;
+// Number of *approved* leave days of a given `type` ("annual" | "sick")
+// an employee has used within `year` (defaults to the current year).
+// Counts every calendar day in each approved request's range that falls
+// inside that year, so a request spanning New Year's is split correctly
+// across both years.
+function usedLeaveDaysByType(employeeId, leaveRequests, type, year) {
   const y = year || new Date().getFullYear();
   return leaveRequests
     .filter(
       (r) =>
         r.employeeId === employeeId &&
-        r.type === "annual" &&
+        r.type === type &&
         r.status === "approved",
     )
     .reduce((sum, r) => {
@@ -1220,11 +1315,24 @@ function usedAnnualLeaveDays(employeeId, leaveRequests, year) {
       return sum + days.length;
     }, 0);
 }
+function usedAnnualLeaveDays(employeeId, leaveRequests, year) {
+  return usedLeaveDaysByType(employeeId, leaveRequests, "annual", year);
+}
+function usedSickLeaveDays(employeeId, leaveRequests, year) {
+  return usedLeaveDaysByType(employeeId, leaveRequests, "sick", year);
+}
 function annualLeaveBalance(emp, leaveRequests, year) {
   const quota = Number.isFinite(emp?.annualLeaveDays)
     ? emp.annualLeaveDays
     : DEFAULT_ANNUAL_LEAVE_DAYS;
   const used = usedAnnualLeaveDays(emp?.id, leaveRequests, year);
+  return { quota, used, remaining: quota - used };
+}
+function sickLeaveBalance(emp, leaveRequests, year) {
+  const quota = Number.isFinite(emp?.sickLeaveDays)
+    ? emp.sickLeaveDays
+    : DEFAULT_SICK_LEAVE_DAYS;
+  const used = usedSickLeaveDays(emp?.id, leaveRequests, year);
   return { quota, used, remaining: quota - used };
 }
 function monthKey(d = new Date()) {
@@ -1718,6 +1826,67 @@ function usePortalRoute() {
 }
 
 /* ---------------------------------------------------------------
+   Audit log — records who changed what, and when.
+   writeAuditLog() is a fire-and-forget insert into the "audit_logs"
+   table; it never throws or blocks the UI, so a missing table or a
+   flaky connection can't break the rest of the app.
+----------------------------------------------------------------*/
+// Fields that are large/binary (base64 photos, uploaded files) or too
+// noisy to be useful in a diff — never include their raw values.
+const AUDIT_SKIP_FIELDS = new Set([
+  "photo",
+  "logo",
+  "dataUrl",
+  "pin",
+  "password",
+]);
+function auditValueToText(v) {
+  if (v === null || v === undefined || v === "") return "—";
+  if (Array.isArray(v)) v = v.join(", ");
+  const s = typeof v === "string" ? v : JSON.stringify(v);
+  return s.length > 80 ? s.slice(0, 80) + "…" : s;
+}
+// Shallow field-by-field diff between two rows, skipping large/sensitive
+// fields — used to record exactly what changed on an "update" action.
+function diffFields(oldRow, newRow) {
+  const keys = new Set([
+    ...Object.keys(oldRow || {}),
+    ...Object.keys(newRow || {}),
+  ]);
+  const changes = {};
+  keys.forEach((k) => {
+    if (AUDIT_SKIP_FIELDS.has(k)) return;
+    const a = oldRow ? oldRow[k] : undefined;
+    const b = newRow ? newRow[k] : undefined;
+    if (JSON.stringify(a) === JSON.stringify(b)) return;
+    changes[k] = { from: auditValueToText(a), to: auditValueToText(b) };
+  });
+  return changes;
+}
+function writeAuditLog({ actor, action, table, entityId, label, changes }) {
+  try {
+    supabase
+      .from("audit_logs")
+      .insert({
+        actor_type: actor?.type || null,
+        actor_id: actor?.id != null ? String(actor.id) : null,
+        actor_name: actor?.name || null,
+        action,
+        entity_table: table,
+        entity_id: entityId != null ? String(entityId) : null,
+        entity_label: label != null ? String(label).slice(0, 200) : null,
+        changes: changes && Object.keys(changes).length ? changes : null,
+        created_at: new Date().toISOString(),
+      })
+      .then(({ error }) => {
+        if (error) console.error("[audit] insert failed:", error.message);
+      });
+  } catch (e) {
+    console.error("[audit] insert threw:", e);
+  }
+}
+
+/* ---------------------------------------------------------------
    Supabase-backed persistence hooks
    These replace the old Claude-Artifact-only window.storage hook.
    Each one keeps the same [value, setValue, ready] shape the rest
@@ -1728,12 +1897,27 @@ function usePortalRoute() {
 // setValue is called elsewhere in the app with the FULL next array (never
 // an updater function), so on every call we diff against the previous
 // array to figure out which rows to upsert and which to delete.
-function useSupabaseArray(table, { fromDb, toDb, orderBy } = {}) {
+// Passing `audit: true` (plus an `actorRef`) additionally writes a create/
+// update/delete entry to the audit log for every row that actually changed —
+// no caller elsewhere in the app has to remember to log anything itself.
+function useSupabaseArray(
+  table,
+  { fromDb, toDb, orderBy, audit, actorRef, entityLabel } = {},
+) {
   const [value, setValueState] = useState([]);
   const [ready, setReady] = useState(false);
+  // Surfaces the last save/delete failure so screens like Settings can
+  // tell the user "this didn't actually save" instead of showing a
+  // success checkmark while Supabase silently rejected the write (e.g. a
+  // column that doesn't exist, or a row-level-security policy denial) —
+  // previously such failures only went to console.error and the UI kept
+  // showing optimistic local state until the next refresh reverted it.
+  const [saveError, setSaveError] = useState(null);
   const prevRef = useRef([]);
   const mapFromDb = fromDb || ((r) => r);
   const mapToDb = toDb || ((r) => r);
+  const labelOf =
+    entityLabel || ((r) => r?.name || r?.title || r?.code || r?.id);
 
   useEffect(() => {
     let cancelled = false;
@@ -1766,40 +1950,83 @@ function useSupabaseArray(table, { fromDb, toDb, orderBy } = {}) {
       setValueState(next);
 
       const nextIds = new Set(next.map((r) => r.id));
-      const toDelete = prev.filter((r) => !nextIds.has(r.id)).map((r) => r.id);
-      const toUpsert = next.filter((r) => {
+      const deletedRows = prev.filter((r) => !nextIds.has(r.id));
+      const toDelete = deletedRows.map((r) => r.id);
+      const createdRows = [];
+      const updatedRows = []; // [{ row, old }]
+      next.forEach((r) => {
         const old = prev.find((p) => p.id === r.id);
-        return !old || JSON.stringify(old) !== JSON.stringify(r);
+        if (!old) createdRows.push(r);
+        else if (JSON.stringify(old) !== JSON.stringify(r))
+          updatedRows.push({ row: r, old });
       });
+      const toUpsert = [...createdRows, ...updatedRows.map((u) => u.row)];
 
+      setSaveError(null);
       (async () => {
         if (toDelete.length) {
           const { error } = await supabase
             .from(table)
             .delete()
             .in("id", toDelete);
-          if (error)
+          if (error) {
             console.error(
               `[supabase] delete failed on ${table}:`,
               error.message,
             );
+            setSaveError(error.message);
+          }
         }
         if (toUpsert.length) {
           const { error } = await supabase
             .from(table)
             .upsert(toUpsert.map(mapToDb));
-          if (error)
+          if (error) {
             console.error(
               `[supabase] upsert failed on ${table}:`,
               error.message,
             );
+            setSaveError(error.message);
+          }
         }
       })();
+
+      if (audit) {
+        const actor = actorRef?.current || null;
+        createdRows.forEach((r) =>
+          writeAuditLog({
+            actor,
+            action: "create",
+            table,
+            entityId: r.id,
+            label: labelOf(r),
+          }),
+        );
+        updatedRows.forEach(({ row, old }) =>
+          writeAuditLog({
+            actor,
+            action: "update",
+            table,
+            entityId: row.id,
+            label: labelOf(row),
+            changes: diffFields(old, row),
+          }),
+        );
+        deletedRows.forEach((r) =>
+          writeAuditLog({
+            actor,
+            action: "delete",
+            table,
+            entityId: r.id,
+            label: labelOf(r),
+          }),
+        );
+      }
     },
-    [table, mapToDb],
+    [table, mapToDb, audit, actorRef, labelOf],
   );
 
-  return [value, setValue, ready];
+  return [value, setValue, ready, saveError];
 }
 
 // payroll_paid is stored as one row per (employee, month) but the app
@@ -2197,6 +2424,86 @@ function Button({ children, variant = "primary", size, style, ...props }) {
     >
       {children}
     </button>
+  );
+}
+// Reusable pagination: give it the full (already filtered/sorted) array
+// and a page size, get back just the slice for the current page plus
+// everything needed to render controls. Resets to page 1 whenever the
+// input list's length changes (e.g. a new search/filter narrows results)
+// so users never land on a page that no longer exists.
+function usePagination(items, pageSize = 20) {
+  const [page, setPage] = useState(1);
+  const total = items.length;
+  const pageCount = Math.max(1, Math.ceil(total / pageSize));
+  useEffect(() => {
+    setPage(1);
+  }, [total, pageSize]);
+  const safePage = Math.min(page, pageCount);
+  const pageItems = useMemo(() => {
+    const start = (safePage - 1) * pageSize;
+    return items.slice(start, start + pageSize);
+  }, [items, safePage, pageSize]);
+  return {
+    page: safePage,
+    setPage,
+    pageCount,
+    total,
+    pageItems,
+    rangeStart: total === 0 ? 0 : (safePage - 1) * pageSize + 1,
+    rangeEnd: Math.min(safePage * pageSize, total),
+  };
+}
+function Pagination({ page, pageCount, setPage, total, rangeStart, rangeEnd }) {
+  const { t } = useLang();
+  if (total === 0 || pageCount <= 1) return null;
+  const go = (p) => setPage(Math.min(pageCount, Math.max(1, p)));
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+        gap: 10,
+        marginTop: 14,
+        fontSize: 12.5,
+        color: T.muted,
+      }}
+    >
+      <span>
+        {rangeStart}–{rangeEnd} {t.pagination?.of || "នៃ"} {total}
+      </span>
+      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => go(page - 1)}
+          disabled={page <= 1}
+          style={{ opacity: page <= 1 ? 0.4 : 1 }}
+        >
+          <ChevronLeft size={14} />
+        </Button>
+        <span
+          style={{
+            fontSize: 12.5,
+            color: T.ink,
+            padding: "0 6px",
+            fontFamily: "'JetBrains Mono',monospace",
+          }}
+        >
+          {page} / {pageCount}
+        </span>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => go(page + 1)}
+          disabled={page >= pageCount}
+          style={{ opacity: page >= pageCount ? 0.4 : 1 }}
+        >
+          <ChevronRight size={14} />
+        </Button>
+      </div>
+    </div>
   );
 }
 const NOTIF_TONE = {
@@ -3764,6 +4071,7 @@ function EmployeeForm({
       weeklyOff: [],
       customDaysOff: [],
       annualLeaveDays: DEFAULT_ANNUAL_LEAVE_DAYS,
+      sickLeaveDays: DEFAULT_SICK_LEAVE_DAYS,
       role: "",
       email: "",
       phone: "",
@@ -3977,6 +4285,15 @@ function EmployeeForm({
           placeholder={String(DEFAULT_ANNUAL_LEAVE_DAYS)}
         />
       </Field>
+      <Field label="ថ្ងៃច្បាប់ឈឺ (ថ្ងៃ/ឆ្នាំ)">
+        <Input
+          type="number"
+          min={0}
+          value={f.sickLeaveDays ?? DEFAULT_SICK_LEAVE_DAYS}
+          onChange={set("sickLeaveDays")}
+          placeholder={String(DEFAULT_SICK_LEAVE_DAYS)}
+        />
+      </Field>
       <Field label="ថ្ងៃឈប់សម្រាកប្រចាំសប្តាហ៍">
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {WEEKDAY_LABELS.map((label, dow) => {
@@ -4096,11 +4413,18 @@ function Employees({
   const [docsFor, setDocsFor] = useState(null);
   const [query, setQuery] = useState("");
   const [branchFilter, setBranchFilter] = useState("");
-  const filtered = employees.filter(
-    (e) =>
-      (e.name + e.code + e.role).toLowerCase().includes(query.toLowerCase()) &&
-      (!branchFilter || e.officeId === branchFilter),
+  const filtered = useMemo(
+    () =>
+      employees.filter(
+        (e) =>
+          (e.name + e.code + e.role)
+            .toLowerCase()
+            .includes(query.toLowerCase()) &&
+          (!branchFilter || e.officeId === branchFilter),
+      ),
+    [employees, query, branchFilter],
   );
+  const pg = usePagination(filtered, 24);
   const deptName = (id) => departments.find((d) => d.id === id)?.name || "—";
   const shiftOf = (id) => shifts.find((s) => s.id === id);
   const officeName = (id) => offices.find((o) => o.id === id)?.name || null;
@@ -4112,6 +4436,9 @@ function Employees({
       annualLeaveDays: Number.isFinite(Number(data.annualLeaveDays))
         ? Number(data.annualLeaveDays)
         : DEFAULT_ANNUAL_LEAVE_DAYS,
+      sickLeaveDays: Number.isFinite(Number(data.sickLeaveDays))
+        ? Number(data.sickLeaveDays)
+        : DEFAULT_SICK_LEAVE_DAYS,
       useCustomRate: !!data.useCustomRate,
       customTaxRate: data.useCustomRate
         ? Number(data.customTaxRate) || 0
@@ -4220,7 +4547,7 @@ function Employees({
         className="wf-grid"
         style={{ gridTemplateColumns: "repeat(auto-fill, minmax(260px,1fr))" }}
       >
-        {filtered.map((e) => (
+        {pg.pageItems.map((e) => (
           <Card key={e.id} accent={colorFor(e.name)} style={{ padding: 16 }}>
             <div
               style={{
@@ -4378,6 +4705,7 @@ function Employees({
           </p>
         )}
       </div>
+      <Pagination {...pg} />
 
       {modal && (
         <Modal
@@ -5769,6 +6097,18 @@ function Attendance({
   const dayRecords = attendance.filter((a) => a.date === date);
   const activeEmployees = employees.filter((e) => e.status === "active");
   const shiftOf = (id) => shifts.find((s) => s.id === id);
+  // Hooks must run unconditionally (not just in the employee-view branch
+  // below), so this is computed here even though only that branch uses it.
+  const myHistory = useMemo(
+    () =>
+      currentEmp
+        ? attendance
+            .filter((a) => a.employeeId === currentEmp.id)
+            .sort((a, b) => b.date.localeCompare(a.date))
+        : [],
+    [attendance, currentEmp],
+  );
+  const myHistoryPg = usePagination(myHistory, 15);
   const rows = activeEmployees.map((e) => ({
     emp: e,
     rec: dayRecords.find((a) => a.employeeId === e.id),
@@ -5797,9 +6137,7 @@ function Attendance({
   };
 
   if (role !== "admin" && currentEmp) {
-    const myHistory = attendance
-      .filter((a) => a.employeeId === currentEmp.id)
-      .sort((a, b) => b.date.localeCompare(a.date));
+    const pg = myHistoryPg;
     return (
       <div>
         <SelfPunch
@@ -5847,7 +6185,7 @@ function Attendance({
                     </td>
                   </tr>
                 )}
-                {myHistory.map((a) => (
+                {pg.pageItems.map((a) => (
                   <tr key={a.id}>
                     <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
                       {a.date}
@@ -5871,6 +6209,7 @@ function Attendance({
               </tbody>
             </table>
           </div>
+          <Pagination {...pg} />
         </Card>
       </div>
     );
@@ -6110,10 +6449,20 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
   const requestedDays = invalidRange
     ? 0
     : dateRange(f.startDate, f.endDate).length;
+  // remaining can be a plain number (legacy annual-only balance) or an
+  // { annual, sick } object — normalize so both shapes keep working.
+  const remainingForType =
+    f.type === "annual"
+      ? typeof remaining === "number"
+        ? remaining
+        : remaining?.annual
+      : f.type === "sick"
+        ? remaining?.sick
+        : undefined;
   const overQuota =
-    f.type === "annual" &&
-    typeof remaining === "number" &&
-    requestedDays > remaining;
+    (f.type === "annual" || f.type === "sick") &&
+    typeof remainingForType === "number" &&
+    requestedDays > remainingForType;
   return (
     <div>
       <Field label="ប្រភេទច្បាប់">
@@ -6123,7 +6472,7 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
           <option value="other">ផ្សេងៗ</option>
         </Select>
       </Field>
-      {f.type === "annual" && typeof remaining === "number" && (
+      {f.type === "annual" && typeof remainingForType === "number" && (
         <p
           style={{
             fontSize: 12,
@@ -6132,7 +6481,19 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
             marginBottom: 12,
           }}
         >
-          នៅសល់ {remaining} ថ្ងៃច្បាប់ប្រចាំឆ្នាំ
+          នៅសល់ {remainingForType} ថ្ងៃច្បាប់ប្រចាំឆ្នាំ
+        </p>
+      )}
+      {f.type === "sick" && typeof remainingForType === "number" && (
+        <p
+          style={{
+            fontSize: 12,
+            color: T.muted,
+            marginTop: -8,
+            marginBottom: 12,
+          }}
+        >
+          នៅសល់ {remainingForType} ថ្ងៃច្បាប់ឈឺ
         </p>
       )}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -6167,9 +6528,10 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
             marginBottom: 12,
           }}
         >
-          ⚠️ សំណើនេះ ({requestedDays} ថ្ងៃ)
-          លើសពីសមតុល្យច្បាប់ប្រចាំឆ្នាំដែលនៅសល់ ({remaining} ថ្ងៃ) —
-          អ្នកនៅតែអាចដាក់ស្នើបាន តែសូមរង់ចាំការសម្រេចពី admin
+          ⚠️ សំណើនេះ ({requestedDays} ថ្ងៃ) លើសពីសមតុល្យ
+          {f.type === "annual" ? "ច្បាប់ប្រចាំឆ្នាំ" : "ច្បាប់ឈឺ"}ដែលនៅសល់ (
+          {remainingForType} ថ្ងៃ) — អ្នកនៅតែអាចដាក់ស្នើបាន
+          តែសូមរង់ចាំការសម្រេចពី admin
         </p>
       )}
       <Field label="មូលហេតុ">
@@ -6210,11 +6572,11 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
 // Small inline "decided by" line shown on both the admin and employee
 // views, so everyone sees the same approve/reject attribution.
 function LeaveDecisionNote({ r, admins }) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   if (r.status !== "approved" && r.status !== "rejected") return null;
   const decider = admins.find((a) => a.id === r.decidedById);
   const name = r.decidedByName || decider?.name || "—";
-  const roleLabel = ADMIN_ROLE_LABEL[r.decidedByRole] || r.decidedByRole || "";
+  const roleLabel = adminRoleLabel(r.decidedByRole, lang);
   return (
     <div style={{ fontSize: 11.5, color: T.textSoft, marginTop: 3 }}>
       {r.status === "approved" ? (
@@ -6393,48 +6755,96 @@ function LeaveRequests({
       .filter((r) => r.employeeId === currentEmp.id)
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     const bal = annualLeaveBalance(currentEmp, leaveRequests);
+    const sickBal = sickLeaveBalance(currentEmp, leaveRequests);
     return (
       <div>
-        <Card
-          accent={bal.remaining <= 0 ? T.rose : T.forest}
+        <div
           style={{
-            padding: "14px 18px",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 12,
             marginBottom: 16,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: 8,
           }}
         >
-          <div>
-            <div
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                textTransform: "uppercase",
-                letterSpacing: ".04em",
-                color: T.muted,
-                marginBottom: 2,
-              }}
-            >
-              ថ្ងៃច្បាប់ប្រចាំឆ្នាំ {new Date().getFullYear()}
-            </div>
-            <div style={{ fontSize: 13, color: T.textSoft }}>
-              បានប្រើ {bal.used} ក្នុងចំណោម {bal.quota} ថ្ងៃ
-            </div>
-          </div>
-          <div
+          <Card
+            accent={bal.remaining <= 0 ? T.rose : T.forest}
             style={{
-              fontSize: 22,
-              fontWeight: 700,
-              fontFamily: "'Space Grotesk',sans-serif",
-              color: bal.remaining <= 0 ? T.rose : T.forestText,
+              padding: "14px 18px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: 8,
             }}
           >
-            នៅសល់ {bal.remaining} ថ្ងៃ
-          </div>
-        </Card>
+            <div>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: ".04em",
+                  color: T.muted,
+                  marginBottom: 2,
+                }}
+              >
+                ថ្ងៃច្បាប់ប្រចាំឆ្នាំ {new Date().getFullYear()}
+              </div>
+              <div style={{ fontSize: 13, color: T.textSoft }}>
+                បានប្រើ {bal.used} ក្នុងចំណោម {bal.quota} ថ្ងៃ
+              </div>
+            </div>
+            <div
+              style={{
+                fontSize: 22,
+                fontWeight: 700,
+                fontFamily: "'Space Grotesk',sans-serif",
+                color: bal.remaining <= 0 ? T.rose : T.forestText,
+              }}
+            >
+              នៅសល់ {bal.remaining} ថ្ងៃ
+            </div>
+          </Card>
+          <Card
+            accent={sickBal.remaining <= 0 ? T.rose : T.blue}
+            style={{
+              padding: "14px 18px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: 8,
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: ".04em",
+                  color: T.muted,
+                  marginBottom: 2,
+                }}
+              >
+                ថ្ងៃច្បាប់ឈឺ {new Date().getFullYear()}
+              </div>
+              <div style={{ fontSize: 13, color: T.textSoft }}>
+                បានប្រើ {sickBal.used} ក្នុងចំណោម {sickBal.quota} ថ្ងៃ
+              </div>
+            </div>
+            <div
+              style={{
+                fontSize: 22,
+                fontWeight: 700,
+                fontFamily: "'Space Grotesk',sans-serif",
+                color: sickBal.remaining <= 0 ? T.rose : T.blue,
+              }}
+            >
+              នៅសល់ {sickBal.remaining} ថ្ងៃ
+            </div>
+          </Card>
+        </div>
         <div
           style={{
             display: "flex",
@@ -6496,7 +6906,7 @@ function LeaveRequests({
         {modal && (
           <Modal title="ស្នើសុំច្បាប់ឈប់សម្រាក" onClose={() => setModal(false)}>
             <LeaveRequestForm
-              remaining={bal.remaining}
+              remaining={{ annual: bal.remaining, sick: sickBal.remaining }}
               onSave={submit}
               onCancel={() => setModal(false)}
             />
@@ -6582,6 +6992,12 @@ function LeaveRequests({
                     {r.type === "annual" && emp && (
                       <div style={{ fontSize: 10.5, color: T.muted }}>
                         នៅសល់ {annualLeaveBalance(emp, leaveRequests).remaining}{" "}
+                        ថ្ងៃ
+                      </div>
+                    )}
+                    {r.type === "sick" && emp && (
+                      <div style={{ fontSize: 10.5, color: T.muted }}>
+                        នៅសល់ {sickLeaveBalance(emp, leaveRequests).remaining}{" "}
                         ថ្ងៃ
                       </div>
                     )}
@@ -7027,11 +7443,11 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
 // Small inline "decided by" line shown on both the admin and employee
 // views, so everyone sees the same approve/reject attribution.
 function OtDecisionNote({ r, admins }) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   if (r.status !== "approved" && r.status !== "rejected") return null;
   const decider = admins.find((a) => a.id === r.decidedById);
   const name = r.decidedByName || decider?.name || "—";
-  const roleLabel = ADMIN_ROLE_LABEL[r.decidedByRole] || r.decidedByRole || "";
+  const roleLabel = adminRoleLabel(r.decidedByRole, lang);
   return (
     <div style={{ fontSize: 11.5, color: T.textSoft, marginTop: 3 }}>
       {r.status === "approved" ? (
@@ -8949,7 +9365,7 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
                           : { background: T.forestSoft, color: T.forestText }
                       }
                     >
-                      {ADMIN_ROLE_LABEL[a.role]}
+                      {adminRoleLabel(a.role, lang)}
                     </span>
                   </td>
                   <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
@@ -9095,6 +9511,7 @@ function MyProfile({
   setEmployees,
   departments,
   shifts,
+  saveError,
 }) {
   const { t, lang } = useLang();
   const [f, setF] = useState({
@@ -9106,6 +9523,13 @@ function MyProfile({
   const [photoPreview, setPhotoPreview] = useState(currentEmp.photo || null);
   const [photoError, setPhotoError] = useState("");
   const [saved, setSaved] = useState(false);
+  // See the identical flag in AdminSettings: only treat a saveError as
+  // "my save just failed" if this screen actually attempted one.
+  const [attemptedSave, setAttemptedSave] = useState(false);
+
+  useEffect(() => {
+    if (attemptedSave && saveError) setSaved(false);
+  }, [saveError, attemptedSave]);
 
   const [pinForm, setPinForm] = useState({
     current: "",
@@ -9122,6 +9546,7 @@ function MyProfile({
   const set = (k) => (e) => {
     setF({ ...f, [k]: e.target.value });
     setSaved(false);
+    setAttemptedSave(false);
   };
 
   const onPhotoChange = async (e) => {
@@ -9140,6 +9565,7 @@ function MyProfile({
       const dataUrl = await fileToCompressedAvatarDataUrl(file);
       setPhotoPreview(dataUrl);
       setSaved(false);
+      setAttemptedSave(false);
     } catch {
       setPhotoError("មិនអាចអានរូបភាពនេះបានទេ សូមសាកល្បងរូបភាពផ្សេង");
     }
@@ -9151,6 +9577,7 @@ function MyProfile({
       return;
     }
     setNameError("");
+    setAttemptedSave(true);
     setEmployees(
       employees.map((e) =>
         e.id === currentEmp.id
@@ -9291,7 +9718,24 @@ function MyProfile({
         <Field label="អ៊ីមែល">
           <Input value={f.email} onChange={set("email")} type="email" />
         </Field>
-        {saved && (
+        {attemptedSave && saveError && (
+          <p
+            style={{
+              fontSize: 12.5,
+              color: T.rose,
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 5,
+              marginBottom: 10,
+            }}
+          >
+            <AlertCircle size={14} style={{ flexShrink: 0, marginTop: 1 }} />
+            <span>
+              {t.settings.saveFailed} {saveError}
+            </span>
+          </p>
+        )}
+        {saved && !saveError && (
           <p
             style={{
               fontSize: 12.5,
@@ -9302,7 +9746,7 @@ function MyProfile({
               marginBottom: 10,
             }}
           >
-            <CheckCircle2 size={14} /> {t.save}
+            <CheckCircle2 size={14} /> {t.settings.saved}
           </p>
         )}
         <Button variant="accent" onClick={saveProfile}>
@@ -9451,8 +9895,14 @@ function AppearanceCard() {
 /* ---------------------------------------------------------------
    Admin — My Settings (name, photo, appearance)
 ----------------------------------------------------------------*/
-function AdminSettings({ currentAdmin, admins, setAdmins, isSuperAdmin }) {
-  const { t } = useLang();
+function AdminSettings({
+  currentAdmin,
+  admins,
+  setAdmins,
+  isSuperAdmin,
+  saveError,
+}) {
+  const { t, lang } = useLang();
   const { theme, setTheme } = useTheme();
   const { branding, setBranding } = useBranding();
   const [f, setF] = useState({ name: currentAdmin.name || "" });
@@ -9460,6 +9910,14 @@ function AdminSettings({ currentAdmin, admins, setAdmins, isSuperAdmin }) {
   const [photoPreview, setPhotoPreview] = useState(currentAdmin.photo || null);
   const [photoError, setPhotoError] = useState("");
   const [saved, setSaved] = useState(false);
+  // True once this component has actually attempted a save — otherwise a
+  // saveError left over from some unrelated earlier admins write (e.g.
+  // another admin's edit) would incorrectly flag this screen as failed.
+  const [attemptedSave, setAttemptedSave] = useState(false);
+
+  useEffect(() => {
+    if (attemptedSave && saveError) setSaved(false);
+  }, [saveError, attemptedSave]);
 
   const [brandForm, setBrandForm] = useState({
     name: branding.name || "",
@@ -9510,6 +9968,7 @@ function AdminSettings({ currentAdmin, admins, setAdmins, isSuperAdmin }) {
       const dataUrl = await fileToCompressedAvatarDataUrl(file);
       setPhotoPreview(dataUrl);
       setSaved(false);
+      setAttemptedSave(false);
     } catch {
       setPhotoError("មិនអាចអានរូបភាពនេះបានទេ សូមសាកល្បងរូបភាពផ្សេង");
     }
@@ -9521,6 +9980,7 @@ function AdminSettings({ currentAdmin, admins, setAdmins, isSuperAdmin }) {
       return;
     }
     setNameError("");
+    setAttemptedSave(true);
     setAdmins(
       admins.map((a) =>
         a.id === currentAdmin.id
@@ -9561,7 +10021,7 @@ function AdminSettings({ currentAdmin, admins, setAdmins, isSuperAdmin }) {
                 fontFamily: "'JetBrains Mono',monospace",
               }}
             >
-              {ADMIN_ROLE_LABEL[currentAdmin.role]}
+              {adminRoleLabel(currentAdmin.role, lang)}
             </div>
           </div>
         </div>
@@ -9571,6 +10031,7 @@ function AdminSettings({ currentAdmin, admins, setAdmins, isSuperAdmin }) {
             onChange={(e) => {
               setF({ ...f, name: e.target.value });
               setSaved(false);
+              setAttemptedSave(false);
               setNameError("");
             }}
             placeholder={t.settings.namePlaceholder}
@@ -9606,7 +10067,24 @@ function AdminSettings({ currentAdmin, admins, setAdmins, isSuperAdmin }) {
             {photoError}
           </p>
         )}
-        {saved && (
+        {attemptedSave && saveError && (
+          <p
+            style={{
+              fontSize: 12.5,
+              color: T.rose,
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 5,
+              marginBottom: 10,
+            }}
+          >
+            <AlertCircle size={14} style={{ flexShrink: 0, marginTop: 1 }} />
+            <span>
+              {t.settings.saveFailed || "Save failed:"} {saveError}
+            </span>
+          </p>
+        )}
+        {saved && !saveError && (
           <p
             style={{
               fontSize: 12.5,
@@ -9795,6 +10273,365 @@ function AdminSettings({ currentAdmin, admins, setAdmins, isSuperAdmin }) {
           <Button variant="accent" onClick={saveBranding}>
             {t.save}
           </Button>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   Audit Log page — read-only view of the audit_logs table written
+   by writeAuditLog() (see the useSupabaseArray hook near the top of
+   the file). Superadmin-only.
+----------------------------------------------------------------*/
+const AUDIT_ACTION_TONE = {
+  create: { bg: T.forestSoft, fg: T.forestText },
+  update: { bg: T.goldSoft, fg: T.goldText },
+  delete: { bg: T.roseSoft, fg: T.rose },
+  login: { bg: T.forestSoft, fg: T.forestText },
+  logout: { bg: T.lineSoft, fg: T.muted },
+};
+function AuditActionBadge({ action, t }) {
+  const tone = AUDIT_ACTION_TONE[action] || {
+    bg: T.lineSoft,
+    fg: T.muted,
+  };
+  const label =
+    {
+      create: t.audit.actionCreate,
+      update: t.audit.actionUpdate,
+      delete: t.audit.actionDelete,
+      login: t.audit.actionLogin,
+      logout: t.audit.actionLogout,
+    }[action] || action;
+  return (
+    <span
+      style={{
+        fontSize: 11,
+        fontWeight: 700,
+        padding: "3px 9px",
+        borderRadius: 999,
+        background: tone.bg,
+        color: tone.fg,
+        whiteSpace: "nowrap",
+      }}
+    >
+      {label}
+    </span>
+  );
+}
+function fmtAuditTime(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  try {
+    return new Intl.DateTimeFormat("km-KH", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(d);
+  } catch {
+    return iso;
+  }
+}
+function AuditLogPage() {
+  const { t } = useLang();
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [q, setQ] = useState("");
+  const [tableFilter, setTableFilter] = useState("all");
+  const [expanded, setExpanded] = useState(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("audit_logs")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(300);
+    if (error) {
+      console.error("[audit] failed to load audit_logs:", error.message);
+      setLogs([]);
+    } else {
+      setLogs(data || []);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const tableNames = useMemo(() => {
+    const seen = new Set(logs.map((l) => l.entity_table).filter(Boolean));
+    return Array.from(seen).sort();
+  }, [logs]);
+
+  const filtered = useMemo(() => {
+    const query = q.trim().toLowerCase();
+    return logs.filter((l) => {
+      if (tableFilter !== "all" && l.entity_table !== tableFilter) return false;
+      if (!query) return true;
+      const hay = [l.actor_name, l.entity_label, l.entity_table, l.action]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return hay.includes(query);
+    });
+  }, [logs, q, tableFilter]);
+  const pg = usePagination(filtered, 25);
+
+  return (
+    <div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          marginBottom: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <div>
+          <h2
+            style={{
+              fontFamily: "'Space Grotesk',sans-serif",
+              fontSize: 18,
+              fontWeight: 600,
+              color: T.ink,
+              margin: 0,
+            }}
+          >
+            {t.audit.title}
+          </h2>
+          <p style={{ fontSize: 12.5, color: T.muted, margin: "4px 0 0" }}>
+            {t.audit.subtitle}
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <div style={{ position: "relative" }}>
+            <Search
+              size={14}
+              color={T.muted}
+              style={{
+                position: "absolute",
+                left: 10,
+                top: "50%",
+                transform: "translateY(-50%)",
+              }}
+            />
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder={t.search}
+              style={{ paddingLeft: 30, minWidth: 200 }}
+            />
+          </div>
+          <Select
+            value={tableFilter}
+            onChange={(e) => setTableFilter(e.target.value)}
+          >
+            <option value="all">{t.audit.allTables}</option>
+            {tableNames.map((tn) => (
+              <option key={tn} value={tn}>
+                {t.audit.tables[tn] || tn}
+              </option>
+            ))}
+          </Select>
+          <Button variant="ghost" size="sm" onClick={load}>
+            <RefreshCw size={14} /> {t.audit.refresh}
+          </Button>
+        </div>
+      </div>
+
+      {loading && (
+        <Card
+          style={{
+            textAlign: "center",
+            padding: "32px 0",
+            color: T.muted,
+            fontSize: 13,
+          }}
+        >
+          <Loader2
+            size={20}
+            color={T.forest}
+            style={{ animation: "spin 1s linear infinite" }}
+          />
+          <div style={{ marginTop: 8 }}>{t.audit.loading}</div>
+        </Card>
+      )}
+
+      {!loading && filtered.length === 0 && (
+        <Card
+          style={{
+            textAlign: "center",
+            padding: "32px 0",
+            color: T.muted,
+            fontSize: 13,
+          }}
+        >
+          {t.audit.noLogs}
+        </Card>
+      )}
+
+      {!loading && filtered.length > 0 && (
+        <Card style={{ overflowX: "auto", padding: 0 }}>
+          <table className="wf-table">
+            <thead>
+              <tr>
+                <th>{t.audit.time}</th>
+                <th>{t.audit.actor}</th>
+                <th>{t.audit.action}</th>
+                <th>{t.audit.entity}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {pg.pageItems.map((l) => {
+                const hasChanges = l.changes && Object.keys(l.changes).length;
+                const isOpen = expanded === l.id;
+                return (
+                  <React.Fragment key={l.id}>
+                    <tr
+                      style={{ cursor: hasChanges ? "pointer" : "default" }}
+                      onClick={() =>
+                        hasChanges && setExpanded(isOpen ? null : l.id)
+                      }
+                    >
+                      <td
+                        style={{
+                          fontFamily: "'JetBrains Mono',monospace",
+                          fontSize: 11.5,
+                          color: T.muted,
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {fmtAuditTime(l.created_at)}
+                      </td>
+                      <td>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                          }}
+                        >
+                          <Avatar
+                            name={l.actor_name || t.audit.unknownActor}
+                            size={26}
+                          />
+                          <div>
+                            <div
+                              style={{
+                                fontSize: 12.5,
+                                fontWeight: 500,
+                                color: T.ink,
+                              }}
+                            >
+                              {l.actor_name || t.audit.unknownActor}
+                            </div>
+                            {l.actor_type && (
+                              <div style={{ fontSize: 10.5, color: T.muted }}>
+                                {l.actor_type === "admin"
+                                  ? t.nav.admins
+                                  : t.employee}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <AuditActionBadge action={l.action} t={t} />
+                      </td>
+                      <td style={{ fontSize: 12.5 }}>
+                        <div style={{ color: T.ink }}>
+                          {l.entity_label || l.entity_id || "—"}
+                        </div>
+                        <div style={{ fontSize: 10.5, color: T.muted }}>
+                          {t.audit.tables[l.entity_table] || l.entity_table}
+                        </div>
+                      </td>
+                      <td style={{ textAlign: "right" }}>
+                        {hasChanges &&
+                          (isOpen ? (
+                            <ChevronLeft size={14} color={T.muted} />
+                          ) : (
+                            <ChevronRight size={14} color={T.muted} />
+                          ))}
+                      </td>
+                    </tr>
+                    {isOpen && hasChanges && (
+                      <tr>
+                        <td
+                          colSpan={5}
+                          style={{ background: T.tableHeadBg, padding: 12 }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: 6,
+                            }}
+                          >
+                            {Object.entries(l.changes).map(([field, ch]) => (
+                              <div
+                                key={field}
+                                style={{
+                                  display: "flex",
+                                  gap: 8,
+                                  fontSize: 11.5,
+                                  flexWrap: "wrap",
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    fontWeight: 700,
+                                    color: T.ink,
+                                    minWidth: 120,
+                                  }}
+                                >
+                                  {field}
+                                </span>
+                                <span style={{ color: T.muted }}>
+                                  {t.audit.changedFrom}
+                                </span>
+                                <span
+                                  style={{
+                                    color: T.rose,
+                                    fontFamily: "'JetBrains Mono',monospace",
+                                  }}
+                                >
+                                  {ch.from}
+                                </span>
+                                <span style={{ color: T.muted }}>
+                                  {t.audit.changedTo}
+                                </span>
+                                <span
+                                  style={{
+                                    color: T.forestText,
+                                    fontFamily: "'JetBrains Mono',monospace",
+                                  }}
+                                >
+                                  {ch.to}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+          <div style={{ padding: "0 16px 14px" }}>
+            <Pagination {...pg} />
+          </div>
         </Card>
       )}
     </div>
@@ -10724,6 +11561,7 @@ function buildNavAdmin(n) {
     { id: "review", label: n.performance, icon: Star },
     { id: "attcorr", label: n.attCorrection, icon: CalendarClock },
     { id: "admins", label: n.admins, icon: ShieldCheck, superadminOnly: true },
+    { id: "audits", label: n.audits, icon: History, superadminOnly: true },
     { id: "settings", label: n.settings, icon: Settings2 },
   ];
 }
@@ -10744,7 +11582,7 @@ function buildNavEmployee(n) {
 
 function AppInner() {
   useGlobalStyle();
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const [branding, setBranding, brandingReady] = useBrandingSettings();
   const brandDisplayName = branding.name?.trim() || t.appName;
   const { theme } = useTheme();
@@ -10771,6 +11609,11 @@ function AppInner() {
     // If no custom logo is set, leave whatever favicon index.html already
     // defines (e.g. a default app icon) rather than clearing it.
   }, [brandingReady, branding.logo]);
+  // Who is currently signed in, kept in a ref (not state) so the
+  // useSupabaseArray hooks below can read the *latest* actor at the
+  // moment a change is saved without needing to be re-created whenever
+  // the logged-in person changes.
+  const actorRef = useRef(null);
   const [departments, setDepartments, dReady] = useSupabaseArray(
     "departments",
     {
@@ -10786,59 +11629,72 @@ function AppInner() {
         code: r.code,
         description: r.desc,
       }),
+      audit: true,
+      actorRef,
     },
   );
-  const [employees, setEmployees, eReady] = useSupabaseArray("employees", {
-    fromDb: (r) => ({
-      id: r.id,
-      code: r.code,
-      pin: r.pin,
-      name: r.name,
-      deptId: r.dept_id,
-      shiftId: r.shift_id,
-      officeId: r.office_id,
-      weeklyOff: r.weekly_off || [],
-      customDaysOff: r.custom_days_off || [],
-      annualLeaveDays: r.annual_leave_days ?? DEFAULT_ANNUAL_LEAVE_DAYS,
-      role: r.role,
-      email: r.email,
-      phone: r.phone,
-      salary: r.salary,
-      status: r.status,
-      joined: r.joined,
-      photo: r.photo,
-      useCustomRate: !!r.use_custom_rate,
-      customTaxRate: r.custom_tax_rate,
-      customInsuranceRate: r.custom_insurance_rate,
-    }),
-    toDb: (r) => ({
-      id: r.id,
-      code: r.code,
-      pin: r.pin,
-      name: r.name,
-      dept_id: r.deptId,
-      shift_id: r.shiftId,
-      office_id: r.officeId || null,
-      weekly_off: r.weeklyOff || [],
-      custom_days_off: r.customDaysOff || [],
-      annual_leave_days: Number.isFinite(r.annualLeaveDays)
-        ? r.annualLeaveDays
-        : DEFAULT_ANNUAL_LEAVE_DAYS,
-      role: r.role,
-      email: r.email,
-      phone: r.phone,
-      salary: r.salary,
-      status: r.status,
-      joined: r.joined,
-      photo: r.photo,
-      use_custom_rate: !!r.useCustomRate,
-      custom_tax_rate: r.useCustomRate ? Number(r.customTaxRate) || 0 : null,
-      custom_insurance_rate: r.useCustomRate
-        ? Number(r.customInsuranceRate) || 0
-        : null,
-    }),
+  const [employees, setEmployees, eReady, employeesSaveError] =
+    useSupabaseArray("employees", {
+      fromDb: (r) => ({
+        id: r.id,
+        code: r.code,
+        pin: r.pin,
+        name: r.name,
+        deptId: r.dept_id,
+        shiftId: r.shift_id,
+        officeId: r.office_id,
+        weeklyOff: r.weekly_off || [],
+        customDaysOff: r.custom_days_off || [],
+        annualLeaveDays: r.annual_leave_days ?? DEFAULT_ANNUAL_LEAVE_DAYS,
+        sickLeaveDays: r.sick_leave_days ?? DEFAULT_SICK_LEAVE_DAYS,
+        role: r.role,
+        email: r.email,
+        phone: r.phone,
+        salary: r.salary,
+        status: r.status,
+        joined: r.joined,
+        photo: r.photo,
+        useCustomRate: !!r.use_custom_rate,
+        customTaxRate: r.custom_tax_rate,
+        customInsuranceRate: r.custom_insurance_rate,
+      }),
+      toDb: (r) => ({
+        id: r.id,
+        code: r.code,
+        pin: r.pin,
+        name: r.name,
+        dept_id: r.deptId,
+        shift_id: r.shiftId,
+        office_id: r.officeId || null,
+        weekly_off: r.weeklyOff || [],
+        custom_days_off: r.customDaysOff || [],
+        annual_leave_days: Number.isFinite(r.annualLeaveDays)
+          ? r.annualLeaveDays
+          : DEFAULT_ANNUAL_LEAVE_DAYS,
+        sick_leave_days: Number.isFinite(r.sickLeaveDays)
+          ? r.sickLeaveDays
+          : DEFAULT_SICK_LEAVE_DAYS,
+        role: r.role,
+        email: r.email,
+        phone: r.phone,
+        salary: r.salary,
+        status: r.status,
+        joined: r.joined,
+        photo: r.photo,
+        use_custom_rate: !!r.useCustomRate,
+        custom_tax_rate: r.useCustomRate ? Number(r.customTaxRate) || 0 : null,
+        custom_insurance_rate: r.useCustomRate
+          ? Number(r.customInsuranceRate) || 0
+          : null,
+      }),
+      audit: true,
+      actorRef,
+      entityLabel: (r) => `${r.name || "?"} (${r.code || r.id})`,
+    });
+  const [shifts, setShifts, shReady] = useSupabaseArray("shifts", {
+    audit: true,
+    actorRef,
   });
-  const [shifts, setShifts, shReady] = useSupabaseArray("shifts");
   const [attendance, setAttendance, aReady] = useSupabaseArray("attendance", {
     fromDb: (r) => ({
       id: r.id,
@@ -10895,6 +11751,9 @@ function AppInner() {
         decision_reason: r.decisionReason,
         reviewed_at: r.reviewedAt,
       }),
+      audit: true,
+      actorRef,
+      entityLabel: (r) => `${r.type || "leave"} · ${r.employeeId || "?"}`,
     },
   );
   const [overtimeRequests, setOvertimeRequests, otrReady] = useSupabaseArray(
@@ -10930,6 +11789,9 @@ function AppInner() {
         created_at: r.createdAt,
         reviewed_at: r.reviewedAt,
       }),
+      audit: true,
+      actorRef,
+      entityLabel: (r) => `OT ${r.hours ?? "?"}h · ${r.employeeId || "?"}`,
     },
   );
   const [performanceReviews, setPerformanceReviews, prReady] = useSupabaseArray(
@@ -10957,6 +11819,9 @@ function AppInner() {
         reviewed_by_name: r.reviewedByName,
         created_at: r.createdAt,
       }),
+      audit: true,
+      actorRef,
+      entityLabel: (r) => `${r.period || "?"} · ${r.employeeId || "?"}`,
     },
   );
   const [announcements, setAnnouncements, annReady] = useSupabaseArray(
@@ -10978,6 +11843,9 @@ function AppInner() {
         created_by_name: r.createdByName,
         created_at: r.createdAt,
       }),
+      audit: true,
+      actorRef,
+      entityLabel: (r) => r.title || "?",
     },
   );
   const [documents, setDocuments, docsReady] = useSupabaseArray(
@@ -11003,11 +11871,16 @@ function AppInner() {
         uploaded_by_name: r.uploadedByName,
         created_at: r.createdAt,
       }),
+      audit: true,
+      actorRef,
+      entityLabel: (r) => r.fileName || "?",
     },
   );
   const [holidays, setHolidays, holReady] = useSupabaseArray("holidays", {
     fromDb: (r) => ({ id: r.id, date: r.date, name: r.name }),
     toDb: (r) => ({ id: r.id, date: r.date, name: r.name }),
+    audit: true,
+    actorRef,
   });
   const [attendanceCorrections, setAttendanceCorrections, acReady] =
     useSupabaseArray("attendance_corrections", {
@@ -11039,8 +11912,18 @@ function AppInner() {
         created_at: r.createdAt,
         reviewed_at: r.reviewedAt,
       }),
+      audit: true,
+      actorRef,
+      entityLabel: (r) => `${r.date || "?"} · ${r.employeeId || "?"}`,
     });
-  const [admins, setAdmins, adminsReady] = useSupabaseArray("admins");
+  const [admins, setAdmins, adminsReady, adminsSaveError] = useSupabaseArray(
+    "admins",
+    {
+      audit: true,
+      actorRef,
+      entityLabel: (r) => r.name || r.username || r.id,
+    },
+  );
   const [offices, setOffices, officesReady] = useSupabaseArray("offices", {
     fromDb: (r) => ({
       id: r.id,
@@ -11057,6 +11940,8 @@ function AppInner() {
       radius: r.radius,
     }),
     orderBy: "name",
+    audit: true,
+    actorRef,
   });
   const [otPolicy, setOtPolicy, otPolicyReady] = useOtPolicy();
   const [payrollPolicy, setPayrollPolicy, payrollPolicyReady] =
@@ -11117,6 +12002,20 @@ function AppInner() {
       ? buildNavAdmin(t.nav).filter((n) => !n.superadminOnly || isSuperAdmin)
       : buildNavEmployee(t.nav);
 
+  // Keep actorRef in sync with whoever is signed in right now, so every
+  // useSupabaseArray hook above always audits changes under the correct
+  // name/id — even though the hooks themselves were created before login.
+  useEffect(() => {
+    actorRef.current =
+      role === "admin"
+        ? currentAdmin
+          ? { type: "admin", id: currentAdmin.id, name: currentAdmin.name }
+          : null
+        : currentEmp
+          ? { type: "employee", id: currentEmp.id, name: currentEmp.name }
+          : null;
+  }, [role, currentAdmin, currentEmp]);
+
   useEffect(() => {
     if (loggedIn && !nav.find((n) => n.id === page)) setPage("dashboard");
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -11154,7 +12053,17 @@ function AppInner() {
         <BrandingContext.Provider value={{ branding, setBranding }}>
           <AdminLoginScreen
             admins={admins}
-            onLogin={(id) => setSessionAdmin(id)}
+            onLogin={(id) => {
+              setSessionAdmin(id);
+              const acct = admins.find((a) => a.id === id);
+              writeAuditLog({
+                actor: { type: "admin", id, name: acct?.name },
+                action: "login",
+                table: "admins",
+                entityId: id,
+                label: acct?.name,
+              });
+            }}
             go={goPortal}
           />
         </BrandingContext.Provider>
@@ -11163,7 +12072,17 @@ function AppInner() {
       <BrandingContext.Provider value={{ branding, setBranding }}>
         <EmployeeLoginScreen
           employees={employees}
-          onLogin={(id) => setSessionEmployee(id)}
+          onLogin={(id) => {
+            setSessionEmployee(id);
+            const emp = employees.find((e) => e.id === id);
+            writeAuditLog({
+              actor: { type: "employee", id, name: emp?.name },
+              action: "login",
+              table: "employees",
+              entityId: id,
+              label: emp?.name,
+            });
+          }}
           go={goPortal}
         />
       </BrandingContext.Provider>
@@ -11298,7 +12217,7 @@ function AppInner() {
                     }}
                   >
                     {role === "admin"
-                      ? ADMIN_ROLE_LABEL[currentAdmin?.role]
+                      ? adminRoleLabel(currentAdmin?.role, lang)
                       : currentEmp?.code}
                   </div>
                 </div>
@@ -11307,8 +12226,33 @@ function AppInner() {
                 className="wf-nav-item"
                 style={{ color: "#E3B7BE" }}
                 onClick={() => {
-                  if (role === "admin") setSessionAdmin(null);
-                  else setSessionEmployee(null);
+                  if (role === "admin") {
+                    writeAuditLog({
+                      actor: {
+                        type: "admin",
+                        id: currentAdmin?.id,
+                        name: currentAdmin?.name,
+                      },
+                      action: "logout",
+                      table: "admins",
+                      entityId: currentAdmin?.id,
+                      label: currentAdmin?.name,
+                    });
+                    setSessionAdmin(null);
+                  } else {
+                    writeAuditLog({
+                      actor: {
+                        type: "employee",
+                        id: currentEmp?.id,
+                        name: currentEmp?.name,
+                      },
+                      action: "logout",
+                      table: "employees",
+                      entityId: currentEmp?.id,
+                      label: currentEmp?.name,
+                    });
+                    setSessionEmployee(null);
+                  }
                 }}
               >
                 <LogOut size={17} /> {t.logout}
@@ -11342,6 +12286,7 @@ function AppInner() {
             >
               {role !== "admin" && currentEmp && (
                 <span
+                  className="wf-role-badge"
                   style={{
                     fontSize: 11,
                     fontWeight: 700,
@@ -11349,6 +12294,10 @@ function AppInner() {
                     color: T.forestText,
                     padding: "5px 10px",
                     borderRadius: 8,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    maxWidth: 90,
                   }}
                 >
                   {t.employee}
@@ -11356,6 +12305,7 @@ function AppInner() {
               )}
               {role === "admin" && (
                 <span
+                  className="wf-role-badge"
                   style={{
                     fontSize: 11,
                     fontWeight: 700,
@@ -11363,9 +12313,14 @@ function AppInner() {
                     color: "#4A3B7A",
                     padding: "5px 10px",
                     borderRadius: 8,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    maxWidth: 90,
                   }}
+                  title={adminRoleLabel(currentAdmin?.role, lang)}
                 >
-                  {ADMIN_ROLE_LABEL[currentAdmin?.role]}
+                  {adminRoleLabel(currentAdmin?.role, lang)}
                 </span>
               )}
               <ThemeToggle variant="light" />
@@ -11573,6 +12528,7 @@ function AppInner() {
                 setEmployees={setEmployees}
                 departments={departments}
                 shifts={shifts}
+                saveError={employeesSaveError}
               />
             )}
             {page === "settings" && role === "admin" && currentAdmin && (
@@ -11581,7 +12537,11 @@ function AppInner() {
                 admins={admins}
                 setAdmins={setAdmins}
                 isSuperAdmin={isSuperAdmin}
+                saveError={adminsSaveError}
               />
+            )}
+            {page === "audits" && role === "admin" && isSuperAdmin && (
+              <AuditLogPage />
             )}
           </main>
         </div>
