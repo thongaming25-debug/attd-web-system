@@ -54,6 +54,7 @@ import {
   FileText,
   Paperclip,
   Upload,
+  CalendarClock,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -91,10 +92,12 @@ const LANG = {
       departments: "នាយកដ្ឋាន",
       shifts: "វេនការងារ",
       attendance: "វត្តមាន",
+      holidays: "ថ្ងៃឈប់សម្រាកជាតិ",
       leave: "ច្បាប់ឈប់សម្រាក",
       overtime: "ការងារបន្ថែម (OT)",
       payroll: "ប្រាក់ខែ",
       performance: "ការវាយតម្លៃការងារ",
+      attCorrection: "សំណើកែតម្រូវវត្តមាន",
       admins: "គណនីអ្នកគ្រប់គ្រង",
       myAttendance: "វត្តមានរបស់ខ្ញុំ",
       myLeave: "ច្បាប់ឈប់សម្រាករបស់ខ្ញុំ",
@@ -102,6 +105,7 @@ const LANG = {
       myPayroll: "ប្រាក់ខែរបស់ខ្ញុំ",
       myPerformance: "ការវាយតម្លៃការងាររបស់ខ្ញុំ",
       myDocuments: "ឯកសាររបស់ខ្ញុំ",
+      myAttCorrection: "ស្នើសុំកែតម្រូវវត្តមាន",
       myProfile: "ប្រវត្តិរូបរបស់ខ្ញុំ",
       settings: "ការកំណត់",
     },
@@ -268,13 +272,23 @@ const LANG = {
       insuranceLabel: "ធានារ៉ាប់រង",
       policyTitle: "គោលការណ៍កាត់ប្រាក់ខែ",
       policyDesc:
-        "កំណត់អត្រាភាគរយពន្ធលើប្រាក់ខែ និងធានារ៉ាប់រង ដែលនឹងកាត់ចេញពីប្រាក់ខែមូលដ្ឋានរបស់បុគ្គលិកទាំងអស់។",
+        "កំណត់អត្រាភាគរយពន្ធលើប្រាក់ខែ និងធានារ៉ាប់រង ព្រមទាំងកម្រិតប្រាក់ខែអប្បបរមា។ ការកាត់ប្រាក់នេះនឹងអនុវត្តលើបុគ្គលិកដែលមានប្រាក់ខែមូលដ្ឋានស្មើ ឬលើសពីកម្រិតកំណត់នេះប៉ុណ្ណោះ។",
       taxRateLabel: "អត្រាពន្ធលើប្រាក់ខែ (%)",
       insuranceRateLabel: "អត្រាធានារ៉ាប់រង (%)",
+      minSalaryThresholdLabel: "ចាប់ផ្តើមគិតចាប់ពីប្រាក់ខែ ($)",
+      minSalaryThresholdHint:
+        "បុគ្គលិកដែលមានប្រាក់ខែមូលដ្ឋានតិចជាងចំនួននេះ នឹងមិនត្រូវកាត់ពន្ធ/ធានារ៉ាប់រងទេ",
+      noThreshold: "អនុវត្តលើគ្រប់បុគ្គលិកទាំងអស់",
       downloadPdf: "ទាញយក PDF",
       payslipTitle: "សន្លឹកប្រាក់ខែ",
       payPeriod: "រយៈពេលបើកប្រាក់ខែ",
       generatedOn: "បង្កើតនៅថ្ងៃ",
+      customRateToggle: "កំណត់អត្រាពន្ធ/ធានារ៉ាប់រងផ្ទាល់ខ្លួន",
+      customRateHint:
+        "នៅពេលបើក បុគ្គលិកនេះនឹងប្រើអត្រាដែលកំណត់ខាងក្រោម ជំនួសអត្រាទូទៅរបស់គោលការណ៍ក្រុមហ៊ុន (មិនគិតតាមកម្រិតប្រាក់ខែអប្បបរមាទេ)",
+      customTaxRateLabel: "អត្រាពន្ធផ្ទាល់ខ្លួន (%)",
+      customInsuranceRateLabel: "អត្រាធានារ៉ាប់រងផ្ទាល់ខ្លួន (%)",
+      customRateBadge: "អត្រាផ្ទាល់ខ្លួន",
     },
     pr: {
       addBtn: "បន្ថែមការវាយតម្លៃ",
@@ -321,6 +335,38 @@ const LANG = {
       tooLarge: "ឯកសារធំពេក សូមជ្រើសរើសឯកសារតូចជាងនេះ (តិចជាង 4MB)",
       view: "មើល/ទាញយក",
       myTitle: "ឯកសាររបស់ខ្ញុំ",
+    },
+    hol: {
+      addBtn: "បន្ថែមថ្ងៃឈប់សម្រាក",
+      editTitle: "កែសម្រួលថ្ងៃឈប់សម្រាកជាតិ",
+      addTitle: "បន្ថែមថ្ងៃឈប់សម្រាកជាតិ",
+      dateLabel: "កាលបរិច្ឆេទ",
+      nameLabel: "ឈ្មោះថ្ងៃឈប់សម្រាក",
+      namePlaceholder: "ឧ. ថ្ងៃចូលឆ្នាំថ្មីខ្មែរ",
+      confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបថ្ងៃឈប់សម្រាកនេះ?",
+      noHolidays: "មិនទាន់មានកំណត់ថ្ងៃឈប់សម្រាកជាតិទេ",
+      upcoming: "ថ្ងៃឈប់សម្រាកខាងមុខ",
+      past: "ថ្ងៃឈប់សម្រាកកន្លងទៅ",
+      todayBanner: "ថ្ងៃនេះជាថ្ងៃឈប់សម្រាកជាតិ",
+    },
+    ac: {
+      addBtn: "ស្នើសុំកែតម្រូវវត្តមាន",
+      date: "កាលបរិច្ឆេទ",
+      requestedCheckIn: "ម៉ោងចូលដែលស្នើសុំ",
+      requestedCheckOut: "ម៉ោងចេញដែលស្នើសុំ",
+      reason: "មូលហេតុ",
+      reasonPlaceholder: "ឧ. ភ្លេចចុចម៉ោងចូល/ចេញ...",
+      approve: "អនុម័ត",
+      reject: "បដិសេធ",
+      approvedBy: "អនុម័តដោយ",
+      rejectedBy: "បដិសេធដោយ",
+      rejectTitle: "បដិសេធសំណើកែតម្រូវវត្តមាន",
+      rejectReason: "មូលហេតុបដិសេធ",
+      rejectReasonPlaceholder: "សូមបញ្ជាក់មូលហេតុបដិសេធ...",
+      rejectReasonRequired: "សូមបញ្ចូលមូលហេតុបដិសេធ",
+      confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបសំណើនេះ?",
+      noRequest: "មិនទាន់មានសំណើកែតម្រូវវត្តមានទេ",
+      needOneField: "សូមបញ្ចូលម៉ោងចូល ឬម៉ោងចេញ យ៉ាងហោចណាស់មួយ",
     },
     admAcc: {
       addBtn: "បន្ថែមអ្នកគ្រប់គ្រង",
@@ -394,10 +440,12 @@ const LANG = {
       departments: "Departments",
       shifts: "Shifts",
       attendance: "Attendance",
+      holidays: "Public Holidays",
       leave: "Leave Requests",
       overtime: "Overtime (OT)",
       payroll: "Payroll",
       performance: "Performance Reviews",
+      attCorrection: "Attendance Corrections",
       admins: "Admin Accounts",
       myAttendance: "My Attendance",
       myLeave: "My Leave",
@@ -405,6 +453,7 @@ const LANG = {
       myPayroll: "My Payroll",
       myPerformance: "My Performance Reviews",
       myDocuments: "My Documents",
+      myAttCorrection: "Attendance Correction",
       myProfile: "My Profile",
       settings: "Settings",
     },
@@ -571,13 +620,23 @@ const LANG = {
       insuranceLabel: "Insurance",
       policyTitle: "Payroll Deduction Policy",
       policyDesc:
-        "Set the tax and insurance percentage rates deducted from every employee's base salary.",
+        "Set the tax and insurance percentage rates, and the minimum base salary at which they start applying. Employees whose base salary is below the threshold are not deducted.",
       taxRateLabel: "Tax Rate (%)",
       insuranceRateLabel: "Insurance Rate (%)",
+      minSalaryThresholdLabel: "Applies From Salary ($)",
+      minSalaryThresholdHint:
+        "Employees earning less than this base salary won't have tax/insurance deducted",
+      noThreshold: "Applies to all employees",
       downloadPdf: "Download PDF",
       payslipTitle: "Payslip",
       payPeriod: "Pay Period",
       generatedOn: "Generated on",
+      customRateToggle: "Custom tax/insurance rate for this employee",
+      customRateHint:
+        "When enabled, this employee uses the rates set below instead of the company-wide policy (the minimum salary threshold is ignored)",
+      customTaxRateLabel: "Custom Tax Rate (%)",
+      customInsuranceRateLabel: "Custom Insurance Rate (%)",
+      customRateBadge: "Custom rate",
     },
     pr: {
       addBtn: "Add Review",
@@ -624,6 +683,38 @@ const LANG = {
       tooLarge: "File too large — please choose a file under 4MB",
       view: "View / Download",
       myTitle: "My Documents",
+    },
+    hol: {
+      addBtn: "Add Holiday",
+      editTitle: "Edit Public Holiday",
+      addTitle: "Add Public Holiday",
+      dateLabel: "Date",
+      nameLabel: "Holiday Name",
+      namePlaceholder: "e.g. Khmer New Year",
+      confirmDel: "Are you sure you want to delete this holiday?",
+      noHolidays: "No public holidays set yet",
+      upcoming: "Upcoming Holidays",
+      past: "Past Holidays",
+      todayBanner: "Today is a public holiday",
+    },
+    ac: {
+      addBtn: "Request Correction",
+      date: "Date",
+      requestedCheckIn: "Requested Check In",
+      requestedCheckOut: "Requested Check Out",
+      reason: "Reason",
+      reasonPlaceholder: "e.g. Forgot to clock in/out...",
+      approve: "Approve",
+      reject: "Reject",
+      approvedBy: "Approved by",
+      rejectedBy: "Rejected by",
+      rejectTitle: "Reject Correction Request",
+      rejectReason: "Rejection Reason",
+      rejectReasonPlaceholder: "Please state the rejection reason...",
+      rejectReasonRequired: "Please enter a rejection reason",
+      confirmDel: "Are you sure you want to delete this request?",
+      noRequest: "No correction requests yet",
+      needOneField: "Please enter at least a check-in or check-out time",
     },
     admAcc: {
       addBtn: "Add Admin",
@@ -1026,6 +1117,9 @@ const OT_RATE_KEY = {
 const DEFAULT_PAYROLL_POLICY = {
   taxRate: 5,
   insuranceRate: 2,
+  // Minimum base salary at which tax/insurance start being deducted.
+  // 0 means the deduction applies to every employee regardless of salary.
+  minSalaryThreshold: 0,
 };
 const DEFAULT_SHIFTS = [
   { id: "s1", name: "វេនព្រឹក", start: "06:00", end: "14:00" },
@@ -1237,6 +1331,7 @@ function buildNotifications({
   overtimeRequests = [],
   performanceReviews = [],
   announcements = [],
+  attendanceCorrections = [],
   lang = "km",
 }) {
   const LEAVE_TYPE_LABEL = getLeaveTypeLabel(lang);
@@ -1268,6 +1363,23 @@ function buildNotifications({
           message: en
             ? `${emp?.name || "?"} requested ${r.hours}h OT on ${r.date}`
             : `${emp?.name || "?"} បានស្នើសុំ OT ចំនួន ${r.hours} ម៉ោង នៅថ្ងៃទី ${r.date}`,
+          time: r.createdAt,
+        });
+      });
+    attendanceCorrections
+      .filter((r) => r.status === "pending")
+      .forEach((r) => {
+        const emp = employees.find((e) => e.id === r.employeeId);
+        list.push({
+          id: `ac-pending-${r.id}`,
+          page: "attcorr",
+          tone: "gold",
+          title: en
+            ? "New attendance correction request"
+            : "សំណើកែតម្រូវវត្តមានថ្មី",
+          message: en
+            ? `${emp?.name || "?"} requested a correction on ${r.date}`
+            : `${emp?.name || "?"} បានស្នើសុំកែតម្រូវវត្តមាននៅថ្ងៃទី ${r.date}`,
           time: r.createdAt,
         });
       });
@@ -1349,6 +1461,30 @@ function buildNotifications({
             : "អ្នកទទួលបានការវាយតម្លៃការងារថ្មី",
           message: r.period,
           time: r.createdAt,
+        });
+      });
+    attendanceCorrections
+      .filter(
+        (r) =>
+          r.employeeId === currentEmp.id &&
+          (r.status === "approved" || r.status === "rejected") &&
+          r.reviewedAt,
+      )
+      .forEach((r) => {
+        list.push({
+          id: `ac-decided-${r.id}`,
+          page: "attcorr",
+          tone: r.status === "approved" ? "forest" : "rose",
+          title:
+            r.status === "approved"
+              ? en
+                ? "Your attendance correction was approved"
+                : "សំណើកែតម្រូវវត្តមានរបស់អ្នកត្រូវបានអនុម័ត"
+              : en
+                ? "Your attendance correction was rejected"
+                : "សំណើកែតម្រូវវត្តមានរបស់អ្នកត្រូវបានបដិសេធ",
+          message: r.date,
+          time: r.reviewedAt,
         });
       });
     announcements.forEach((a) => {
@@ -1434,11 +1570,13 @@ function monthAttendanceStats(attendance, employeeId, mk) {
   }
   return { absentDays, leaveDays, lateDays };
 }
-// Suggests a default OT day type from a "YYYY-MM-DD" date: Saturday/Sunday
-// suggest "weekend", everything else suggests "normal". Employees can still
-// override this in the request form (e.g. for public holidays).
-function suggestDayType(dateStr) {
+// Suggests a default OT day type from a "YYYY-MM-DD" date: a date on the
+// company holiday calendar suggests "holiday"; Saturday/Sunday suggest
+// "weekend"; everything else suggests "normal". Employees can still
+// override this in the request form.
+function suggestDayType(dateStr, holidays) {
   if (!dateStr) return "normal";
+  if (isHoliday(dateStr, holidays)) return "holiday";
   const day = new Date(dateStr + "T00:00:00").getDay();
   return day === 0 || day === 6 ? "weekend" : "normal";
 }
@@ -1493,8 +1631,25 @@ function computePayroll(
   const dailyRate = emp.salary / WORKING_DAYS_PER_MONTH;
   const absenceDeduction = Math.min(emp.salary, absentDays * dailyRate);
   const adjustedBase = emp.salary - absenceDeduction;
-  const taxRate = Number(policy.taxRate) || 0;
-  const insuranceRate = Number(policy.insuranceRate) || 0;
+  // An employee can override the company-wide tax/insurance rates with
+  // their own. When active, the override applies unconditionally (the
+  // policy's minimum-salary threshold is only meant to gate the
+  // *default* rates, not an explicit per-employee rate).
+  const usesCustomRate = !!emp.useCustomRate;
+  let minSalaryThreshold, deductionApplies, taxRate, insuranceRate;
+  if (usesCustomRate) {
+    minSalaryThreshold = 0;
+    deductionApplies = true;
+    taxRate = Number(emp.customTaxRate) || 0;
+    insuranceRate = Number(emp.customInsuranceRate) || 0;
+  } else {
+    minSalaryThreshold = Number(policy.minSalaryThreshold) || 0;
+    // Tax/insurance only kick in once the employee's base salary reaches the
+    // configured threshold. Below it, no deduction is applied at all.
+    deductionApplies = (Number(emp.salary) || 0) >= minSalaryThreshold;
+    taxRate = deductionApplies ? Number(policy.taxRate) || 0 : 0;
+    insuranceRate = deductionApplies ? Number(policy.insuranceRate) || 0 : 0;
+  }
   const tax = adjustedBase * (taxRate / 100);
   const insurance = adjustedBase * (insuranceRate / 100);
   const { otHours, otPay } = computeOvertimeForMonth(
@@ -1515,6 +1670,9 @@ function computePayroll(
     insurance,
     taxRate,
     insuranceRate,
+    minSalaryThreshold,
+    deductionApplies,
+    usesCustomRate,
     otHours,
     otPay,
     net,
@@ -1848,6 +2006,9 @@ function usePayrollPolicy() {
           taxRate: data.tax_rate ?? DEFAULT_PAYROLL_POLICY.taxRate,
           insuranceRate:
             data.insurance_rate ?? DEFAULT_PAYROLL_POLICY.insuranceRate,
+          minSalaryThreshold:
+            data.min_salary_threshold ??
+            DEFAULT_PAYROLL_POLICY.minSalaryThreshold,
         });
       } else {
         setValueState(DEFAULT_PAYROLL_POLICY);
@@ -1866,6 +2027,7 @@ function usePayrollPolicy() {
         id: 1,
         tax_rate: next.taxRate,
         insurance_rate: next.insuranceRate,
+        min_salary_threshold: next.minSalaryThreshold,
       });
       if (error)
         console.error(
@@ -2118,6 +2280,7 @@ function NotificationBell({
   overtimeRequests,
   performanceReviews,
   announcements,
+  attendanceCorrections,
   setPage,
 }) {
   const { t, lang } = useLang();
@@ -2145,6 +2308,7 @@ function NotificationBell({
         overtimeRequests,
         performanceReviews,
         announcements,
+        attendanceCorrections,
         lang,
       }),
     [
@@ -2157,6 +2321,7 @@ function NotificationBell({
       overtimeRequests,
       performanceReviews,
       announcements,
+      attendanceCorrections,
     ],
   );
   const unread = notifications.filter((n) => !readIds.includes(n.id));
@@ -3605,6 +3770,9 @@ function EmployeeForm({
       salary: "",
       status: "active",
       joined: todayStr(),
+      useCustomRate: false,
+      customTaxRate: "",
+      customInsuranceRate: "",
     },
   );
   const [newOffDate, setNewOffDate] = useState("");
@@ -3722,6 +3890,70 @@ function EmployeeForm({
             <option value="inactive">អសកម្ម</option>
           </Select>
         </Field>
+      </div>
+      <div
+        style={{
+          border: `1px solid ${T.lineSoft}`,
+          borderRadius: 10,
+          padding: "10px 12px",
+          marginBottom: 14,
+        }}
+      >
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            cursor: "pointer",
+            fontSize: 13,
+            fontWeight: 600,
+            color: T.ink,
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={!!f.useCustomRate}
+            onChange={(e) => setF({ ...f, useCustomRate: e.target.checked })}
+            style={{ width: 15, height: 15, accentColor: T.forest }}
+          />
+          {t.pay.customRateToggle}
+        </label>
+        <p
+          style={{
+            fontSize: 11.5,
+            color: T.muted,
+            marginTop: 6,
+            marginBottom: f.useCustomRate ? 12 : 0,
+          }}
+        >
+          {t.pay.customRateHint}
+        </p>
+        {f.useCustomRate && (
+          <div
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
+          >
+            <Field label={t.pay.customTaxRateLabel}>
+              <Input
+                type="number"
+                step="0.1"
+                min="0"
+                value={f.customTaxRate}
+                onChange={set("customTaxRate")}
+                placeholder="0"
+              />
+            </Field>
+            <Field label={t.pay.customInsuranceRateLabel}>
+              <Input
+                type="number"
+                step="0.1"
+                min="0"
+                value={f.customInsuranceRate}
+                onChange={set("customInsuranceRate")}
+                placeholder="0"
+              />
+            </Field>
+          </div>
+        )}
       </div>
       <Field label={t.emps.joined}>
         <DatePicker value={f.joined || todayStr()} onChange={set("joined")} />
@@ -3880,6 +4112,13 @@ function Employees({
       annualLeaveDays: Number.isFinite(Number(data.annualLeaveDays))
         ? Number(data.annualLeaveDays)
         : DEFAULT_ANNUAL_LEAVE_DAYS,
+      useCustomRate: !!data.useCustomRate,
+      customTaxRate: data.useCustomRate
+        ? Number(data.customTaxRate) || 0
+        : null,
+      customInsuranceRate: data.useCustomRate
+        ? Number(data.customInsuranceRate) || 0
+        : null,
     };
     if (modal.mode === "add")
       setEmployees([...employees, { ...clean, id: uid("e") }]);
@@ -5290,6 +5529,226 @@ function ManualAttendanceForm({ employees, initial, onSave, onCancel }) {
   );
 }
 
+/* ---------------------------------------------------------------
+   Public holidays — admin maintains a company-wide holiday calendar.
+   The dates feed into OT day-type auto-suggestion and show as an
+   informational banner on the Attendance page.
+----------------------------------------------------------------*/
+function isHoliday(dateStr, holidays) {
+  return (holidays || []).find((h) => h.date === dateStr) || null;
+}
+
+function HolidayForm({ initial, onSave, onCancel }) {
+  const { t } = useLang();
+  const [f, setF] = useState(initial || { date: todayStr(), name: "" });
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const invalid = !f.date || !f.name.trim();
+  return (
+    <div>
+      <Field label={t.hol.dateLabel}>
+        <DatePicker value={f.date} onChange={set("date")} />
+      </Field>
+      <Field label={t.hol.nameLabel}>
+        <Input
+          value={f.name}
+          onChange={set("name")}
+          placeholder={t.hol.namePlaceholder}
+        />
+      </Field>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          marginTop: 16,
+          paddingTop: 14,
+          borderTop: `1px solid ${T.lineSoft}`,
+        }}
+      >
+        <Button variant="ghost" onClick={onCancel}>
+          {t.cancel}
+        </Button>
+        <Button
+          variant="accent"
+          onClick={() => onSave({ date: f.date, name: f.name.trim() })}
+          disabled={invalid}
+        >
+          {t.save}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function Holidays({ holidays, setHolidays, isSuperAdmin }) {
+  const { t } = useLang();
+  const [modal, setModal] = useState(null);
+  const [confirmDel, setConfirmDel] = useState(null);
+  const today = todayStr();
+
+  const save = (f) => {
+    if (modal.mode === "add") {
+      setHolidays([...holidays, { id: uid("hol"), ...f }]);
+    } else {
+      setHolidays(
+        holidays.map((h) => (h.id === modal.data.id ? { ...h, ...f } : h)),
+      );
+    }
+    setModal(null);
+  };
+
+  const sorted = [...holidays].sort((a, b) => a.date.localeCompare(b.date));
+  const upcoming = sorted.filter((h) => h.date >= today);
+  const past = sorted.filter((h) => h.date < today).reverse();
+
+  const renderRow = (h) => (
+    <div
+      key={h.id}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 10,
+        padding: "10px 12px",
+        border: `1px solid ${T.lineSoft}`,
+        borderRadius: 10,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <CalendarDays size={16} color={T.forestText} />
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: T.ink }}>
+            {h.name}
+          </div>
+          <div
+            style={{
+              fontSize: 11,
+              color: T.muted,
+              fontFamily: "'JetBrains Mono',monospace",
+            }}
+          >
+            {h.date}
+          </div>
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: 8 }}>
+        <button
+          onClick={() => setModal({ mode: "edit", data: h })}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            color: T.mutedLight,
+          }}
+        >
+          <Pencil size={14} />
+        </button>
+        {isSuperAdmin && (
+          <button
+            onClick={() => setConfirmDel(h)}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: T.mutedLight,
+            }}
+          >
+            <Trash2 size={14} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: 16,
+        }}
+      >
+        <Button variant="accent" onClick={() => setModal({ mode: "add" })}>
+          <Plus size={15} /> {t.hol.addBtn}
+        </Button>
+      </div>
+      {sorted.length === 0 && (
+        <Card
+          style={{
+            textAlign: "center",
+            padding: "32px 0",
+            color: T.muted,
+            fontSize: 13,
+          }}
+        >
+          {t.hol.noHolidays}
+        </Card>
+      )}
+      {upcoming.length > 0 && (
+        <div style={{ marginBottom: 20 }}>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: T.muted,
+              textTransform: "uppercase",
+              letterSpacing: ".03em",
+              marginBottom: 8,
+            }}
+          >
+            {t.hol.upcoming}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {upcoming.map(renderRow)}
+          </div>
+        </div>
+      )}
+      {past.length > 0 && (
+        <div>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: T.muted,
+              textTransform: "uppercase",
+              letterSpacing: ".03em",
+              marginBottom: 8,
+            }}
+          >
+            {t.hol.past}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {past.map(renderRow)}
+          </div>
+        </div>
+      )}
+      {modal && (
+        <Modal
+          title={modal.mode === "add" ? t.hol.addTitle : t.hol.editTitle}
+          onClose={() => setModal(null)}
+        >
+          <HolidayForm
+            initial={modal.data}
+            onSave={save}
+            onCancel={() => setModal(null)}
+          />
+        </Modal>
+      )}
+      {confirmDel && (
+        <ConfirmDialog
+          text={t.hol.confirmDel}
+          onCancel={() => setConfirmDel(null)}
+          onConfirm={() => {
+            setHolidays(holidays.filter((h) => h.id !== confirmDel.id));
+            setConfirmDel(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
 function Attendance({
   role,
   currentEmp,
@@ -5300,6 +5759,7 @@ function Attendance({
   isSuperAdmin,
   offices,
   setOffices,
+  holidays,
 }) {
   const { t, lang } = useLang();
   const [date, setDate] = useState(todayStr());
@@ -5313,6 +5773,7 @@ function Attendance({
     emp: e,
     rec: dayRecords.find((a) => a.employeeId === e.id),
   }));
+  const holidayToday = isHoliday(date, holidays);
 
   const save = (f) => {
     const existing = attendance.find(
@@ -5418,6 +5879,23 @@ function Attendance({
   return (
     <div>
       <OfficeLocationSettings offices={offices} setOffices={setOffices} />
+      {holidayToday && (
+        <Card
+          accent={T.gold}
+          style={{
+            padding: "12px 16px",
+            marginBottom: 16,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <CalendarDays size={18} color={T.goldText} />
+          <span style={{ fontSize: 13, fontWeight: 600, color: T.ink }}>
+            {t.hol.todayBanner}: {holidayToday.name}
+          </span>
+        </Card>
+      )}
       <div
         style={{
           display: "flex",
@@ -6198,18 +6676,18 @@ function LeaveRequests({
    role) and stay visible to the employee. Rejections require a reason.
    Approved requests feed OT pay into Payroll via computePayroll.
 ----------------------------------------------------------------*/
-function OvertimeRequestForm({ onSave, onCancel }) {
+function OvertimeRequestForm({ onSave, onCancel, holidays }) {
   const { t } = useLang();
   const [f, setF] = useState({
     date: todayStr(),
     hours: "",
-    dayType: suggestDayType(todayStr()),
+    dayType: suggestDayType(todayStr(), holidays),
     reason: "",
   });
   const set = (k) => (e) => {
     const val = e.target.value;
     if (k === "date") {
-      setF({ ...f, date: val, dayType: suggestDayType(val) });
+      setF({ ...f, date: val, dayType: suggestDayType(val, holidays) });
     } else {
       setF({ ...f, [k]: val });
     }
@@ -6444,6 +6922,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
     setPayrollPolicy({
       taxRate: Number(f.taxRate) || 0,
       insuranceRate: Number(f.insuranceRate) || 0,
+      minSalaryThreshold: Number(f.minSalaryThreshold) || 0,
     });
     setOpen(false);
   };
@@ -6473,6 +6952,9 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
           }}
         >
           {payrollPolicy.taxRate}% / {payrollPolicy.insuranceRate}%
+          {Number(payrollPolicy.minSalaryThreshold) > 0
+            ? ` · ≥ ${fmtMoney(payrollPolicy.minSalaryThreshold)}`
+            : ""}
         </span>
       </div>
       {open && (
@@ -6507,6 +6989,23 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
                 onChange={set("insuranceRate")}
               />
             </Field>
+          </div>
+          <div style={{ marginTop: 12 }}>
+            <Field label={t.pay.minSalaryThresholdLabel}>
+              <Input
+                type="number"
+                step="1"
+                min="0"
+                placeholder="0"
+                value={f.minSalaryThreshold}
+                onChange={set("minSalaryThreshold")}
+              />
+            </Field>
+            <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+              {Number(f.minSalaryThreshold) > 0
+                ? t.pay.minSalaryThresholdHint
+                : t.pay.noThreshold}
+            </p>
           </div>
           <div
             style={{
@@ -6562,6 +7061,7 @@ function OvertimeRequests({
   otPolicy,
   setOtPolicy,
   isSuperAdmin,
+  holidays,
 }) {
   const { t, lang } = useLang();
   const [modal, setModal] = useState(false);
@@ -6700,6 +7200,7 @@ function OvertimeRequests({
             <OvertimeRequestForm
               onSave={submit}
               onCancel={() => setModal(false)}
+              holidays={holidays}
             />
           </Modal>
         )}
@@ -6854,6 +7355,499 @@ function OvertimeRequests({
           onConfirm={() => {
             setOvertimeRequests(
               overtimeRequests.filter((r) => r.id !== confirmDel.id),
+            );
+            setConfirmDel(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   Attendance corrections
+   Employees request a fix for a missed/incorrect clock-in or
+   clock-out (date + requested check-in/out + reason). Admins
+   approve or reject; approving upserts the attendance record for
+   that employee/date, mirroring a manual admin edit.
+----------------------------------------------------------------*/
+function AcRejectModal({ onCancel, onConfirm }) {
+  const { t } = useLang();
+  const [reason, setReason] = useState("");
+  const trimmed = reason.trim();
+  return (
+    <Modal title={t.ac.rejectTitle} onClose={onCancel} width={420}>
+      <Field label={t.ac.rejectReason}>
+        <textarea
+          className="wf-input"
+          rows={3}
+          style={{ resize: "vertical", fontFamily: "inherit" }}
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          placeholder={t.ac.rejectReasonPlaceholder}
+        />
+      </Field>
+      {reason !== "" && !trimmed && (
+        <p
+          style={{
+            fontSize: 12.5,
+            color: T.rose,
+            marginTop: -8,
+            marginBottom: 12,
+          }}
+        >
+          {t.ac.rejectReasonRequired}
+        </p>
+      )}
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+        <Button variant="ghost" onClick={onCancel}>
+          {t.cancel}
+        </Button>
+        <Button
+          variant="danger-solid"
+          disabled={!trimmed}
+          onClick={() => onConfirm(trimmed)}
+        >
+          {t.ac.reject}
+        </Button>
+      </div>
+    </Modal>
+  );
+}
+
+function AcDecisionNote({ r, admins }) {
+  const { t } = useLang();
+  if (r.status !== "approved" && r.status !== "rejected") return null;
+  const decider = admins.find((a) => a.id === r.decidedById);
+  const name = r.decidedByName || decider?.name || "—";
+  return (
+    <div style={{ fontSize: 11.5, color: T.textSoft, marginTop: 3 }}>
+      {r.status === "approved" ? (
+        <span>
+          {t.ac.approvedBy} <strong>{name}</strong>
+        </span>
+      ) : (
+        <span style={{ color: T.rose }}>
+          {t.ac.rejectedBy} <strong>{name}</strong>
+          {r.decisionReason ? ` — ${r.decisionReason}` : ""}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function AttendanceCorrectionForm({ onSave, onCancel }) {
+  const { t } = useLang();
+  const [f, setF] = useState({
+    date: todayStr(),
+    requestedCheckIn: "",
+    requestedCheckOut: "",
+    reason: "",
+  });
+  const set = (k) => (e) =>
+    setF({ ...f, [k]: typeof e === "string" ? e : e.target.value });
+  const hasTime = !!(f.requestedCheckIn || f.requestedCheckOut);
+  const invalid = !f.date || !hasTime || !f.reason.trim();
+  return (
+    <div>
+      <Field label={t.ac.date}>
+        <DatePicker value={f.date} onChange={set("date")} />
+      </Field>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <Field label={t.ac.requestedCheckIn}>
+          <TimePicker
+            value={f.requestedCheckIn}
+            onChange={(e) => setF({ ...f, requestedCheckIn: e.target.value })}
+          />
+        </Field>
+        <Field label={t.ac.requestedCheckOut}>
+          <TimePicker
+            value={f.requestedCheckOut}
+            onChange={(e) => setF({ ...f, requestedCheckOut: e.target.value })}
+          />
+        </Field>
+      </div>
+      {!hasTime && (
+        <p
+          style={{
+            fontSize: 12.5,
+            color: T.rose,
+            marginTop: -8,
+            marginBottom: 12,
+          }}
+        >
+          {t.ac.needOneField}
+        </p>
+      )}
+      <Field label={t.ac.reason}>
+        <textarea
+          className="wf-input"
+          rows={3}
+          style={{ resize: "vertical", fontFamily: "inherit" }}
+          value={f.reason}
+          onChange={set("reason")}
+          placeholder={t.ac.reasonPlaceholder}
+        />
+      </Field>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          marginTop: 16,
+          paddingTop: 14,
+          borderTop: `1px solid ${T.lineSoft}`,
+        }}
+      >
+        <Button variant="ghost" onClick={onCancel}>
+          {t.cancel}
+        </Button>
+        <Button
+          variant="accent"
+          onClick={() =>
+            onSave({
+              date: f.date,
+              requestedCheckIn: f.requestedCheckIn || null,
+              requestedCheckOut: f.requestedCheckOut || null,
+              reason: f.reason.trim(),
+            })
+          }
+          disabled={invalid}
+        >
+          {t.save}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function AttendanceCorrections({
+  role,
+  currentAdmin,
+  currentEmp,
+  employees,
+  admins,
+  attendanceCorrections,
+  setAttendanceCorrections,
+  attendance,
+  setAttendance,
+  isSuperAdmin,
+}) {
+  const { t } = useLang();
+  const [modal, setModal] = useState(false);
+  const [rejectFor, setRejectFor] = useState(null);
+  const [confirmDel, setConfirmDel] = useState(null);
+  const empOf = (id) => employees.find((e) => e.id === id);
+
+  const approve = (req) => {
+    setAttendanceCorrections(
+      attendanceCorrections.map((r) =>
+        r.id === req.id
+          ? {
+              ...r,
+              status: "approved",
+              decidedById: currentAdmin?.id || null,
+              decidedByName: currentAdmin?.name || "",
+              decisionReason: "",
+              reviewedAt: new Date().toISOString(),
+            }
+          : r,
+      ),
+    );
+    // Upsert the attendance record for that employee/date, same as a
+    // manual admin edit would — the requested times become the record.
+    const existing = attendance.find(
+      (a) => a.employeeId === req.employeeId && a.date === req.date,
+    );
+    const patch = {
+      checkIn: req.requestedCheckIn || existing?.checkIn || null,
+      checkOut: req.requestedCheckOut || existing?.checkOut || null,
+      status: "present",
+    };
+    if (existing) {
+      setAttendance(
+        attendance.map((a) => (a.id === existing.id ? { ...a, ...patch } : a)),
+      );
+    } else {
+      setAttendance([
+        ...attendance,
+        {
+          id: uid("a"),
+          employeeId: req.employeeId,
+          date: req.date,
+          ...patch,
+        },
+      ]);
+    }
+  };
+  const reject = (req, reason) => {
+    setAttendanceCorrections(
+      attendanceCorrections.map((r) =>
+        r.id === req.id
+          ? {
+              ...r,
+              status: "rejected",
+              decidedById: currentAdmin?.id || null,
+              decidedByName: currentAdmin?.name || "",
+              decisionReason: reason,
+              reviewedAt: new Date().toISOString(),
+            }
+          : r,
+      ),
+    );
+    setRejectFor(null);
+  };
+
+  const submit = (f) => {
+    if (!currentEmp) return;
+    setAttendanceCorrections([
+      ...attendanceCorrections,
+      {
+        id: uid("ac"),
+        employeeId: currentEmp.id,
+        date: f.date,
+        requestedCheckIn: f.requestedCheckIn,
+        requestedCheckOut: f.requestedCheckOut,
+        reason: f.reason,
+        status: "pending",
+        decidedById: null,
+        decidedByName: "",
+        decisionReason: "",
+        createdAt: new Date().toISOString(),
+        reviewedAt: null,
+      },
+    ]);
+    setModal(false);
+  };
+
+  if (role !== "admin" && currentEmp) {
+    const mine = attendanceCorrections
+      .filter((r) => r.employeeId === currentEmp.id)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    return (
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: 16,
+          }}
+        >
+          <Button variant="accent" onClick={() => setModal(true)}>
+            <Plus size={15} /> {t.ac.addBtn}
+          </Button>
+        </div>
+        <Card style={{ overflowX: "auto" }}>
+          <table className="wf-table">
+            <thead>
+              <tr>
+                <th>{t.ac.date}</th>
+                <th>{t.ac.requestedCheckIn}</th>
+                <th>{t.ac.requestedCheckOut}</th>
+                <th>{t.ac.reason}</th>
+                <th>{t.status}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {mine.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={5}
+                    style={{
+                      textAlign: "center",
+                      color: T.muted,
+                      padding: "24px 0",
+                    }}
+                  >
+                    {t.ac.noRequest}
+                  </td>
+                </tr>
+              )}
+              {mine.map((r) => (
+                <tr key={r.id}>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                    {r.date}
+                  </td>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                    {r.requestedCheckIn || "—"}
+                  </td>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                    {r.requestedCheckOut || "—"}
+                  </td>
+                  <td
+                    style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}
+                  >
+                    {r.reason || "—"}
+                  </td>
+                  <td>
+                    <StatusPill status={r.status} />
+                    <AcDecisionNote r={r} admins={admins} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+        {modal && (
+          <Modal title={t.ac.addBtn} onClose={() => setModal(false)}>
+            <AttendanceCorrectionForm
+              onSave={submit}
+              onCancel={() => setModal(false)}
+            />
+          </Modal>
+        )}
+      </div>
+    );
+  }
+
+  // Admin view — pending requests surfaced on top, newest first.
+  const sorted = [...attendanceCorrections].sort((a, b) => {
+    if (a.status === "pending" && b.status !== "pending") return -1;
+    if (a.status !== "pending" && b.status === "pending") return 1;
+    return b.createdAt.localeCompare(a.createdAt);
+  });
+  return (
+    <div>
+      <Card style={{ overflowX: "auto" }}>
+        <table className="wf-table">
+          <thead>
+            <tr>
+              <th>{t.employee}</th>
+              <th>{t.ac.date}</th>
+              <th>{t.ac.requestedCheckIn}</th>
+              <th>{t.ac.requestedCheckOut}</th>
+              <th>{t.ac.reason}</th>
+              <th>{t.status}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.length === 0 && (
+              <tr>
+                <td
+                  colSpan={7}
+                  style={{
+                    textAlign: "center",
+                    color: T.muted,
+                    padding: "24px 0",
+                  }}
+                >
+                  {t.ac.noRequest}
+                </td>
+              </tr>
+            )}
+            {sorted.map((r) => {
+              const emp = empOf(r.employeeId);
+              return (
+                <tr key={r.id}>
+                  <td>
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 10 }}
+                    >
+                      <Avatar
+                        name={emp?.name || "?"}
+                        photo={emp?.photo}
+                        size={30}
+                      />
+                      <div>
+                        <div
+                          style={{
+                            fontWeight: 500,
+                            color: T.ink,
+                            fontSize: 13,
+                          }}
+                        >
+                          {emp?.name || "—"}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 10.5,
+                            color: T.muted,
+                            fontFamily: "'JetBrains Mono',monospace",
+                          }}
+                        >
+                          {emp?.code}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                    {r.date}
+                  </td>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                    {r.requestedCheckIn || "—"}
+                  </td>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                    {r.requestedCheckOut || "—"}
+                  </td>
+                  <td
+                    style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}
+                  >
+                    {r.reason || "—"}
+                  </td>
+                  <td>
+                    <StatusPill status={r.status} />
+                    <AcDecisionNote r={r} admins={admins} />
+                  </td>
+                  <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                    {r.status === "pending" ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 6,
+                          justifyContent: "flex-end",
+                        }}
+                      >
+                        <Button
+                          size="sm"
+                          variant="accent"
+                          onClick={() => approve(r)}
+                        >
+                          <ThumbsUp size={13} /> {t.ac.approve}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          onClick={() => setRejectFor(r)}
+                        >
+                          <ThumbsDown size={13} /> {t.ac.reject}
+                        </Button>
+                      </div>
+                    ) : (
+                      isSuperAdmin && (
+                        <button
+                          onClick={() => setConfirmDel(r)}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            color: T.mutedLight,
+                          }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </Card>
+      {rejectFor && (
+        <AcRejectModal
+          onCancel={() => setRejectFor(null)}
+          onConfirm={(reason) => reject(rejectFor, reason)}
+        />
+      )}
+      {confirmDel && (
+        <ConfirmDialog
+          text={t.ac.confirmDel}
+          onCancel={() => setConfirmDel(null)}
+          onConfirm={() => {
+            setAttendanceCorrections(
+              attendanceCorrections.filter((r) => r.id !== confirmDel.id),
             );
             setConfirmDel(null);
           }}
@@ -9126,6 +10120,8 @@ function Payslip({
     insurance,
     taxRate,
     insuranceRate,
+    deductionApplies,
+    usesCustomRate,
     otHours,
     otPay,
     net,
@@ -9152,16 +10148,20 @@ function Payslip({
       ...(leaveDays > 0
         ? [{ label: t.lv.approved, value: `${leaveDays} ថ្ងៃ` }]
         : []),
-      {
-        label: `${t.pay.taxLabel} (${taxRate}%)`,
-        value: fmtMoney(tax),
-        tone: "neg",
-      },
-      {
-        label: `${t.pay.insuranceLabel} (${insuranceRate}%)`,
-        value: fmtMoney(insurance),
-        tone: "neg",
-      },
+      ...(deductionApplies
+        ? [
+            {
+              label: `${t.pay.taxLabel} (${taxRate}%)`,
+              value: fmtMoney(tax),
+              tone: "neg",
+            },
+            {
+              label: `${t.pay.insuranceLabel} (${insuranceRate}%)`,
+              value: fmtMoney(insurance),
+              tone: "neg",
+            },
+          ]
+        : []),
       ...(otHours > 0
         ? [
             {
@@ -9222,8 +10222,25 @@ function Payslip({
           marginBottom: 16,
         }}
       >
-        <div style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>
-          {emp.name}
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>
+            {emp.name}
+          </span>
+          {usesCustomRate && (
+            <span
+              style={{
+                fontSize: 9.5,
+                fontWeight: 700,
+                color: T.goldText,
+                background: T.goldSoft,
+                padding: "2px 6px",
+                borderRadius: 6,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {t.pay.customRateBadge}
+            </span>
+          )}
         </div>
         <div
           style={{
@@ -9281,34 +10298,38 @@ function Payslip({
             </span>
           </div>
         )}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            color: T.rose,
-          }}
-        >
-          <span>
-            {t.pay.taxLabel} ({taxRate}%)
-          </span>
-          <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-            -{fmtMoney(tax)}
-          </span>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            color: T.rose,
-          }}
-        >
-          <span>
-            {t.pay.insuranceLabel} ({insuranceRate}%)
-          </span>
-          <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-            -{fmtMoney(insurance)}
-          </span>
-        </div>
+        {deductionApplies && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              color: T.rose,
+            }}
+          >
+            <span>
+              {t.pay.taxLabel} ({taxRate}%)
+            </span>
+            <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+              -{fmtMoney(tax)}
+            </span>
+          </div>
+        )}
+        {deductionApplies && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              color: T.rose,
+            }}
+          >
+            <span>
+              {t.pay.insuranceLabel} ({insuranceRate}%)
+            </span>
+            <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+              -{fmtMoney(insurance)}
+            </span>
+          </div>
+        )}
         {otHours > 0 && (
           <div
             style={{
@@ -9556,14 +10577,15 @@ function Payroll({
           <tbody>
             {list.map((e) => {
               const paid = !!payrollPaid[`${e.id}-${mk}`];
-              const { net, absentDays, otHours } = computePayroll(
-                e,
-                attendance,
-                mk,
-                overtimeRequests,
-                otPolicy,
-                payrollPolicy,
-              );
+              const { net, absentDays, otHours, usesCustomRate } =
+                computePayroll(
+                  e,
+                  attendance,
+                  mk,
+                  overtimeRequests,
+                  otPolicy,
+                  payrollPolicy,
+                );
               return (
                 <tr key={e.id}>
                   <td>
@@ -9574,12 +10596,35 @@ function Payroll({
                       <div>
                         <div
                           style={{
-                            fontWeight: 500,
-                            color: T.ink,
-                            fontSize: 13,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 6,
                           }}
                         >
-                          {e.name}
+                          <span
+                            style={{
+                              fontWeight: 500,
+                              color: T.ink,
+                              fontSize: 13,
+                            }}
+                          >
+                            {e.name}
+                          </span>
+                          {usesCustomRate && (
+                            <span
+                              style={{
+                                fontSize: 9.5,
+                                fontWeight: 700,
+                                color: T.goldText,
+                                background: T.goldSoft,
+                                padding: "2px 6px",
+                                borderRadius: 6,
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {t.pay.customRateBadge}
+                            </span>
+                          )}
                         </div>
                         {absentDays > 0 && (
                           <div style={{ fontSize: 10.5, color: T.rose }}>
@@ -9672,10 +10717,12 @@ function buildNavAdmin(n) {
     { id: "departments", label: n.departments, icon: Building2 },
     { id: "shifts", label: n.shifts, icon: Watch },
     { id: "attendance", label: n.attendance, icon: Clock },
+    { id: "holidays", label: n.holidays, icon: CalendarDays },
     { id: "leave", label: n.leave, icon: CalendarDays },
     { id: "ot", label: n.overtime, icon: Timer },
     { id: "payroll", label: n.payroll, icon: Wallet },
     { id: "review", label: n.performance, icon: Star },
+    { id: "attcorr", label: n.attCorrection, icon: CalendarClock },
     { id: "admins", label: n.admins, icon: ShieldCheck, superadminOnly: true },
     { id: "settings", label: n.settings, icon: Settings2 },
   ];
@@ -9689,6 +10736,7 @@ function buildNavEmployee(n) {
     { id: "ot", label: n.myOvertime, icon: Timer },
     { id: "payroll", label: n.myPayroll, icon: Wallet },
     { id: "review", label: n.myPerformance, icon: Star },
+    { id: "attcorr", label: n.myAttCorrection, icon: CalendarClock },
     { id: "documents", label: n.myDocuments, icon: FileText },
     { id: "profile", label: n.myProfile, icon: UserCircle2 },
   ];
@@ -9759,6 +10807,9 @@ function AppInner() {
       status: r.status,
       joined: r.joined,
       photo: r.photo,
+      useCustomRate: !!r.use_custom_rate,
+      customTaxRate: r.custom_tax_rate,
+      customInsuranceRate: r.custom_insurance_rate,
     }),
     toDb: (r) => ({
       id: r.id,
@@ -9780,6 +10831,11 @@ function AppInner() {
       status: r.status,
       joined: r.joined,
       photo: r.photo,
+      use_custom_rate: !!r.useCustomRate,
+      custom_tax_rate: r.useCustomRate ? Number(r.customTaxRate) || 0 : null,
+      custom_insurance_rate: r.useCustomRate
+        ? Number(r.customInsuranceRate) || 0
+        : null,
     }),
   });
   const [shifts, setShifts, shReady] = useSupabaseArray("shifts");
@@ -9949,6 +11005,41 @@ function AppInner() {
       }),
     },
   );
+  const [holidays, setHolidays, holReady] = useSupabaseArray("holidays", {
+    fromDb: (r) => ({ id: r.id, date: r.date, name: r.name }),
+    toDb: (r) => ({ id: r.id, date: r.date, name: r.name }),
+  });
+  const [attendanceCorrections, setAttendanceCorrections, acReady] =
+    useSupabaseArray("attendance_corrections", {
+      fromDb: (r) => ({
+        id: r.id,
+        employeeId: r.employee_id,
+        date: r.date,
+        requestedCheckIn: r.requested_check_in,
+        requestedCheckOut: r.requested_check_out,
+        reason: r.reason,
+        status: r.status,
+        decidedById: r.decided_by_id,
+        decidedByName: r.decided_by_name,
+        decisionReason: r.decision_reason,
+        createdAt: r.created_at,
+        reviewedAt: r.reviewed_at,
+      }),
+      toDb: (r) => ({
+        id: r.id,
+        employee_id: r.employeeId,
+        date: r.date,
+        requested_check_in: r.requestedCheckIn,
+        requested_check_out: r.requestedCheckOut,
+        reason: r.reason,
+        status: r.status,
+        decided_by_id: r.decidedById,
+        decided_by_name: r.decidedByName,
+        decision_reason: r.decisionReason,
+        created_at: r.createdAt,
+        reviewed_at: r.reviewedAt,
+      }),
+    });
   const [admins, setAdmins, adminsReady] = useSupabaseArray("admins");
   const [offices, setOffices, officesReady] = useSupabaseArray("offices", {
     fromDb: (r) => ({
@@ -10290,6 +11381,7 @@ function AppInner() {
                 overtimeRequests={overtimeRequests}
                 performanceReviews={performanceReviews}
                 announcements={announcements}
+                attendanceCorrections={attendanceCorrections}
                 setPage={setPage}
               />
               <Avatar
@@ -10386,6 +11478,14 @@ function AppInner() {
                 isSuperAdmin={isSuperAdmin}
                 offices={offices}
                 setOffices={setOffices}
+                holidays={holidays}
+              />
+            )}
+            {page === "holidays" && role === "admin" && (
+              <Holidays
+                holidays={holidays}
+                setHolidays={setHolidays}
+                isSuperAdmin={isSuperAdmin}
               />
             )}
             {page === "leave" && (
@@ -10414,6 +11514,7 @@ function AppInner() {
                 otPolicy={otPolicy}
                 setOtPolicy={setOtPolicy}
                 isSuperAdmin={isSuperAdmin}
+                holidays={holidays}
               />
             )}
             {page === "payroll" && (
@@ -10443,6 +11544,20 @@ function AppInner() {
             )}
             {page === "documents" && role !== "admin" && currentEmp && (
               <MyDocuments currentEmp={currentEmp} documents={documents} />
+            )}
+            {page === "attcorr" && (
+              <AttendanceCorrections
+                role={role}
+                currentAdmin={currentAdmin}
+                currentEmp={currentEmp}
+                employees={employees}
+                admins={admins}
+                attendanceCorrections={attendanceCorrections}
+                setAttendanceCorrections={setAttendanceCorrections}
+                attendance={attendance}
+                setAttendance={setAttendance}
+                isSuperAdmin={isSuperAdmin}
+              />
             )}
             {page === "admins" && role === "admin" && isSuperAdmin && (
               <AdminAccounts
