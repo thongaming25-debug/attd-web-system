@@ -1200,6 +1200,7 @@ html,body,#root{height:100%;}
 .wf-nav-item,.wf-bottomnav-item{transition:background .15s ease,color .15s ease,transform .15s ease;}
 .wf-bottomnav-item:active{transform:scale(.93);}
 .wf-menu-btn,.wf-btn{transition:background .15s ease,transform .12s ease,box-shadow .15s ease,color .15s ease;}
+.wf-bottomnav.wf-bottomnav-hidden{display:none !important;}
 .wf-role-badge{white-space:nowrap;flex-shrink:0;}
 .wf-bottomnav{display:none;position:absolute;left:0;right:0;bottom:0;z-index:45;background:${T.headerBg};backdrop-filter:blur(10px);border-top:1px solid ${T.lineSoft};align-items:stretch;justify-content:space-around;padding:5px 2px calc(5px + env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(18,32,61,0.06);}
 .wf-bottomnav-item{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;color:${T.muted};padding:5px 2px 4px;border-radius:12px;font-size:10px;font-weight:600;transition:color .15s ease;}
@@ -13777,7 +13778,9 @@ function AppInner() {
           </main>
 
           {bottomNav && (
-            <nav className="wf-bottomnav">
+            <nav
+              className={`wf-bottomnav ${navOpen ? "wf-bottomnav-hidden" : ""}`}
+            >
               {bottomNav.map((n) => (
                 <button
                   key={n.id}
