@@ -1193,10 +1193,10 @@ html,body,#root{height:100%;}
 .wf-sidebar nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:8px;}
 @keyframes wf-fade{from{opacity:0}to{opacity:1}}
 @keyframes wf-pop{from{opacity:0;transform:scale(.96) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
-@keyframes wf-app-in{from{opacity:0;transform:translateY(14px) scale(.985);}to{opacity:1;transform:translateY(0) scale(1);}}
-@keyframes wf-page-in{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-.wf-app-enter{animation:wf-app-in .42s cubic-bezier(.2,.9,.3,1) both;}
-.wf-page-enter{animation:wf-page-in .26s cubic-bezier(.2,.9,.3,1) both;}
+@keyframes wf-app-in{from{opacity:0;}to{opacity:1;}}
+@keyframes wf-page-in{from{opacity:0;}to{opacity:1;}}
+.wf-app-enter{animation:wf-app-in .38s ease both;}
+.wf-page-enter{animation:wf-page-in .24s ease both;}
 .wf-nav-item,.wf-bottomnav-item{transition:background .15s ease,color .15s ease,transform .15s ease;}
 .wf-bottomnav-item:active{transform:scale(.93);}
 .wf-menu-btn,.wf-btn{transition:background .15s ease,transform .12s ease,box-shadow .15s ease,color .15s ease;}
