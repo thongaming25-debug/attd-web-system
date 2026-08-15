@@ -57,6 +57,9 @@ import {
   CalendarClock,
   History,
   RefreshCw,
+  Smartphone,
+  Tablet,
+  Monitor,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -111,6 +114,7 @@ const LANG = {
       myProfile: "ប្រវត្តិរូបរបស់ខ្ញុំ",
       settings: "ការកំណត់",
       audits: "កំណត់ត្រាសកម្មភាព",
+      loginActivity: "សកម្មភាពចូលគណនី",
     },
     logout: "ចាកចេញ",
     notifications: "ការជូនដំណឹង",
@@ -449,6 +453,47 @@ const LANG = {
         employee_documents: "ឯកសារបុគ្គលិក",
       },
     },
+    loginAct: {
+      title: "សកម្មភាពចូលគណនី",
+      subtitle: "ប្រវត្តិចូល និងចេញពីគណនីរបស់អ្នក រួមទាំងឧបករណ៍ដែលបានប្រើ",
+      subtitleAll: "ប្រវត្តិចូល និងចេញរបស់អ្នកប្រើប្រាស់ទាំងអស់",
+      scopeMine: "របស់ខ្ញុំ",
+      scopeAll: "អ្នកប្រើប្រាស់ទាំងអស់",
+      refresh: "ផ្ទុកឡើងវិញ",
+      time: "ពេលវេលា",
+      actor: "អ្នកប្រើប្រាស់",
+      action: "សកម្មភាព",
+      device: "ឧបករណ៍",
+      os: "ប្រព័ន្ធប្រតិបត្តិការ",
+      model: "ម៉ូដែល (Android)",
+      browser: "កម្មវិធីរុករក",
+      noLogs: "មិនទាន់មានកំណត់ត្រាទេ",
+      loading: "កំពុងផ្ទុក...",
+      actionLogin: "បានចូលប្រព័ន្ធ",
+      actionLogout: "បានចាកចេញ",
+      unknownActor: "មិនស្គាល់",
+      deviceMobile: "ទូរស័ព្ទ",
+      deviceTablet: "Tablet",
+      deviceDesktop: "កុំព្យូទ័រ",
+      unknown: "មិនស្គាល់",
+      active: "កំពុងចូល",
+      currentDevice: "ឧបករណ៍នេះ",
+      revoke: "មិនមែនខ្ញុំ — Sign out ភ្លាម",
+      revokeConfirm:
+        "តើអ្នកប្រាកដទេថាចង់បង្ខំ Sign out ឧបករណ៍នេះចេញពីគណនីភ្លាមៗ?",
+      revoked: "បាន Sign out",
+      revokedAlert:
+        "គណនីរបស់អ្នកត្រូវបានបង្ខំឲ្យ Sign out ពីឧបករណ៍មួយផ្សេងទៀត។",
+      clearOld: "លុបចាស់ (30+ ថ្ងៃ)",
+      clearAll: "លុបទាំងអស់",
+      clearOldConfirm:
+        "លុបកំណត់ត្រាទាំងអស់ដែលចាស់ជាង 30 ថ្ងៃ? សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។",
+      clearAllConfirm:
+        "លុបកំណត់ត្រា Login Activity ទាំងអស់ដែលកំពុងបង្ហាញ? សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។",
+      deleteConfirm: "លុបកំណត់ត្រានេះ?",
+      deleteBlocked:
+        "មិនអាចលុបបានទេ — ប្រព័ន្ធ database បដិសេធសំណើនេះ (RLS policy)។ សូមពិនិត្យមើលការកំណត់សិទ្ធិលុបសម្រាប់ Super Admin នៅលើតារាង login_activity។",
+    },
   },
   en: {
     appName: "Workforce Suite",
@@ -498,6 +543,7 @@ const LANG = {
       myProfile: "My Profile",
       settings: "Settings",
       audits: "Audit Log",
+      loginActivity: "Login Activity",
     },
     logout: "Sign Out",
     notifications: "Notifications",
@@ -836,6 +882,45 @@ const LANG = {
         employee_documents: "Employee Document",
       },
     },
+    loginAct: {
+      title: "Login Activity",
+      subtitle: "Your sign-in and sign-out history, including the device used",
+      subtitleAll: "Sign-in and sign-out history for all users",
+      scopeMine: "Mine",
+      scopeAll: "All users",
+      refresh: "Refresh",
+      time: "Time",
+      actor: "User",
+      action: "Action",
+      device: "Device",
+      os: "OS",
+      model: "Model (Android)",
+      browser: "Browser",
+      noLogs: "No log entries yet",
+      loading: "Loading...",
+      actionLogin: "Logged in",
+      actionLogout: "Logged out",
+      unknownActor: "Unknown",
+      deviceMobile: "Mobile",
+      deviceTablet: "Tablet",
+      deviceDesktop: "Desktop",
+      unknown: "Unknown",
+      active: "Active",
+      currentDevice: "This device",
+      revoke: "Not me — Sign out now",
+      revokeConfirm: "Force-sign this device out of the account right now?",
+      revoked: "Signed out",
+      revokedAlert: "Your session was force-signed-out from another device.",
+      clearOld: "Clear old (30+ days)",
+      clearAll: "Clear all",
+      clearOldConfirm:
+        "Delete every log entry older than 30 days? This can't be undone.",
+      clearAllConfirm:
+        "Delete every Login Activity entry currently in view? This can't be undone.",
+      deleteConfirm: "Delete this log entry?",
+      deleteBlocked:
+        "Delete was blocked by the database (RLS policy) — the entry is still there. Check that Super Admin has delete permission on the login_activity table.",
+    },
   },
 };
 
@@ -1108,6 +1193,21 @@ html,body,#root{height:100%;}
 .wf-sidebar nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:8px;}
 @keyframes wf-fade{from{opacity:0}to{opacity:1}}
 @keyframes wf-pop{from{opacity:0;transform:scale(.96) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes wf-app-in{from{opacity:0;transform:translateY(14px) scale(.985);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes wf-page-in{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.wf-app-enter{animation:wf-app-in .42s cubic-bezier(.2,.9,.3,1) both;}
+.wf-page-enter{animation:wf-page-in .26s cubic-bezier(.2,.9,.3,1) both;}
+.wf-nav-item,.wf-bottomnav-item{transition:background .15s ease,color .15s ease,transform .15s ease;}
+.wf-bottomnav-item:active{transform:scale(.93);}
+.wf-menu-btn,.wf-btn{transition:background .15s ease,transform .12s ease,box-shadow .15s ease,color .15s ease;}
+.wf-role-badge{white-space:nowrap;flex-shrink:0;}
+.wf-bottomnav{display:none;position:absolute;left:0;right:0;bottom:0;z-index:45;background:${T.headerBg};backdrop-filter:blur(10px);border-top:1px solid ${T.lineSoft};align-items:stretch;justify-content:space-around;padding:5px 2px calc(5px + env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(18,32,61,0.06);}
+.wf-bottomnav-item{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;color:${T.muted};padding:5px 2px 4px;border-radius:12px;font-size:10px;font-weight:600;transition:color .15s ease;}
+.wf-bottomnav-item span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.wf-bottomnav-item.active{color:${T.forestText};}
+.wf-bnav-icon-wrap{width:38px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:10px;transition:background .15s ease;}
+.wf-bottomnav-item.active .wf-bnav-icon-wrap{background:${T.forestSoft};}
+.wf-bottomnav-item .wf-bnav-dot{position:absolute;top:2px;right:calc(50% - 20px);width:7px;height:7px;border-radius:999px;background:${T.rose};border:1.5px solid ${T.card};}
 @media (max-width: 820px){
   .wf-sidebar{position:absolute;inset:0 auto 0 0;z-index:40;transform:translateX(-100%);height:100%;box-shadow:8px 0 24px rgba(0,0,0,0.25);}
   .wf-sidebar.open{transform:translateX(0);}
@@ -1116,8 +1216,10 @@ html,body,#root{height:100%;}
   .wf-header{padding:12px 16px;}
   .wf-content{padding:16px;}
   .wf-role-badge{display:none;}
+  .wf-bottomnav{display:flex;}
+  .wf-content.wf-content-bnpad{padding-bottom:86px;}
+  .wf-role-staff .wf-menu-btn{display:none;}
 }
-.wf-role-badge{white-space:nowrap;flex-shrink:0;}
 `;
 function useGlobalStyle() {
   useEffect(() => {
@@ -1152,6 +1254,7 @@ const K = {
   OFFICE_LOCATION: "hrsuite:officelocation",
   SESSION_ADMIN: "hrsuite:session:admin",
   SESSION_EMPLOYEE: "hrsuite:session:employee",
+  ACTIVE_SESSION_ID: "hrsuite:session:activeId",
 };
 const DEFAULT_DEPARTMENTS = [
   {
@@ -1883,6 +1986,172 @@ function writeAuditLog({ actor, action, table, entityId, label, changes }) {
       });
   } catch (e) {
     console.error("[audit] insert threw:", e);
+  }
+}
+
+/* ---------------------------------------------------------------
+   Login activity — a dedicated, per-user record of sign-in/sign-out
+   events plus a best-effort read of the device used. This is
+   deliberately kept separate from audit_logs: audit_logs answers
+   "who changed what", this answers "who signed in, from what, and
+   when" — the question people actually ask when reviewing account
+   security.
+
+   Device detection is done purely client-side via navigator.userAgent.
+   Browsers intentionally limit how much they reveal for privacy
+   reasons, so treat this as a best-effort hint, not a precise
+   fingerprint:
+   - deviceType (mobile / tablet / desktop) and the OS/browser name+
+     version are generally reliable.
+   - The exact hardware model (e.g. "iPhone 15 Pro") is NOT reliably
+     available from the browser — iOS Safari never exposes it, and
+     Android only exposes it through the newer User-Agent Client
+     Hints API, gated behind a permission-like call and not
+     guaranteed to be granted. We don't attempt to parse a model out
+     of the UA string because doing so silently produces wrong
+     answers more often than right ones.
+   - IP address / location is NOT available from client-side JS at
+     all — that requires a server (e.g. a Supabase Edge Function
+     reading the request's forwarded-for header). Add later if
+     needed; out of scope here.
+
+   Expected Supabase table (create this before using the page):
+     create table login_activity (
+       id bigint generated always as identity primary key,
+       actor_type text,        -- 'admin' | 'employee'
+       actor_id text,
+       actor_name text,
+       action text,            -- 'login' | 'logout'
+       device_type text,       -- 'mobile' | 'tablet' | 'desktop'
+       os text,
+       browser text,
+       device_model text,      -- Android-only, best-effort internal model
+                                -- code (e.g. "SM-A536E") via User-Agent
+                                -- Client Hints. Always null on iOS/desktop
+                                -- and on non-Chromium Android browsers —
+                                -- see getAndroidModel() above.
+       user_agent text,
+       session_id text,        -- random id generated at login, carried
+                                -- through to the matching logout row —
+                                -- lets a "login" row be revoked to force
+                                -- that specific device to sign out
+       revoked_at timestamptz, -- set when someone force-signs-out this
+                                -- device from the Login Activity page
+       created_at timestamptz default now()
+     );
+   If you already created this table before device_model existed, add
+   it with: alter table login_activity add column device_model text;
+   Remember to add a row-level-security policy that lets each user
+   read only their own rows, plus a superadmin-only policy (or a
+   view) for reading everyone's.
+----------------------------------------------------------------*/
+// A fresh id generated client-side at every login and carried in
+// localStorage for the lifetime of that sign-in. It ties this browser's
+// session to one login_activity row, so that row can later be flagged
+// with revoked_at to force this exact device to sign out remotely.
+function newSessionId() {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return `sess_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+}
+function getDeviceInfo() {
+  const ua =
+    typeof navigator !== "undefined" && navigator.userAgent
+      ? navigator.userAgent
+      : "";
+  if (!ua) return { deviceType: "desktop", os: "", browser: "", userAgent: "" };
+
+  let deviceType = "desktop";
+  if (/iPad/i.test(ua) || (/Android/i.test(ua) && !/Mobile/i.test(ua))) {
+    deviceType = "tablet";
+  } else if (/Mobi|iPhone|iPod|Android/i.test(ua)) {
+    deviceType = "mobile";
+  }
+
+  let os = "";
+  let m;
+  if ((m = ua.match(/Windows NT ([\d.]+)/))) {
+    const known = {
+      "10.0": "Windows 10/11",
+      6.3: "Windows 8.1",
+      6.1: "Windows 7",
+    };
+    os = known[m[1]] || `Windows (NT ${m[1]})`;
+  } else if ((m = ua.match(/Mac OS X ([\d_]+)/))) {
+    os = `macOS ${m[1].replace(/_/g, ".")}`;
+  } else if ((m = ua.match(/Android ([\d.]+)/))) {
+    os = `Android ${m[1]}`;
+  } else if ((m = ua.match(/OS ([\d_]+) like Mac OS X/))) {
+    os = `iOS ${m[1].replace(/_/g, ".")}`;
+  } else if (/Linux/i.test(ua)) {
+    os = "Linux";
+  }
+
+  let browser = "";
+  if ((m = ua.match(/Edg\/([\d.]+)/))) browser = `Edge ${m[1]}`;
+  else if ((m = ua.match(/OPR\/([\d.]+)/))) browser = `Opera ${m[1]}`;
+  else if (
+    /Chrome\//.test(ua) &&
+    !/Chromium/.test(ua) &&
+    (m = ua.match(/Chrome\/([\d.]+)/))
+  )
+    browser = `Chrome ${m[1]}`;
+  else if ((m = ua.match(/Firefox\/([\d.]+)/))) browser = `Firefox ${m[1]}`;
+  else if (
+    /Safari\//.test(ua) &&
+    !/Chrome/.test(ua) &&
+    (m = ua.match(/Version\/([\d.]+)/))
+  )
+    browser = `Safari ${m[1]}`;
+
+  return { deviceType, os, browser, userAgent: ua };
+}
+// Best-effort Android device model (e.g. "SM-A536E") via the User-Agent
+// Client Hints API. Chromium-based browsers on Android only (Chrome,
+// Edge, Samsung Internet) — not Firefox, and not available on iOS at
+// all (Apple never exposes it to web content, by design). The value
+// returned is the internal model code, not a friendly marketing name
+// (e.g. "SM-A536E" rather than "Galaxy A54") — there's no public,
+// always-current code-to-name mapping we can rely on, so we show the
+// raw code as-is rather than guessing a name that might be wrong.
+async function getAndroidModel(ua) {
+  try {
+    if (!/Android/i.test(ua)) return null;
+    if (typeof navigator === "undefined" || !navigator.userAgentData)
+      return null;
+    const hints = await navigator.userAgentData.getHighEntropyValues(["model"]);
+    return hints?.model || null;
+  } catch {
+    return null;
+  }
+}
+function writeLoginActivity({ actor, action, sessionId }) {
+  try {
+    const { deviceType, os, browser, userAgent } = getDeviceInfo();
+    getAndroidModel(userAgent).then((deviceModel) => {
+      supabase
+        .from("login_activity")
+        .insert({
+          actor_type: actor?.type || null,
+          actor_id: actor?.id != null ? String(actor.id) : null,
+          actor_name: actor?.name || null,
+          action,
+          device_type: deviceType,
+          os: os || null,
+          browser: browser || null,
+          device_model: deviceModel || null,
+          user_agent: userAgent || null,
+          session_id: sessionId || null,
+          created_at: new Date().toISOString(),
+        })
+        .then(({ error }) => {
+          if (error)
+            console.error("[login-activity] insert failed:", error.message);
+        });
+    });
+  } catch (e) {
+    console.error("[login-activity] insert threw:", e);
   }
 }
 
@@ -2959,6 +3228,70 @@ function Field({ label, children }) {
       <span className="wf-field-label">{label}</span>
       {children}
     </label>
+  );
+}
+// Styled replacement for window.confirm(), used only by LoginActivityPage
+// (named LoginAct* to avoid colliding with the app-wide ConfirmDialog
+// used elsewhere for delete confirmations — that one hardcodes its
+// confirm button to "Delete", which doesn't fit actions like "Revoke").
+function LoginActConfirmDialog({
+  title,
+  message,
+  danger,
+  confirmLabel,
+  cancelLabel,
+  onConfirm,
+  onCancel,
+}) {
+  const { t } = useLang();
+  return (
+    <Modal title={title || t.confirmDelete} onClose={onCancel} width={400}>
+      <p
+        style={{
+          fontSize: 13.5,
+          color: T.ink,
+          margin: "0 0 20px",
+          lineHeight: 1.5,
+        }}
+      >
+        {message}
+      </p>
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+        <Button variant="ghost" onClick={onCancel}>
+          {cancelLabel || t.cancel}
+        </Button>
+        <Button
+          variant={danger ? "danger-solid" : "primary"}
+          onClick={onConfirm}
+        >
+          {confirmLabel || t.delete}
+        </Button>
+      </div>
+    </Modal>
+  );
+}
+// Styled replacement for window.alert(). Same visual language as
+// LoginActConfirmDialog but with a single acknowledgement button.
+function LoginActAlertDialog({ title, message, closeLabel, onClose }) {
+  const { t } = useLang();
+  return (
+    <Modal title={title || t.appName} onClose={onClose} width={400}>
+      <p
+        style={{
+          fontSize: 13.5,
+          color: T.ink,
+          margin: "0 0 20px",
+          lineHeight: 1.5,
+        }}
+      >
+        {message}
+      </p>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <Button variant="primary" onClick={onClose}>
+          {closeLabel || "OK"}
+        </Button>
+      </div>
+    </Modal>
   );
 }
 function Input(props) {
@@ -10745,6 +11078,658 @@ function AuditLogPage() {
 }
 
 /* ---------------------------------------------------------------
+   Login Activity page — per-user sign-in/out history with a
+   best-effort device summary, read from the login_activity table
+   (see writeLoginActivity near the top of the file). Every signed-in
+   user can see their own history by default; superadmins get an
+   extra toggle to view everyone's.
+----------------------------------------------------------------*/
+function LoginActionBadge({ action, t }) {
+  const isLogin = action === "login";
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 4,
+        fontSize: 11,
+        fontWeight: 700,
+        padding: "3px 9px",
+        borderRadius: 999,
+        background: isLogin ? T.forestSoft : T.lineSoft,
+        color: isLogin ? T.forestText : T.muted,
+        whiteSpace: "nowrap",
+      }}
+    >
+      {isLogin ? <LogIn size={11} /> : <LogOut size={11} />}
+      {isLogin ? t.loginAct.actionLogin : t.loginAct.actionLogout}
+    </span>
+  );
+}
+function DeviceTypeIcon({ deviceType, size = 14, color }) {
+  if (deviceType === "mobile") return <Smartphone size={size} color={color} />;
+  if (deviceType === "tablet") return <Tablet size={size} color={color} />;
+  return <Monitor size={size} color={color} />;
+}
+function deviceTypeLabel(deviceType, t) {
+  if (deviceType === "mobile") return t.loginAct.deviceMobile;
+  if (deviceType === "tablet") return t.loginAct.deviceTablet;
+  return t.loginAct.deviceDesktop;
+}
+// Best-effort Android model code -> friendly marketing name, applied at
+// display time (the raw code from getAndroidModel() is what's actually
+// stored, so this table can be extended later without touching old
+// rows). Keys are code *prefixes* with the trailing region/carrier
+// letter dropped (Samsung in particular ships the same phone under many
+// suffixes — "SM-A546E", "SM-A546B", "SM-A546W" are all a Galaxy A54),
+// matched longest-prefix-first. Coverage favors brands common in this
+// region (Samsung, Xiaomi/Redmi/POCO, OPPO, vivo, realme) — anything
+// not in the table just falls back to showing the raw code, which is
+// always correct even when we don't have a friendly name for it yet.
+const ANDROID_MODEL_MAP = {
+  // Samsung Galaxy S
+  "SM-S911": "Galaxy S23",
+  "SM-S916": "Galaxy S23+",
+  "SM-S918": "Galaxy S23 Ultra",
+  "SM-S921": "Galaxy S24",
+  "SM-S926": "Galaxy S24+",
+  "SM-S928": "Galaxy S24 Ultra",
+  "SM-G991": "Galaxy S21",
+  "SM-G996": "Galaxy S21+",
+  "SM-G998": "Galaxy S21 Ultra",
+  "SM-S901": "Galaxy S22",
+  "SM-S906": "Galaxy S22+",
+  "SM-S908": "Galaxy S22 Ultra",
+  // Samsung Galaxy A
+  "SM-A125": "Galaxy A12",
+  "SM-A135": "Galaxy A13",
+  "SM-A145": "Galaxy A14",
+  "SM-A155": "Galaxy A15",
+  "SM-A165": "Galaxy A16",
+  "SM-A235": "Galaxy A23",
+  "SM-A245": "Galaxy A24",
+  "SM-A255": "Galaxy A25",
+  "SM-A325": "Galaxy A32",
+  "SM-A336": "Galaxy A33",
+  "SM-A346": "Galaxy A34",
+  "SM-A356": "Galaxy A35",
+  "SM-A525": "Galaxy A52",
+  "SM-A536": "Galaxy A53",
+  "SM-A546": "Galaxy A54",
+  "SM-A556": "Galaxy A55",
+  "SM-A715": "Galaxy A71",
+  "SM-A725": "Galaxy A72",
+  // Samsung Galaxy M / Note / Z
+  "SM-M115": "Galaxy M11",
+  "SM-M127": "Galaxy M12",
+  "SM-M135": "Galaxy M13",
+  "SM-M146": "Galaxy M14",
+  "SM-N970": "Galaxy Note10",
+  "SM-N975": "Galaxy Note10+",
+  "SM-N980": "Galaxy Note20",
+  "SM-N985": "Galaxy Note20 Ultra",
+  "SM-F711": "Galaxy Z Flip3",
+  "SM-F721": "Galaxy Z Flip4",
+  "SM-F731": "Galaxy Z Flip5",
+  "SM-F926": "Galaxy Z Fold3",
+  "SM-F936": "Galaxy Z Fold4",
+  "SM-F946": "Galaxy Z Fold5",
+  // Google Pixel
+  "Pixel 6": "Pixel 6",
+  "Pixel 7": "Pixel 7",
+  "Pixel 8": "Pixel 8",
+  "Pixel 9": "Pixel 9",
+  // OnePlus
+  CPH2449: "OnePlus 11",
+  CPH2581: "OnePlus 12",
+  CPH2609: "OnePlus Nord 3",
+  // Xiaomi / Redmi / POCO — Xiaomi's own codes (e.g. "2201117TG") are
+  // rarely human-readable at all, so only the few widely-known ones
+  // are listed; most Xiaomi devices will just show the raw code.
+  "2201117TG": "Redmi Note 11",
+  "2201117SG": "Redmi Note 11",
+  "23021RAAEG": "Redmi Note 12",
+  "22111317I": "Redmi Note 12 Pro",
+  "2210132G": "POCO X5",
+  // OPPO
+  CPH2477: "OPPO Reno8",
+  CPH2413: "OPPO A96",
+  CPH2481: "OPPO A78",
+  // vivo
+  V2145: "vivo Y33s",
+  V2219: "vivo Y36",
+  V2247: "vivo V29",
+  // realme
+  RMX3630: "realme 10",
+  RMX3710: "realme 11",
+  RMX3785: "realme 12",
+};
+function androidModelName(code) {
+  if (!code) return null;
+  const upper = code.toUpperCase();
+  // Longest-prefix-first so e.g. "SM-A546" (Galaxy A54) doesn't get
+  // shadowed by a shorter, coincidentally-matching key.
+  const prefixes = Object.keys(ANDROID_MODEL_MAP).sort(
+    (a, b) => b.length - a.length,
+  );
+  for (const prefix of prefixes) {
+    if (upper.startsWith(prefix.toUpperCase()))
+      return ANDROID_MODEL_MAP[prefix];
+  }
+  return null;
+}
+function LoginActivityPage({
+  role,
+  currentAdmin,
+  currentEmp,
+  isSuperAdmin,
+  activeSessionId,
+}) {
+  const { t } = useLang();
+  const selfType = role === "admin" ? "admin" : "employee";
+  const selfId = role === "admin" ? currentAdmin?.id : currentEmp?.id;
+  // "mine" | "all" — the "all" scope is only ever offered to superadmins;
+  // everyone else is hard-locked to their own history below.
+  const [scope, setScope] = useState("mine");
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [q, setQ] = useState("");
+  const [revokingId, setRevokingId] = useState(null);
+  const viewingAll = isSuperAdmin && scope === "all";
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    let query = supabase
+      .from("login_activity")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(300);
+    if (!(isSuperAdmin && scope === "all")) {
+      query = query.eq("actor_type", selfType).eq("actor_id", String(selfId));
+    }
+    const { data, error } = await query;
+    if (error) {
+      console.error("[login-activity] failed to load:", error.message);
+      setLogs([]);
+    } else {
+      setLogs(data || []);
+    }
+    setLoading(false);
+  }, [isSuperAdmin, scope, selfType, selfId]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // A "login" row counts as an active/live session when it has no
+  // matching "logout" row (same session_id) among what we've loaded,
+  // and hasn't been revoked yet — that's exactly what a "revoke"
+  // action should be offered on.
+  const loggedOutSessionIds = useMemo(() => {
+    const s = new Set();
+    logs.forEach((l) => {
+      if (l.action === "logout" && l.session_id) s.add(l.session_id);
+    });
+    return s;
+  }, [logs]);
+  const isActiveSession = useCallback(
+    (l) =>
+      l.action === "login" &&
+      !!l.session_id &&
+      !l.revoked_at &&
+      !loggedOutSessionIds.has(l.session_id),
+    [loggedOutSessionIds],
+  );
+
+  // Drive ConfirmDialog / AlertDialog instead of window.confirm/alert —
+  // confirmDialog holds {message, danger, onConfirm}; alertDialog holds
+  // {message}. Rendered once at the bottom of this component's JSX.
+  const [confirmDialog, setConfirmDialog] = useState(null);
+  const [alertDialog, setAlertDialog] = useState(null);
+
+  const doRevokeSession = useCallback(async (row) => {
+    setRevokingId(row.id);
+    const { error } = await supabase
+      .from("login_activity")
+      .update({ revoked_at: new Date().toISOString() })
+      .eq("id", row.id);
+    if (error) {
+      console.error("[login-activity] revoke failed:", error.message);
+    } else {
+      setLogs((prev) =>
+        prev.map((l) =>
+          l.id === row.id ? { ...l, revoked_at: new Date().toISOString() } : l,
+        ),
+      );
+    }
+    setRevokingId(null);
+  }, []);
+  const revokeSession = useCallback(
+    (row) => {
+      setConfirmDialog({
+        message: t.loginAct.revokeConfirm,
+        danger: true,
+        confirmLabel: t.loginAct.revoke,
+        onConfirm: () => doRevokeSession(row),
+      });
+    },
+    [t, doRevokeSession],
+  );
+
+  const [deletingId, setDeletingId] = useState(null);
+  const doDeleteEntry = useCallback(
+    async (row) => {
+      setDeletingId(row.id);
+      // .select() makes Postgres return the rows it actually deleted.
+      // Without it, an RLS policy can silently block the delete (0 rows
+      // affected) while Supabase still reports no error — which would
+      // make the UI remove the row locally even though it's still in
+      // the database. Checking the returned rows catches that case.
+      const { data, error } = await supabase
+        .from("login_activity")
+        .delete()
+        .eq("id", row.id)
+        .select("id");
+      if (error) {
+        console.error("[login-activity] delete failed:", error.message);
+        setAlertDialog({ message: t.loginAct.deleteBlocked });
+      } else if (!data || data.length === 0) {
+        console.error(
+          "[login-activity] delete affected 0 rows — likely blocked by an RLS policy",
+        );
+        setAlertDialog({ message: t.loginAct.deleteBlocked });
+      } else {
+        setLogs((prev) => prev.filter((l) => l.id !== row.id));
+      }
+      setDeletingId(null);
+    },
+    [t],
+  );
+  const deleteEntry = useCallback(
+    (row) => {
+      setConfirmDialog({
+        message: t.loginAct.deleteConfirm,
+        danger: true,
+        onConfirm: () => doDeleteEntry(row),
+      });
+    },
+    [t, doDeleteEntry],
+  );
+
+  // Bulk cleanup — scoped to whatever's currently in view (own history,
+  // or everyone's when a superadmin has switched to "all"), so people
+  // can't accidentally wipe records outside what they can already see.
+  const [clearing, setClearing] = useState(false);
+  const doClearLogs = useCallback(
+    async (olderThanDays) => {
+      setClearing(true);
+      let query = supabase.from("login_activity").delete();
+      if (!(isSuperAdmin && scope === "all")) {
+        query = query.eq("actor_type", selfType).eq("actor_id", String(selfId));
+      }
+      if (olderThanDays != null) {
+        const cutoff = new Date(
+          Date.now() - olderThanDays * 24 * 60 * 60 * 1000,
+        ).toISOString();
+        query = query.lt("created_at", cutoff);
+      } else {
+        // Supabase requires an explicit filter for delete — .gt on the
+        // primary key matches every row without needing a date cutoff.
+        query = query.gt("id", 0);
+      }
+      // Same RLS check as deleteEntry: confirm rows were actually
+      // deleted rather than trusting the absence of an error.
+      const { data, error } = await query.select("id");
+      if (error) {
+        console.error("[login-activity] clear failed:", error.message);
+        setAlertDialog({ message: t.loginAct.deleteBlocked });
+      } else if (!data || data.length === 0) {
+        console.error(
+          "[login-activity] clear affected 0 rows — likely blocked by an RLS policy",
+        );
+        setAlertDialog({ message: t.loginAct.deleteBlocked });
+      } else {
+        load();
+      }
+      setClearing(false);
+    },
+    [isSuperAdmin, scope, selfType, selfId, load, t],
+  );
+  const clearLogs = useCallback(
+    (olderThanDays) => {
+      setConfirmDialog({
+        message:
+          olderThanDays == null
+            ? t.loginAct.clearAllConfirm
+            : t.loginAct.clearOldConfirm,
+        danger: true,
+        onConfirm: () => doClearLogs(olderThanDays),
+      });
+    },
+    [t, doClearLogs],
+  );
+
+  const filtered = useMemo(() => {
+    const query = q.trim().toLowerCase();
+    if (!query) return logs;
+    return logs.filter((l) => {
+      const hay = [l.actor_name, l.os, l.browser, l.device_type, l.action]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return hay.includes(query);
+    });
+  }, [logs, q]);
+  const pg = usePagination(filtered, 25);
+
+  return (
+    <div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          marginBottom: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <div>
+          <h2
+            style={{
+              fontFamily: "'Space Grotesk',sans-serif",
+              fontSize: 18,
+              fontWeight: 600,
+              color: T.ink,
+              margin: 0,
+            }}
+          >
+            {t.loginAct.title}
+          </h2>
+          <p style={{ fontSize: 12.5, color: T.muted, margin: "4px 0 0" }}>
+            {viewingAll ? t.loginAct.subtitleAll : t.loginAct.subtitle}
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <div style={{ position: "relative" }}>
+            <Search
+              size={14}
+              color={T.muted}
+              style={{
+                position: "absolute",
+                left: 10,
+                top: "50%",
+                transform: "translateY(-50%)",
+              }}
+            />
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder={t.search}
+              style={{ paddingLeft: 30, minWidth: 200 }}
+            />
+          </div>
+          {isSuperAdmin && (
+            <Select value={scope} onChange={(e) => setScope(e.target.value)}>
+              <option value="mine">{t.loginAct.scopeMine}</option>
+              <option value="all">{t.loginAct.scopeAll}</option>
+            </Select>
+          )}
+          <Button variant="ghost" size="sm" onClick={load}>
+            <RefreshCw size={14} /> {t.loginAct.refresh}
+          </Button>
+          {isSuperAdmin && (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={clearing}
+                onClick={() => clearLogs(30)}
+                style={{ color: T.rose }}
+              >
+                <Trash2 size={14} /> {t.loginAct.clearOld}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={clearing}
+                onClick={() => clearLogs(null)}
+                style={{ color: T.rose }}
+              >
+                <Trash2 size={14} /> {t.loginAct.clearAll}
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {loading && (
+        <Card
+          style={{
+            textAlign: "center",
+            padding: "32px 0",
+            color: T.muted,
+            fontSize: 13,
+          }}
+        >
+          <Loader2
+            size={20}
+            color={T.forest}
+            style={{ animation: "spin 1s linear infinite" }}
+          />
+          <div style={{ marginTop: 8 }}>{t.loginAct.loading}</div>
+        </Card>
+      )}
+
+      {!loading && filtered.length === 0 && (
+        <Card
+          style={{
+            textAlign: "center",
+            padding: "32px 0",
+            color: T.muted,
+            fontSize: 13,
+          }}
+        >
+          {t.loginAct.noLogs}
+        </Card>
+      )}
+
+      {!loading && filtered.length > 0 && (
+        <Card style={{ overflowX: "auto", padding: 0 }}>
+          <table className="wf-table">
+            <thead>
+              <tr>
+                <th>{t.loginAct.time}</th>
+                {viewingAll && <th>{t.loginAct.actor}</th>}
+                <th>{t.loginAct.action}</th>
+                <th>{t.loginAct.device}</th>
+                <th>{t.loginAct.os}</th>
+                <th>{t.loginAct.model}</th>
+                <th>{t.loginAct.browser}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {pg.pageItems.map((l) => (
+                <tr key={l.id}>
+                  <td
+                    style={{
+                      fontFamily: "'JetBrains Mono',monospace",
+                      fontSize: 11.5,
+                      color: T.muted,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {fmtAuditTime(l.created_at)}
+                  </td>
+                  {viewingAll && (
+                    <td>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        <Avatar
+                          name={l.actor_name || t.loginAct.unknownActor}
+                          size={26}
+                        />
+                        <div
+                          style={{
+                            fontSize: 12.5,
+                            fontWeight: 500,
+                            color: T.ink,
+                          }}
+                        >
+                          {l.actor_name || t.loginAct.unknownActor}
+                        </div>
+                      </div>
+                    </td>
+                  )}
+                  <td>
+                    <LoginActionBadge action={l.action} t={t} />
+                  </td>
+                  <td>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
+                        fontSize: 12.5,
+                        color: T.ink,
+                      }}
+                    >
+                      <DeviceTypeIcon
+                        deviceType={l.device_type}
+                        color={T.muted}
+                      />
+                      {deviceTypeLabel(l.device_type, t)}
+                    </div>
+                  </td>
+                  <td style={{ fontSize: 12.5, color: T.ink }}>
+                    {l.os || t.loginAct.unknown}
+                  </td>
+                  <td style={{ fontSize: 12.5 }}>
+                    {l.device_model ? (
+                      <>
+                        <div style={{ color: T.ink }}>
+                          {androidModelName(l.device_model) || l.device_model}
+                        </div>
+                        {androidModelName(l.device_model) && (
+                          <div
+                            style={{
+                              fontSize: 10.5,
+                              color: T.muted,
+                              fontFamily: "'JetBrains Mono',monospace",
+                            }}
+                          >
+                            {l.device_model}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <span style={{ color: T.muted }}>—</span>
+                    )}
+                  </td>
+                  <td style={{ fontSize: 12.5, color: T.ink }}>
+                    {l.browser || t.loginAct.unknown}
+                  </td>
+                  <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        justifyContent: "flex-end",
+                      }}
+                    >
+                      {l.session_id && l.session_id === activeSessionId ? (
+                        <span style={{ fontSize: 10.5, color: T.muted }}>
+                          {t.loginAct.currentDevice}
+                        </span>
+                      ) : isActiveSession(l) ? (
+                        <>
+                          <span
+                            style={{
+                              fontSize: 10.5,
+                              fontWeight: 700,
+                              color: T.forestText,
+                              background: T.forestSoft,
+                              padding: "2px 8px",
+                              borderRadius: 999,
+                            }}
+                          >
+                            {t.loginAct.active}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            disabled={revokingId === l.id}
+                            onClick={() => revokeSession(l)}
+                            style={{ color: T.rose }}
+                          >
+                            <LogOut size={13} /> {t.loginAct.revoke}
+                          </Button>
+                        </>
+                      ) : l.revoked_at ? (
+                        <span style={{ fontSize: 10.5, color: T.muted }}>
+                          {t.loginAct.revoked}
+                        </span>
+                      ) : null}
+                      {isSuperAdmin && (
+                        <button
+                          onClick={() => deleteEntry(l)}
+                          disabled={deletingId === l.id}
+                          title={t.delete}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            color: T.muted,
+                            padding: 4,
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div style={{ padding: "0 16px 14px" }}>
+            <Pagination {...pg} />
+          </div>
+        </Card>
+      )}
+      {confirmDialog && (
+        <LoginActConfirmDialog
+          message={confirmDialog.message}
+          danger={confirmDialog.danger}
+          confirmLabel={confirmDialog.confirmLabel}
+          onCancel={() => setConfirmDialog(null)}
+          onConfirm={() => {
+            const fn = confirmDialog.onConfirm;
+            setConfirmDialog(null);
+            fn();
+          }}
+        />
+      )}
+      {alertDialog && (
+        <LoginActAlertDialog
+          message={alertDialog.message}
+          onClose={() => setAlertDialog(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
    Payroll
 ----------------------------------------------------------------*/
 // Builds a CSV file from headers + row arrays and triggers a browser
@@ -11668,6 +12653,7 @@ function buildNavAdmin(n) {
     { id: "attcorr", label: n.attCorrection, icon: CalendarClock },
     { id: "admins", label: n.admins, icon: ShieldCheck, superadminOnly: true },
     { id: "audits", label: n.audits, icon: History, superadminOnly: true },
+    { id: "loginActivity", label: n.loginActivity, icon: Smartphone },
     { id: "settings", label: n.settings, icon: Settings2 },
   ];
 }
@@ -11682,7 +12668,22 @@ function buildNavEmployee(n) {
     { id: "review", label: n.myPerformance, icon: Star },
     { id: "attcorr", label: n.myAttCorrection, icon: CalendarClock },
     { id: "documents", label: n.myDocuments, icon: FileText },
+    { id: "loginActivity", label: n.loginActivity, icon: Smartphone },
     { id: "profile", label: n.myProfile, icon: UserCircle2 },
+  ];
+}
+
+// Compact 5-item tab bar shown on phones for the employee/staff role,
+// mirroring the "home / activity / requests / wallet / more" pattern of
+// consumer apps (Grab, ABA...) so staff get one-tap access to the things
+// they touch daily. Less-frequent pages stay reachable via "More", which
+// opens the existing full side menu rather than duplicating it.
+function buildBottomNavEmployee(n) {
+  return [
+    { id: "dashboard", label: n.dashboard, icon: LayoutDashboard },
+    { id: "attendance", label: n.myAttendance, icon: Clock },
+    { id: "leave", label: n.myLeave, icon: CalendarDays },
+    { id: "payroll", label: n.myPayroll, icon: Wallet },
   ];
 }
 
@@ -11692,6 +12693,11 @@ function AppInner() {
   const [branding, setBranding, brandingReady] = useBrandingSettings();
   const brandDisplayName = branding.name?.trim() || t.appName;
   const { theme } = useTheme();
+  // Shows a styled AlertDialog (instead of window.alert) when this
+  // device's session gets force-signed-out via the Login Activity page.
+  // Rendered in the logged-out branches below, since checkRevoked always
+  // clears the session before setting this.
+  const [revokedNotice, setRevokedNotice] = useState(false);
 
   // The browser tab title/favicon live outside React (in the document
   // head), so setting `branding` state alone doesn't touch them — push
@@ -12063,6 +13069,14 @@ function AppInner() {
     K.SESSION_EMPLOYEE,
     null,
   );
+  // Id of this browser's current sign-in, generated fresh at login and
+  // carried on its login_activity row — lets that specific device be
+  // force-signed-out remotely from the Login Activity page (see the
+  // revoke-session effect below).
+  const [activeSessionId, setActiveSessionId] = useLocalStorage(
+    K.ACTIVE_SESSION_ID,
+    null,
+  );
   const [navOpen, setNavOpen] = useState(false);
   const [portal, routedPage, goPortal, setPage] = usePortalRoute();
   // Falls back to "dashboard" only when the URL has no page segment yet
@@ -12107,6 +13121,7 @@ function AppInner() {
     role === "admin"
       ? buildNavAdmin(t.nav).filter((n) => !n.superadminOnly || isSuperAdmin)
       : buildNavEmployee(t.nav);
+  const bottomNav = role !== "admin" ? buildBottomNavEmployee(t.nav) : null;
 
   // Keep actorRef in sync with whoever is signed in right now, so every
   // useSupabaseArray hook above always audits changes under the correct
@@ -12121,6 +13136,55 @@ function AppInner() {
           ? { type: "employee", id: currentEmp.id, name: currentEmp.name }
           : null;
   }, [role, currentAdmin, currentEmp]);
+
+  // Periodically checks whether THIS device's session has been revoked
+  // from the Login Activity page (e.g. a superadmin marking a device
+  // they don't recognize). If so, force-sign this device out right
+  // away — this is what makes "revoke" actually kick the device out,
+  // rather than just deleting a log row.
+  useEffect(() => {
+    if (!loggedIn || !activeSessionId) return;
+    let cancelled = false;
+    const checkRevoked = async () => {
+      const { data, error } = await supabase
+        .from("login_activity")
+        .select("revoked_at")
+        .eq("session_id", activeSessionId)
+        .eq("action", "login")
+        .not("revoked_at", "is", null)
+        .limit(1);
+      if (cancelled || error || !data || data.length === 0) return;
+      const actor =
+        role === "admin"
+          ? { type: "admin", id: currentAdmin?.id, name: currentAdmin?.name }
+          : { type: "employee", id: currentEmp?.id, name: currentEmp?.name };
+      writeAuditLog({
+        actor,
+        action: "logout",
+        table: role === "admin" ? "admins" : "employees",
+        entityId: actor.id,
+        label: actor.name,
+      });
+      writeLoginActivity({
+        actor,
+        action: "logout",
+        sessionId: activeSessionId,
+      });
+      setActiveSessionId(null);
+      if (role === "admin") setSessionAdmin(null);
+      else setSessionEmployee(null);
+      setRevokedNotice(true);
+    };
+    checkRevoked();
+    const interval = setInterval(checkRevoked, 20000);
+    window.addEventListener("focus", checkRevoked);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      window.removeEventListener("focus", checkRevoked);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loggedIn, activeSessionId, role, currentAdmin, currentEmp]);
 
   useEffect(() => {
     if (loggedIn && !nav.find((n) => n.id === page)) setPage("dashboard");
@@ -12169,9 +13233,22 @@ function AppInner() {
                 entityId: id,
                 label: acct?.name,
               });
+              const sid = newSessionId();
+              setActiveSessionId(sid);
+              writeLoginActivity({
+                actor: { type: "admin", id, name: acct?.name },
+                action: "login",
+                sessionId: sid,
+              });
             }}
             go={goPortal}
           />
+          {revokedNotice && (
+            <LoginActAlertDialog
+              message={t.loginAct.revokedAlert}
+              onClose={() => setRevokedNotice(false)}
+            />
+          )}
         </BrandingContext.Provider>
       );
     return (
@@ -12188,16 +13265,33 @@ function AppInner() {
               entityId: id,
               label: emp?.name,
             });
+            const sid = newSessionId();
+            setActiveSessionId(sid);
+            writeLoginActivity({
+              actor: { type: "employee", id, name: emp?.name },
+              action: "login",
+              sessionId: sid,
+            });
           }}
           go={goPortal}
         />
+        {revokedNotice && (
+          <LoginActAlertDialog
+            message={t.loginAct.revokedAlert}
+            onClose={() => setRevokedNotice(false)}
+          />
+        )}
       </BrandingContext.Provider>
     );
   }
 
   return (
     <BrandingContext.Provider value={{ branding, setBranding }}>
-      <div className={`wf-root ${theme === "dark" ? "wf-dark" : ""}`}>
+      <div
+        className={`wf-root wf-app-enter ${theme === "dark" ? "wf-dark" : ""} ${
+          bottomNav ? "wf-role-staff" : ""
+        }`}
+      >
         <div
           className={`wf-overlay-scrim ${navOpen ? "open" : ""}`}
           onClick={() => setNavOpen(false)}
@@ -12344,6 +13438,16 @@ function AppInner() {
                       entityId: currentAdmin?.id,
                       label: currentAdmin?.name,
                     });
+                    writeLoginActivity({
+                      actor: {
+                        type: "admin",
+                        id: currentAdmin?.id,
+                        name: currentAdmin?.name,
+                      },
+                      action: "logout",
+                      sessionId: activeSessionId,
+                    });
+                    setActiveSessionId(null);
                     setSessionAdmin(null);
                   } else {
                     writeAuditLog({
@@ -12357,6 +13461,16 @@ function AppInner() {
                       entityId: currentEmp?.id,
                       label: currentEmp?.name,
                     });
+                    writeLoginActivity({
+                      actor: {
+                        type: "employee",
+                        id: currentEmp?.id,
+                        name: currentEmp?.name,
+                      },
+                      action: "logout",
+                      sessionId: activeSessionId,
+                    });
+                    setActiveSessionId(null);
                     setSessionEmployee(null);
                   }
                 }}
@@ -12459,7 +13573,7 @@ function AppInner() {
             </div>
           </header>
 
-          <main className="wf-content">
+          <main className={`wf-content ${bottomNav ? "wf-content-bnpad" : ""}`}>
             {employees.length === 0 &&
               role === "admin" &&
               page !== "employees" && (
@@ -12479,177 +13593,214 @@ function AppInner() {
                   <AlertCircle size={16} /> {t.dash.noEmpWarn}
                 </div>
               )}
-            {page === "dashboard" && (
-              <Dashboard
-                employees={employees}
-                departments={departments}
-                attendance={attendance}
-                payrollPaid={payrollPaid}
-                role={role}
-                currentEmp={currentEmp}
-                shifts={shifts}
-              />
-            )}
-            {page === "announcements" && (
-              <Announcements
-                role={role}
-                currentAdmin={currentAdmin}
-                announcements={announcements}
-                setAnnouncements={setAnnouncements}
-                isSuperAdmin={isSuperAdmin}
-              />
-            )}
-            {page === "employees" && role === "admin" && (
-              <Employees
-                employees={employees}
-                departments={departments}
-                shifts={shifts}
-                offices={offices}
-                setEmployees={setEmployees}
-                isSuperAdmin={isSuperAdmin}
-                currentAdmin={currentAdmin}
-                documents={documents}
-                setDocuments={setDocuments}
-              />
-            )}
-            {page === "departments" && role === "admin" && (
-              <Departments
-                departments={departments}
-                setDepartments={setDepartments}
-                employees={employees}
-                isSuperAdmin={isSuperAdmin}
-              />
-            )}
-            {page === "shifts" && role === "admin" && (
-              <Shifts
-                shifts={shifts}
-                setShifts={setShifts}
-                employees={employees}
-                isSuperAdmin={isSuperAdmin}
-              />
-            )}
-            {page === "attendance" && (
-              <Attendance
-                role={role}
-                currentEmp={currentEmp}
-                employees={employees}
-                shifts={shifts}
-                attendance={attendance}
-                setAttendance={setAttendance}
-                isSuperAdmin={isSuperAdmin}
-                offices={offices}
-                setOffices={setOffices}
-                holidays={holidays}
-              />
-            )}
-            {page === "holidays" && role === "admin" && (
-              <Holidays
-                holidays={holidays}
-                setHolidays={setHolidays}
-                isSuperAdmin={isSuperAdmin}
-              />
-            )}
-            {page === "leave" && (
-              <LeaveRequests
-                role={role}
-                currentAdmin={currentAdmin}
-                currentEmp={currentEmp}
-                employees={employees}
-                admins={admins}
-                leaveRequests={leaveRequests}
-                setLeaveRequests={setLeaveRequests}
-                attendance={attendance}
-                setAttendance={setAttendance}
-                isSuperAdmin={isSuperAdmin}
-              />
-            )}
-            {page === "ot" && (
-              <OvertimeRequests
-                role={role}
-                currentAdmin={currentAdmin}
-                currentEmp={currentEmp}
-                employees={employees}
-                admins={admins}
-                overtimeRequests={overtimeRequests}
-                setOvertimeRequests={setOvertimeRequests}
-                otPolicy={otPolicy}
-                setOtPolicy={setOtPolicy}
-                isSuperAdmin={isSuperAdmin}
-                holidays={holidays}
-              />
-            )}
-            {page === "payroll" && (
-              <Payroll
-                role={role}
-                currentEmp={currentEmp}
-                employees={employees}
-                attendance={attendance}
-                payrollPaid={payrollPaid}
-                setPayrollPaid={setPayrollPaid}
-                overtimeRequests={overtimeRequests}
-                otPolicy={otPolicy}
-                payrollPolicy={payrollPolicy}
-                setPayrollPolicy={setPayrollPolicy}
-              />
-            )}
-            {page === "review" && (
-              <PerformanceReviews
-                role={role}
-                currentAdmin={currentAdmin}
-                currentEmp={currentEmp}
-                employees={employees}
-                performanceReviews={performanceReviews}
-                setPerformanceReviews={setPerformanceReviews}
-                isSuperAdmin={isSuperAdmin}
-              />
-            )}
-            {page === "documents" && role !== "admin" && currentEmp && (
-              <MyDocuments currentEmp={currentEmp} documents={documents} />
-            )}
-            {page === "attcorr" && (
-              <AttendanceCorrections
-                role={role}
-                currentAdmin={currentAdmin}
-                currentEmp={currentEmp}
-                employees={employees}
-                admins={admins}
-                attendanceCorrections={attendanceCorrections}
-                setAttendanceCorrections={setAttendanceCorrections}
-                attendance={attendance}
-                setAttendance={setAttendance}
-                isSuperAdmin={isSuperAdmin}
-              />
-            )}
-            {page === "admins" && role === "admin" && isSuperAdmin && (
-              <AdminAccounts
-                admins={admins}
-                setAdmins={setAdmins}
-                currentAdminId={currentAdmin?.id}
-              />
-            )}
-            {page === "profile" && role !== "admin" && currentEmp && (
-              <MyProfile
-                currentEmp={currentEmp}
-                employees={employees}
-                setEmployees={setEmployees}
-                departments={departments}
-                shifts={shifts}
-                saveError={employeesSaveError}
-              />
-            )}
-            {page === "settings" && role === "admin" && currentAdmin && (
-              <AdminSettings
-                currentAdmin={currentAdmin}
-                admins={admins}
-                setAdmins={setAdmins}
-                isSuperAdmin={isSuperAdmin}
-                saveError={adminsSaveError}
-              />
-            )}
-            {page === "audits" && role === "admin" && isSuperAdmin && (
-              <AuditLogPage />
-            )}
+            <div key={page} className="wf-page-enter">
+              {page === "dashboard" && (
+                <Dashboard
+                  employees={employees}
+                  departments={departments}
+                  attendance={attendance}
+                  payrollPaid={payrollPaid}
+                  role={role}
+                  currentEmp={currentEmp}
+                  shifts={shifts}
+                />
+              )}
+              {page === "announcements" && (
+                <Announcements
+                  role={role}
+                  currentAdmin={currentAdmin}
+                  announcements={announcements}
+                  setAnnouncements={setAnnouncements}
+                  isSuperAdmin={isSuperAdmin}
+                />
+              )}
+              {page === "employees" && role === "admin" && (
+                <Employees
+                  employees={employees}
+                  departments={departments}
+                  shifts={shifts}
+                  offices={offices}
+                  setEmployees={setEmployees}
+                  isSuperAdmin={isSuperAdmin}
+                  currentAdmin={currentAdmin}
+                  documents={documents}
+                  setDocuments={setDocuments}
+                />
+              )}
+              {page === "departments" && role === "admin" && (
+                <Departments
+                  departments={departments}
+                  setDepartments={setDepartments}
+                  employees={employees}
+                  isSuperAdmin={isSuperAdmin}
+                />
+              )}
+              {page === "shifts" && role === "admin" && (
+                <Shifts
+                  shifts={shifts}
+                  setShifts={setShifts}
+                  employees={employees}
+                  isSuperAdmin={isSuperAdmin}
+                />
+              )}
+              {page === "attendance" && (
+                <Attendance
+                  role={role}
+                  currentEmp={currentEmp}
+                  employees={employees}
+                  shifts={shifts}
+                  attendance={attendance}
+                  setAttendance={setAttendance}
+                  isSuperAdmin={isSuperAdmin}
+                  offices={offices}
+                  setOffices={setOffices}
+                  holidays={holidays}
+                />
+              )}
+              {page === "holidays" && role === "admin" && (
+                <Holidays
+                  holidays={holidays}
+                  setHolidays={setHolidays}
+                  isSuperAdmin={isSuperAdmin}
+                />
+              )}
+              {page === "leave" && (
+                <LeaveRequests
+                  role={role}
+                  currentAdmin={currentAdmin}
+                  currentEmp={currentEmp}
+                  employees={employees}
+                  admins={admins}
+                  leaveRequests={leaveRequests}
+                  setLeaveRequests={setLeaveRequests}
+                  attendance={attendance}
+                  setAttendance={setAttendance}
+                  isSuperAdmin={isSuperAdmin}
+                />
+              )}
+              {page === "ot" && (
+                <OvertimeRequests
+                  role={role}
+                  currentAdmin={currentAdmin}
+                  currentEmp={currentEmp}
+                  employees={employees}
+                  admins={admins}
+                  overtimeRequests={overtimeRequests}
+                  setOvertimeRequests={setOvertimeRequests}
+                  otPolicy={otPolicy}
+                  setOtPolicy={setOtPolicy}
+                  isSuperAdmin={isSuperAdmin}
+                  holidays={holidays}
+                />
+              )}
+              {page === "payroll" && (
+                <Payroll
+                  role={role}
+                  currentEmp={currentEmp}
+                  employees={employees}
+                  attendance={attendance}
+                  payrollPaid={payrollPaid}
+                  setPayrollPaid={setPayrollPaid}
+                  overtimeRequests={overtimeRequests}
+                  otPolicy={otPolicy}
+                  payrollPolicy={payrollPolicy}
+                  setPayrollPolicy={setPayrollPolicy}
+                />
+              )}
+              {page === "review" && (
+                <PerformanceReviews
+                  role={role}
+                  currentAdmin={currentAdmin}
+                  currentEmp={currentEmp}
+                  employees={employees}
+                  performanceReviews={performanceReviews}
+                  setPerformanceReviews={setPerformanceReviews}
+                  isSuperAdmin={isSuperAdmin}
+                />
+              )}
+              {page === "documents" && role !== "admin" && currentEmp && (
+                <MyDocuments currentEmp={currentEmp} documents={documents} />
+              )}
+              {page === "attcorr" && (
+                <AttendanceCorrections
+                  role={role}
+                  currentAdmin={currentAdmin}
+                  currentEmp={currentEmp}
+                  employees={employees}
+                  admins={admins}
+                  attendanceCorrections={attendanceCorrections}
+                  setAttendanceCorrections={setAttendanceCorrections}
+                  attendance={attendance}
+                  setAttendance={setAttendance}
+                  isSuperAdmin={isSuperAdmin}
+                />
+              )}
+              {page === "admins" && role === "admin" && isSuperAdmin && (
+                <AdminAccounts
+                  admins={admins}
+                  setAdmins={setAdmins}
+                  currentAdminId={currentAdmin?.id}
+                />
+              )}
+              {page === "profile" && role !== "admin" && currentEmp && (
+                <MyProfile
+                  currentEmp={currentEmp}
+                  employees={employees}
+                  setEmployees={setEmployees}
+                  departments={departments}
+                  shifts={shifts}
+                  saveError={employeesSaveError}
+                />
+              )}
+              {page === "settings" && role === "admin" && currentAdmin && (
+                <AdminSettings
+                  currentAdmin={currentAdmin}
+                  admins={admins}
+                  setAdmins={setAdmins}
+                  isSuperAdmin={isSuperAdmin}
+                  saveError={adminsSaveError}
+                />
+              )}
+              {page === "audits" && role === "admin" && isSuperAdmin && (
+                <AuditLogPage />
+              )}
+              {page === "loginActivity" && (
+                <LoginActivityPage
+                  role={role}
+                  currentAdmin={currentAdmin}
+                  currentEmp={currentEmp}
+                  isSuperAdmin={isSuperAdmin}
+                  activeSessionId={activeSessionId}
+                />
+              )}
+            </div>
           </main>
+
+          {bottomNav && (
+            <nav className="wf-bottomnav">
+              {bottomNav.map((n) => (
+                <button
+                  key={n.id}
+                  className={`wf-bottomnav-item ${page === n.id ? "active" : ""}`}
+                  onClick={() => setPage(n.id)}
+                >
+                  <span className="wf-bnav-icon-wrap">
+                    <n.icon size={19} />
+                  </span>
+                  <span>{n.label}</span>
+                </button>
+              ))}
+              <button
+                className={`wf-bottomnav-item ${navOpen ? "active" : ""}`}
+                onClick={() => setNavOpen(true)}
+              >
+                <span className="wf-bnav-icon-wrap">
+                  <Menu size={19} />
+                </span>
+                <span>{lang === "km" ? "ផ្សេងទៀត" : "More"}</span>
+              </button>
+            </nav>
+          )}
         </div>
       </div>
     </BrandingContext.Provider>
