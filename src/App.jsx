@@ -8,6 +8,7 @@ import React, {
   useContext as useCtx,
 } from "react";
 import { supabase } from "./lib/supabaseClient";
+import ExcelJS from "exceljs";
 import {
   LayoutDashboard,
   Users,
@@ -61,6 +62,7 @@ import {
   Tablet,
   Monitor,
   BarChart3,
+  FileSpreadsheet,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -134,6 +136,7 @@ const LANG = {
     actions: "សកម្មភាព",
     noData: "មិនមានទិន្នន័យ",
     exportCsv: "នាំចេញ CSV",
+    exportExcel: "នាំចេញ Excel",
     pagination: { of: "នៃ" },
     dash: {
       welcome: "សូមអញ្ជើញ",
@@ -577,6 +580,7 @@ const LANG = {
     actions: "Actions",
     noData: "No data",
     exportCsv: "Export CSV",
+    exportExcel: "Export Excel",
     pagination: { of: "of" },
     dash: {
       welcome: "Welcome",
@@ -12098,6 +12102,117 @@ function exportCsv(filename, headers, rows) {
   URL.revokeObjectURL(url);
 }
 
+// Builds a formatted, bank/accountant-ready .xlsx payroll report (bold
+// header band, merged title row, currency number formats, a totals row,
+// and frozen header) and triggers a browser download. Uses ExcelJS
+// (`npm install exceljs`) rather than the CSV path above because real
+// payroll handoffs need actual formatting, not raw comma-separated text.
+async function exportPayrollXlsx({
+  filename,
+  companyName,
+  reportTitle,
+  periodLabel,
+  columns, // [{ header, width, currency? }]
+  rows, // array of arrays, same order as columns
+  totalLabel,
+  totalValue,
+  totalColIndex, // 0-based index into `columns` where the total goes
+}) {
+  const wb = new ExcelJS.Workbook();
+  wb.creator = companyName || "Workforce Suite";
+  wb.created = new Date();
+  const ws = wb.addWorksheet("Payroll", {
+    views: [{ state: "frozen", ySplit: 4 }],
+  });
+
+  const colCount = columns.length;
+  const lastColLetter = String.fromCharCode(64 + colCount); // supports up to 26 cols
+
+  // Title band
+  ws.mergeCells(`A1:${lastColLetter}1`);
+  const titleCell = ws.getCell("A1");
+  titleCell.value = companyName
+    ? `${companyName} — ${reportTitle}`
+    : reportTitle;
+  titleCell.font = { bold: true, size: 14, color: { argb: "FF12203D" } };
+  titleCell.alignment = { horizontal: "center", vertical: "middle" };
+  ws.getRow(1).height = 26;
+
+  ws.mergeCells(`A2:${lastColLetter}2`);
+  const subCell = ws.getCell("A2");
+  subCell.value = periodLabel;
+  subCell.font = { italic: true, size: 11, color: { argb: "FF6B7280" } };
+  subCell.alignment = { horizontal: "center" };
+
+  ws.addRow([]); // spacer, row 3
+
+  // Header row (row 4)
+  const headerRow = ws.addRow(columns.map((c) => c.header));
+  headerRow.eachCell((cell) => {
+    cell.font = { bold: true, color: { argb: "FFFFFFFF" }, size: 11 };
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF12203D" },
+    };
+    cell.alignment = { horizontal: "center", vertical: "middle" };
+    cell.border = {
+      top: { style: "thin", color: { argb: "FF0B1730" } },
+      bottom: { style: "thin", color: { argb: "FF0B1730" } },
+    };
+  });
+  headerRow.height = 20;
+
+  // Data rows
+  rows.forEach((r, i) => {
+    const row = ws.addRow(r);
+    const zebra = i % 2 === 1;
+    row.eachCell((cell, colNumber) => {
+      const col = columns[colNumber - 1];
+      if (col?.currency) cell.numFmt = '"$"#,##0.00';
+      cell.alignment = { horizontal: col?.currency ? "right" : "left" };
+      if (zebra) {
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFF4F6F9" },
+        };
+      }
+      cell.border = { bottom: { style: "hair", color: { argb: "FFE3E7EE" } } };
+    });
+  });
+
+  // Totals row
+  if (totalLabel !== undefined && totalColIndex !== undefined) {
+    const totalRowValues = columns.map((_, i) =>
+      i === 0 ? totalLabel : i === totalColIndex ? totalValue : "",
+    );
+    const totalRow = ws.addRow(totalRowValues);
+    totalRow.eachCell((cell, colNumber) => {
+      cell.font = { bold: true, color: { argb: "FF12203D" } };
+      cell.border = { top: { style: "double", color: { argb: "FF12203D" } } };
+      if (columns[colNumber - 1]?.currency) cell.numFmt = '"$"#,##0.00';
+    });
+  }
+
+  columns.forEach((c, i) => {
+    ws.getColumn(i + 1).width = c.width || 16;
+  });
+
+  const buffer = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 function escapeHtml(s) {
   return String(s ?? "").replace(
     /[&<>"']/g,
@@ -12664,6 +12779,7 @@ function Payroll({
   setPayrollPolicy,
 }) {
   const { t, lang } = useLang();
+  const { branding } = useBranding();
   const currentMk = monthKey();
   const availableMonths = useMemo(() => {
     const set = new Set([currentMk]);
@@ -12674,6 +12790,7 @@ function Payroll({
   }, [attendance, currentMk]);
   const [mk, setMk] = useState(currentMk);
   const [slipFor, setSlipFor] = useState(null);
+  const [xlsxExporting, setXlsxExporting] = useState(false);
   const isPastMonth = mk !== currentMk;
   const activeEmployees = employees.filter((e) => e.status === "active");
   const list =
@@ -12747,48 +12864,109 @@ function Payroll({
           </span>
         )}
         {role === "admin" && (
-          <Button
-            variant="ghost"
-            style={{ marginLeft: "auto" }}
-            onClick={() =>
-              exportCsv(
-                `payroll-${mk}.csv`,
-                [
-                  t.employee,
-                  "Code",
-                  t.pay.baseSalary,
-                  t.pay.otPay,
-                  t.pay.taxLabel,
-                  t.pay.insuranceLabel,
-                  t.pay.netSalary,
-                  t.status,
-                ],
-                list.map((e) => {
-                  const paid = !!payrollPaid[`${e.id}-${mk}`];
-                  const { net, otPay, tax, insurance } = computePayroll(
-                    e,
-                    attendance,
-                    mk,
-                    overtimeRequests,
-                    otPolicy,
-                    payrollPolicy,
-                  );
-                  return [
-                    e.name,
-                    e.code,
-                    e.salary,
-                    otPay,
-                    tax,
-                    insurance,
-                    net,
-                    paid ? t.pay.paid : t.pay.unpaid,
-                  ];
-                }),
-              )
-            }
-          >
-            <Download size={15} /> {t.exportCsv}
-          </Button>
+          <div style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
+            <Button
+              variant="ghost"
+              onClick={() =>
+                exportCsv(
+                  `payroll-${mk}.csv`,
+                  [
+                    t.employee,
+                    "Code",
+                    t.pay.baseSalary,
+                    t.pay.otPay,
+                    t.pay.taxLabel,
+                    t.pay.insuranceLabel,
+                    t.pay.netSalary,
+                    t.status,
+                  ],
+                  list.map((e) => {
+                    const paid = !!payrollPaid[`${e.id}-${mk}`];
+                    const { net, otPay, tax, insurance } = computePayroll(
+                      e,
+                      attendance,
+                      mk,
+                      overtimeRequests,
+                      otPolicy,
+                      payrollPolicy,
+                    );
+                    return [
+                      e.name,
+                      e.code,
+                      e.salary,
+                      otPay,
+                      tax,
+                      insurance,
+                      net,
+                      paid ? t.pay.paid : t.pay.unpaid,
+                    ];
+                  }),
+                )
+              }
+            >
+              <Download size={15} /> {t.exportCsv}
+            </Button>
+            <Button
+              variant="ghost"
+              disabled={xlsxExporting}
+              onClick={async () => {
+                setXlsxExporting(true);
+                try {
+                  const dataRows = list.map((e) => {
+                    const paid = !!payrollPaid[`${e.id}-${mk}`];
+                    const { net, otPay, tax, insurance } = computePayroll(
+                      e,
+                      attendance,
+                      mk,
+                      overtimeRequests,
+                      otPolicy,
+                      payrollPolicy,
+                    );
+                    return [
+                      e.name,
+                      e.code,
+                      e.salary,
+                      otPay,
+                      tax,
+                      insurance,
+                      net,
+                      paid ? t.pay.paid : t.pay.unpaid,
+                    ];
+                  });
+                  await exportPayrollXlsx({
+                    filename: `payroll-${mk}.xlsx`,
+                    companyName: branding?.name,
+                    reportTitle:
+                      lang === "en" ? "Payroll Report" : "របាយការណ៍ប្រាក់ខែ",
+                    periodLabel: monthLabel(mk),
+                    columns: [
+                      { header: t.employee, width: 24 },
+                      { header: "Code", width: 12 },
+                      { header: t.pay.baseSalary, width: 16, currency: true },
+                      { header: t.pay.otPay, width: 14, currency: true },
+                      { header: t.pay.taxLabel, width: 14, currency: true },
+                      {
+                        header: t.pay.insuranceLabel,
+                        width: 14,
+                        currency: true,
+                      },
+                      { header: t.pay.netSalary, width: 16, currency: true },
+                      { header: t.status, width: 14 },
+                    ],
+                    rows: dataRows,
+                    totalLabel: lang === "en" ? "TOTAL" : "សរុប",
+                    totalValue: totalNet,
+                    totalColIndex: 6,
+                  });
+                } finally {
+                  setXlsxExporting(false);
+                }
+              }}
+            >
+              <FileSpreadsheet size={15} />{" "}
+              {xlsxExporting ? "…" : t.exportExcel}
+            </Button>
+          </div>
         )}
       </div>
       {role === "admin" && (
