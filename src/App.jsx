@@ -60,6 +60,7 @@ import {
   Smartphone,
   Tablet,
   Monitor,
+  BarChart3,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -115,6 +116,7 @@ const LANG = {
       settings: "ការកំណត់",
       audits: "កំណត់ត្រាសកម្មភាព",
       loginActivity: "សកម្មភាពចូលគណនី",
+      analytics: "វិភាគទិន្នន័យ",
     },
     logout: "ចាកចេញ",
     notifications: "ការជូនដំណឹង",
@@ -155,6 +157,19 @@ const LANG = {
       todayStatus: "ស្ថានភាពថ្ងៃនេះ",
       payrollStatus: "ស្ថានភាពប្រាក់ខែ",
       notCheckedIn: "មិនទាន់ចូលធ្វើការ",
+    },
+    analytics: {
+      title: "វិភាគទិន្នន័យ",
+      subtitle: "ទិដ្ឋភាពទូទៅនិន្នាការវត្តមាន ប្រាក់ខែ និង OT",
+      attendTrend: "អត្រាមកធ្វើការ (៦ ខែចុងក្រោយ)",
+      attendTrendSub: "ភាគរយវត្តមាន/មកយឺត ធៀបនឹងកំណត់ត្រាសរុបប្រចាំខែ",
+      deptCost: "ចំណាយប្រាក់ខែសុទ្ធតាមនាយកដ្ឋាន",
+      deptCostSub: "ប្រចាំខែបច្ចុប្បន្ន បុគ្គលិកសកម្មប៉ុណ្ណោះ",
+      otTrend: "ម៉ោង OT ដែលបានអនុម័ត (៦ ខែចុងក្រោយ)",
+      otTrendSub: "សរុបម៉ោង OT ដែលបានអនុម័តគ្រប់នាយកដ្ឋាន",
+      noChartData: "មិនទាន់មានទិន្នន័យគ្រប់គ្រាន់ដើម្បីបង្ហាញទេ",
+      totalOt: "OT សរុប",
+      hours: "ម៉ោង",
     },
     depts: {
       addBtn: "បន្ថែមនាយកដ្ឋាន",
@@ -544,6 +559,7 @@ const LANG = {
       settings: "Settings",
       audits: "Audit Log",
       loginActivity: "Login Activity",
+      analytics: "Analytics",
     },
     logout: "Sign Out",
     notifications: "Notifications",
@@ -584,6 +600,19 @@ const LANG = {
       todayStatus: "Today's Status",
       payrollStatus: "Payroll Status",
       notCheckedIn: "Not checked in",
+    },
+    analytics: {
+      title: "Analytics",
+      subtitle: "Overview of attendance, payroll and OT trends",
+      attendTrend: "Attendance Rate (last 6 months)",
+      attendTrendSub: "Present/late records vs. total records logged per month",
+      deptCost: "Net Payroll Cost by Department",
+      deptCostSub: "Current month, active employees only",
+      otTrend: "Approved OT Hours (last 6 months)",
+      otTrendSub: "Total approved overtime hours across all departments",
+      noChartData: "Not enough data to show yet",
+      totalOt: "Total OT",
+      hours: "hrs",
     },
     depts: {
       addBtn: "Add Department",
@@ -4484,6 +4513,318 @@ function Dashboard({
           </div>
         )}
       </Card>
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   Analytics — lightweight, dependency-free SVG charts built from
+   data already loaded elsewhere in the app (no new package needed).
+----------------------------------------------------------------*/
+// Returns the last `count` "YYYY-MM" month keys, oldest first, ending
+// at the current month.
+function lastMonthKeys(count) {
+  const out = [];
+  const now = new Date();
+  for (let i = count - 1; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    out.push(monthKey(d));
+  }
+  return out;
+}
+// Short month label ("Jan", "ម.ក") instead of monthLabel's full
+// "January 2026" — compact enough for chart axis ticks.
+function shortMonthLabel(mk, lang) {
+  const [y, m] = mk.split("-").map(Number);
+  try {
+    return new Intl.DateTimeFormat(lang === "en" ? "en-US" : "km-KH", {
+      month: "short",
+    }).format(new Date(y, m - 1, 1));
+  } catch {
+    return mk;
+  }
+}
+// A minimal vertical bar chart. `data` is [{ label, value }]. Values are
+// scaled to the tallest bar in the set; `formatValue` controls the label
+// drawn above each bar and `suffix` is appended to it.
+function MiniBarChart({ data, color, formatValue, height = 160 }) {
+  const max = Math.max(1, ...data.map((d) => d.value));
+  const barW = 100 / data.length;
+  return (
+    <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height }}>
+      {data.map((d, i) => {
+        const h = Math.max(2, Math.round((d.value / max) * (height - 34)));
+        return (
+          <div
+            key={i}
+            style={{
+              flex: `0 0 ${barW}%`,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              height: "100%",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 10,
+                color: T.muted,
+                fontFamily: "'JetBrains Mono',monospace",
+                marginBottom: 4,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {formatValue ? formatValue(d.value) : d.value}
+            </div>
+            <div
+              style={{
+                width: "62%",
+                height: h,
+                borderRadius: "5px 5px 2px 2px",
+                background: color,
+                transition: "height .25s ease",
+              }}
+              title={`${d.label}: ${formatValue ? formatValue(d.value) : d.value}`}
+            />
+            <div
+              style={{
+                fontSize: 10,
+                color: T.muted,
+                marginTop: 6,
+                textAlign: "center",
+              }}
+            >
+              {d.label}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+// A minimal horizontal bar chart, better suited to longer text labels
+// (department names) than vertical bars.
+function HorizontalBarChart({ data, color, formatValue }) {
+  const max = Math.max(1, ...data.map((d) => d.value));
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      {data.map((d, i) => (
+        <div key={i}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              fontSize: 12,
+              marginBottom: 4,
+            }}
+          >
+            <span style={{ color: T.ink, fontWeight: 500 }}>{d.label}</span>
+            <span
+              style={{
+                color: T.textSoft,
+                fontFamily: "'JetBrains Mono',monospace",
+              }}
+            >
+              {formatValue ? formatValue(d.value) : d.value}
+            </span>
+          </div>
+          <div
+            style={{
+              height: 8,
+              borderRadius: 5,
+              background: T.divider,
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                width: `${Math.max(2, Math.round((d.value / max) * 100))}%`,
+                height: "100%",
+                borderRadius: 5,
+                background: color,
+              }}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+function ChartCard({ title, subtitle, children, noData, noDataLabel }) {
+  return (
+    <Card style={{ padding: 18 }}>
+      <h3
+        style={{
+          fontFamily: "'Space Grotesk',sans-serif",
+          fontWeight: 600,
+          color: T.ink,
+          fontSize: 14,
+        }}
+      >
+        {title}
+      </h3>
+      {subtitle && (
+        <p
+          style={{
+            fontSize: 11,
+            color: T.muted,
+            marginTop: 2,
+            marginBottom: 14,
+          }}
+        >
+          {subtitle}
+        </p>
+      )}
+      {noData ? (
+        <p
+          style={{
+            fontSize: 13,
+            color: T.muted,
+            textAlign: "center",
+            padding: "28px 0",
+          }}
+        >
+          {noDataLabel}
+        </p>
+      ) : (
+        <div style={{ marginTop: subtitle ? 0 : 14 }}>{children}</div>
+      )}
+    </Card>
+  );
+}
+function AnalyticsPage({
+  employees,
+  departments,
+  attendance,
+  overtimeRequests,
+  otPolicy,
+  payrollPolicy,
+}) {
+  const { t, lang } = useLang();
+  const months = useMemo(() => lastMonthKeys(6), []);
+  const activeEmployees = employees.filter((e) => e.status === "active");
+
+  // Attendance rate per month: share of that month's attendance records
+  // that were present/late (as opposed to absent), out of all records
+  // logged in that month.
+  const attendTrend = months.map((mk) => {
+    const recs = attendance.filter((a) => a.date && a.date.startsWith(mk));
+    const present = recs.filter(
+      (a) => a.status === "present" || a.status === "late",
+    ).length;
+    const rate = recs.length ? Math.round((present / recs.length) * 100) : 0;
+    return { label: shortMonthLabel(mk, lang), value: rate };
+  });
+  const hasAttendData = attendance.some((a) => a.date);
+
+  // Net payroll cost by department for the current month.
+  const mk = monthKey();
+  const deptCost = departments
+    .map((d) => {
+      const total = activeEmployees
+        .filter((e) => e.deptId === d.id)
+        .reduce((sum, e) => {
+          const p = computePayroll(
+            e,
+            attendance,
+            mk,
+            overtimeRequests,
+            otPolicy,
+            payrollPolicy,
+          );
+          return sum + p.net;
+        }, 0);
+      return { label: d.name, value: Math.round(total) };
+    })
+    .filter((d) => d.value > 0)
+    .sort((a, b) => b.value - a.value);
+
+  // Approved OT hours per month across all employees.
+  const otTrend = months.map((mkm) => {
+    const hours = overtimeRequests
+      .filter(
+        (r) => r.status === "approved" && r.date && r.date.startsWith(mkm),
+      )
+      .reduce((sum, r) => sum + (Number(r.hours) || 0), 0);
+    return { label: shortMonthLabel(mkm, lang), value: Math.round(hours) };
+  });
+  const hasOtData = overtimeRequests.some((r) => r.status === "approved");
+  const totalOtThisTrend = otTrend.reduce((s, d) => s + d.value, 0);
+
+  return (
+    <div>
+      <Card
+        style={{
+          padding: 20,
+          marginBottom: 22,
+          background: BRAND.ink,
+          color: "#fff",
+        }}
+      >
+        <h2
+          style={{
+            fontFamily: "'Space Grotesk',sans-serif",
+            fontSize: 20,
+            fontWeight: 600,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <BarChart3 size={20} /> {t.analytics.title}
+        </h2>
+        <p style={{ color: "#A9B4C7", fontSize: 12, marginTop: 6 }}>
+          {t.analytics.subtitle}
+        </p>
+      </Card>
+
+      <div
+        className="wf-grid"
+        style={{
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px,1fr))",
+          marginBottom: 16,
+        }}
+      >
+        <ChartCard
+          title={t.analytics.attendTrend}
+          subtitle={t.analytics.attendTrendSub}
+          noData={!hasAttendData}
+          noDataLabel={t.analytics.noChartData}
+        >
+          <MiniBarChart
+            data={attendTrend}
+            color={T.forest}
+            formatValue={(v) => `${v}%`}
+          />
+        </ChartCard>
+
+        <ChartCard
+          title={t.analytics.otTrend}
+          subtitle={`${t.analytics.otTrendSub} · ${t.analytics.totalOt}: ${totalOtThisTrend} ${t.analytics.hours}`}
+          noData={!hasOtData}
+          noDataLabel={t.analytics.noChartData}
+        >
+          <MiniBarChart
+            data={otTrend}
+            color={T.gold}
+            formatValue={(v) => `${v}h`}
+          />
+        </ChartCard>
+      </div>
+
+      <ChartCard
+        title={t.analytics.deptCost}
+        subtitle={t.analytics.deptCostSub}
+        noData={deptCost.length === 0}
+        noDataLabel={t.analytics.noChartData}
+      >
+        <HorizontalBarChart
+          data={deptCost}
+          color={T.blue}
+          formatValue={fmtMoney}
+        />
+      </ChartCard>
     </div>
   );
 }
@@ -12641,6 +12982,7 @@ function Payroll({
 function buildNavAdmin(n) {
   return [
     { id: "dashboard", label: n.dashboard, icon: LayoutDashboard },
+    { id: "analytics", label: n.analytics, icon: BarChart3 },
     { id: "announcements", label: n.announcements, icon: Megaphone },
     { id: "employees", label: n.employees, icon: Users },
     { id: "departments", label: n.departments, icon: Building2 },
@@ -13604,6 +13946,16 @@ function AppInner() {
                   role={role}
                   currentEmp={currentEmp}
                   shifts={shifts}
+                />
+              )}
+              {page === "analytics" && role === "admin" && (
+                <AnalyticsPage
+                  employees={employees}
+                  departments={departments}
+                  attendance={attendance}
+                  overtimeRequests={overtimeRequests}
+                  otPolicy={otPolicy}
+                  payrollPolicy={payrollPolicy}
                 />
               )}
               {page === "announcements" && (
