@@ -119,6 +119,7 @@ const LANG = {
       audits: "កំណត់ត្រាសកម្មភាព",
       loginActivity: "សកម្មភាពចូលគណនី",
       analytics: "វិភាគទិន្នន័យ",
+      rolePerms: "សិទ្ធិតួនាទី",
     },
     logout: "ចាកចេញ",
     notifications: "ការជូនដំណឹង",
@@ -572,6 +573,7 @@ const LANG = {
       audits: "Audit Log",
       loginActivity: "Login Activity",
       analytics: "Analytics",
+      rolePerms: "Roles & Permissions",
     },
     logout: "Sign Out",
     notifications: "Notifications",
@@ -1060,6 +1062,42 @@ function LangToggle({ variant = "dark" }) {
     </button>
   );
 }
+// Live ledger-style clock shown in the header — a small functional nod to
+// this being a time & attendance system, not just decoration: admins and
+// employees glance at it to sanity-check punch times against the system
+// clock. Ticks every second; unmounts cleanly via the interval cleanup.
+function HeaderClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const hh = String(now.getHours()).padStart(2, "0");
+  const mm = String(now.getMinutes()).padStart(2, "0");
+  const ss = String(now.getSeconds()).padStart(2, "0");
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "baseline",
+        gap: 5,
+        fontFamily: "'JetBrains Mono',monospace",
+        fontSize: 13,
+        fontWeight: 600,
+        color: T.text,
+        padding: "5px 10px",
+        borderRadius: 8,
+        border: `1px solid ${T.line}`,
+        background: T.tableHeadBg,
+        letterSpacing: "-.01em",
+      }}
+    >
+      <span style={{ width: 6, height: 6, borderRadius: 999, background: T.forest, flexShrink: 0 }} />
+      {hh}:{mm}
+      <span style={{ color: T.muted, fontSize: 11 }}>{ss}</span>
+    </div>
+  );
+}
 
 /* ---------------------------------------------------------------
    Tokens
@@ -1068,8 +1106,8 @@ function LangToggle({ variant = "dark" }) {
 // primary buttons, and hero banners — which stays the same regardless of
 // light/dark mode (white text sits on it either way).
 const BRAND = {
-  ink: "#12203D",
-  inkDark: "#0B1730",
+  ink: "#0A0F1A",
+  inkDark: "#050810",
 };
 // T holds the tokens that DO change between light/dark mode. Each value is
 // a CSS custom property reference — the actual light/dark hex values are
@@ -1081,18 +1119,18 @@ const T = {
   inkDark: "var(--wf-ink-dark)",
   paper: "var(--wf-paper)",
   card: "var(--wf-card)",
-  forest: "#2E6F4E",
-  forestDark: "#245A3F",
+  forest: "#1FA26B",
+  forestDark: "#168053",
   forestSoft: "var(--wf-forest-soft)",
   forestText: "var(--wf-forest-text)",
-  clay: "#B5502F",
-  gold: "#C08A2E",
+  clay: "#D9622E",
+  gold: "#F0A83B",
   goldSoft: "var(--wf-gold-soft)",
   goldText: "var(--wf-gold-text)",
-  rose: "#A93E4C",
+  rose: "#E5637A",
   roseDark: "var(--wf-rose-dark)",
   roseSoft: "var(--wf-rose-soft)",
-  blue: "#3E5C8A",
+  blue: "#5B8DEF",
   line: "var(--wf-line)",
   lineSoft: "var(--wf-line-soft)",
   muted: "var(--wf-muted)",
@@ -1109,31 +1147,270 @@ const T = {
   headerBg: "var(--wf-header-bg)",
 };
 const PALETTE = [
-  "#2E6F4E",
-  "#C08A2E",
-  "#3E5C8A",
-  "#A93E4C",
-  "#6B5B95",
-  "#B5502F",
+  "#1FA26B",
+  "#F0A83B",
+  "#5B8DEF",
+  "#E5637A",
+  "#35D0BA",
+  "#D9622E",
 ];
 // Legacy single admin password — kept only as a fallback reference; login now
 // checks against the ADMINS list below, which supports multiple accounts
 // with different permission levels.
 const ADMIN_PASSWORD = "admin123";
+// Seven configurable HR ranks below Superadmin, in ascending seniority
+// order ("staff" is the lowest — read-only by default, meant for admin
+// portal accounts that shouldn't act on anything until Superadmin grants
+// specific modules). Superadmin sits above all of them, always has every
+// permission, and is the only rank that can manage other admin accounts
+// (kept hardcoded, not configurable, since granting "manage admins" to a
+// lower rank would let that rank promote itself — a privilege-escalation
+// hole).
+const ADMIN_RANKS = [
+  "staff",
+  "officer",
+  "senior",
+  "supervisor",
+  "manager",
+  "seniorManager",
+  "admin",
+];
 const ADMIN_ROLE_LABEL = {
   km: {
-    superadmin: "អ្នកគ្រប់គ្រងជាន់ខ្ពស់",
-    manager: "អ្នកគ្រប់គ្រង HR",
+    staff: "បុគ្គលិក (Employee)",
+    officer: "មន្ត្រី HR (Officer)",
+    senior: "មន្ត្រីជាន់ខ្ពស់ (Senior)",
+    supervisor: "ប្រធានក្រុម (Supervisor)",
+    manager: "អ្នកគ្រប់គ្រង HR (Manager)",
+    seniorManager: "អ្នកគ្រប់គ្រងជាន់ខ្ពស់ (Senior Manager)",
+    admin: "អ្នកគ្រប់គ្រងប្រព័ន្ធ (Admin)",
+    superadmin: "អ្នកគ្រប់គ្រងកំពូល (Superadmin)",
   },
   en: {
-    superadmin: "Super Admin",
+    staff: "Employee",
+    officer: "HR Officer",
+    senior: "Senior Officer",
+    supervisor: "Supervisor",
     manager: "HR Manager",
+    seniorManager: "Senior Manager",
+    admin: "Admin",
+    superadmin: "Superadmin",
+  },
+};
+// The permission modules Superadmin can grant/revoke per rank. Each key
+// corresponds to a real gate somewhere in the app (see PERMISSION_KEY
+// usage below) — "manageAdmins" is deliberately absent here; that stays
+// superadmin-only and isn't configurable, for the reason noted above.
+const PERMISSION_MODULES = [
+  "manageDepartments",
+  "manageEmployees",
+  "approveRequests",
+  "managePayroll",
+  "manageDocuments",
+  "manageAnnouncements",
+  "manageSettings",
+  "viewAuditLog",
+];
+const PERMISSION_LABEL = {
+  km: {
+    manageDepartments: "គ្រប់គ្រងនាយកដ្ឋាន/វេន",
+    manageEmployees: "គ្រប់គ្រងបុគ្គលិក",
+    approveRequests: "អនុម័តច្បាប់/OT/កែតម្រូវវត្តមាន",
+    managePayroll: "គ្រប់គ្រងប្រាក់ខែ",
+    manageDocuments: "គ្រប់គ្រងឯកសារបុគ្គលិក",
+    manageAnnouncements: "គ្រប់គ្រងសេចក្តីប្រកាស",
+    manageSettings: "គ្រប់គ្រងការកំណត់ក្រុមហ៊ុន",
+    viewAuditLog: "មើលកំណត់ត្រាសកម្មភាព",
+  },
+  en: {
+    manageDepartments: "Manage Departments/Shifts",
+    manageEmployees: "Manage Employees",
+    approveRequests: "Approve Leave/OT/Corrections",
+    managePayroll: "Manage Payroll",
+    manageDocuments: "Manage Employee Documents",
+    manageAnnouncements: "Manage Announcements",
+    manageSettings: "Manage Company Settings",
+    viewAuditLog: "View Audit Log",
+  },
+};
+// Fixed id under which the Employee Self-Service module toggles are saved
+// inside the same role_permissions table/array as the admin rank matrix
+// (id column is free text, so this just piggybacks on the existing
+// storage — no new table needed). This is NOT an admin rank; it's a
+// single company-wide on/off switchboard that applies to every regular
+// employee using the self-service portal (buildNavEmployee), since
+// employees don't have seniority ranks the way admin accounts do.
+const EMPLOYEE_MODULES_ID = "employeePortal";
+// The self-service pages Superadmin can hide company-wide. "dashboard" is
+// deliberately absent — it's the landing page every employee needs, so it
+// always stays on and isn't configurable.
+const EMPLOYEE_MODULES = [
+  "announcements",
+  "attendance",
+  "leave",
+  "ot",
+  "payroll",
+  "review",
+  "attcorr",
+  "documents",
+  "loginActivity",
+  "profile",
+];
+const EMPLOYEE_MODULE_LABEL = {
+  km: {
+    announcements: "សេចក្តីប្រកាស",
+    attendance: "វត្តមានផ្ទាល់ខ្លួន",
+    leave: "សំណើច្បាប់ឈប់សម្រាក",
+    ot: "ម៉ោងបន្ថែម (OT)",
+    payroll: "ប្រាក់ខែផ្ទាល់ខ្លួន",
+    review: "ការវាយតម្លៃការងារ",
+    attcorr: "សំណើកែតម្រូវវត្តមាន",
+    documents: "ឯកសារផ្ទាល់ខ្លួន",
+    loginActivity: "សកម្មភាពចូលប្រើ",
+    profile: "ប្រវត្តិរូបផ្ទាល់ខ្លួន",
+  },
+  en: {
+    announcements: "Announcements",
+    attendance: "My Attendance",
+    leave: "My Leave",
+    ot: "My Overtime (OT)",
+    payroll: "My Payroll",
+    review: "My Performance Reviews",
+    attcorr: "Attendance Correction",
+    documents: "My Documents",
+    loginActivity: "Login Activity",
+    profile: "My Profile",
+  },
+};
+function employeeModuleLabel(key, lang) {
+  return (EMPLOYEE_MODULE_LABEL[lang] || EMPLOYEE_MODULE_LABEL.km)[key] || key;
+}
+// Every module defaults to visible — nothing disappears for existing
+// companies until Superadmin explicitly unchecks something.
+const DEFAULT_EMPLOYEE_MODULES = {
+  // The employeePortal row lives in the same role_permissions table as
+  // the admin rank rows, so it must also carry these manage_* columns
+  // (all false — they're meaningless for this row, but the columns are
+  // NOT NULL) or the upsert fails with a not-null constraint violation.
+  manageDepartments: false,
+  manageEmployees: false,
+  approveRequests: false,
+  managePayroll: false,
+  manageDocuments: false,
+  manageAnnouncements: false,
+  manageSettings: false,
+  viewAuditLog: false,
+  announcements: true,
+  attendance: true,
+  leave: true,
+  ot: true,
+  payroll: true,
+  review: true,
+  attcorr: true,
+  documents: true,
+  loginActivity: true,
+  profile: true,
+};
+// Sensible starting point covering the natural HR seniority ladder — an
+// Officer can only view, each step up adds more, Admin gets everything
+// short of managing other admin accounts. Superadmin edits this freely
+// from the Roles & Permissions page; these are just the seed defaults
+// used until Superadmin has saved a custom matrix (and as a fallback for
+// any rank the matrix doesn't yet have a row for).
+const DEFAULT_ROLE_PERMISSIONS = {
+  staff: {
+    manageDepartments: false,
+    manageEmployees: false,
+    approveRequests: false,
+    managePayroll: false,
+    manageDocuments: false,
+    manageAnnouncements: false,
+    manageSettings: false,
+    viewAuditLog: false,
+  },
+  officer: {
+    manageDepartments: false,
+    manageEmployees: false,
+    approveRequests: false,
+    managePayroll: false,
+    manageDocuments: false,
+    manageAnnouncements: false,
+    manageSettings: false,
+    viewAuditLog: false,
+  },
+  senior: {
+    manageDepartments: false,
+    manageEmployees: true,
+    approveRequests: false,
+    managePayroll: false,
+    manageDocuments: true,
+    manageAnnouncements: false,
+    manageSettings: false,
+    viewAuditLog: false,
+  },
+  supervisor: {
+    manageDepartments: false,
+    manageEmployees: true,
+    approveRequests: true,
+    managePayroll: false,
+    manageDocuments: true,
+    manageAnnouncements: false,
+    manageSettings: false,
+    viewAuditLog: false,
+  },
+  manager: {
+    manageDepartments: true,
+    manageEmployees: true,
+    approveRequests: true,
+    managePayroll: true,
+    manageDocuments: true,
+    manageAnnouncements: true,
+    manageSettings: false,
+    viewAuditLog: false,
+  },
+  seniorManager: {
+    manageDepartments: true,
+    manageEmployees: true,
+    approveRequests: true,
+    managePayroll: true,
+    manageDocuments: true,
+    manageAnnouncements: true,
+    manageSettings: true,
+    viewAuditLog: true,
+  },
+  admin: {
+    manageDepartments: true,
+    manageEmployees: true,
+    approveRequests: true,
+    managePayroll: true,
+    manageDocuments: true,
+    manageAnnouncements: true,
+    manageSettings: true,
+    viewAuditLog: true,
   },
 };
 // Admin role names follow the app's km/en language toggle (like every
 // other label) rather than being hardcoded to Khmer everywhere.
 function adminRoleLabel(role, lang) {
   return (ADMIN_ROLE_LABEL[lang] || ADMIN_ROLE_LABEL.km)[role] || role || "";
+}
+function permissionLabel(key, lang) {
+  return (PERMISSION_LABEL[lang] || PERMISSION_LABEL.km)[key] || key;
+}
+// Central "can this admin do X" check. Superadmin always passes every
+// check (and is the only rank allowed to manage other admin accounts —
+// that check bypasses the matrix entirely, see manageAdmins usage
+// elsewhere). Everyone else is looked up in the Superadmin-editable
+// rolePermissions matrix, falling back to the seed defaults above for
+// any rank that isn't in it yet (e.g. right after this feature ships,
+// before Superadmin has saved anything).
+function canDo(admin, rolePermissions, key) {
+  if (!admin) return false;
+  if (admin.role === "superadmin") return true;
+  if (key === "manageAdmins") return false; // superadmin-only, not configurable
+  const row =
+    rolePermissions?.[admin.role] || DEFAULT_ROLE_PERMISSIONS[admin.role];
+  return !!row?.[key];
 }
 // Standard working days used to derive a daily rate from monthly salary
 // when calculating unpaid-absence deductions in payroll.
@@ -1147,95 +1424,96 @@ const CSS = `
 *,*::before,*::after{box-sizing:border-box;}
 html,body,#root{height:100%;}
 :root{
-  --wf-ink:#12203D; --wf-ink-dark:#0B1730; --wf-paper:#F5F2EA; --wf-card:#FFFFFF;
-  --wf-forest-soft:#E8F2EC; --wf-forest-text:#215D3F; --wf-gold-soft:#FBF1DF; --wf-gold-text:#8A5E14;
-  --wf-rose-dark:#8C3140; --wf-rose-soft:#F3E9E9; --wf-line:#E7E2D6; --wf-line-soft:#EEE9DC;
-  --wf-muted:#8A8577; --wf-muted-light:#B0AA98; --wf-text-soft:#4A4638;
-  --wf-input-border:#D8D2C2; --wf-input-bg:#FDFCF9; --wf-field-label:#6B6455;
-  --wf-table-head-bg:#FAF8F2; --wf-divider:#F0EDE2; --wf-danger-border:#E4C7CB;
-  --wf-danger-hover-bg:#F8ECEE; --wf-header-bg:rgba(255,255,255,0.92);
+  --wf-ink:#10141C; --wf-ink-dark:#050810; --wf-paper:#F3F4F7; --wf-card:#FFFFFF;
+  --wf-forest-soft:#E4F5EC; --wf-forest-text:#127449; --wf-gold-soft:#FCF0DC; --wf-gold-text:#9A6212;
+  --wf-rose-dark:#B23752; --wf-rose-soft:#FBEAEE; --wf-line:#E2E5EB; --wf-line-soft:#EAECF1;
+  --wf-muted:#767E8F; --wf-muted-light:#A7ADBB; --wf-text-soft:#3C4250;
+  --wf-input-border:#D6DAE2; --wf-input-bg:#FAFBFC; --wf-field-label:#5B6274;
+  --wf-table-head-bg:#F6F7F9; --wf-divider:#ECEEF2; --wf-danger-border:#F0C7D0;
+  --wf-danger-hover-bg:#FBEEF1; --wf-header-bg:rgba(255,255,255,0.85);
 }
 .wf-dark{
-  --wf-ink:#E9ECF4; --wf-ink-dark:#B7BFD4; --wf-paper:#0E1526; --wf-card:#161F35;
-  --wf-forest-soft:#173226; --wf-forest-text:#7FD9A8; --wf-gold-soft:#332715; --wf-gold-text:#E8C067;
-  --wf-rose-dark:#F4A6B0; --wf-rose-soft:#3A2126; --wf-line:#2A3350; --wf-line-soft:#233049;
-  --wf-muted:#8D96B3; --wf-muted-light:#5B6486; --wf-text-soft:#C3C9DC;
-  --wf-input-border:#2E3A5C; --wf-input-bg:#101A30; --wf-field-label:#98A1C0;
-  --wf-table-head-bg:#131C32; --wf-divider:#232D4A; --wf-danger-border:#5C2C36;
-  --wf-danger-hover-bg:#2C1820; --wf-header-bg:rgba(14,21,38,0.92);
+  --wf-ink:#EEF1F6; --wf-ink-dark:#AEB6C7; --wf-paper:#080B12; --wf-card:#0E121B;
+  --wf-forest-soft:#0E2A20; --wf-forest-text:#3FD996; --wf-gold-soft:#2E2211; --wf-gold-text:#F5BE5F;
+  --wf-rose-dark:#F0879B; --wf-rose-soft:#2C151B; --wf-line:#1C2230; --wf-line-soft:#161B27;
+  --wf-muted:#717A90; --wf-muted-light:#414A5E; --wf-text-soft:#B9C0D2;
+  --wf-input-border:#1F2634; --wf-input-bg:#0B0F17; --wf-field-label:#8791A8;
+  --wf-table-head-bg:#0B0F18; --wf-divider:#171D29; --wf-danger-border:#3D1D26;
+  --wf-danger-hover-bg:#20121A; --wf-header-bg:rgba(8,11,18,0.82);
 }
-.wf-root{display:flex;height:100vh;height:100dvh;min-height:640px;max-height:100vh;max-height:100dvh;background:${T.paper};font-family:'Inter',sans-serif;color:${T.text};position:relative;overflow:hidden;border-radius:16px;box-shadow:0 1px 2px rgba(18,32,61,0.05),0 20px 48px -16px rgba(18,32,61,0.22);transition:background .15s ease,color .15s ease;}
-.wf-sidebar{background:linear-gradient(175deg,${BRAND.ink} 0%,${BRAND.inkDark} 100%);color:#fff;width:250px;flex-shrink:0;display:flex;flex-direction:column;transition:transform .25s cubic-bezier(.4,0,.2,1);}
+.wf-root{display:flex;height:100vh;height:100dvh;min-height:640px;max-height:100vh;max-height:100dvh;background:${T.paper};font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.text};position:relative;overflow:hidden;border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,0.02),0 16px 40px -18px rgba(5,8,16,0.35);border:1px solid ${T.line};transition:background .15s ease,color .15s ease;}
+.wf-sidebar{background:linear-gradient(180deg,${BRAND.ink} 0%,${BRAND.inkDark} 100%);color:#fff;width:246px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,0.06);transition:transform .25s cubic-bezier(.4,0,.2,1);}
 .wf-sidebar-inner{display:flex;flex-direction:column;height:100%;}
-.wf-logo-badge{width:34px;height:34px;border-radius:10px;background:linear-gradient(145deg,${T.forest},${T.forestDark});display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;font-family:'Space Grotesk',sans-serif;flex-shrink:0;box-shadow:0 2px 8px rgba(46,111,78,0.4),inset 0 1px 0 rgba(255,255,255,0.18);}
-.wf-nav-item{position:relative;width:100%;display:flex;align-items:center;gap:11px;padding:10px 14px;border-radius:10px;font-size:13.5px;font-weight:500;background:transparent;color:#AEB8CC;border:none;cursor:pointer;text-align:left;transition:background .15s ease,color .15s ease;}
-.wf-nav-item:hover{background:rgba(255,255,255,0.07);color:#fff;}
-.wf-nav-item.active{background:rgba(255,255,255,0.09);color:#fff;font-weight:600;}
-.wf-nav-item.active::before{content:"";position:absolute;left:-10px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:${T.gold};}
+.wf-logo-badge{width:32px;height:32px;border-radius:7px;background:${T.gold};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#1A1300;font-family:'JetBrains Mono',monospace;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);}
+.wf-nav-eyebrow{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#4C5670;padding:4px 14px 8px;}
+.wf-nav-item{position:relative;width:100%;display:flex;align-items:center;gap:11px;padding:9px 14px;border-radius:7px;font-size:13.5px;font-weight:500;background:transparent;color:#8891A6;border:none;cursor:pointer;text-align:left;transition:background .15s ease,color .15s ease;}
+.wf-nav-item:hover{background:rgba(255,255,255,0.045);color:#fff;}
+.wf-nav-item.active{background:rgba(240,168,59,0.09);color:#fff;font-weight:600;}
+.wf-nav-item.active::before{content:"";position:absolute;left:-10px;top:6px;bottom:6px;width:2px;border-radius:0;background:${T.gold};}
 .wf-main{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;background:${T.paper};}
-.wf-header{background:${T.headerBg};backdrop-filter:blur(8px);border-bottom:1px solid ${T.lineSoft};padding:14px 22px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;transition:background .15s ease,border-color .15s ease;}
+.wf-header{background:${T.headerBg};backdrop-filter:blur(8px);border-bottom:1px solid ${T.lineSoft};padding:13px 22px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;transition:background .15s ease,border-color .15s ease;}
 .wf-content{flex:1;overflow-y:auto;padding:22px;}
-.wf-card{background:${T.card};border-radius:14px;border:1px solid ${T.line};box-shadow:0 1px 2px rgba(18,32,61,0.04);transition:box-shadow .15s ease,background .15s ease,border-color .15s ease;}
-.wf-btn{display:inline-flex;align-items:center;gap:6px;font-weight:600;border-radius:10px;font-size:13px;padding:9px 15px;border:1px solid transparent;cursor:pointer;transition:background .15s ease,transform .1s ease,box-shadow .15s ease;}
+.wf-card{background:${T.card};border-radius:9px;border:1px solid ${T.line};box-shadow:none;transition:box-shadow .15s ease,background .15s ease,border-color .15s ease;}
+.wf-btn{display:inline-flex;align-items:center;gap:6px;font-weight:600;border-radius:7px;font-size:13px;padding:9px 15px;border:1px solid transparent;cursor:pointer;transition:background .15s ease,transform .1s ease,box-shadow .15s ease;}
 .wf-btn:active:not(:disabled){transform:scale(.97);}
 .wf-btn:disabled{opacity:.5;cursor:not-allowed;}
 .wf-btn-sm{padding:6px 10px;font-size:12px;}
-.wf-btn-primary{background:${BRAND.ink};color:#fff;box-shadow:0 1px 2px rgba(18,32,61,0.18);}
-.wf-btn-primary:hover:not(:disabled){background:${BRAND.inkDark};}
-.wf-btn-accent{background:${T.forest};color:#fff;box-shadow:0 1px 2px rgba(46,111,78,0.22);}
+.wf-btn-primary{background:${T.gold};color:#1A1300;box-shadow:0 1px 2px rgba(240,168,59,0.25);}
+.wf-btn-primary:hover:not(:disabled){background:#D89430;}
+.wf-btn-accent{background:${T.forest};color:#fff;box-shadow:0 1px 2px rgba(31,162,107,0.22);}
 .wf-btn-accent:hover:not(:disabled){background:${T.forestDark};}
 .wf-btn-ghost{background:transparent;color:${T.ink};border-color:${T.line};}
-.wf-btn-ghost:hover:not(:disabled){background:${T.paper};}
+.wf-btn-ghost:hover:not(:disabled){background:${T.tableHeadBg};}
 .wf-btn-danger{background:transparent;color:${T.rose};border-color:${T.dangerBorder};}
 .wf-btn-danger:hover:not(:disabled){background:${T.dangerHoverBg};}
 .wf-btn-danger-solid{background:${T.rose};color:#fff;}
 .wf-btn-danger-solid:hover:not(:disabled){background:${T.roseDark};}
-.wf-input{width:100%;padding:9px 12px;border-radius:10px;border:1px solid ${T.inputBorder};font-size:13px;background:${T.inputBg};color:${T.text};outline:none;font-family:inherit;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
-.wf-input:focus{border-color:${T.forest};box-shadow:0 0 0 3px rgba(46,111,78,0.15);}
-.wf-field-label{display:block;font-size:11px;font-weight:700;color:${T.fieldLabel};margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;}
+.wf-input{width:100%;padding:9px 12px;border-radius:7px;border:1px solid ${T.inputBorder};font-size:13px;background:${T.inputBg};color:${T.text};outline:none;font-family:inherit;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
+.wf-input:focus{border-color:${T.gold};box-shadow:0 0 0 3px rgba(240,168,59,0.16);}
+.wf-field-label{display:block;font-size:11px;font-weight:700;color:${T.fieldLabel};margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;}
 .wf-dp-wrap{position:relative;display:inline-block;width:100%;}
-.wf-dp-trigger{width:100%;padding:9px 12px;border-radius:10px;border:1px solid ${T.inputBorder};font-size:13px;background:${T.inputBg};color:${T.text};outline:none;font-family:inherit;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;text-align:left;}
-.wf-dp-trigger:hover{border-color:${T.forest};}
-.wf-dp-trigger.open{border-color:${T.forest};box-shadow:0 0 0 3px rgba(46,111,78,0.15);}
+.wf-dp-trigger{width:100%;padding:9px 12px;border-radius:7px;border:1px solid ${T.inputBorder};font-size:13px;background:${T.inputBg};color:${T.text};outline:none;font-family:inherit;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;text-align:left;}
+.wf-dp-trigger:hover{border-color:${T.gold};}
+.wf-dp-trigger.open{border-color:${T.gold};box-shadow:0 0 0 3px rgba(240,168,59,0.16);}
 .wf-dp-placeholder{color:${T.muted};}
-.wf-dp-pop{position:absolute;z-index:60;top:calc(100% + 6px);left:0;min-width:264px;background:${T.card};border:1px solid ${T.line};border-radius:14px;box-shadow:0 12px 32px rgba(18,32,61,0.18);padding:12px;animation:wf-pop .15s cubic-bezier(.2,.9,.3,1.2);}
+.wf-dp-pop{position:absolute;z-index:60;top:calc(100% + 6px);left:0;min-width:264px;background:${T.card};border:1px solid ${T.line};border-radius:10px;box-shadow:0 12px 32px rgba(5,8,16,0.28);padding:12px;animation:wf-pop .15s cubic-bezier(.2,.9,.3,1.2);}
 .wf-dp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.wf-dp-nav{background:none;border:none;cursor:pointer;color:${T.muted};display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;transition:background .12s ease,color .12s ease;flex-shrink:0;}
+.wf-dp-nav{background:none;border:none;cursor:pointer;color:${T.muted};display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:6px;transition:background .12s ease,color .12s ease;flex-shrink:0;}
 .wf-dp-nav:hover{background:${T.tableHeadBg};color:${T.ink};}
-.wf-dp-title{font-size:13px;font-weight:700;color:${T.ink};font-family:'Space Grotesk',sans-serif;}
+.wf-dp-title{font-size:13px;font-weight:700;color:${T.ink};font-family:'Sora','Noto Sans Khmer',sans-serif;}
 .wf-dp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
 .wf-dp-dow{font-size:10px;font-weight:700;color:${T.muted};text-align:center;padding:4px 0;text-transform:uppercase;}
-.wf-dp-day{font-size:12.5px;text-align:center;padding:7px 0;border-radius:8px;cursor:pointer;color:${T.text};background:none;border:1px solid transparent;transition:background .12s ease,color .12s ease;}
+.wf-dp-day{font-size:12.5px;text-align:center;padding:7px 0;border-radius:6px;cursor:pointer;color:${T.text};background:none;border:1px solid transparent;transition:background .12s ease,color .12s ease;}
 .wf-dp-day:hover{background:${T.tableHeadBg};}
 .wf-dp-day.outside{color:${T.mutedLight};}
-.wf-dp-day.today{border-color:${T.forest};font-weight:700;}
-.wf-dp-day.selected{background:${T.forest};color:#fff;font-weight:700;}
-.wf-dp-day.selected:hover{background:${T.forestDark};}
+.wf-dp-day.today{border-color:${T.gold};font-weight:700;}
+.wf-dp-day.selected{background:${T.gold};color:#1A1300;font-weight:700;}
+.wf-dp-day.selected:hover{background:#D89430;}
 .wf-dp-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid ${T.lineSoft};}
 .wf-dp-link{background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:${T.forestText};padding:2px 4px;border-radius:6px;}
 .wf-dp-link:hover{background:${T.forestSoft};}
-.wf-tp-pop{position:absolute;z-index:60;top:calc(100% + 6px);left:0;background:${T.card};border:1px solid ${T.line};border-radius:14px;box-shadow:0 12px 32px rgba(18,32,61,0.18);padding:10px;display:flex;flex-direction:column;animation:wf-pop .15s cubic-bezier(.2,.9,.3,1.2);}
+.wf-tp-pop{position:absolute;z-index:60;top:calc(100% + 6px);left:0;background:${T.card};border:1px solid ${T.line};border-radius:10px;box-shadow:0 12px 32px rgba(5,8,16,0.28);padding:10px;display:flex;flex-direction:column;animation:wf-pop .15s cubic-bezier(.2,.9,.3,1.2);}
 .wf-tp-cols{display:flex;align-items:center;gap:6px;}
 .wf-tp-col{width:50px;height:168px;overflow-y:auto;scroll-snap-type:y mandatory;border-radius:8px;background:${T.tableHeadBg};scrollbar-width:none;}
 .wf-tp-col::-webkit-scrollbar{width:0;height:0;}
 .wf-tp-pad{height:68px;flex-shrink:0;scroll-snap-align:none;}
 .wf-tp-item{scroll-snap-align:center;text-align:center;padding:8px 0;font-size:13px;font-family:'JetBrains Mono',monospace;color:${T.text};cursor:pointer;border-radius:6px;transition:background .12s ease,color .12s ease;}
 .wf-tp-item:hover{background:${T.line};}
-.wf-tp-item.selected{background:${T.forest};color:#fff;font-weight:700;}
+.wf-tp-item.selected{background:${T.gold};color:#1A1300;font-weight:700;}
 .wf-tp-sep{font-weight:700;color:${T.muted};padding-bottom:2px;}
-.wf-modal-overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(8,12,24,0.55);backdrop-filter:blur(2px);animation:wf-fade .15s ease;}
-.wf-modal{background:${T.card};border-radius:16px;box-shadow:0 24px 64px rgba(18,32,61,0.35);width:100%;max-height:90vh;overflow-y:auto;animation:wf-pop .18s cubic-bezier(.2,.9,.3,1.2);}
-.wf-modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid ${T.lineSoft};position:sticky;top:0;background:${T.card};border-radius:16px 16px 0 0;}
+.wf-modal-overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(3,5,10,0.65);backdrop-filter:blur(2px);animation:wf-fade .15s ease;}
+.wf-modal{background:${T.card};border-radius:11px;border:1px solid ${T.line};box-shadow:0 24px 64px rgba(3,5,10,0.5);width:100%;max-height:90vh;overflow-y:auto;animation:wf-pop .18s cubic-bezier(.2,.9,.3,1.2);}
+.wf-modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid ${T.lineSoft};position:sticky;top:0;background:${T.card};border-radius:11px 11px 0 0;}
 .wf-avatar{border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;flex-shrink:0;}
-.wf-badge{display:inline-block;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;letter-spacing:.02em;white-space:nowrap;}
+.wf-badge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.02em;white-space:nowrap;}
 .wf-table{width:100%;font-size:13px;border-collapse:collapse;}
-.wf-table th{text-align:left;font-size:11px;color:${T.muted};text-transform:uppercase;padding:11px 16px;background:${T.tableHeadBg};border-bottom:1px solid ${T.lineSoft};font-weight:700;letter-spacing:.03em;}
-.wf-table td{padding:10px 16px;border-bottom:1px solid ${T.paper};}
+.wf-table th{text-align:left;font-size:10.5px;color:${T.muted};text-transform:uppercase;padding:11px 16px;background:${T.tableHeadBg};border-bottom:1px solid ${T.lineSoft};font-weight:700;letter-spacing:.05em;font-family:'JetBrains Mono',monospace;}
+.wf-table td{padding:10px 16px;border-bottom:1px solid ${T.lineSoft};}
 .wf-table tr:last-child td{border-bottom:none;}
 .wf-table tbody tr{transition:background .12s ease;}
 .wf-table tbody tr:hover{background:${T.tableHeadBg};}
 .wf-grid{display:grid;gap:16px;}
-.wf-punch-clock{font-size:34px;font-weight:700;font-family:'JetBrains Mono',monospace;color:${T.ink};font-variant-numeric:tabular-nums;}
+.wf-punch-clock{font-size:34px;font-weight:700;font-family:'JetBrains Mono',monospace;color:${T.ink};font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
 .wf-menu-btn{display:none;background:none;border:none;color:${T.ink};cursor:pointer;padding:4px;}
 .wf-overlay-scrim{display:none;}
 .wf-content::-webkit-scrollbar,.wf-sidebar nav::-webkit-scrollbar,.wf-modal::-webkit-scrollbar{width:8px;}
@@ -1253,15 +1531,15 @@ html,body,#root{height:100%;}
 .wf-menu-btn,.wf-btn{transition:background .15s ease,transform .12s ease,box-shadow .15s ease,color .15s ease;}
 .wf-bottomnav.wf-bottomnav-hidden{display:none !important;}
 .wf-role-badge{white-space:nowrap;flex-shrink:0;}
-.wf-bottomnav{display:none;position:absolute;left:0;right:0;bottom:0;z-index:45;background:${T.headerBg};backdrop-filter:blur(10px);border-top:1px solid ${T.lineSoft};align-items:stretch;justify-content:space-around;padding:5px 2px calc(5px + env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(18,32,61,0.06);}
-.wf-bottomnav-item{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;color:${T.muted};padding:5px 2px 4px;border-radius:12px;font-size:10px;font-weight:600;transition:color .15s ease;}
+.wf-bottomnav{display:none;position:absolute;left:0;right:0;bottom:0;z-index:45;background:${T.headerBg};backdrop-filter:blur(10px);border-top:1px solid ${T.lineSoft};align-items:stretch;justify-content:space-around;padding:5px 2px calc(5px + env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(5,8,16,0.08);}
+.wf-bottomnav-item{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;color:${T.muted};padding:5px 2px 4px;border-radius:9px;font-size:10px;font-weight:600;transition:color .15s ease;}
 .wf-bottomnav-item span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.wf-bottomnav-item.active{color:${T.forestText};}
-.wf-bnav-icon-wrap{width:38px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:10px;transition:background .15s ease;}
-.wf-bottomnav-item.active .wf-bnav-icon-wrap{background:${T.forestSoft};}
+.wf-bottomnav-item.active{color:${T.goldText};}
+.wf-bnav-icon-wrap{width:38px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:background .15s ease;}
+.wf-bottomnav-item.active .wf-bnav-icon-wrap{background:${T.goldSoft};}
 .wf-bottomnav-item .wf-bnav-dot{position:absolute;top:2px;right:calc(50% - 20px);width:7px;height:7px;border-radius:999px;background:${T.rose};border:1.5px solid ${T.card};}
 @media (max-width: 820px){
-  .wf-sidebar{position:absolute;inset:0 auto 0 0;z-index:40;transform:translateX(-100%);height:100%;box-shadow:8px 0 24px rgba(0,0,0,0.25);}
+  .wf-sidebar{position:absolute;inset:0 auto 0 0;z-index:40;transform:translateX(-100%);height:100%;box-shadow:8px 0 24px rgba(0,0,0,0.4);}
   .wf-sidebar.open{transform:translateX(0);}
   .wf-menu-btn{display:inline-flex;}
   .wf-overlay-scrim.open{display:block;position:absolute;inset:0;background:rgba(18,32,61,0.45);z-index:35;backdrop-filter:blur(1px);}
@@ -1286,7 +1564,7 @@ function useGlobalStyle() {
       link.id = "wf-fonts";
       link.rel = "stylesheet";
       link.href =
-        "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap";
+        "https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Khmer:wght@400;500;600;700&display=swap";
       document.head.appendChild(link);
     }
   }, []);
@@ -2252,6 +2530,7 @@ const REALTIME_TABLES = [
   "admins",
   "offices",
   "payroll_paid",
+  "role_permissions",
 ];
 const realtimeHandlers = new Map(REALTIME_TABLES.map((t) => [t, new Set()]));
 let realtimeChannel = null;
@@ -3054,10 +3333,10 @@ function Pagination({ page, pageCount, setPage, total, rangeStart, rangeEnd }) {
   );
 }
 const NOTIF_TONE = {
-  gold: "#C08A2E",
-  rose: "#A93E4C",
-  forest: "#2E6F4E",
-  blue: "#3E5C8A",
+  gold: "#F0A83B",
+  rose: "#E5637A",
+  forest: "#1FA26B",
+  blue: "#5B8DEF",
 };
 // notification_reads stores, per user (admin or employee id), which
 // notification ids they've already seen. This used to live in
@@ -3369,7 +3648,7 @@ function Modal({ title, onClose, children, width = 480 }) {
         <div className="wf-modal-head">
           <h3
             style={{
-              fontFamily: "'Space Grotesk',sans-serif",
+              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
               fontWeight: 600,
               color: T.ink,
               flex: 1,
@@ -3805,79 +4084,81 @@ const LOGIN_CSS = `
 .wf-login-root {
   display:flex; align-items:center; justify-content:center;
   min-height:100vh; min-height:100dvh; position:relative; overflow:hidden;
-  background: linear-gradient(145deg, #0B1730 0%, #12203D 45%, #1a2e50 100%);
+  background: linear-gradient(160deg, #050810 0%, #0A0F1A 55%, #0D1420 100%);
 }
 .wf-login-bg {
   position:absolute; inset:-40px; z-index:0; pointer-events:none;
-  background: radial-gradient(ellipse 80% 60% at 20% 30%, rgba(46,111,78,0.18) 0%, transparent 60%),
-              radial-gradient(ellipse 60% 80% at 80% 70%, rgba(62,92,138,0.15) 0%, transparent 60%),
-              radial-gradient(ellipse 50% 40% at 60% 10%, rgba(192,138,46,0.10) 0%, transparent 60%);
+  background: radial-gradient(ellipse 80% 60% at 20% 30%, rgba(240,168,59,0.10) 0%, transparent 60%),
+              radial-gradient(ellipse 60% 80% at 80% 70%, rgba(91,141,239,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse 50% 40% at 60% 10%, rgba(31,162,107,0.08) 0%, transparent 60%);
   animation: wf-bg-drift 14s ease-in-out infinite, wf-bg-hue 22s ease-in-out infinite;
   will-change: transform, filter;
 }
 .wf-login-orbs { position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
 .wf-login-orb {
-  position:absolute; border-radius:50%; filter:blur(50px); opacity:.55;
+  position:absolute; border-radius:50%; filter:blur(50px); opacity:.4;
   will-change: transform;
 }
 .wf-login-orb-1 {
   width:260px; height:260px; top:8%; left:8%;
-  background:radial-gradient(circle,rgba(46,111,78,0.55),transparent 70%);
+  background:radial-gradient(circle,rgba(31,162,107,0.5),transparent 70%);
   animation: wf-orb-a 16s ease-in-out infinite;
 }
 .wf-login-orb-2 {
   width:320px; height:320px; bottom:6%; right:6%;
-  background:radial-gradient(circle,rgba(62,92,138,0.5),transparent 70%);
+  background:radial-gradient(circle,rgba(91,141,239,0.45),transparent 70%);
   animation: wf-orb-b 20s ease-in-out infinite;
 }
 .wf-login-orb-3 {
   width:200px; height:200px; top:55%; left:2%;
-  background:radial-gradient(circle,rgba(192,138,46,0.4),transparent 70%);
+  background:radial-gradient(circle,rgba(240,168,59,0.4),transparent 70%);
   animation: wf-orb-c 18s ease-in-out infinite;
 }
 .wf-login-orb-4 {
   width:180px; height:180px; top:4%; right:16%;
-  background:radial-gradient(circle,rgba(140,49,64,0.35),transparent 70%);
+  background:radial-gradient(circle,rgba(229,99,122,0.3),transparent 70%);
   animation: wf-orb-d 15s ease-in-out infinite;
 }
 .wf-login-card {
   position:relative; z-index:2;
   width:100%; max-width:420px; margin:16px;
   padding:36px 32px 28px;
-  background:rgba(255,255,255,0.97);
+  background:rgba(14,18,27,0.86);
   backdrop-filter:blur(24px);
-  border-radius:24px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 32px 80px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.9);
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 32px 80px rgba(0,0,0,0.55);
   animation: wf-float-up .6s cubic-bezier(.16,.9,.28,1) both;
 }
 .wf-login-logo-ring {
-  width:64px; height:64px; border-radius:20px;
-  background:linear-gradient(145deg,${T.forest},${T.forestDark});
+  width:56px; height:56px; border-radius:12px;
+  background:${T.gold};
   display:flex; align-items:center; justify-content:center;
-  font-weight:800; font-size:20px; color:#fff;
-  font-family:'Space Grotesk',sans-serif;
-  box-shadow:0 4px 20px rgba(46,111,78,0.45), inset 0 1px 0 rgba(255,255,255,0.2);
+  font-weight:800; font-size:18px; color:#1A1300;
+  font-family:'JetBrains Mono',monospace;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);
   position:relative;
 }
 .wf-login-logo-ring::before {
-  content:''; position:absolute; inset:-8px; border-radius:28px;
-  border:2px solid rgba(46,111,78,0.25);
+  content:''; position:absolute; inset:-8px; border-radius:18px;
+  border:1px solid rgba(240,168,59,0.3);
   animation: wf-pulse-ring 3s ease-in-out infinite;
 }
 .wf-login-input {
-  width:100%; padding:12px 14px; border-radius:12px;
-  border:1.5px solid #E2DDD4; font-size:14px;
-  background:#FDFCFA; color:${T.text}; outline:none;
+  width:100%; padding:12px 14px; border-radius:8px;
+  border:1.5px solid rgba(255,255,255,0.1); font-size:14px;
+  background:rgba(255,255,255,0.04); color:#EEF1F6; outline:none;
   font-family:inherit; transition:border-color .25s ease, box-shadow .25s ease, background .25s ease, transform .15s ease;
   box-sizing:border-box;
 }
+.wf-login-input::placeholder { color:#5B6478; }
 .wf-login-input:focus {
-  border-color:${T.forest}; background:#fff;
-  box-shadow:0 0 0 4px rgba(46,111,78,0.12);
+  border-color:${T.gold}; background:rgba(255,255,255,0.06);
+  box-shadow:0 0 0 4px rgba(240,168,59,0.14);
   transform:translateY(-1px);
 }
 .wf-login-btn {
-  width:100%; padding:13px; border:none; border-radius:14px;
+  width:100%; padding:13px; border:none; border-radius:9px;
   font-size:15px; font-weight:700; cursor:pointer; display:flex;
   align-items:center; justify-content:center; gap:8px;
   font-family:inherit; transition:transform .2s cubic-bezier(.2,.9,.3,1), box-shadow .2s ease, filter .2s ease;
@@ -3886,28 +4167,29 @@ const LOGIN_CSS = `
 .wf-login-btn:hover:not(:disabled) { transform:translateY(-1px); }
 .wf-login-btn:active:not(:disabled) { transform:scale(.97) translateY(0); }
 .wf-login-btn-emp {
-  background:linear-gradient(135deg,${T.forest} 0%,${T.forestDark} 100%);
-  color:#fff;
-  box-shadow:0 4px 16px rgba(46,111,78,0.35);
+  background:${T.gold};
+  color:#1A1300;
+  box-shadow:0 4px 16px rgba(240,168,59,0.3);
 }
-.wf-login-btn-emp:hover { box-shadow:0 6px 24px rgba(46,111,78,0.45); filter:brightness(1.06); }
+.wf-login-btn-emp:hover { box-shadow:0 6px 24px rgba(240,168,59,0.4); filter:brightness(1.05); }
 .wf-login-btn-adm {
-  background:linear-gradient(135deg,${BRAND.ink} 0%,${BRAND.inkDark} 100%);
+  background:rgba(255,255,255,0.06);
   color:#fff;
-  box-shadow:0 4px 16px rgba(18,32,61,0.35);
+  border:1px solid rgba(255,255,255,0.14);
+  box-shadow:none;
 }
-.wf-login-btn-adm:hover { box-shadow:0 6px 24px rgba(18,32,61,0.45); filter:brightness(1.1); }
+.wf-login-btn-adm:hover { background:rgba(255,255,255,0.1); }
 .wf-login-divider { display:flex; align-items:center; gap:10px; margin:18px 0; }
-.wf-login-divider::before,.wf-login-divider::after { content:''; flex:1; height:1px; background:#ECEAE3; }
+.wf-login-divider::before,.wf-login-divider::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.1); }
 .wf-login-error {
   display:flex; align-items:center; gap:7px; font-size:12.5px;
-  color:${T.rose}; background:${T.roseSoft}; border-radius:10px;
-  padding:9px 12px; margin-bottom:14px; border:1px solid #F0D4D8;
+  color:#F0879B; background:rgba(229,99,122,0.12); border-radius:8px;
+  padding:9px 12px; margin-bottom:14px; border:1px solid rgba(229,99,122,0.25);
 }
 .wf-login-demo {
-  margin-top:20px; padding:11px 14px; background:#F7F5EE;
-  border-radius:12px; font-size:11px; color:${T.muted};
-  line-height:1.7; border:1px solid #EDE9DF;
+  margin-top:20px; padding:11px 14px; background:rgba(255,255,255,0.04);
+  border-radius:8px; font-size:11px; color:#8891A6;
+  line-height:1.7; border:1px solid rgba(255,255,255,0.07);
 }
 `;
 function useLoginStyle() {
@@ -3945,7 +4227,7 @@ function LoginField({ label, children }) {
         style={{
           fontSize: 11.5,
           fontWeight: 700,
-          color: "#6B6455",
+          color: "#8A93A8",
           marginBottom: 7,
           textTransform: "uppercase",
           letterSpacing: ".04em",
@@ -4030,15 +4312,15 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
           <div
             style={{
               marginTop: 14,
-              fontFamily: "'Space Grotesk',sans-serif",
+              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
               fontWeight: 700,
               fontSize: 20,
-              color: T.ink,
+              color: "#EEF1F6",
             }}
           >
             {displayName}
           </div>
-          <div style={{ fontSize: 13, color: T.muted, marginTop: 4 }}>
+          <div style={{ fontSize: 13, color: "#8891A6", marginTop: 4 }}>
             {L.employeePortal}
           </div>
         </div>
@@ -4144,7 +4426,7 @@ function AdminLoginScreen({ admins, onLogin, go }) {
             background: "none",
             border: "none",
             cursor: "pointer",
-            color: T.muted,
+            color: "#8891A6",
             fontSize: 12.5,
             fontWeight: 600,
             marginBottom: 20,
@@ -4163,16 +4445,14 @@ function AdminLoginScreen({ admins, onLogin, go }) {
         >
           <div
             style={{
-              width: 64,
-              height: 64,
-              borderRadius: 20,
-              background: branding.logo
-                ? "#fff"
-                : "linear-gradient(145deg,#5C4B9E,#3D3070)",
+              width: 56,
+              height: 56,
+              borderRadius: 12,
+              background: branding.logo ? "#fff" : T.blue,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 4px 20px rgba(92,75,158,0.4)",
+              boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.25)",
               overflow: "hidden",
               border: branding.logo ? `1px solid ${T.line}` : "none",
             }}
@@ -4184,21 +4464,21 @@ function AdminLoginScreen({ admins, onLogin, go }) {
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             ) : (
-              <ShieldCheck size={28} color="#fff" />
+              <ShieldCheck size={26} color="#fff" />
             )}
           </div>
           <div
             style={{
               marginTop: 14,
-              fontFamily: "'Space Grotesk',sans-serif",
+              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
               fontWeight: 700,
               fontSize: 20,
-              color: T.ink,
+              color: "#EEF1F6",
             }}
           >
             {L.adminTitle}
           </div>
-          <div style={{ fontSize: 13, color: T.muted, marginTop: 4 }}>
+          <div style={{ fontSize: 13, color: "#8891A6", marginTop: 4 }}>
             {displayName}
           </div>
         </div>
@@ -4497,7 +4777,7 @@ function Dashboard({
         <p style={{ color: "#A9B4C7", fontSize: 13 }}>{t.dash.welcome}</p>
         <h2
           style={{
-            fontFamily: "'Space Grotesk',sans-serif",
+            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
             fontSize: 24,
             fontWeight: 600,
             marginTop: 2,
@@ -4577,7 +4857,7 @@ function Dashboard({
       <Card style={{ padding: 18 }}>
         <h3
           style={{
-            fontFamily: "'Space Grotesk',sans-serif",
+            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
             fontWeight: 600,
             color: T.ink,
             marginBottom: 12,
@@ -4798,7 +5078,7 @@ function ChartCard({ title, subtitle, children, noData, noDataLabel }) {
     <Card style={{ padding: 18 }}>
       <h3
         style={{
-          fontFamily: "'Space Grotesk',sans-serif",
+          fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
           fontWeight: 600,
           color: T.ink,
           fontSize: 14,
@@ -4906,7 +5186,7 @@ function AnalyticsPage({
       >
         <h2
           style={{
-            fontFamily: "'Space Grotesk',sans-serif",
+            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
             fontSize: 20,
             fontWeight: 600,
             display: "flex",
@@ -7073,7 +7353,7 @@ function Attendance({
         <Card style={{ padding: 16 }}>
           <h3
             style={{
-              fontFamily: "'Space Grotesk',sans-serif",
+              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
               fontWeight: 600,
               color: T.ink,
               marginBottom: 12,
@@ -7573,6 +7853,7 @@ function LeaveRequests({
   attendance,
   setAttendance,
   isSuperAdmin,
+  canApprove,
 }) {
   const { t, lang } = useLang();
   const [modal, setModal] = useState(false);
@@ -7721,7 +8002,7 @@ function LeaveRequests({
               style={{
                 fontSize: 22,
                 fontWeight: 700,
-                fontFamily: "'Space Grotesk',sans-serif",
+                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
                 color: bal.remaining <= 0 ? T.rose : T.forestText,
               }}
             >
@@ -7760,7 +8041,7 @@ function LeaveRequests({
               style={{
                 fontSize: 22,
                 fontWeight: 700,
-                fontFamily: "'Space Grotesk',sans-serif",
+                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
                 color: sickBal.remaining <= 0 ? T.rose : T.blue,
               }}
             >
@@ -7941,44 +8222,44 @@ function LeaveRequests({
                     <LeaveDecisionNote r={r} admins={admins} />
                   </td>
                   <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                    {r.status === "pending" ? (
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: 6,
-                          justifyContent: "flex-end",
-                        }}
-                      >
-                        <Button
-                          size="sm"
-                          variant="accent"
-                          onClick={() => approve(r)}
-                        >
-                          {t.lv.approve}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="danger"
-                          onClick={() => setRejectFor(r)}
-                        >
-                          {t.lv.reject}
-                        </Button>
-                      </div>
-                    ) : (
-                      isSuperAdmin && (
-                        <button
-                          onClick={() => setConfirmDel(r)}
-                          style={{
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            color: T.mutedLight,
-                          }}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      )
-                    )}
+                    {r.status === "pending"
+                      ? canApprove && (
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: 6,
+                              justifyContent: "flex-end",
+                            }}
+                          >
+                            <Button
+                              size="sm"
+                              variant="accent"
+                              onClick={() => approve(r)}
+                            >
+                              {t.lv.approve}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="danger"
+                              onClick={() => setRejectFor(r)}
+                            >
+                              {t.lv.reject}
+                            </Button>
+                          </div>
+                        )
+                      : isSuperAdmin && (
+                          <button
+                            onClick={() => setConfirmDel(r)}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              color: T.mutedLight,
+                            }}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
                   </td>
                 </tr>
               );
@@ -8400,6 +8681,7 @@ function OvertimeRequests({
   otPolicy,
   setOtPolicy,
   isSuperAdmin,
+  canApprove,
   holidays,
 }) {
   const { t, lang } = useLang();
@@ -8636,44 +8918,44 @@ function OvertimeRequests({
                     <OtDecisionNote r={r} admins={admins} />
                   </td>
                   <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                    {r.status === "pending" ? (
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: 6,
-                          justifyContent: "flex-end",
-                        }}
-                      >
-                        <Button
-                          size="sm"
-                          variant="accent"
-                          onClick={() => approve(r)}
-                        >
-                          <ThumbsUp size={13} /> {t.ot.approve}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="danger"
-                          onClick={() => setRejectFor(r)}
-                        >
-                          <ThumbsDown size={13} /> {t.ot.reject}
-                        </Button>
-                      </div>
-                    ) : (
-                      isSuperAdmin && (
-                        <button
-                          onClick={() => setConfirmDel(r)}
-                          style={{
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            color: T.mutedLight,
-                          }}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      )
-                    )}
+                    {r.status === "pending"
+                      ? canApprove && (
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: 6,
+                              justifyContent: "flex-end",
+                            }}
+                          >
+                            <Button
+                              size="sm"
+                              variant="accent"
+                              onClick={() => approve(r)}
+                            >
+                              <ThumbsUp size={13} /> {t.ot.approve}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="danger"
+                              onClick={() => setRejectFor(r)}
+                            >
+                              <ThumbsDown size={13} /> {t.ot.reject}
+                            </Button>
+                          </div>
+                        )
+                      : isSuperAdmin && (
+                          <button
+                            onClick={() => setConfirmDel(r)}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              color: T.mutedLight,
+                            }}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
                   </td>
                 </tr>
               );
@@ -8871,6 +9153,7 @@ function AttendanceCorrections({
   attendance,
   setAttendance,
   isSuperAdmin,
+  canApprove,
 }) {
   const { t } = useLang();
   const [modal, setModal] = useState(false);
@@ -9129,44 +9412,44 @@ function AttendanceCorrections({
                     <AcDecisionNote r={r} admins={admins} />
                   </td>
                   <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                    {r.status === "pending" ? (
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: 6,
-                          justifyContent: "flex-end",
-                        }}
-                      >
-                        <Button
-                          size="sm"
-                          variant="accent"
-                          onClick={() => approve(r)}
-                        >
-                          <ThumbsUp size={13} /> {t.ac.approve}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="danger"
-                          onClick={() => setRejectFor(r)}
-                        >
-                          <ThumbsDown size={13} /> {t.ac.reject}
-                        </Button>
-                      </div>
-                    ) : (
-                      isSuperAdmin && (
-                        <button
-                          onClick={() => setConfirmDel(r)}
-                          style={{
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            color: T.mutedLight,
-                          }}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      )
-                    )}
+                    {r.status === "pending"
+                      ? canApprove && (
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: 6,
+                              justifyContent: "flex-end",
+                            }}
+                          >
+                            <Button
+                              size="sm"
+                              variant="accent"
+                              onClick={() => approve(r)}
+                            >
+                              <ThumbsUp size={13} /> {t.ac.approve}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="danger"
+                              onClick={() => setRejectFor(r)}
+                            >
+                              <ThumbsDown size={13} /> {t.ac.reject}
+                            </Button>
+                          </div>
+                        )
+                      : isSuperAdmin && (
+                          <button
+                            onClick={() => setConfirmDel(r)}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              color: T.mutedLight,
+                            }}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
                   </td>
                 </tr>
               );
@@ -9443,8 +9726,8 @@ function RatingStars({ value, onChange, size = 16 }) {
         >
           <Star
             size={size}
-            fill={n <= value ? "#D9A441" : "none"}
-            color={n <= value ? "#D9A441" : T.mutedLight}
+            fill={n <= value ? T.gold : "none"}
+            color={n <= value ? T.gold : T.mutedLight}
             strokeWidth={1.75}
           />
         </span>
@@ -10155,14 +10438,27 @@ function AdminAccountForm({ initial, onSave, onCancel }) {
       </Field>
       <Field label="សិទ្ធិ">
         <Select value={f.role} onChange={set("role")}>
-          <option value="manager">
-            អ្នកគ្រប់គ្រង HR (មិនអាចលុបទិន្នន័យបាន)
-          </option>
+          {ADMIN_RANKS.map((rank) => (
+            <option key={rank} value={rank}>
+              {adminRoleLabel(rank, lang)}
+            </option>
+          ))}
           <option value="superadmin">
-            អ្នកគ្រប់គ្រងជាន់ខ្ពស់ (សិទ្ធិពេញលេញ)
+            {adminRoleLabel("superadmin", lang)} — សិទ្ធិពេញលេញ
           </option>
         </Select>
       </Field>
+      <p
+        style={{
+          fontSize: 11.5,
+          color: T.muted,
+          marginTop: -8,
+          marginBottom: 14,
+        }}
+      >
+        តើតួនាទីនីមួយៗអាចធ្វើអ្វីបាន? កំណត់នៅទំព័រ "សិទ្ធិតួនាទី" (Superadmin
+        ប៉ុណ្ណោះ)
+      </p>
       <div
         style={{
           display: "flex",
@@ -10181,6 +10477,192 @@ function AdminAccountForm({ initial, onSave, onCancel }) {
           onClick={() => onSave(f)}
           disabled={!f.name || !f.username || !f.password}
         >
+          {t.save}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function RolePermissionsPage({ rolePermissions, setRolePermissions }) {
+  const { t, lang } = useLang();
+  // Local editable draft so clicking a checkbox doesn't fire a save on
+  // every click — one explicit "Save" commits the whole matrix at once.
+  const buildDraft = () => {
+    const map = {};
+    ADMIN_RANKS.forEach((rank) => {
+      const saved = rolePermissions.find((r) => r.id === rank);
+      map[rank] = saved
+        ? { ...DEFAULT_ROLE_PERMISSIONS[rank], ...saved }
+        : { ...DEFAULT_ROLE_PERMISSIONS[rank] };
+    });
+    return map;
+  };
+  const buildEmpDraft = () => {
+    const saved = rolePermissions.find((r) => r.id === EMPLOYEE_MODULES_ID);
+    return saved
+      ? { ...DEFAULT_EMPLOYEE_MODULES, ...saved }
+      : { ...DEFAULT_EMPLOYEE_MODULES };
+  };
+  const [draft, setDraft] = useState(buildDraft);
+  const [empDraft, setEmpDraft] = useState(buildEmpDraft);
+  const [dirty, setDirty] = useState(false);
+  // If another Superadmin saves changes elsewhere while this tab is open,
+  // pull in the fresh matrix — but only while this tab has no unsaved
+  // edits of its own, so we never silently overwrite someone mid-edit.
+  useEffect(() => {
+    if (!dirty) {
+      setDraft(buildDraft());
+      setEmpDraft(buildEmpDraft());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rolePermissions]);
+
+  const toggle = (rank, key) => {
+    setDraft((d) => ({ ...d, [rank]: { ...d[rank], [key]: !d[rank][key] } }));
+    setDirty(true);
+  };
+  const toggleEmp = (key) => {
+    setEmpDraft((d) => ({ ...d, [key]: !d[key] }));
+    setDirty(true);
+  };
+
+  const save = () => {
+    const next = ADMIN_RANKS.map((rank) => ({ id: rank, ...draft[rank] }));
+    next.push({ id: EMPLOYEE_MODULES_ID, ...empDraft });
+    setRolePermissions(next);
+    setDirty(false);
+  };
+
+  return (
+    <div>
+      <Card style={{ padding: 20, marginBottom: 18 }}>
+        <h2
+          style={{
+            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontSize: 18,
+            fontWeight: 600,
+            color: T.ink,
+          }}
+        >
+          {t.nav.rolePerms}
+        </h2>
+        <p style={{ fontSize: 12, color: T.muted, marginTop: 6 }}>
+          {lang === "en"
+            ? "Choose what each rank can access below. Superadmin always has full access (including managing admin accounts) and isn't shown here — that stays superadmin-exclusive."
+            : "កំណត់ថាតួនាទីនីមួយៗអាចប្រើមុខងារអ្វីខ្លះខាងក្រោម។ Superadmin មានសិទ្ធិពេញលេញជានិច្ច (រួមទាំងគ្រប់គ្រងគណនីអ្នកគ្រប់គ្រង) ដូច្នេះមិនបង្ហាញនៅទីនេះទេ — សិទ្ធិនោះនៅតែសម្រាប់ Superadmin ប៉ុណ្ណោះ។"}
+        </p>
+      </Card>
+      <Card style={{ overflowX: "auto", padding: 0, marginBottom: 24 }}>
+        <table className="wf-table">
+          <thead>
+            <tr>
+              <th style={{ whiteSpace: "nowrap" }}>
+                {lang === "en" ? "Rank" : "តួនាទី"}
+              </th>
+              {PERMISSION_MODULES.map((key) => (
+                <th
+                  key={key}
+                  style={{ textAlign: "center", whiteSpace: "nowrap" }}
+                >
+                  {permissionLabel(key, lang)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {ADMIN_RANKS.map((rank) => (
+              <tr key={rank}>
+                <td
+                  style={{
+                    fontWeight: 600,
+                    color: T.ink,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {adminRoleLabel(rank, lang)}
+                </td>
+                {PERMISSION_MODULES.map((key) => (
+                  <td key={key} style={{ textAlign: "center" }}>
+                    <input
+                      type="checkbox"
+                      checked={!!draft[rank]?.[key]}
+                      onChange={() => toggle(rank, key)}
+                      style={{ width: 16, height: 16, cursor: "pointer" }}
+                    />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Card>
+
+      <Card style={{ padding: 20, marginBottom: 18 }}>
+        <h2
+          style={{
+            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontSize: 18,
+            fontWeight: 600,
+            color: T.ink,
+          }}
+        >
+          {lang === "en"
+            ? "Employee Self-Service Portal"
+            : "កម្មវិធីសម្រាប់បុគ្គលិក (Self-Service)"}
+        </h2>
+        <p style={{ fontSize: 12, color: T.muted, marginTop: 6 }}>
+          {lang === "en"
+            ? "Turn features off here to hide them for every employee company-wide. This applies to all employees equally — they don't have ranks the way admin accounts do. Dashboard always stays on."
+            : "បិទមុខងារនៅទីនេះ ដើម្បីលាក់វាចេញពីបុគ្គលិកទាំងអស់ក្នុងក្រុមហ៊ុនតែម្តង។ ការកំណត់នេះអនុវត្តដូចគ្នាចំពោះបុគ្គលិកទាំងអស់ ព្រោះពួកគេគ្មានតួនាទីខុសៗគ្នាដូច admin ទេ។ Dashboard នៅតែបើកជានិច្ច។"}
+        </p>
+      </Card>
+      <Card style={{ overflowX: "auto", padding: 0 }}>
+        <table className="wf-table">
+          <thead>
+            <tr>
+              {EMPLOYEE_MODULES.map((key) => (
+                <th
+                  key={key}
+                  style={{ textAlign: "center", whiteSpace: "nowrap" }}
+                >
+                  {employeeModuleLabel(key, lang)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              {EMPLOYEE_MODULES.map((key) => (
+                <td key={key} style={{ textAlign: "center" }}>
+                  <input
+                    type="checkbox"
+                    checked={empDraft[key] !== false}
+                    onChange={() => toggleEmp(key)}
+                    style={{ width: 16, height: 16, cursor: "pointer" }}
+                  />
+                </td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+      </Card>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "center",
+          gap: 10,
+          marginTop: 16,
+        }}
+      >
+        {dirty && (
+          <span style={{ fontSize: 12, color: T.gold }}>
+            {lang === "en" ? "Unsaved changes" : "មិនទាន់រក្សាទុក"}
+          </span>
+        )}
+        <Button variant="accent" onClick={save} disabled={!dirty}>
           {t.save}
         </Button>
       </div>
@@ -10284,7 +10766,7 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
                       className="wf-badge"
                       style={
                         a.role === "superadmin"
-                          ? { background: "#EDE7F6", color: "#4A3B7A" }
+                          ? { background: "rgba(91,141,239,0.14)", color: T.blue }
                           : { background: T.forestSoft, color: T.forestText }
                       }
                     >
@@ -10680,7 +11162,7 @@ function MyProfile({
       <Card style={{ padding: 20 }}>
         <h3
           style={{
-            fontFamily: "'Space Grotesk',sans-serif",
+            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
             fontWeight: 600,
             color: T.ink,
             marginBottom: 4,
@@ -10767,7 +11249,7 @@ function AppearanceCard() {
     <Card style={{ padding: 20 }}>
       <h3
         style={{
-          fontFamily: "'Space Grotesk',sans-serif",
+          fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
           fontWeight: 600,
           color: T.ink,
           marginBottom: 4,
@@ -11029,7 +11511,7 @@ function AdminSettings({
       <Card style={{ padding: 20 }}>
         <h3
           style={{
-            fontFamily: "'Space Grotesk',sans-serif",
+            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
             fontWeight: 600,
             color: T.ink,
             marginBottom: 4,
@@ -11079,7 +11561,7 @@ function AdminSettings({
         <Card style={{ padding: 20 }}>
           <h3
             style={{
-              fontFamily: "'Space Grotesk',sans-serif",
+              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
               fontWeight: 600,
               color: T.ink,
               marginBottom: 4,
@@ -11118,7 +11600,7 @@ function AdminSettings({
                 flexShrink: 0,
                 color: "#fff",
                 fontWeight: 700,
-                fontFamily: "'Space Grotesk',sans-serif",
+                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
               }}
             >
               {brandForm.logo ? (
@@ -11321,7 +11803,7 @@ function AuditLogPage() {
         <div>
           <h2
             style={{
-              fontFamily: "'Space Grotesk',sans-serif",
+              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
               fontSize: 18,
               fontWeight: 600,
               color: T.ink,
@@ -11921,7 +12403,7 @@ function LoginActivityPage({
         <div>
           <h2
             style={{
-              fontFamily: "'Space Grotesk',sans-serif",
+              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
               fontSize: 18,
               fontWeight: 600,
               color: T.ink,
@@ -12722,7 +13204,7 @@ function Payslip({
             gap: 8,
             color: T.forest,
             fontWeight: 700,
-            fontFamily: "'Space Grotesk',sans-serif",
+            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
           }}
         >
           <Receipt size={20} /> {t.nav.myPayroll}
@@ -13554,18 +14036,50 @@ function buildNavAdmin(n) {
     { id: "shifts", label: n.shifts, icon: Watch },
     { id: "attendance", label: n.attendance, icon: Clock },
     { id: "holidays", label: n.holidays, icon: CalendarDays },
-    { id: "leave", label: n.leave, icon: CalendarDays },
-    { id: "ot", label: n.overtime, icon: Timer },
+    {
+      id: "leave",
+      label: n.leave,
+      icon: CalendarDays,
+      permission: "approveRequests",
+    },
+    {
+      id: "ot",
+      label: n.overtime,
+      icon: Timer,
+      permission: "approveRequests",
+    },
     { id: "payroll", label: n.payroll, icon: Wallet },
     { id: "review", label: n.performance, icon: Star },
-    { id: "attcorr", label: n.attCorrection, icon: CalendarClock },
-    { id: "admins", label: n.admins, icon: ShieldCheck, superadminOnly: true },
-    { id: "audits", label: n.audits, icon: History, superadminOnly: true },
+    {
+      id: "attcorr",
+      label: n.attCorrection,
+      icon: CalendarClock,
+      permission: "approveRequests",
+    },
+    {
+      id: "admins",
+      label: n.admins,
+      icon: ShieldCheck,
+      superadminOnly: true,
+    },
+    {
+      id: "rolePerms",
+      label: n.rolePerms,
+      icon: KeyRound,
+      superadminOnly: true,
+    },
+    {
+      id: "audits",
+      label: n.audits,
+      icon: History,
+      permission: "viewAuditLog",
+    },
     { id: "loginActivity", label: n.loginActivity, icon: Smartphone },
     { id: "settings", label: n.settings, icon: Settings2 },
   ];
 }
-function buildNavEmployee(n) {
+function buildNavEmployee(n, enabledModules) {
+  const enabled = enabledModules || DEFAULT_EMPLOYEE_MODULES;
   return [
     { id: "dashboard", label: n.dashboard, icon: LayoutDashboard },
     { id: "announcements", label: n.announcements, icon: Megaphone },
@@ -13578,7 +14092,7 @@ function buildNavEmployee(n) {
     { id: "documents", label: n.myDocuments, icon: FileText },
     { id: "loginActivity", label: n.loginActivity, icon: Smartphone },
     { id: "profile", label: n.myProfile, icon: UserCircle2 },
-  ];
+  ].filter((item) => item.id === "dashboard" || enabled[item.id] !== false);
 }
 
 // Compact 5-item tab bar shown on phones for the employee/staff role,
@@ -13586,13 +14100,14 @@ function buildNavEmployee(n) {
 // consumer apps (Grab, ABA...) so staff get one-tap access to the things
 // they touch daily. Less-frequent pages stay reachable via "More", which
 // opens the existing full side menu rather than duplicating it.
-function buildBottomNavEmployee(n) {
+function buildBottomNavEmployee(n, enabledModules) {
+  const enabled = enabledModules || DEFAULT_EMPLOYEE_MODULES;
   return [
     { id: "dashboard", label: n.dashboard, icon: LayoutDashboard },
     { id: "attendance", label: n.myAttendance, icon: Clock },
     { id: "leave", label: n.myLeave, icon: CalendarDays },
     { id: "payroll", label: n.myPayroll, icon: Wallet },
-  ];
+  ].filter((item) => item.id === "dashboard" || enabled[item.id] !== false);
 }
 
 function AppInner() {
@@ -13976,6 +14491,89 @@ function AppInner() {
   const [otPolicy, setOtPolicy, otPolicyReady] = useOtPolicy();
   const [payrollPolicy, setPayrollPolicy, payrollPolicyReady] =
     usePayrollPolicy();
+  // Superadmin-editable permission matrix: one row per rank (Officer,
+  // Senior, Supervisor, Manager, Senior Manager, Admin), each holding
+  // which modules that rank can access. `id` IS the rank name (e.g.
+  // "officer") — role_permissions has no separate numeric id, the rank
+  // name itself is the primary key, which lets this reuse the same
+  // generic upsert/delete-by-id logic as every other table above.
+  const [rolePermissions, setRolePermissions, rolePermsReady] =
+    useSupabaseArray("role_permissions", {
+      fromDb: (r) => ({
+        id: r.id,
+        manageDepartments: !!r.manage_departments,
+        manageEmployees: !!r.manage_employees,
+        approveRequests: !!r.approve_requests,
+        managePayroll: !!r.manage_payroll,
+        manageDocuments: !!r.manage_documents,
+        manageAnnouncements: !!r.manage_announcements,
+        manageSettings: !!r.manage_settings,
+        viewAuditLog: !!r.view_audit_log,
+        // Employee self-service module toggles — only meaningful on the
+        // single row where id === EMPLOYEE_MODULES_ID, but mapped for
+        // every row since the columns live on the same table. Coerced
+        // with ?? true rather than !! so a brand-new column (still null
+        // for every existing row right after the migration runs) reads
+        // as "on" instead of silently turning every module off.
+        announcements: r.emp_announcements ?? true,
+        attendance: r.emp_attendance ?? true,
+        leave: r.emp_leave ?? true,
+        ot: r.emp_ot ?? true,
+        payroll: r.emp_payroll ?? true,
+        review: r.emp_review ?? true,
+        attcorr: r.emp_attcorr ?? true,
+        documents: r.emp_documents ?? true,
+        loginActivity: r.emp_login_activity ?? true,
+        profile: r.emp_profile ?? true,
+      }),
+      toDb: (r) => ({
+        id: r.id,
+        manage_departments: r.manageDepartments,
+        manage_employees: r.manageEmployees,
+        approve_requests: r.approveRequests,
+        manage_payroll: r.managePayroll,
+        manage_documents: r.manageDocuments,
+        manage_announcements: r.manageAnnouncements,
+        manage_settings: r.manageSettings,
+        view_audit_log: r.viewAuditLog,
+        emp_announcements: r.announcements,
+        emp_attendance: r.attendance,
+        emp_leave: r.leave,
+        emp_ot: r.ot,
+        emp_payroll: r.payroll,
+        emp_review: r.review,
+        emp_attcorr: r.attcorr,
+        emp_documents: r.documents,
+        emp_login_activity: r.loginActivity,
+        emp_profile: r.profile,
+      }),
+      audit: true,
+      actorRef,
+    });
+  // { officer: {...}, senior: {...}, ... } — the saved matrix keyed by
+  // rank, falling back to DEFAULT_ROLE_PERMISSIONS for any rank without
+  // a saved row yet (fresh install, or a rank added after go-live).
+  const rolePermissionsMap = useMemo(() => {
+    const map = { ...DEFAULT_ROLE_PERMISSIONS };
+    rolePermissions.forEach((r) => {
+      map[r.id] = { ...DEFAULT_ROLE_PERMISSIONS[r.id], ...r };
+    });
+    return map;
+  }, [rolePermissions]);
+  // Company-wide switchboard for the employee self-service portal —
+  // saved as one row (id === EMPLOYEE_MODULES_ID) inside the same
+  // rolePermissions array as the admin rank matrix. Falls back to
+  // "everything on" until Superadmin has saved a custom set.
+  const employeeModules = useMemo(() => {
+    const saved = rolePermissions.find((r) => r.id === EMPLOYEE_MODULES_ID);
+    return saved
+      ? { ...DEFAULT_EMPLOYEE_MODULES, ...saved }
+      : { ...DEFAULT_EMPLOYEE_MODULES };
+  }, [rolePermissions]);
+  const moduleEnabled = useCallback(
+    (key) => employeeModules[key] !== false,
+    [employeeModules],
+  );
   // Session state stays personal (per device) on purpose — each phone
   // remembers only who is logged in on THAT phone, so employees never
   // see each other's login state.
@@ -14026,6 +14624,13 @@ function AppInner() {
       ? admins.find((a) => a.id === sessionAdmin) || null
       : null;
   const isSuperAdmin = currentAdmin?.role === "superadmin";
+  // can("managePayroll") etc. — the granular permission check pages
+  // should use going forward instead of isSuperAdmin, so a rank
+  // Superadmin has granted a module to can actually use it.
+  const can = useCallback(
+    (key) => canDo(currentAdmin, rolePermissionsMap, key),
+    [currentAdmin, rolePermissionsMap],
+  );
   const role =
     portal === "admin"
       ? currentAdmin
@@ -14037,9 +14642,14 @@ function AppInner() {
   const loggedIn = role === "admin" || !!currentEmp;
   const nav =
     role === "admin"
-      ? buildNavAdmin(t.nav).filter((n) => !n.superadminOnly || isSuperAdmin)
-      : buildNavEmployee(t.nav);
-  const bottomNav = role !== "admin" ? buildBottomNavEmployee(t.nav) : null;
+      ? buildNavAdmin(t.nav).filter(
+          (n) =>
+            (!n.superadminOnly || isSuperAdmin) &&
+            (!n.permission || can(n.permission)),
+        )
+      : buildNavEmployee(t.nav, employeeModules);
+  const bottomNav =
+    role !== "admin" ? buildBottomNavEmployee(t.nav, employeeModules) : null;
 
   // Keep actorRef in sync with whoever is signed in right now, so every
   // useSupabaseArray hook above always audits changes under the correct
@@ -14245,7 +14855,7 @@ function AppInner() {
                 style={{
                   fontWeight: 600,
                   fontSize: 15,
-                  fontFamily: "'Space Grotesk',sans-serif",
+                  fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
@@ -14269,9 +14879,12 @@ function AppInner() {
                 padding: "14px 10px",
                 display: "flex",
                 flexDirection: "column",
-                gap: 4,
+                gap: 3,
               }}
             >
+              <div className="wf-nav-eyebrow">
+                {lang === "km" ? "ម៉ឺនុយ" : "Menu"}
+              </div>
               {nav.map((n) => (
                 <button
                   key={n.id}
@@ -14404,16 +15017,32 @@ function AppInner() {
             <button className="wf-menu-btn" onClick={() => setNavOpen(true)}>
               <Menu size={20} />
             </button>
-            <h1
-              style={{
-                fontFamily: "'Space Grotesk',sans-serif",
-                fontWeight: 600,
-                color: T.ink,
-                fontSize: 16,
-              }}
-            >
-              {nav.find((n) => n.id === page)?.label}
-            </h1>
+            <div>
+              <div
+                style={{
+                  fontFamily: "'JetBrains Mono',monospace",
+                  fontSize: 10.5,
+                  fontWeight: 600,
+                  letterSpacing: ".08em",
+                  textTransform: "uppercase",
+                  color: T.muted,
+                  marginBottom: 2,
+                }}
+              >
+                {brandDisplayName}
+              </div>
+              <h1
+                style={{
+                  fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                  fontWeight: 700,
+                  color: T.ink,
+                  fontSize: 16,
+                  letterSpacing: "-.01em",
+                }}
+              >
+                {nav.find((n) => n.id === page)?.label}
+              </h1>
+            </div>
             <div
               style={{
                 marginLeft: "auto",
@@ -14422,6 +15051,9 @@ function AppInner() {
                 gap: 8,
               }}
             >
+              <div className="wf-role-badge">
+                <HeaderClock />
+              </div>
               {role !== "admin" && currentEmp && (
                 <span
                   className="wf-role-badge"
@@ -14447,10 +15079,10 @@ function AppInner() {
                   style={{
                     fontSize: 11,
                     fontWeight: 700,
-                    background: "#EDE7F6",
-                    color: "#4A3B7A",
+                    background: "rgba(91,141,239,0.14)",
+                    color: T.blue,
                     padding: "5px 10px",
-                    borderRadius: 8,
+                    borderRadius: 6,
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -14533,15 +15165,16 @@ function AppInner() {
                   payrollPolicy={payrollPolicy}
                 />
               )}
-              {page === "announcements" && (
-                <Announcements
-                  role={role}
-                  currentAdmin={currentAdmin}
-                  announcements={announcements}
-                  setAnnouncements={setAnnouncements}
-                  isSuperAdmin={isSuperAdmin}
-                />
-              )}
+              {page === "announcements" &&
+                (role === "admin" || moduleEnabled("announcements")) && (
+                  <Announcements
+                    role={role}
+                    currentAdmin={currentAdmin}
+                    announcements={announcements}
+                    setAnnouncements={setAnnouncements}
+                    isSuperAdmin={isSuperAdmin || can("manageAnnouncements")}
+                  />
+                )}
               {page === "employees" && role === "admin" && (
                 <Employees
                   employees={employees}
@@ -14549,7 +15182,7 @@ function AppInner() {
                   shifts={shifts}
                   offices={offices}
                   setEmployees={setEmployees}
-                  isSuperAdmin={isSuperAdmin}
+                  isSuperAdmin={isSuperAdmin || can("manageEmployees")}
                   currentAdmin={currentAdmin}
                   documents={documents}
                   setDocuments={setDocuments}
@@ -14560,7 +15193,7 @@ function AppInner() {
                   departments={departments}
                   setDepartments={setDepartments}
                   employees={employees}
-                  isSuperAdmin={isSuperAdmin}
+                  isSuperAdmin={isSuperAdmin || can("manageDepartments")}
                 />
               )}
               {page === "shifts" && role === "admin" && (
@@ -14568,45 +15201,48 @@ function AppInner() {
                   shifts={shifts}
                   setShifts={setShifts}
                   employees={employees}
-                  isSuperAdmin={isSuperAdmin}
+                  isSuperAdmin={isSuperAdmin || can("manageDepartments")}
                 />
               )}
-              {page === "attendance" && (
-                <Attendance
-                  role={role}
-                  currentEmp={currentEmp}
-                  employees={employees}
-                  shifts={shifts}
-                  attendance={attendance}
-                  setAttendance={setAttendance}
-                  isSuperAdmin={isSuperAdmin}
-                  offices={offices}
-                  setOffices={setOffices}
-                  holidays={holidays}
-                />
-              )}
+              {page === "attendance" &&
+                (role === "admin" || moduleEnabled("attendance")) && (
+                  <Attendance
+                    role={role}
+                    currentEmp={currentEmp}
+                    employees={employees}
+                    shifts={shifts}
+                    attendance={attendance}
+                    setAttendance={setAttendance}
+                    isSuperAdmin={isSuperAdmin}
+                    offices={offices}
+                    setOffices={setOffices}
+                    holidays={holidays}
+                  />
+                )}
               {page === "holidays" && role === "admin" && (
                 <Holidays
                   holidays={holidays}
                   setHolidays={setHolidays}
-                  isSuperAdmin={isSuperAdmin}
+                  isSuperAdmin={isSuperAdmin || can("manageDepartments")}
                 />
               )}
-              {page === "leave" && (
-                <LeaveRequests
-                  role={role}
-                  currentAdmin={currentAdmin}
-                  currentEmp={currentEmp}
-                  employees={employees}
-                  admins={admins}
-                  leaveRequests={leaveRequests}
-                  setLeaveRequests={setLeaveRequests}
-                  attendance={attendance}
-                  setAttendance={setAttendance}
-                  isSuperAdmin={isSuperAdmin}
-                />
-              )}
-              {page === "ot" && (
+              {page === "leave" &&
+                (role === "admin" || moduleEnabled("leave")) && (
+                  <LeaveRequests
+                    role={role}
+                    currentAdmin={currentAdmin}
+                    currentEmp={currentEmp}
+                    employees={employees}
+                    admins={admins}
+                    leaveRequests={leaveRequests}
+                    setLeaveRequests={setLeaveRequests}
+                    attendance={attendance}
+                    setAttendance={setAttendance}
+                    isSuperAdmin={isSuperAdmin || can("approveRequests")}
+                    canApprove={isSuperAdmin || can("approveRequests")}
+                  />
+                )}
+              {page === "ot" && (role === "admin" || moduleEnabled("ot")) && (
                 <OvertimeRequests
                   role={role}
                   currentAdmin={currentAdmin}
@@ -14617,52 +15253,60 @@ function AppInner() {
                   setOvertimeRequests={setOvertimeRequests}
                   otPolicy={otPolicy}
                   setOtPolicy={setOtPolicy}
-                  isSuperAdmin={isSuperAdmin}
+                  isSuperAdmin={isSuperAdmin || can("approveRequests")}
+                  canApprove={isSuperAdmin || can("approveRequests")}
                   holidays={holidays}
                 />
               )}
-              {page === "payroll" && (
-                <Payroll
-                  role={role}
-                  currentEmp={currentEmp}
-                  employees={employees}
-                  attendance={attendance}
-                  payrollPaid={payrollPaid}
-                  setPayrollPaid={setPayrollPaid}
-                  overtimeRequests={overtimeRequests}
-                  otPolicy={otPolicy}
-                  payrollPolicy={payrollPolicy}
-                  setPayrollPolicy={setPayrollPolicy}
-                />
-              )}
-              {page === "review" && (
-                <PerformanceReviews
-                  role={role}
-                  currentAdmin={currentAdmin}
-                  currentEmp={currentEmp}
-                  employees={employees}
-                  performanceReviews={performanceReviews}
-                  setPerformanceReviews={setPerformanceReviews}
-                  isSuperAdmin={isSuperAdmin}
-                />
-              )}
-              {page === "documents" && role !== "admin" && currentEmp && (
-                <MyDocuments currentEmp={currentEmp} documents={documents} />
-              )}
-              {page === "attcorr" && (
-                <AttendanceCorrections
-                  role={role}
-                  currentAdmin={currentAdmin}
-                  currentEmp={currentEmp}
-                  employees={employees}
-                  admins={admins}
-                  attendanceCorrections={attendanceCorrections}
-                  setAttendanceCorrections={setAttendanceCorrections}
-                  attendance={attendance}
-                  setAttendance={setAttendance}
-                  isSuperAdmin={isSuperAdmin}
-                />
-              )}
+              {page === "payroll" &&
+                (role === "admin" || moduleEnabled("payroll")) && (
+                  <Payroll
+                    role={role}
+                    currentEmp={currentEmp}
+                    employees={employees}
+                    attendance={attendance}
+                    payrollPaid={payrollPaid}
+                    setPayrollPaid={setPayrollPaid}
+                    overtimeRequests={overtimeRequests}
+                    otPolicy={otPolicy}
+                    payrollPolicy={payrollPolicy}
+                    setPayrollPolicy={setPayrollPolicy}
+                  />
+                )}
+              {page === "review" &&
+                (role === "admin" || moduleEnabled("review")) && (
+                  <PerformanceReviews
+                    role={role}
+                    currentAdmin={currentAdmin}
+                    currentEmp={currentEmp}
+                    employees={employees}
+                    performanceReviews={performanceReviews}
+                    setPerformanceReviews={setPerformanceReviews}
+                    isSuperAdmin={isSuperAdmin}
+                  />
+                )}
+              {page === "documents" &&
+                role !== "admin" &&
+                currentEmp &&
+                moduleEnabled("documents") && (
+                  <MyDocuments currentEmp={currentEmp} documents={documents} />
+                )}
+              {page === "attcorr" &&
+                (role === "admin" || moduleEnabled("attcorr")) && (
+                  <AttendanceCorrections
+                    role={role}
+                    currentAdmin={currentAdmin}
+                    currentEmp={currentEmp}
+                    employees={employees}
+                    admins={admins}
+                    attendanceCorrections={attendanceCorrections}
+                    setAttendanceCorrections={setAttendanceCorrections}
+                    attendance={attendance}
+                    setAttendance={setAttendance}
+                    isSuperAdmin={isSuperAdmin || can("approveRequests")}
+                    canApprove={isSuperAdmin || can("approveRequests")}
+                  />
+                )}
               {page === "admins" && role === "admin" && isSuperAdmin && (
                 <AdminAccounts
                   admins={admins}
@@ -14670,16 +15314,25 @@ function AppInner() {
                   currentAdminId={currentAdmin?.id}
                 />
               )}
-              {page === "profile" && role !== "admin" && currentEmp && (
-                <MyProfile
-                  currentEmp={currentEmp}
-                  employees={employees}
-                  setEmployees={setEmployees}
-                  departments={departments}
-                  shifts={shifts}
-                  saveError={employeesSaveError}
+              {page === "rolePerms" && role === "admin" && isSuperAdmin && (
+                <RolePermissionsPage
+                  rolePermissions={rolePermissions}
+                  setRolePermissions={setRolePermissions}
                 />
               )}
+              {page === "profile" &&
+                role !== "admin" &&
+                currentEmp &&
+                moduleEnabled("profile") && (
+                  <MyProfile
+                    currentEmp={currentEmp}
+                    employees={employees}
+                    setEmployees={setEmployees}
+                    departments={departments}
+                    shifts={shifts}
+                    saveError={employeesSaveError}
+                  />
+                )}
               {page === "settings" && role === "admin" && currentAdmin && (
                 <AdminSettings
                   currentAdmin={currentAdmin}
@@ -14689,18 +15342,19 @@ function AppInner() {
                   saveError={adminsSaveError}
                 />
               )}
-              {page === "audits" && role === "admin" && isSuperAdmin && (
-                <AuditLogPage />
-              )}
-              {page === "loginActivity" && (
-                <LoginActivityPage
-                  role={role}
-                  currentAdmin={currentAdmin}
-                  currentEmp={currentEmp}
-                  isSuperAdmin={isSuperAdmin}
-                  activeSessionId={activeSessionId}
-                />
-              )}
+              {page === "audits" &&
+                role === "admin" &&
+                (isSuperAdmin || can("viewAuditLog")) && <AuditLogPage />}
+              {page === "loginActivity" &&
+                (role === "admin" || moduleEnabled("loginActivity")) && (
+                  <LoginActivityPage
+                    role={role}
+                    currentAdmin={currentAdmin}
+                    currentEmp={currentEmp}
+                    isSuperAdmin={isSuperAdmin}
+                    activeSessionId={activeSessionId}
+                  />
+                )}
             </div>
           </main>
 
