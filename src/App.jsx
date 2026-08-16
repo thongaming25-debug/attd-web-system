@@ -315,6 +315,15 @@ const LANG = {
       customTaxRateLabel: "អត្រាពន្ធផ្ទាល់ខ្លួន (%)",
       customInsuranceRateLabel: "អត្រាធានារ៉ាប់រងផ្ទាល់ខ្លួន (%)",
       customRateBadge: "អត្រាផ្ទាល់ខ្លួន",
+      historicalBtn: "របាយការណ៍ខែចាស់",
+      historicalTitle: "របាយការណ៍ប្រាក់ខែខែចាស់",
+      historicalDesc:
+        "ជ្រើសខែ/ឆ្នាំណាមួយ ដើម្បីទាញយកទិន្នន័យវត្តមានពី database ដោយផ្ទាល់ (មិនកម្រិតត្រឹម ៦ខែថ្មីៗទេ)",
+      historicalPick: "ខែ/ឆ្នាំ",
+      historicalLoad: "ទាញយកទិន្នន័យ",
+      historicalLoading: "កំពុងទាញយកទិន្នន័យ...",
+      historicalEmpty: "គ្មានកំណត់ត្រាវត្តមានសម្រាប់ខែនេះទេ",
+      historicalError: "មិនអាចទាញយកទិន្នន័យបានទេ សូមព្យាយាមម្តងទៀត",
     },
     pr: {
       addBtn: "បន្ថែមការវាយតម្លៃ",
@@ -759,6 +768,15 @@ const LANG = {
       customTaxRateLabel: "Custom Tax Rate (%)",
       customInsuranceRateLabel: "Custom Insurance Rate (%)",
       customRateBadge: "Custom rate",
+      historicalBtn: "Older Months Report",
+      historicalTitle: "Historical Payroll Report",
+      historicalDesc:
+        "Pick any month/year to pull attendance directly from the database (not limited to the last 6 months kept live in the app)",
+      historicalPick: "Month / Year",
+      historicalLoad: "Load Data",
+      historicalLoading: "Loading data...",
+      historicalEmpty: "No attendance records found for this month",
+      historicalError: "Couldn't load this data — please try again",
     },
     pr: {
       addBtn: "Add Review",
@@ -12886,6 +12904,241 @@ function Payslip({
   );
 }
 
+// Fetches attendance for exactly one "YYYY-MM" month straight from
+// Supabase (paginated the same way as useSupabaseArray, so it's correct
+// no matter how many rows the month has), without touching the app's
+// windowed `attendance` state. Used by the historical payroll report to
+// look at months older than the live 6-month window kept in memory.
+async function fetchAttendanceForMonth(mk) {
+  const [y, m] = mk.split("-").map(Number);
+  const start = `${mk}-01`;
+  const lastDay = new Date(y, m, 0).getDate();
+  const end = `${mk}-${String(lastDay).padStart(2, "0")}`;
+  const PAGE_SIZE = 1000;
+  let all = [];
+  let offset = 0;
+  for (;;) {
+    const { data, error } = await supabase
+      .from("attendance")
+      .select("*")
+      .gte("date", start)
+      .lte("date", end)
+      .range(offset, offset + PAGE_SIZE - 1);
+    if (error) throw error;
+    all = all.concat(data || []);
+    if (!data || data.length < PAGE_SIZE) break;
+    offset += PAGE_SIZE;
+  }
+  return all.map((r) => ({
+    id: r.id,
+    employeeId: r.employee_id,
+    date: r.date,
+    checkIn: r.check_in,
+    checkOut: r.check_out,
+    status: r.status,
+    checkInLoc: r.check_in_loc,
+    checkOutLoc: r.check_out_loc,
+  }));
+}
+function HistoricalPayrollModal({
+  onClose,
+  employees,
+  overtimeRequests,
+  otPolicy,
+  payrollPolicy,
+  branding,
+}) {
+  const { t, lang } = useLang();
+  const [mk, setMk] = useState(() => {
+    // Default to just before the live 6-month window so the picker
+    // opens on a month that actually needs this on-demand fetch.
+    const d = new Date();
+    d.setMonth(d.getMonth() - 7);
+    return monthKey(d);
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [histAttendance, setHistAttendance] = useState(null); // null = not loaded yet
+  const [xlsxExporting, setXlsxExporting] = useState(false);
+
+  const activeEmployees = employees.filter((e) => e.status === "active");
+
+  const load = async () => {
+    setLoading(true);
+    setError(null);
+    setHistAttendance(null);
+    try {
+      const rows = await fetchAttendanceForMonth(mk);
+      setHistAttendance(rows);
+    } catch (err) {
+      console.error("[historical payroll] load failed:", err);
+      setError(t.pay.historicalError);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const rows = histAttendance
+    ? activeEmployees.map((e) => ({
+        emp: e,
+        p: computePayroll(
+          e,
+          histAttendance,
+          mk,
+          overtimeRequests,
+          otPolicy,
+          payrollPolicy,
+        ),
+      }))
+    : [];
+  const totalNet = rows.reduce((sum, r) => sum + r.p.net, 0);
+
+  return (
+    <Modal title={t.pay.historicalTitle} onClose={onClose} width={760}>
+      <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
+        {t.pay.historicalDesc}
+      </p>
+      <div
+        style={{
+          display: "flex",
+          gap: 10,
+          alignItems: "flex-end",
+          marginBottom: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <Field label={t.pay.historicalPick}>
+          <Input
+            type="month"
+            value={mk}
+            max={monthKey()}
+            onChange={(e) => e.target.value && setMk(e.target.value)}
+          />
+        </Field>
+        <Button onClick={load} disabled={loading} style={{ marginBottom: 14 }}>
+          {loading ? t.pay.historicalLoading : t.pay.historicalLoad}
+        </Button>
+      </div>
+
+      {error && (
+        <p style={{ color: T.rose, fontSize: 13, marginBottom: 12 }}>{error}</p>
+      )}
+
+      {loading && (
+        <p
+          style={{
+            fontSize: 13,
+            color: T.muted,
+            textAlign: "center",
+            padding: "24px 0",
+          }}
+        >
+          {t.pay.historicalLoading}
+        </p>
+      )}
+
+      {!loading && histAttendance && !error && (
+        <>
+          {histAttendance.length === 0 && (
+            <p
+              style={{
+                fontSize: 13,
+                color: T.muted,
+                textAlign: "center",
+                padding: "16px 0",
+              }}
+            >
+              {t.pay.historicalEmpty}
+            </p>
+          )}
+          <div style={{ maxHeight: 360, overflow: "auto" }}>
+            <table className="wf-table">
+              <thead>
+                <tr>
+                  <th>{t.employee}</th>
+                  <th>{t.pay.baseSalary}</th>
+                  <th>{t.pay.otPay}</th>
+                  <th>{t.pay.taxLabel}</th>
+                  <th>{t.pay.insuranceLabel}</th>
+                  <th>{t.pay.netSalary}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map(({ emp, p }) => (
+                  <tr key={emp.id}>
+                    <td>{emp.name}</td>
+                    <td>{fmtMoney(emp.salary)}</td>
+                    <td>{fmtMoney(p.otPay)}</td>
+                    <td>{fmtMoney(p.tax)}</td>
+                    <td>{fmtMoney(p.insurance)}</td>
+                    <td style={{ fontWeight: 600 }}>{fmtMoney(p.net)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginTop: 16,
+            }}
+          >
+            <span style={{ fontWeight: 600, color: T.ink }}>
+              {t.pay.totalPaid}: {fmtMoney(totalNet)}
+            </span>
+            <Button
+              variant="ghost"
+              disabled={xlsxExporting || rows.length === 0}
+              onClick={async () => {
+                setXlsxExporting(true);
+                try {
+                  await exportPayrollXlsx({
+                    filename: `payroll-${mk}.xlsx`,
+                    companyName: branding?.name,
+                    reportTitle:
+                      lang === "en" ? "Payroll Report" : "របាយការណ៍ប្រាក់ខែ",
+                    periodLabel: monthLabel(mk),
+                    columns: [
+                      { header: t.employee, width: 24 },
+                      { header: t.pay.baseSalary, width: 16, currency: true },
+                      { header: t.pay.otPay, width: 14, currency: true },
+                      { header: t.pay.taxLabel, width: 14, currency: true },
+                      {
+                        header: t.pay.insuranceLabel,
+                        width: 14,
+                        currency: true,
+                      },
+                      { header: t.pay.netSalary, width: 16, currency: true },
+                    ],
+                    rows: rows.map(({ emp, p }) => [
+                      emp.name,
+                      emp.salary,
+                      p.otPay,
+                      p.tax,
+                      p.insurance,
+                      p.net,
+                    ]),
+                    totalLabel: lang === "en" ? "TOTAL" : "សរុប",
+                    totalValue: totalNet,
+                    totalColIndex: 5,
+                  });
+                } finally {
+                  setXlsxExporting(false);
+                }
+              }}
+            >
+              <FileSpreadsheet size={15} />{" "}
+              {xlsxExporting ? "…" : t.exportExcel}
+            </Button>
+          </div>
+        </>
+      )}
+    </Modal>
+  );
+}
+
 function Payroll({
   role,
   currentEmp,
@@ -12911,6 +13164,7 @@ function Payroll({
   const [mk, setMk] = useState(currentMk);
   const [slipFor, setSlipFor] = useState(null);
   const [xlsxExporting, setXlsxExporting] = useState(false);
+  const [showHistorical, setShowHistorical] = useState(false);
   const isPastMonth = mk !== currentMk;
   const activeEmployees = employees.filter((e) => e.status === "active");
   const list =
@@ -13085,6 +13339,9 @@ function Payroll({
             >
               <FileSpreadsheet size={15} />{" "}
               {xlsxExporting ? "…" : t.exportExcel}
+            </Button>
+            <Button variant="ghost" onClick={() => setShowHistorical(true)}>
+              <History size={15} /> {t.pay.historicalBtn}
             </Button>
           </div>
         )}
@@ -13268,6 +13525,16 @@ function Payroll({
           otPolicy={otPolicy}
           payrollPolicy={payrollPolicy}
           onClose={() => setSlipFor(null)}
+        />
+      )}
+      {showHistorical && (
+        <HistoricalPayrollModal
+          employees={employees}
+          overtimeRequests={overtimeRequests}
+          otPolicy={otPolicy}
+          payrollPolicy={payrollPolicy}
+          branding={branding}
+          onClose={() => setShowHistorical(false)}
         />
       )}
     </div>
