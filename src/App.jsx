@@ -2196,6 +2196,100 @@ function writeLoginActivity({ actor, action, sessionId }) {
    of the app already expects, so components below don't change.
 ----------------------------------------------------------------*/
 
+// ---------------------------------------------------------------
+// Shared realtime bus: ONE Supabase Realtime channel per browser tab,
+// instead of one private channel per table.
+//
+// Each useSupabaseArray(table) call used to open its own
+// `supabase.channel("realtime:"+table)` — fine with a handful of tables,
+// but this app calls useSupabaseArray for 13 different tables on every
+// login (departments, employees, shifts, attendance, leave_requests,
+// overtime_requests, performance_reviews, announcements,
+// employee_documents, holidays, attendance_corrections, admins,
+// offices), all mounted together in AppInner regardless of which page
+// is showing. That's 13 open channels per signed-in user — at 1000+
+// concurrent staff, ~13,000 channels, which can run into a Supabase
+// project's realtime connection limits (plan-dependent) and slow down
+// delivery for everyone.
+//
+// Supabase's realtime client supports chaining multiple
+// `.on("postgres_changes", { table: ... }, handler)` calls on a SINGLE
+// channel before calling `.subscribe()` once — the server multiplexes
+// change events for all of them over that one connection. We register
+// every known table up front (before subscribing) so hooks can attach
+// and detach their own per-table callback at any time, in any order,
+// without needing to re-subscribe the channel.
+const REALTIME_TABLES = [
+  "departments",
+  "employees",
+  "shifts",
+  "attendance",
+  "leave_requests",
+  "overtime_requests",
+  "performance_reviews",
+  "announcements",
+  "employee_documents",
+  "holidays",
+  "attendance_corrections",
+  "admins",
+  "offices",
+  "payroll_paid",
+];
+const realtimeHandlers = new Map(REALTIME_TABLES.map((t) => [t, new Set()]));
+let realtimeChannel = null;
+
+function ensureRealtimeChannel() {
+  if (realtimeChannel) return realtimeChannel;
+  try {
+    const channel = supabase.channel("realtime:app-wide");
+    REALTIME_TABLES.forEach((table) => {
+      channel.on(
+        "postgres_changes",
+        { event: "*", schema: "public", table },
+        (payload) => {
+          realtimeHandlers.get(table)?.forEach((fn) => fn(payload));
+        },
+      );
+    });
+    channel.subscribe();
+    realtimeChannel = channel;
+  } catch (err) {
+    console.error("[supabase] failed to open shared realtime channel:", err);
+  }
+  return realtimeChannel;
+}
+// Registers `handler` for postgres_changes events on `table` and returns
+// an unsubscribe function. Tables outside REALTIME_TABLES still work —
+// they just fall back to their own small channel — so adding a new
+// useSupabaseArray table elsewhere doesn't silently lose realtime; it's
+// just worth adding that table name to REALTIME_TABLES above too so it
+// shares the one connection like everything else.
+function subscribeTableChanges(table, handler) {
+  if (!realtimeHandlers.has(table)) {
+    realtimeHandlers.set(table, new Set());
+    try {
+      supabase
+        .channel(`realtime:${table}`)
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table },
+          (payload) => {
+            realtimeHandlers.get(table)?.forEach((fn) => fn(payload));
+          },
+        )
+        .subscribe();
+    } catch (err) {
+      console.error(`[supabase] realtime subscribe failed for ${table}:`, err);
+    }
+  } else {
+    ensureRealtimeChannel();
+  }
+  realtimeHandlers.get(table).add(handler);
+  return () => {
+    realtimeHandlers.get(table)?.delete(handler);
+  };
+}
+
 // Generic hook for a Supabase table holding an array of rows keyed by `id`.
 // setValue is called elsewhere in the app with the FULL next array (never
 // an updater function), so on every call we diff against the previous
@@ -2205,7 +2299,22 @@ function writeLoginActivity({ actor, action, sessionId }) {
 // no caller elsewhere in the app has to remember to log anything itself.
 function useSupabaseArray(
   table,
-  { fromDb, toDb, orderBy, audit, actorRef, entityLabel } = {},
+  {
+    fromDb,
+    toDb,
+    orderBy,
+    audit,
+    actorRef,
+    entityLabel,
+    // Optional: scope the initial load (and what a remote realtime event is
+    // allowed to add) to rows where `dateField >= today - daysBack days`.
+    // Use this for tables that grow without bound over time (attendance,
+    // punch logs, etc.) so the app doesn't keep dragging years of history
+    // into every session as the company grows. Leave both unset for tables
+    // that don't grow that way (employees, departments, ...).
+    dateField,
+    daysBack,
+  } = {},
 ) {
   const [value, setValueState] = useState([]);
   const [ready, setReady] = useState(false);
@@ -2221,20 +2330,46 @@ function useSupabaseArray(
   const mapToDb = toDb || ((r) => r);
   const labelOf =
     entityLabel || ((r) => r?.name || r?.title || r?.code || r?.id);
+  const cutoffDate =
+    dateField && daysBack
+      ? new Date(Date.now() - daysBack * 86400000).toISOString().slice(0, 10)
+      : null;
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      let query = supabase.from(table).select("*");
-      if (orderBy) query = query.order(orderBy);
-      const { data, error } = await query;
-      if (cancelled) return;
-      if (error) {
-        console.error(`[supabase] failed to load ${table}:`, error.message);
+      // Supabase/PostgREST caps any single response at its configured
+      // "max rows" (1000 by default) and truncates silently past that —
+      // no error, just a short result. A company with 1000+ staff can
+      // blow past 1000 rows on tables like `attendance` within a day or
+      // two, so we page through with .range() and keep fetching until a
+      // page comes back shorter than the page size, rather than trusting
+      // one request to return everything.
+      const PAGE_SIZE = 1000;
+      let all = [];
+      let offset = 0;
+      let pageError = null;
+      for (;;) {
+        let query = supabase.from(table).select("*");
+        if (orderBy) query = query.order(orderBy);
+        if (cutoffDate) query = query.gte(dateField, cutoffDate);
+        query = query.range(offset, offset + PAGE_SIZE - 1);
+        const { data, error } = await query;
+        if (cancelled) return;
+        if (error) {
+          pageError = error;
+          break;
+        }
+        all = all.concat(data || []);
+        if (!data || data.length < PAGE_SIZE) break;
+        offset += PAGE_SIZE;
+      }
+      if (pageError) {
+        console.error(`[supabase] failed to load ${table}:`, pageError.message);
         prevRef.current = [];
         setValueState([]);
       } else {
-        const mapped = (data || []).map(mapFromDb);
+        const mapped = all.map(mapFromDb);
         prevRef.current = mapped;
         setValueState(mapped);
       }
@@ -2244,16 +2379,17 @@ function useSupabaseArray(
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [table]);
+  }, [table, cutoffDate]);
 
   // Live sync: without this, admin and staff only ever see what was on the
   // table at the moment their tab loaded — a staff check-in, an admin's
   // leave-request decision, a new announcement, etc. would sit invisible on
   // every other open tab until someone manually reloaded the page. This
-  // subscribes to Postgres changes on this table and folds each remote
-  // insert/update/delete into local state as it happens, so every open
-  // admin and staff screen stays live without polling or a manual refresh.
-  // Requires realtime to be enabled for the table in Supabase (Database →
+  // registers a handler on the shared realtime bus above (one WebSocket
+  // channel per tab, not one per table) and folds each remote insert/
+  // update/delete into local state as it happens, so every open admin and
+  // staff screen stays live without polling or a manual refresh. Requires
+  // realtime to be enabled for the table in Supabase (Database →
   // Replication, or `alter publication supabase_realtime add table <name>;`).
   useEffect(() => {
     if (!ready) return; // wait for the initial load so we don't race it
@@ -2269,47 +2405,47 @@ function useSupabaseArray(
       });
       return sorted;
     };
-    let channel;
-    try {
-      channel = supabase
-        .channel(`realtime:${table}`)
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table },
-          (payload) => {
-            setValueState((current) => {
-              let next;
-              if (payload.eventType === "DELETE") {
-                const deletedId = payload.old?.id;
-                next = current.filter((r) => r.id !== deletedId);
-              } else {
-                const row = mapFromDb(payload.new);
-                const idx = current.findIndex((r) => r.id === row.id);
-                next =
-                  idx === -1
-                    ? [...current, row]
-                    : current.map((r, i) => (i === idx ? row : r));
-                next = sortIfNeeded(next);
-              }
-              // Keep the local-edit baseline in sync so this remote-origin
-              // change isn't mistaken for a pending local edit next time
-              // setValue() runs its create/update/delete diff — otherwise
-              // a change made on another device would look, to this tab,
-              // like something *it* just created/edited and get pushed
-              // straight back to Supabase (and logged to the audit trail
-              // a second time, credited to the wrong device).
-              prevRef.current = next;
-              return next;
-            });
-          },
-        )
-        .subscribe();
-    } catch (err) {
-      console.error(`[supabase] realtime subscribe failed for ${table}:`, err);
-    }
-    return () => {
-      if (channel) supabase.removeChannel(channel);
+    const handler = (payload) => {
+      setValueState((current) => {
+        let next;
+        if (payload.eventType === "DELETE") {
+          const deletedId = payload.old?.id;
+          next = current.filter((r) => r.id !== deletedId);
+        } else {
+          const row = mapFromDb(payload.new);
+          // If this table is date-windowed, ignore remote rows that
+          // fall outside the window rather than letting them sneak
+          // into state (and then potentially get "upserted" back as
+          // if they were new/local on the next setValue() call).
+          if (
+            cutoffDate &&
+            dateField &&
+            row?.[dateField] &&
+            row[dateField] < cutoffDate
+          ) {
+            next = current;
+          } else {
+            const idx = current.findIndex((r) => r.id === row.id);
+            next =
+              idx === -1
+                ? [...current, row]
+                : current.map((r, i) => (i === idx ? row : r));
+            next = sortIfNeeded(next);
+          }
+        }
+        // Keep the local-edit baseline in sync so this remote-origin
+        // change isn't mistaken for a pending local edit next time
+        // setValue() runs its create/update/delete diff — otherwise
+        // a change made on another device would look, to this tab,
+        // like something *it* just created/edited and get pushed
+        // straight back to Supabase (and logged to the audit trail
+        // a second time, credited to the wrong device).
+        prevRef.current = next;
+        return next;
+      });
     };
+    const unsubscribe = subscribeTableChanges(table, handler);
+    return unsubscribe;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [table, ready]);
 
@@ -2438,40 +2574,24 @@ function usePayrollPaid() {
 
   // Same live-sync reasoning as useSupabaseArray above: without this, a
   // "mark as paid" done by one admin stays invisible to any other admin
-  // tab until it's reloaded.
+  // tab until it's reloaded. Uses the same shared realtime bus as
+  // useSupabaseArray (one channel per tab) instead of a private channel.
   useEffect(() => {
     if (!ready) return;
-    let channel;
-    try {
-      channel = supabase
-        .channel("realtime:payroll_paid")
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "payroll_paid" },
-          (payload) => {
-            setValueState((current) => {
-              const row =
-                payload.eventType === "DELETE" ? payload.old : payload.new;
-              if (!row) return current;
-              const key = `${row.employee_id}-${row.month}`;
-              const next = { ...current };
-              if (payload.eventType === "DELETE") delete next[key];
-              else next[key] = row.paid;
-              prevRef.current = next;
-              return next;
-            });
-          },
-        )
-        .subscribe();
-    } catch (err) {
-      console.error(
-        "[supabase] realtime subscribe failed for payroll_paid:",
-        err,
-      );
-    }
-    return () => {
-      if (channel) supabase.removeChannel(channel);
+    const handler = (payload) => {
+      setValueState((current) => {
+        const row = payload.eventType === "DELETE" ? payload.old : payload.new;
+        if (!row) return current;
+        const key = `${row.employee_id}-${row.month}`;
+        const next = { ...current };
+        if (payload.eventType === "DELETE") delete next[key];
+        else next[key] = row.paid;
+        prevRef.current = next;
+        return next;
+      });
     };
+    const unsubscribe = subscribeTableChanges("payroll_paid", handler);
+    return unsubscribe;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready]);
 
@@ -13329,6 +13449,16 @@ function AppInner() {
     actorRef,
   });
   const [attendance, setAttendance, aReady] = useSupabaseArray("attendance", {
+    // Attendance grows without bound (every check-in/out, forever), so we
+    // only keep a rolling 6-month window live in the app — enough for the
+    // Payroll month-picker's usual back-history and the Analytics trend
+    // (which only ever looks at the last 6 months anyway). This keeps the
+    // payload bounded even at 1000+ staff instead of dragging in years of
+    // punches on every load. Combined with the pagination fix in
+    // useSupabaseArray above, this also protects against Supabase/
+    // PostgREST's default 1000-row response cap.
+    dateField: "date",
+    daysBack: 180,
     fromDb: (r) => ({
       id: r.id,
       employeeId: r.employee_id,
