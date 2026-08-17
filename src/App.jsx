@@ -232,6 +232,20 @@ const LANG = {
       setOffice: "កំណត់ទីតាំងការិយាល័យ",
       noRecord: "មិនទាន់មានកំណត់ត្រាទេ",
       absentDays: "ថ្ងៃអវត្តមាន",
+      branch: "សាខា",
+      liveClockLabel: "ម៉ោងបច្ចុប្បន្ន",
+      punchOutBtn: "ចុចចេញពីធ្វើការ",
+      awayFromOffice: (name, dist, radius) =>
+        `អ្នកនៅឆ្ងាយពីការិយាល័យ "${name}" ${dist}m (កំណត់អនុញ្ញាត ${radius}m) — មិនអាចចុះឈ្មោះបានទេ`,
+      cannotVerifyLoc: "មិនអាចផ្ទៀងផ្ទាត់ទីតាំងបានទេ",
+      wrongBranchWarning: (name) =>
+        `⚠️ អ្នកកំពុងចុះឈ្មោះនៅសាខា "${name}" ប៉ុន្តែអ្នកត្រូវបានកំណត់ឲ្យធ្វើការនៅសាខាផ្សេង`,
+      gpsFailed:
+        "មិនអាចទាញយកទីតាំង GPS បានទេ សូមបើក Location សម្រាប់កម្មវិធីនេះ",
+      gpsRequiredHint: (n) =>
+        `ត្រូវការទីតាំង GPS នៅជិតសាខាមួយក្នុងចំណោម ${n} សាខា`,
+      noData: "គ្មានទិន្នន័យ",
+      manualEntry: "កត់ត្រាដោយដៃ",
     },
     lv: {
       addBtn: "សំណើច្បាប់ថ្មី",
@@ -686,6 +700,19 @@ const LANG = {
       setOffice: "Set Office Location",
       noRecord: "No records yet",
       absentDays: "Absent days",
+      branch: "Branch",
+      liveClockLabel: "Current Time",
+      punchOutBtn: "Check Out",
+      awayFromOffice: (name, dist, radius) =>
+        `You're ${dist}m away from "${name}" (allowed radius ${radius}m) — cannot check in`,
+      cannotVerifyLoc: "Couldn't verify your location",
+      wrongBranchWarning: (name) =>
+        `⚠️ You're checking in at "${name}" but you're assigned to a different branch`,
+      gpsFailed:
+        "Couldn't get your GPS location. Please enable Location for this app.",
+      gpsRequiredHint: (n) => `GPS location required near one of ${n} branches`,
+      noData: "No data",
+      manualEntry: "Manual Entry",
     },
     lv: {
       addBtn: "New Leave Request",
@@ -1092,7 +1119,15 @@ function HeaderClock() {
         letterSpacing: "-.01em",
       }}
     >
-      <span style={{ width: 6, height: 6, borderRadius: 999, background: T.forest, flexShrink: 0 }} />
+      <span
+        style={{
+          width: 6,
+          height: 6,
+          borderRadius: 999,
+          background: T.forest,
+          flexShrink: 0,
+        }}
+      />
       {hh}:{mm}
       <span style={{ color: T.muted, fontSize: 11 }}>{ss}</span>
     </div>
@@ -6376,15 +6411,17 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
         );
         setLocError(
           nearest
-            ? `អ្នកនៅឆ្ងាយពីការិយាល័យ "${nearest.office.name}" ${nearest.distance}m (កំណត់អនុញ្ញាត ${nearest.office.radius}m) — មិនអាចចុះឈ្មោះបានទេ`
-            : "មិនអាចផ្ទៀងផ្ទាត់ទីតាំងបានទេ",
+            ? t.att.awayFromOffice(
+                nearest.office.name,
+                nearest.distance,
+                nearest.office.radius,
+              )
+            : t.att.cannotVerifyLoc,
         );
         return null;
       }
       if (emp.officeId && match.office.id !== emp.officeId) {
-        setBranchWarning(
-          `⚠️ អ្នកកំពុងចុះឈ្មោះនៅសាខា "${match.office.name}" ប៉ុន្តែអ្នកត្រូវបានកំណត់ឲ្យធ្វើការនៅសាខាផ្សេង`,
-        );
+        setBranchWarning(t.att.wrongBranchWarning(match.office.name));
       } else {
         setBranchWarning("");
       }
@@ -6396,9 +6433,7 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
         officeName: match.office.name,
       };
     } catch {
-      setLocError(
-        "មិនអាចទាញយកទីតាំង GPS បានទេ សូមបើក Location សម្រាប់កម្មវិធីនេះ",
-      );
+      setLocError(t.att.gpsFailed);
       return null;
     } finally {
       setLocBusy(false);
@@ -6479,7 +6514,7 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
           marginBottom: 4,
         }}
       >
-        ម៉ោងបច្ចុប្បន្ន
+        {t.att.liveClockLabel}
       </div>
       <div className="wf-punch-clock" style={{ marginBottom: 8 }}>
         {timeNow()}
@@ -6514,8 +6549,7 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
             marginBottom: 12,
           }}
         >
-          <MapPin size={12} /> ត្រូវការទីតាំង GPS នៅជិតសាខាមួយក្នុងចំណោម{" "}
-          {offices.length} សាខា
+          <MapPin size={12} /> {t.att.gpsRequiredHint(offices.length)}
         </div>
       )}
       {todayIsDayOff && (
@@ -6628,7 +6662,7 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
             ) : (
               <LogOut size={18} />
             )}{" "}
-            ចុចចេញពីធ្វើការ
+            {t.att.punchOutBtn}
           </Button>
         </div>
       )}
@@ -6647,16 +6681,36 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
           />
           {t.att.checkOut} · {t.att.checkIn} {rec.checkIn} · {t.att.checkOut}{" "}
           {rec.checkOut}
-          {rec.checkOutLoc?.officeName && (
+          {rec.checkInLoc?.officeName &&
+          rec.checkOutLoc?.officeName &&
+          rec.checkInLoc.officeName !== rec.checkOutLoc.officeName ? (
             <>
               {" "}
               ·{" "}
               <span
                 style={{ display: "inline-flex", alignItems: "center", gap: 3 }}
               >
-                <MapPin size={11} /> {rec.checkOutLoc.officeName}
+                <MapPin size={11} /> {rec.checkInLoc.officeName} →{" "}
+                {rec.checkOutLoc.officeName}
               </span>
             </>
+          ) : (
+            (rec.checkOutLoc?.officeName || rec.checkInLoc?.officeName) && (
+              <>
+                {" "}
+                ·{" "}
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 3,
+                  }}
+                >
+                  <MapPin size={11} />{" "}
+                  {rec.checkOutLoc?.officeName || rec.checkInLoc?.officeName}
+                </span>
+              </>
+            )
           )}
         </div>
       )}
@@ -7366,10 +7420,10 @@ function Attendance({
             <table className="wf-table">
               <thead>
                 <tr>
-                  <th>កាលបរិច្ឆេទ</th>
-                  <th>ចូល</th>
-                  <th>ចេញ</th>
-                  <th>សាខា</th>
+                  <th>{t.att.date}</th>
+                  <th>{t.att.inTime}</th>
+                  <th>{t.att.outTime}</th>
+                  <th>{t.att.branch}</th>
                   <th>{t.status}</th>
                 </tr>
               </thead>
@@ -7384,7 +7438,7 @@ function Attendance({
                         padding: "24px 0",
                       }}
                     >
-                      មិនទាន់មានទិន្នន័យទេ
+                      {t.att.noRecord}
                     </td>
                   </tr>
                 )}
@@ -7400,9 +7454,13 @@ function Attendance({
                       {a.checkOut || "—"}
                     </td>
                     <td style={{ fontSize: 11.5, color: T.muted }}>
-                      {a.checkInLoc?.officeName ||
-                        a.checkOutLoc?.officeName ||
-                        "—"}
+                      {a.checkInLoc?.officeName &&
+                      a.checkOutLoc?.officeName &&
+                      a.checkInLoc.officeName !== a.checkOutLoc.officeName
+                        ? `${a.checkInLoc.officeName} → ${a.checkOutLoc.officeName}`
+                        : a.checkInLoc?.officeName ||
+                          a.checkOutLoc?.officeName ||
+                          "—"}
                     </td>
                     <td>
                       <StatusPill status={a.status} />
@@ -7461,7 +7519,13 @@ function Attendance({
             onClick={() =>
               exportCsv(
                 `attendance-${date}.csv`,
-                [t.employee, "Code", "Check In", "Check Out", t.status],
+                [
+                  t.employee,
+                  t.emps.code,
+                  t.att.inTime,
+                  t.att.outTime,
+                  t.status,
+                ],
                 rows.map(({ emp, rec }) => [
                   emp.name,
                   emp.code,
@@ -7481,7 +7545,7 @@ function Attendance({
               setModal(true);
             }}
           >
-            <Plus size={15} /> កត់ត្រាដោយដៃ
+            <Plus size={15} /> {t.att.manualEntry}
           </Button>
         </div>
       </div>
@@ -7489,11 +7553,11 @@ function Attendance({
         <table className="wf-table">
           <thead>
             <tr>
-              <th>បុគ្គលិក</th>
-              <th>វេន</th>
-              <th>ចូល</th>
-              <th>ចេញ</th>
-              <th>សាខា</th>
+              <th>{t.employee}</th>
+              <th>{t.emps.shift}</th>
+              <th>{t.att.inTime}</th>
+              <th>{t.att.outTime}</th>
+              <th>{t.att.branch}</th>
               <th>{t.status}</th>
               <th></th>
             </tr>
@@ -7540,16 +7604,20 @@ function Attendance({
                   {rec?.checkOut || "—"}
                 </td>
                 <td style={{ fontSize: 11.5, color: T.muted }}>
-                  {rec?.checkInLoc?.officeName ||
-                    rec?.checkOutLoc?.officeName ||
-                    "—"}
+                  {rec?.checkInLoc?.officeName &&
+                  rec?.checkOutLoc?.officeName &&
+                  rec.checkInLoc.officeName !== rec.checkOutLoc.officeName
+                    ? `${rec.checkInLoc.officeName} → ${rec.checkOutLoc.officeName}`
+                    : rec?.checkInLoc?.officeName ||
+                      rec?.checkOutLoc?.officeName ||
+                      "—"}
                 </td>
                 <td>
                   {rec ? (
                     <StatusPill status={rec.status} />
                   ) : (
                     <span style={{ fontSize: 12, color: T.mutedLight }}>
-                      គ្មានទិន្នន័យ
+                      {t.att.noData}
                     </span>
                   )}
                 </td>
@@ -10766,7 +10834,10 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
                       className="wf-badge"
                       style={
                         a.role === "superadmin"
-                          ? { background: "rgba(91,141,239,0.14)", color: T.blue }
+                          ? {
+                              background: "rgba(91,141,239,0.14)",
+                              color: T.blue,
+                            }
                           : { background: T.forestSoft, color: T.forestText }
                       }
                     >
