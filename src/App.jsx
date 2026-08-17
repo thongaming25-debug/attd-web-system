@@ -260,6 +260,21 @@ const LANG = {
       officeCountLabel: (n) => `${n} សាខា`,
       officeNotSet: "មិនទាន់កំណត់",
       officeNoneYet: "មិនទាន់មានសាខាទេ",
+      scanQrBtn: "ស្កេន QR សាខា",
+      scanQrOr: "ឬ",
+      scanQrTitle: "ស្កេន QR សាខា",
+      scanQrDesc: "ដាក់កាមេរ៉ាឲ្យត្រង់ QR code នៅសាខារបស់អ្នក",
+      scanQrHint: "កំពុងស្វែងរក QR...",
+      qrNoMatch: "QR នេះមិនមែនជារបស់សាខាណាមួយឡើយ សូមសាកល្បងម្តងទៀត",
+      cameraDenied:
+        "មិនអាចបើកកាមេរ៉ាបានទេ សូមអនុញ្ញាតការប្រើប្រាស់កាមេរ៉ាសម្រាប់កម្មវិធីនេះ",
+      cameraNotFound: "រកមិនឃើញកាមេរ៉ានៅលើឧបករណ៍នេះទេ",
+      viaQrLabel: "ស្កេន QR",
+      officeQrBtn: "QR Code",
+      officeQrTitle: (name) => `QR Code · ${name}`,
+      officeQrDesc:
+        "បោះពុម្ព ឬបិទ QR នេះនៅសាខា ដើម្បីឲ្យបុគ្គលិកស្កេន check-in/check-out",
+      printBtn: "បោះពុម្ព",
     },
     lv: {
       addBtn: "សំណើច្បាប់ថ្មី",
@@ -769,6 +784,21 @@ const LANG = {
       officeCountLabel: (n) => `${n} branches`,
       officeNotSet: "Not set",
       officeNoneYet: "No branches yet",
+      scanQrBtn: "Scan Branch QR",
+      scanQrOr: "or",
+      scanQrTitle: "Scan Branch QR",
+      scanQrDesc: "Point your camera at the QR code at your branch",
+      scanQrHint: "Looking for a QR code...",
+      qrNoMatch: "That QR code doesn't match any branch — try again",
+      cameraDenied:
+        "Couldn't access the camera. Please allow camera access for this app.",
+      cameraNotFound: "No camera was found on this device",
+      viaQrLabel: "QR scan",
+      officeQrBtn: "QR Code",
+      officeQrTitle: (name) => `QR Code · ${name}`,
+      officeQrDesc:
+        "Print or post this QR at the branch so employees can scan to check in/out",
+      printBtn: "Print",
     },
     lv: {
       addBtn: "New Leave Request",
@@ -2201,6 +2231,18 @@ function nearestOffice(offices, lat, lng) {
       best = { office: o, distance: Math.round(dist) };
   }
   return best;
+}
+// Payload encoded into an office's printable check-in QR code, and the
+// matching parser. Prefixed so scanning a random/unrelated QR code is
+// safely ignored instead of matched by accident.
+const OFFICE_QR_PREFIX = "WFOFFICE:";
+function officeQrPayload(officeId) {
+  return `${OFFICE_QR_PREFIX}${officeId}`;
+}
+function parseOfficeQrOfficeId(text) {
+  if (typeof text !== "string" || !text.startsWith(OFFICE_QR_PREFIX))
+    return null;
+  return text.slice(OFFICE_QR_PREFIX.length).trim() || null;
 }
 // Promise wrapper around the browser geolocation API.
 function getCurrentPosition(options) {
@@ -4666,11 +4708,16 @@ function employeePortalUrl() {
   const { origin, pathname } = window.location;
   return `${origin}${pathname}#/employee`;
 }
-function QrModal({ url, onClose }) {
+// Generic QR display modal. Pass `url` for the existing employee-portal
+// link use case (kept for backwards compatibility), or `data` for any
+// other raw payload to encode (e.g. an office check-in QR token). `title`
+// and `desc` let callers override the default employee-portal copy.
+function QrModal({ url, data, title, desc, onClose, footer }) {
   const { t: t2 } = useLang();
-  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(url)}`;
+  const payload = data != null ? data : url;
+  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(payload)}`;
   return (
-    <Modal title={t2.qr.title} onClose={onClose} width={340}>
+    <Modal title={title || t2.qr.title} onClose={onClose} width={340}>
       <div
         style={{
           display: "flex",
@@ -4687,16 +4734,12 @@ function QrModal({ url, onClose }) {
             borderRadius: 12,
           }}
         >
-          <img
-            src={qrSrc}
-            alt="Employee portal QR code"
-            width={220}
-            height={220}
-          />
+          <img src={qrSrc} alt="QR code" width={220} height={220} />
         </div>
         <p style={{ fontSize: 12, color: T.muted, textAlign: "center" }}>
-          {t2.qr.desc}
+          {desc || t2.qr.desc}
         </p>
+        {footer}
       </div>
     </Modal>
   );
@@ -6460,6 +6503,174 @@ function Shifts({ shifts, setShifts, employees, isSuperAdmin }) {
 /* ---------------------------------------------------------------
    Attendance
 ----------------------------------------------------------------*/
+/* ---------------------------------------------------------------
+   QR scan modal — lets an employee check in/out by scanning a
+   branch's printed QR code instead of relying on GPS. Prefers the
+   browser-native BarcodeDetector API when available; falls back to
+   loading the small "jsQR" library from a CDN at runtime (no extra
+   build dependency required) for browsers that lack it (e.g. Safari).
+----------------------------------------------------------------*/
+let jsQRLoadPromise = null;
+function loadJsQR() {
+  if (window.jsQR) return Promise.resolve(window.jsQR);
+  if (!jsQRLoadPromise) {
+    jsQRLoadPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js";
+      script.async = true;
+      script.onload = () => resolve(window.jsQR);
+      script.onerror = () => reject(new Error("jsqr-load-failed"));
+      document.head.appendChild(script);
+    });
+  }
+  return jsQRLoadPromise;
+}
+
+function QrScanModal({ offices, onMatch, onClose }) {
+  const { t } = useLang();
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const streamRef = useRef(null);
+  const rafRef = useRef(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const stop = () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((tr) => tr.stop());
+        streamRef.current = null;
+      }
+    };
+
+    const handleDecoded = (text) => {
+      const officeId = parseOfficeQrOfficeId(text);
+      const office = officeId && offices.find((o) => o.id === officeId);
+      if (office) {
+        stop();
+        onMatch(office);
+      } else {
+        setError(t.att.qrNoMatch);
+      }
+    };
+
+    const tickBarcodeDetector = async (bd) => {
+      if (cancelled) return;
+      try {
+        const video = videoRef.current;
+        if (video && video.readyState >= 2) {
+          const codes = await bd.detect(video);
+          if (codes && codes.length > 0) {
+            handleDecoded(codes[0].rawValue);
+            return; // handleDecoded stops the loop on a real match
+          }
+        }
+      } catch {
+        // transient decode errors between frames are expected — ignore
+      }
+      rafRef.current = requestAnimationFrame(() => tickBarcodeDetector(bd));
+    };
+
+    const tickJsQR = (jsQR) => {
+      if (cancelled) return;
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      if (video && canvas && video.readyState >= 2) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imgData.data, imgData.width, imgData.height);
+        if (code && code.data) {
+          handleDecoded(code.data);
+          return;
+        }
+      }
+      rafRef.current = requestAnimationFrame(() => tickJsQR(jsQR));
+    };
+
+    const start = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment" },
+        });
+        if (cancelled) {
+          stream.getTracks().forEach((tr) => tr.stop());
+          return;
+        }
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          await videoRef.current.play();
+        }
+        if (typeof window.BarcodeDetector !== "undefined") {
+          try {
+            const bd = new window.BarcodeDetector({ formats: ["qr_code"] });
+            tickBarcodeDetector(bd);
+            return;
+          } catch {
+            // unsupported format/config — fall through to jsQR
+          }
+        }
+        const jsQR = await loadJsQR();
+        if (cancelled) return;
+        tickJsQR(jsQR);
+      } catch (err) {
+        if (cancelled) return;
+        setError(
+          err && err.name === "NotFoundError"
+            ? t.att.cameraNotFound
+            : t.att.cameraDenied,
+        );
+      }
+    };
+
+    start();
+    return () => {
+      cancelled = true;
+      stop();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <Modal title={t.att.scanQrTitle} onClose={onClose} width={360}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div
+          style={{
+            position: "relative",
+            width: "100%",
+            aspectRatio: "1 / 1",
+            background: "#000",
+            borderRadius: 12,
+            overflow: "hidden",
+          }}
+        >
+          <video
+            ref={videoRef}
+            muted
+            playsInline
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        </div>
+        <canvas ref={canvasRef} style={{ display: "none" }} />
+        {error ? (
+          <p style={{ fontSize: 12.5, color: T.rose, textAlign: "center" }}>
+            {error}
+          </p>
+        ) : (
+          <p style={{ fontSize: 12.5, color: T.muted, textAlign: "center" }}>
+            {t.att.scanQrHint}
+          </p>
+        )}
+      </div>
+    </Modal>
+  );
+}
+
 function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
   const { t, lang } = useLang();
   const today = todayStr();
@@ -6469,6 +6680,7 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
   const [locBusy, setLocBusy] = useState(false);
   const [locError, setLocError] = useState("");
   const [branchWarning, setBranchWarning] = useState("");
+  const [scanOpen, setScanOpen] = useState(false);
   const hasOffices = offices && offices.length > 0;
   const todayIsDayOff = isDayOff(emp, today);
 
@@ -6527,9 +6739,14 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
     }
   };
 
-  const punchIn = async () => {
-    let loc = null;
-    if (hasOffices) {
+  // `preLoc` lets a QR scan supply an already-verified branch match
+  // (see QrScanModal below) so we skip the GPS geofence check. Any
+  // branch-mismatch warning for a QR-sourced loc is set by the caller
+  // (handleScanMatch), since translations aren't reachable in here —
+  // `t` below is intentionally shadowed to mean "current time".
+  const punchIn = async (preLoc) => {
+    let loc = preLoc || null;
+    if (!loc && hasOffices) {
       loc = await verifyLocation();
       if (!loc) return;
     }
@@ -6573,9 +6790,9 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
       },
     ]);
   };
-  const punchOut = async () => {
-    let loc = null;
-    if (hasOffices) {
+  const punchOut = async (preLoc) => {
+    let loc = preLoc || null;
+    if (!loc && hasOffices) {
       loc = await verifyLocation();
       if (!loc) return;
     }
@@ -6584,6 +6801,27 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
         a.id === rec.id ? { ...a, checkOut: timeNow(), checkOutLoc: loc } : a,
       ),
     );
+  };
+
+  // Called when QrScanModal decodes a QR code that matches one of the
+  // configured office branches. Builds the same shaped loc object
+  // verifyLocation would return (minus GPS distance, since none was
+  // taken) and routes it into whichever punch is currently pending.
+  const handleScanMatch = (office) => {
+    setScanOpen(false);
+    setLocError("");
+    if (emp.officeId && office.id !== emp.officeId) {
+      setBranchWarning(t.att.wrongBranchWarning(office.name));
+    } else {
+      setBranchWarning("");
+    }
+    const loc = {
+      officeId: office.id,
+      officeName: office.name,
+      viaQr: true,
+    };
+    if (!rec) punchIn(loc);
+    else if (!rec.checkOut) punchOut(loc);
   };
 
   return (
@@ -6690,22 +6928,46 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
         </p>
       )}
       {!rec && (
-        <Button
-          variant="accent"
-          onClick={punchIn}
-          disabled={locBusy}
-          style={{ padding: "12px 26px", fontSize: 15 }}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 10,
+          }}
         >
-          {locBusy ? (
-            <Loader2
-              size={18}
-              style={{ animation: "spin 1s linear infinite" }}
-            />
-          ) : (
-            <LogIn size={18} />
-          )}{" "}
-          {t.att.checkIn}
-        </Button>
+          <Button
+            variant="accent"
+            onClick={() => punchIn()}
+            disabled={locBusy}
+            style={{ padding: "12px 26px", fontSize: 15 }}
+          >
+            {locBusy ? (
+              <Loader2
+                size={18}
+                style={{ animation: "spin 1s linear infinite" }}
+              />
+            ) : (
+              <LogIn size={18} />
+            )}{" "}
+            {t.att.checkIn}
+          </Button>
+          {hasOffices && (
+            <>
+              <div style={{ fontSize: 11, color: T.mutedLight }}>
+                {t.att.scanQrOr}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setScanOpen(true)}
+                disabled={locBusy}
+              >
+                <QrCode size={13} /> {t.att.scanQrBtn}
+              </Button>
+            </>
+          )}
+        </div>
       )}
       {rec && !rec.checkOut && (
         <div>
@@ -6734,22 +6996,46 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
               </>
             )}
           </p>
-          <Button
-            variant="danger-solid"
-            onClick={punchOut}
-            disabled={locBusy}
-            style={{ padding: "12px 26px", fontSize: 15 }}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 10,
+            }}
           >
-            {locBusy ? (
-              <Loader2
-                size={18}
-                style={{ animation: "spin 1s linear infinite" }}
-              />
-            ) : (
-              <LogOut size={18} />
-            )}{" "}
-            {t.att.punchOutBtn}
-          </Button>
+            <Button
+              variant="danger-solid"
+              onClick={() => punchOut()}
+              disabled={locBusy}
+              style={{ padding: "12px 26px", fontSize: 15 }}
+            >
+              {locBusy ? (
+                <Loader2
+                  size={18}
+                  style={{ animation: "spin 1s linear infinite" }}
+                />
+              ) : (
+                <LogOut size={18} />
+              )}{" "}
+              {t.att.punchOutBtn}
+            </Button>
+            {hasOffices && (
+              <>
+                <div style={{ fontSize: 11, color: T.mutedLight }}>
+                  {t.att.scanQrOr}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setScanOpen(true)}
+                  disabled={locBusy}
+                >
+                  <QrCode size={13} /> {t.att.scanQrBtn}
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       )}
       {rec && rec.checkOut && (
@@ -6799,6 +7085,13 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
             )
           )}
         </div>
+      )}
+      {scanOpen && (
+        <QrScanModal
+          offices={offices}
+          onMatch={handleScanMatch}
+          onClose={() => setScanOpen(false)}
+        />
       )}
     </Card>
   );
@@ -6931,6 +7224,7 @@ function OfficeLocationSettings({ offices, setOffices }) {
   const [open, setOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(null); // null | "add" | <office being edited>
   const [confirmDel, setConfirmDel] = useState(null);
+  const [qrOffice, setQrOffice] = useState(null); // office currently shown in the QR modal
 
   const saveOffice = (data) => {
     if (formOpen === "add") {
@@ -7014,7 +7308,19 @@ function OfficeLocationSettings({ offices, setOffices }) {
                   {o.lat.toFixed(4)}, {o.lng.toFixed(4)} · {o.radius}m
                 </div>
               </div>
-              <div style={{ display: "flex", gap: 10 }}>
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <button
+                  onClick={() => setQrOffice(o)}
+                  title={t.att.officeQrBtn}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: T.muted,
+                  }}
+                >
+                  <QrCode size={14} />
+                </button>
                 <button
                   onClick={() => setFormOpen(o)}
                   style={{
@@ -7071,6 +7377,19 @@ function OfficeLocationSettings({ offices, setOffices }) {
             setOffices(offices.filter((o) => o.id !== confirmDel.id));
             setConfirmDel(null);
           }}
+        />
+      )}
+      {qrOffice && (
+        <QrModal
+          data={officeQrPayload(qrOffice.id)}
+          title={t.att.officeQrTitle(qrOffice.name)}
+          desc={t.att.officeQrDesc}
+          onClose={() => setQrOffice(null)}
+          footer={
+            <Button variant="ghost" size="sm" onClick={() => window.print()}>
+              <FileText size={13} /> {t.att.printBtn}
+            </Button>
+          }
         />
       )}
     </Card>
