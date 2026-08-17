@@ -138,6 +138,12 @@ const LANG = {
     noData: "មិនមានទិន្នន័យ",
     exportCsv: "នាំចេញ CSV",
     exportExcel: "នាំចេញ Excel",
+    clear: "សម្អាត",
+    today: "ថ្ងៃនេះ",
+    now: "ឥឡូវ",
+    timeLabel: "ម៉ោង",
+    selectDate: "ជ្រើសរើសកាលបរិច្ឆេទ",
+    noResults: "មិនមានលទ្ធផលទេ",
     pagination: { of: "នៃ" },
     dash: {
       welcome: "សូមអញ្ជើញ",
@@ -246,6 +252,14 @@ const LANG = {
         `ត្រូវការទីតាំង GPS នៅជិតសាខាមួយក្នុងចំណោម ${n} សាខា`,
       noData: "គ្មានទិន្នន័យ",
       manualEntry: "កត់ត្រាដោយដៃ",
+      dayOffNote:
+        "🛌 ថ្ងៃនេះជាថ្ងៃឈប់សម្រាករបស់អ្នក — អ្នកនៅតែអាចចុះឈ្មោះបានប្រសិនបើអ្នកមកធ្វើការ",
+      officeGeofenceTitle: "ការការពារទីតាំង GPS សម្រាប់ Check-in (ច្រើនសាខា)",
+      officeGeofenceDesc:
+        "កំណត់ទីតាំងសាខានីមួយៗ ដើម្បីតម្រូវឲ្យបុគ្គលិកនៅជិតសាខាមួយណាមួយ ពេលចុច check-in/check-out ដោយខ្លួនឯង។ ឈ្មោះសាខាដែលបុគ្គលិកចូលជិត នឹងត្រូវបានកត់ត្រាទុកជាមួយកំណត់ត្រាវត្តមានរបស់គេ។ បើមិនបន្ថែមសាខាណាមួយទេ ការការពារទីតាំងនឹងមិនដំណើរការទេ។",
+      officeCountLabel: (n) => `${n} សាខា`,
+      officeNotSet: "មិនទាន់កំណត់",
+      officeNoneYet: "មិនទាន់មានសាខាទេ",
     },
     lv: {
       addBtn: "សំណើច្បាប់ថ្មី",
@@ -266,6 +280,19 @@ const LANG = {
       rejectReasonRequired: "សូមបញ្ចូលមូលហេតុបដិសេធ",
       confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបសំណើនេះ?",
       noRequest: "មិនទាន់មានសំណើទេ",
+      typeAnnual: "ច្បាប់ប្រចាំឆ្នាំ",
+      typeSick: "ច្បាប់ឈឺ",
+      typeOther: "ផ្សេងៗ",
+      remainingAnnual: (n) => `នៅសល់ ${n} ថ្ងៃច្បាប់ប្រចាំឆ្នាំ`,
+      remainingSick: (n) => `នៅសល់ ${n} ថ្ងៃច្បាប់ឈឺ`,
+      overQuotaWarning: (days, typeLabel, remaining) =>
+        `⚠️ សំណើនេះ (${days} ថ្ងៃ) លើសពីសមតុល្យ${typeLabel}ដែលនៅសល់ (${remaining} ថ្ងៃ) — អ្នកនៅតែអាចដាក់ស្នើបាន តែសូមរង់ចាំការសម្រេចពី admin`,
+      reasonPlaceholder: "សរសេរមូលហេតុសង្ខេប...",
+      submit: "ដាក់ស្នើ",
+      annualLeaveYear: (y) => `ថ្ងៃច្បាប់ប្រចាំឆ្នាំ ${y}`,
+      sickLeaveYear: (y) => `ថ្ងៃច្បាប់ឈឺ ${y}`,
+      usedOfQuota: (used, quota) => `បានប្រើ ${used} ក្នុងចំណោម ${quota} ថ្ងៃ`,
+      remainingDays: (n) => `នៅសល់ ${n} ថ្ងៃ`,
     },
     ot: {
       addBtn: "សុំ OT ថ្មី",
@@ -309,6 +336,9 @@ const LANG = {
       otPay: "ប្រាក់ OT",
       viewSlip: "មើលសន្លឹកប្រាក់ខែ",
       unmarkPaid: "ដកសញ្ញាបានបើក",
+      monthLabel: "ខែ",
+      currentMonthTag: "(ខែបច្ចុប្បន្ន)",
+      viewingPastMonth: "កំពុងមើលប្រវត្តិខែមុន",
       taxLabel: "ពន្ធលើប្រាក់ខែ",
       insuranceLabel: "ធានារ៉ាប់រង",
       policyTitle: "គោលការណ៍កាត់ប្រាក់ខែ",
@@ -424,13 +454,25 @@ const LANG = {
       addTitle: "បន្ថែមអ្នកគ្រប់គ្រង",
       roleLabel: "តួនាទី",
       confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបគណនីនេះ?",
+      username: "ឈ្មោះគណនី (Username)",
+      usernamePlaceholder: "ឧ. manager2",
+      password: "ពាក្យសម្ងាត់",
+      fullAccessSuffix: "— សិទ្ធិពេញលេញ",
+      permsNote:
+        'តើតួនាទីនីមួយៗអាចធ្វើអ្វីបាន? កំណត់នៅទំព័រ "សិទ្ធិតួនាទី" (Superadmin ប៉ុណ្ណោះ)',
     },
     profile: {
       title: "ប្រវត្តិរូបរបស់ខ្ញុំ",
       editBtn: "កែប្រវត្តិរូប",
-      changePin: "ផ្លាស់ប្តូរ PIN",
-      oldPin: "PIN ចាស់",
-      newPin: "PIN ថ្មី",
+      changePin: "ប្តូរកូដសម្ងាត់ (PIN)",
+      oldPin: "កូដសម្ងាត់បច្ចុប្បន្ន",
+      newPin: "កូដសម្ងាត់ថ្មី",
+      confirmPin: "បញ្ជាក់កូដសម្ងាត់ថ្មី",
+      pinDesc: "កូដសម្ងាត់នេះប្រើសម្រាប់ចូលប្រើប្រព័ន្ធ។ សូមកុំប្រាប់អ្នកដទៃ។",
+      pinChanged: "បានប្តូរកូដសម្ងាត់ដោយជោគជ័យ",
+      pinWrongCurrent: "កូដសម្ងាត់បច្ចុប្បន្នមិនត្រឹមត្រូវទេ",
+      pinTooShort: "កូដសម្ងាត់ថ្មីត្រូវមានយ៉ាងតិច 4 ខ្ទង់",
+      pinMismatch: "ការបញ្ជាក់កូដសម្ងាត់ថ្មីមិនត្រូវគ្នាទេ",
     },
     qr: {
       title: "QR Code សម្រាប់បុគ្គលិក",
@@ -606,6 +648,12 @@ const LANG = {
     noData: "No data",
     exportCsv: "Export CSV",
     exportExcel: "Export Excel",
+    clear: "Clear",
+    today: "Today",
+    now: "Now",
+    timeLabel: "Time",
+    selectDate: "Select a date",
+    noResults: "No results found",
     pagination: { of: "of" },
     dash: {
       welcome: "Welcome",
@@ -713,6 +761,14 @@ const LANG = {
       gpsRequiredHint: (n) => `GPS location required near one of ${n} branches`,
       noData: "No data",
       manualEntry: "Manual Entry",
+      dayOffNote:
+        "🛌 Today is your day off — you can still check in if you're coming to work",
+      officeGeofenceTitle: "GPS Check-in Geofencing (Multiple Branches)",
+      officeGeofenceDesc:
+        "Set the location of each branch to require employees to be near a branch when they self check-in/check-out. The branch they're closest to is recorded on their attendance record. If no branch is added, geofencing is disabled.",
+      officeCountLabel: (n) => `${n} branches`,
+      officeNotSet: "Not set",
+      officeNoneYet: "No branches yet",
     },
     lv: {
       addBtn: "New Leave Request",
@@ -733,6 +789,19 @@ const LANG = {
       rejectReasonRequired: "Please enter a rejection reason",
       confirmDel: "Are you sure you want to delete this request?",
       noRequest: "No requests yet",
+      typeAnnual: "Annual Leave",
+      typeSick: "Sick Leave",
+      typeOther: "Other",
+      remainingAnnual: (n) => `${n} annual leave days remaining`,
+      remainingSick: (n) => `${n} sick leave days remaining`,
+      overQuotaWarning: (days, typeLabel, remaining) =>
+        `⚠️ This request (${days} days) exceeds your remaining ${typeLabel} balance (${remaining} days) — you can still submit it, but it'll need admin approval`,
+      reasonPlaceholder: "Write a brief reason...",
+      submit: "Submit",
+      annualLeaveYear: (y) => `${y} Annual Leave`,
+      sickLeaveYear: (y) => `${y} Sick Leave`,
+      usedOfQuota: (used, quota) => `Used ${used} of ${quota} days`,
+      remainingDays: (n) => `${n} days remaining`,
     },
     ot: {
       addBtn: "New OT Request",
@@ -776,6 +845,9 @@ const LANG = {
       otPay: "OT Pay",
       viewSlip: "View Payslip",
       unmarkPaid: "Unmark as Paid",
+      monthLabel: "Month",
+      currentMonthTag: "(Current Month)",
+      viewingPastMonth: "Viewing past month's history",
       taxLabel: "Income Tax",
       insuranceLabel: "Insurance",
       policyTitle: "Payroll Deduction Policy",
@@ -891,13 +963,26 @@ const LANG = {
       addTitle: "Add Admin",
       roleLabel: "Role",
       confirmDel: "Are you sure you want to delete this account?",
+      username: "Username",
+      usernamePlaceholder: "e.g. manager2",
+      password: "Password",
+      fullAccessSuffix: "— Full Access",
+      permsNote:
+        'What can each role do? Set it on the "Role Permissions" page (Superadmin only)',
     },
     profile: {
       title: "My Profile",
       editBtn: "Edit Profile",
       changePin: "Change PIN",
-      oldPin: "Old PIN",
+      oldPin: "Current PIN",
       newPin: "New PIN",
+      confirmPin: "Confirm New PIN",
+      pinDesc:
+        "This PIN is used to log into the system. Don't share it with anyone.",
+      pinChanged: "PIN changed successfully",
+      pinWrongCurrent: "Current PIN is incorrect",
+      pinTooShort: "New PIN must be at least 4 digits",
+      pinMismatch: "PIN confirmation doesn't match",
     },
     qr: {
       title: "Employee Portal QR Code",
@@ -3831,6 +3916,7 @@ function useCloseOnOutside(ref, onClose) {
 }
 
 function DatePicker({ value, onChange, placeholder, style, disabled }) {
+  const { t } = useLang();
   const [open, setOpen] = useState(false);
   const selected = parseYMD(value);
   const [cursor, setCursor] = useState(() => selected || new Date());
@@ -3888,7 +3974,7 @@ function DatePicker({ value, onChange, placeholder, style, disabled }) {
         style={disabled ? { opacity: 0.6, cursor: "not-allowed" } : undefined}
       >
         <span className={value ? "" : "wf-dp-placeholder"}>
-          {value ? fmtDateDisplay(value) : placeholder || "ជ្រើសរើសកាលបរិច្ឆេទ"}
+          {value ? fmtDateDisplay(value) : placeholder || t.selectDate}
         </span>
         <CalendarDays size={15} style={{ opacity: 0.55, flexShrink: 0 }} />
       </button>
@@ -3947,7 +4033,7 @@ function DatePicker({ value, onChange, placeholder, style, disabled }) {
                 setOpen(false);
               }}
             >
-              សម្អាត
+              {t.clear}
             </button>
             <button
               type="button"
@@ -3957,7 +4043,7 @@ function DatePicker({ value, onChange, placeholder, style, disabled }) {
                 setOpen(false);
               }}
             >
-              ថ្ងៃនេះ
+              {t.today}
             </button>
           </div>
         </div>
@@ -3979,6 +4065,7 @@ const TP_HOURS = Array.from({ length: 24 }, (_, i) => i);
 const TP_MINUTES = Array.from({ length: 60 }, (_, i) => i);
 
 function TimePicker({ value, onChange, placeholder, style, disabled }) {
+  const { t } = useLang();
   const [open, setOpen] = useState(false);
   const wrapRef = useRef(null);
   const hourColRef = useRef(null);
@@ -4014,7 +4101,7 @@ function TimePicker({ value, onChange, placeholder, style, disabled }) {
         style={disabled ? { opacity: 0.6, cursor: "not-allowed" } : undefined}
       >
         <span className={value ? "" : "wf-dp-placeholder"}>
-          {value || placeholder || "ម៉ោង"}
+          {value || placeholder || t.timeLabel}
         </span>
         <Clock size={15} style={{ opacity: 0.55, flexShrink: 0 }} />
       </button>
@@ -4064,7 +4151,7 @@ function TimePicker({ value, onChange, placeholder, style, disabled }) {
                 setOpen(false);
               }}
             >
-              សម្អាត
+              {t.clear}
             </button>
             <button
               type="button"
@@ -4075,7 +4162,7 @@ function TimePicker({ value, onChange, placeholder, style, disabled }) {
                 setOpen(false);
               }}
             >
-              ឥឡូវ
+              {t.now}
             </button>
           </div>
         </div>
@@ -4948,8 +5035,8 @@ function Dashboard({
                         fontFamily: "'JetBrains Mono',monospace",
                       }}
                     >
-                      ចូល {a.checkIn || "—"}{" "}
-                      {a.checkOut ? `· ចេញ ${a.checkOut}` : ""}
+                      {t.att.checkIn} {a.checkIn || "—"}{" "}
+                      {a.checkOut ? `· ${t.att.checkOut} ${a.checkOut}` : ""}
                     </div>
                     {lateMins > 0 && (
                       <div
@@ -5939,7 +6026,7 @@ function Employees({
               padding: "40px 0",
             }}
           >
-            មិនមានលទ្ធផលទេ
+            {t.noResults}
           </p>
         )}
       </div>
@@ -6567,8 +6654,7 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
             marginRight: "auto",
           }}
         >
-          🛌 ថ្ងៃនេះជាថ្ងៃឈប់សម្រាករបស់អ្នក —
-          អ្នកនៅតែអាចចុះឈ្មោះបានប្រសិនបើអ្នកមកធ្វើការ
+          {t.att.dayOffNote}
         </p>
       )}
       {branchWarning && (
@@ -6872,7 +6958,7 @@ function OfficeLocationSettings({ offices, setOffices }) {
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <MapPin size={16} color={T.forest} />
           <span style={{ fontWeight: 600, fontSize: 13.5, color: T.ink }}>
-            ការការពារទីតាំង GPS សម្រាប់ Check-in (ច្រើនសាខា)
+            {t.att.officeGeofenceTitle}
           </span>
         </div>
         <span
@@ -6881,7 +6967,9 @@ function OfficeLocationSettings({ offices, setOffices }) {
             color: offices.length ? T.textSoft : T.mutedLight,
           }}
         >
-          {offices.length > 0 ? `${offices.length} សាខា` : "មិនទាន់កំណត់"}
+          {offices.length > 0
+            ? t.att.officeCountLabel(offices.length)
+            : t.att.officeNotSet}
         </span>
       </div>
       {open && (
@@ -6893,14 +6981,11 @@ function OfficeLocationSettings({ offices, setOffices }) {
           }}
         >
           <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
-            កំណត់ទីតាំងសាខានីមួយៗ ដើម្បីតម្រូវឲ្យបុគ្គលិកនៅជិតសាខាមួយណាមួយ
-            ពេលចុច check-in/check-out ដោយខ្លួនឯង។ ឈ្មោះសាខាដែលបុគ្គលិកចូលជិត
-            នឹងត្រូវបានកត់ត្រាទុកជាមួយកំណត់ត្រាវត្តមានរបស់គេ។
-            បើមិនបន្ថែមសាខាណាមួយទេ ការការពារទីតាំងនឹងមិនដំណើរការទេ។
+            {t.att.officeGeofenceDesc}
           </p>
           {offices.length === 0 && (
             <p style={{ fontSize: 12, color: T.mutedLight, marginBottom: 12 }}>
-              មិនទាន់មានសាខាទេ
+              {t.att.officeNoneYet}
             </p>
           )}
           {offices.map((o) => (
@@ -7736,11 +7821,11 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
     requestedDays > remainingForType;
   return (
     <div>
-      <Field label="ប្រភេទច្បាប់">
+      <Field label={t.lv.type}>
         <Select value={f.type} onChange={set("type")}>
-          <option value="annual">ច្បាប់ប្រចាំឆ្នាំ</option>
-          <option value="sick">ច្បាប់ឈឺ</option>
-          <option value="other">ផ្សេងៗ</option>
+          <option value="annual">{t.lv.typeAnnual}</option>
+          <option value="sick">{t.lv.typeSick}</option>
+          <option value="other">{t.lv.typeOther}</option>
         </Select>
       </Field>
       {f.type === "annual" && typeof remainingForType === "number" && (
@@ -7752,7 +7837,7 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
             marginBottom: 12,
           }}
         >
-          នៅសល់ {remainingForType} ថ្ងៃច្បាប់ប្រចាំឆ្នាំ
+          {t.lv.remainingAnnual(remainingForType)}
         </p>
       )}
       {f.type === "sick" && typeof remainingForType === "number" && (
@@ -7764,14 +7849,14 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
             marginBottom: 12,
           }}
         >
-          នៅសល់ {remainingForType} ថ្ងៃច្បាប់ឈឺ
+          {t.lv.remainingSick(remainingForType)}
         </p>
       )}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <Field label="ចាប់ពីថ្ងៃ">
+        <Field label={t.lv.startDate}>
           <DatePicker value={f.startDate} onChange={set("startDate")} />
         </Field>
-        <Field label="ដល់ថ្ងៃ">
+        <Field label={t.lv.endDate}>
           <DatePicker value={f.endDate} onChange={set("endDate")} />
         </Field>
       </div>
@@ -7799,20 +7884,21 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
             marginBottom: 12,
           }}
         >
-          ⚠️ សំណើនេះ ({requestedDays} ថ្ងៃ) លើសពីសមតុល្យ
-          {f.type === "annual" ? "ច្បាប់ប្រចាំឆ្នាំ" : "ច្បាប់ឈឺ"}ដែលនៅសល់ (
-          {remainingForType} ថ្ងៃ) — អ្នកនៅតែអាចដាក់ស្នើបាន
-          តែសូមរង់ចាំការសម្រេចពី admin
+          {t.lv.overQuotaWarning(
+            requestedDays,
+            f.type === "annual" ? t.lv.typeAnnual : t.lv.typeSick,
+            remainingForType,
+          )}
         </p>
       )}
-      <Field label="មូលហេតុ">
+      <Field label={t.lv.reason}>
         <textarea
           className="wf-input"
           rows={3}
           style={{ resize: "vertical", fontFamily: "inherit" }}
           value={f.reason}
           onChange={set("reason")}
-          placeholder="សរសេរមូលហេតុសង្ខេប..."
+          placeholder={t.lv.reasonPlaceholder}
         />
       </Field>
       <div
@@ -7833,7 +7919,7 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
           onClick={() => onSave(f)}
           disabled={invalidRange || !f.startDate || !f.endDate}
         >
-          ដាក់ស្នើ
+          {t.lv.submit}
         </Button>
       </div>
     </div>
@@ -8060,10 +8146,10 @@ function LeaveRequests({
                   marginBottom: 2,
                 }}
               >
-                ថ្ងៃច្បាប់ប្រចាំឆ្នាំ {new Date().getFullYear()}
+                {t.lv.annualLeaveYear(new Date().getFullYear())}
               </div>
               <div style={{ fontSize: 13, color: T.textSoft }}>
-                បានប្រើ {bal.used} ក្នុងចំណោម {bal.quota} ថ្ងៃ
+                {t.lv.usedOfQuota(bal.used, bal.quota)}
               </div>
             </div>
             <div
@@ -8074,7 +8160,7 @@ function LeaveRequests({
                 color: bal.remaining <= 0 ? T.rose : T.forestText,
               }}
             >
-              នៅសល់ {bal.remaining} ថ្ងៃ
+              {t.lv.remainingDays(bal.remaining)}
             </div>
           </Card>
           <Card
@@ -8099,10 +8185,10 @@ function LeaveRequests({
                   marginBottom: 2,
                 }}
               >
-                ថ្ងៃច្បាប់ឈឺ {new Date().getFullYear()}
+                {t.lv.sickLeaveYear(new Date().getFullYear())}
               </div>
               <div style={{ fontSize: 13, color: T.textSoft }}>
-                បានប្រើ {sickBal.used} ក្នុងចំណោម {sickBal.quota} ថ្ងៃ
+                {t.lv.usedOfQuota(sickBal.used, sickBal.quota)}
               </div>
             </div>
             <div
@@ -8113,7 +8199,7 @@ function LeaveRequests({
                 color: sickBal.remaining <= 0 ? T.rose : T.blue,
               }}
             >
-              នៅសល់ {sickBal.remaining} ថ្ងៃ
+              {t.lv.remainingDays(sickBal.remaining)}
             </div>
           </Card>
         </div>
@@ -8150,7 +8236,7 @@ function LeaveRequests({
                       padding: "24px 0",
                     }}
                   >
-                    មិនទាន់មានសំណើទេ
+                    {t.lv.noRequest}
                   </td>
                 </tr>
               )}
@@ -8220,7 +8306,7 @@ function LeaveRequests({
                     padding: "24px 0",
                   }}
                 >
-                  មិនទាន់មានសំណើទេ
+                  {t.lv.noRequest}
                 </td>
               </tr>
             )}
@@ -8263,14 +8349,16 @@ function LeaveRequests({
                     {getLeaveTypeLabel(lang)[r.type] || r.type}
                     {r.type === "annual" && emp && (
                       <div style={{ fontSize: 10.5, color: T.muted }}>
-                        នៅសល់ {annualLeaveBalance(emp, leaveRequests).remaining}{" "}
-                        ថ្ងៃ
+                        {t.lv.remainingDays(
+                          annualLeaveBalance(emp, leaveRequests).remaining,
+                        )}
                       </div>
                     )}
                     {r.type === "sick" && emp && (
                       <div style={{ fontSize: 10.5, color: T.muted }}>
-                        នៅសល់ {sickLeaveBalance(emp, leaveRequests).remaining}{" "}
-                        ថ្ងៃ
+                        {t.lv.remainingDays(
+                          sickLeaveBalance(emp, leaveRequests).remaining,
+                        )}
                       </div>
                     )}
                   </td>
@@ -10490,21 +10578,21 @@ function AdminAccountForm({ initial, onSave, onCancel }) {
           placeholder="ឧ. សុខ សម្បត្តិ"
         />
       </Field>
-      <Field label="ឈ្មោះគណនី (Username)">
+      <Field label={t.admAcc.username}>
         <Input
           value={f.username}
           onChange={set("username")}
-          placeholder="ឧ. manager2"
+          placeholder={t.admAcc.usernamePlaceholder}
         />
       </Field>
-      <Field label="ពាក្យសម្ងាត់">
+      <Field label={t.admAcc.password}>
         <Input
           value={f.password}
           onChange={set("password")}
           placeholder="••••••••"
         />
       </Field>
-      <Field label="សិទ្ធិ">
+      <Field label={t.admAcc.roleLabel}>
         <Select value={f.role} onChange={set("role")}>
           {ADMIN_RANKS.map((rank) => (
             <option key={rank} value={rank}>
@@ -10512,7 +10600,7 @@ function AdminAccountForm({ initial, onSave, onCancel }) {
             </option>
           ))}
           <option value="superadmin">
-            {adminRoleLabel("superadmin", lang)} — សិទ្ធិពេញលេញ
+            {adminRoleLabel("superadmin", lang)} {t.admAcc.fullAccessSuffix}
           </option>
         </Select>
       </Field>
@@ -10524,8 +10612,7 @@ function AdminAccountForm({ initial, onSave, onCancel }) {
           marginBottom: 14,
         }}
       >
-        តើតួនាទីនីមួយៗអាចធ្វើអ្វីបាន? កំណត់នៅទំព័រ "សិទ្ធិតួនាទី" (Superadmin
-        ប៉ុណ្ណោះ)
+        {t.admAcc.permsNote}
       </p>
       <div
         style={{
@@ -11073,15 +11160,15 @@ function MyProfile({
   const savePin = () => {
     setPinSaved(false);
     if ((currentEmp.pin || "") !== pinForm.current.trim()) {
-      setPinError("កូដសម្ងាត់បច្ចុប្បន្នមិនត្រឹមត្រូវទេ");
+      setPinError(t.profile.pinWrongCurrent);
       return;
     }
     if (!pinForm.next.trim() || pinForm.next.trim().length < 4) {
-      setPinError("កូដសម្ងាត់ថ្មីត្រូវមានយ៉ាងតិច 4 ខ្ទង់");
+      setPinError(t.profile.pinTooShort);
       return;
     }
     if (pinForm.next.trim() !== pinForm.confirm.trim()) {
-      setPinError("ការបញ្ជាក់កូដសម្ងាត់ថ្មីមិនត្រូវគ្នាទេ");
+      setPinError(t.profile.pinMismatch);
       return;
     }
     setPinError("");
@@ -11243,12 +11330,12 @@ function MyProfile({
             gap: 8,
           }}
         >
-          <KeyRound size={16} /> ប្តូរកូដសម្ងាត់ (PIN)
+          <KeyRound size={16} /> {t.profile.changePin}
         </h3>
         <p style={{ fontSize: 12, color: T.muted, marginBottom: 16 }}>
-          កូដសម្ងាត់នេះប្រើសម្រាប់ចូលប្រើប្រព័ន្ធ។ សូមកុំប្រាប់អ្នកដទៃ។
+          {t.profile.pinDesc}
         </p>
-        <Field label="កូដសម្ងាត់បច្ចុប្បន្ន">
+        <Field label={t.profile.oldPin}>
           <Input
             type="password"
             inputMode="numeric"
@@ -11260,7 +11347,7 @@ function MyProfile({
             }}
           />
         </Field>
-        <Field label="កូដសម្ងាត់ថ្មី">
+        <Field label={t.profile.newPin}>
           <Input
             type="password"
             inputMode="numeric"
@@ -11272,7 +11359,7 @@ function MyProfile({
             }}
           />
         </Field>
-        <Field label="បញ្ជាក់កូដសម្ងាត់ថ្មី">
+        <Field label={t.profile.confirmPin}>
           <Input
             type="password"
             inputMode="numeric"
@@ -11300,11 +11387,11 @@ function MyProfile({
               marginBottom: 10,
             }}
           >
-            <CheckCircle2 size={14} /> បានប្តូរកូដសម្ងាត់ដោយជោគជ័យ
+            <CheckCircle2 size={14} /> {t.profile.pinChanged}
           </p>
         )}
         <Button variant="accent" onClick={savePin}>
-          ប្តូរកូដសម្ងាត់
+          {t.profile.changePin}
         </Button>
       </Card>
 
@@ -13762,7 +13849,7 @@ function Payroll({
             letterSpacing: ".03em",
           }}
         >
-          {lang === "en" ? "Month" : "ខែ"}
+          {t.pay.monthLabel}
         </span>
         <Select
           value={mk}
@@ -13772,7 +13859,7 @@ function Payroll({
           {availableMonths.map((m) => (
             <option key={m} value={m}>
               {monthLabel(m)}
-              {m === currentMk ? " (ខែបច្ចុប្បន្ន)" : ""}
+              {m === currentMk ? ` ${t.pay.currentMonthTag}` : ""}
             </option>
           ))}
         </Select>
@@ -13787,7 +13874,7 @@ function Payroll({
               borderRadius: 8,
             }}
           >
-            កំពុងមើលប្រវត្តិខែមុន
+            {t.pay.viewingPastMonth}
           </span>
         )}
         {role === "admin" && (
