@@ -191,6 +191,10 @@ const LANG = {
       staffCount: "នាក់",
       noDesc: "គ្មានការពិពណ៌នា",
       confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបនាយកដ្ឋាននេះ?",
+      namePlaceholder: "ឧ. ធនធានមនុស្ស",
+      codePlaceholder: "ឧ. HR",
+      confirmDelWithCount: (name, n) =>
+        `តើអ្នកពិតជាចង់លុបនាយកដ្ឋាន "${name}" មែនទេ? (មានបុគ្គលិក ${n} នាក់)`,
     },
     emps: {
       addBtn: "បន្ថែមបុគ្គលិក",
@@ -212,6 +216,22 @@ const LANG = {
       confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបបុគ្គលិកនេះ?",
       noEmp: "មិនទាន់មានបុគ្គលិកទេ",
       printBadge: "បោះពុម្ពកាតសម្គាល់",
+      namePlaceholder: "ឧ. លោក សុវណ្ណ ដារា",
+      codePlaceholder: "EMP-004",
+      rolePlaceholder: "ឧ. Accountant",
+      pinLabel: "កូដសម្ងាត់ PIN (សម្រាប់ Login)",
+      pinRegenerate: "បង្កើតថ្មី",
+      status: "ស្ថានភាព",
+      branch: "សាខា (Branch)",
+      branchNotSet: "មិនទាន់កំណត់",
+      annualLeaveDaysLabel: "ថ្ងៃច្បាប់ប្រចាំឆ្នាំ (ថ្ងៃ/ឆ្នាំ)",
+      sickLeaveDaysLabel: "ថ្ងៃច្បាប់ឈឺ (ថ្ងៃ/ឆ្នាំ)",
+      weeklyOffLabel: "ថ្ងៃឈប់សម្រាកប្រចាំសប្តាហ៍",
+      customDaysOffLabel: "ថ្ងៃឈប់សម្រាកពិសេស (កាលបរិច្ឆេទជាក់លាក់)",
+      addBtnShort: "បន្ថែម",
+      searchPlaceholder: "ស្វែងរកបុគ្គលិក...",
+      allBranches: "គ្រប់សាខា",
+      confirmDelWithName: (name) => `តើអ្នកពិតជាចង់លុប "${name}" មែនទេ?`,
     },
     sh: {
       addBtn: "បន្ថែមវេន",
@@ -224,6 +244,11 @@ const LANG = {
       confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបវេននេះ?",
       noShift: "មិនទាន់មានវេនទេ",
       assignedEmp: "បុគ្គលិកប្រើវេននេះ",
+      namePlaceholder: "ឧ. វេនព្រឹក",
+      overnightHint: "ⓘ វេននេះលើសពាក់កណ្តាលអធ្រាត្រ (ឧ. ចូលយប់ ចេញព្រឹក)",
+      overnightTag: "(ឆ្លងអធ្រាត្រ)",
+      confirmDelWithCount: (name, n) =>
+        `តើអ្នកពិតជាចង់លុបវេន "${name}" មែនទេ? (មានបុគ្គលិក ${n} នាក់កំពុងប្រើវេននេះ)`,
     },
     att: {
       checkIn: "ចូលធ្វើការ",
@@ -260,6 +285,20 @@ const LANG = {
       officeCountLabel: (n) => `${n} សាខា`,
       officeNotSet: "មិនទាន់កំណត់",
       officeNoneYet: "មិនទាន់មានសាខាទេ",
+      officeNameLabel: "ឈ្មោះសាខា / ការិយាល័យ",
+      officeNamePlaceholder: "ការិយាល័យកណ្តាល, សាខាទួលគោក...",
+      officeRadiusLabel: "កាំអនុញ្ញាត (ម៉ែត្រ)",
+      officeUseCurrentLoc: "ប្រើទីតាំងបច្ចុប្បន្ន",
+      officeGpsFailed: "មិនអាចទាញយកទីតាំង GPS បច្ចុប្បន្នបានទេ",
+      officeNameRequired: "សូមបញ្ចូលឈ្មោះសាខា/ការិយាល័យ",
+      officeCoordsRequired: "សូមបំពេញកូអរដោនេ និងកាំឲ្យត្រឹមត្រូវ",
+      officeAddBtn: "បន្ថែមសាខា",
+      officeEditTitle: "កែសម្រួលសាខា",
+      officeConfirmDel: (name) => `តើអ្នកពិតជាចង់លុបសាខា "${name}" មែនទេ?`,
+      statusPresent: "មកធ្វើការ",
+      statusLate: "មកយឺត",
+      statusAbsent: "អវត្តមាន (មិនបានអនុញ្ញាត)",
+      statusLeavePaid: "ឈប់សម្រាក (មានប្រាក់ខែ)",
       scanQrBtn: "ស្កេន QR សាខា",
       scanQrOr: "ឬ",
       scanQrTitle: "ស្កេន QR សាខា",
@@ -311,6 +350,9 @@ const LANG = {
       sickLeaveYear: (y) => `ថ្ងៃច្បាប់ឈឺ ${y}`,
       usedOfQuota: (used, quota) => `បានប្រើ ${used} ក្នុងចំណោម ${quota} ថ្ងៃ`,
       remainingDays: (n) => `នៅសល់ ${n} ថ្ងៃ`,
+      modalTitle: "ស្នើសុំច្បាប់ឈប់សម្រាក",
+      fromShort: "ចាប់ពី",
+      toShort: "ដល់",
     },
     ot: {
       addBtn: "សុំ OT ថ្មី",
@@ -478,6 +520,9 @@ const LANG = {
       fullAccessSuffix: "— សិទ្ធិពេញលេញ",
       permsNote:
         'តើតួនាទីនីមួយៗអាចធ្វើអ្វីបាន? កំណត់នៅទំព័រ "សិទ្ធិតួនាទី" (Superadmin ប៉ុណ្ណោះ)',
+      confirmDelWithName: (name) => `តើអ្នកពិតជាចង់លុបគណនី "${name}" មែនទេ?`,
+      fullName: "ឈ្មោះពេញ",
+      fullNamePlaceholder: "ឧ. សុខ សម្បត្តិ",
     },
     profile: {
       title: "ប្រវត្តិរូបរបស់ខ្ញុំ",
@@ -491,6 +536,11 @@ const LANG = {
       pinWrongCurrent: "កូដសម្ងាត់បច្ចុប្បន្នមិនត្រឹមត្រូវទេ",
       pinTooShort: "កូដសម្ងាត់ថ្មីត្រូវមានយ៉ាងតិច 4 ខ្ទង់",
       pinMismatch: "ការបញ្ជាក់កូដសម្ងាត់ថ្មីមិនត្រូវគ្នាទេ",
+      joinedSince: "ចូលបម្រើការតាំងពី",
+      photoLabel: "រូបភាពប្រវត្តិរូប",
+      choosePhoto: "ជ្រើសរើសរូបភាព",
+      phone: "លេខទូរស័ព្ទ",
+      email: "អ៊ីមែល",
     },
     qr: {
       title: "QR Code សម្រាប់បុគ្គលិក",
@@ -719,6 +769,10 @@ const LANG = {
       staffCount: "staff",
       noDesc: "No description",
       confirmDel: "Are you sure you want to delete this department?",
+      namePlaceholder: "e.g. Human Resources",
+      codePlaceholder: "e.g. HR",
+      confirmDelWithCount: (name, n) =>
+        `Are you sure you want to delete "${name}"? (${n} staff assigned)`,
     },
     emps: {
       addBtn: "Add Employee",
@@ -740,6 +794,23 @@ const LANG = {
       confirmDel: "Are you sure you want to delete this employee?",
       noEmp: "No employees yet",
       printBadge: "Print ID Badge",
+      namePlaceholder: "e.g. John Doe",
+      codePlaceholder: "EMP-004",
+      rolePlaceholder: "e.g. Accountant",
+      pinLabel: "PIN (used for Login)",
+      pinRegenerate: "Regenerate",
+      status: "Status",
+      branch: "Branch",
+      branchNotSet: "Not set",
+      annualLeaveDaysLabel: "Annual Leave Days (per year)",
+      sickLeaveDaysLabel: "Sick Leave Days (per year)",
+      weeklyOffLabel: "Weekly Day(s) Off",
+      customDaysOffLabel: "Custom Days Off (specific dates)",
+      addBtnShort: "Add",
+      searchPlaceholder: "Search employees...",
+      allBranches: "All Branches",
+      confirmDelWithName: (name) =>
+        `Are you sure you want to delete "${name}"?`,
     },
     sh: {
       addBtn: "Add Shift",
@@ -752,6 +823,12 @@ const LANG = {
       confirmDel: "Are you sure you want to delete this shift?",
       noShift: "No shifts yet",
       assignedEmp: "Employees using this shift",
+      namePlaceholder: "e.g. Morning Shift",
+      overnightHint:
+        "ⓘ This shift crosses midnight (e.g. starts at night, ends in the morning)",
+      overnightTag: "(overnight)",
+      confirmDelWithCount: (name, n) =>
+        `Are you sure you want to delete "${name}"? (${n} staff use this shift)`,
     },
     att: {
       checkIn: "Check In",
@@ -787,6 +864,21 @@ const LANG = {
       officeCountLabel: (n) => `${n} branches`,
       officeNotSet: "Not set",
       officeNoneYet: "No branches yet",
+      officeNameLabel: "Branch / Office Name",
+      officeNamePlaceholder: "Main Office, Toul Kork Branch...",
+      officeRadiusLabel: "Allowed Radius (meters)",
+      officeUseCurrentLoc: "Use Current Location",
+      officeGpsFailed: "Couldn't get your current GPS location",
+      officeNameRequired: "Please enter a branch/office name",
+      officeCoordsRequired: "Please fill in valid coordinates and radius",
+      officeAddBtn: "Add Branch",
+      officeEditTitle: "Edit Branch",
+      officeConfirmDel: (name) =>
+        `Are you sure you want to delete branch "${name}"?`,
+      statusPresent: "Present",
+      statusLate: "Late",
+      statusAbsent: "Absent (Unexcused)",
+      statusLeavePaid: "On Leave (Paid)",
       scanQrBtn: "Scan Branch QR",
       scanQrOr: "or",
       scanQrTitle: "Scan Branch QR",
@@ -838,6 +930,9 @@ const LANG = {
       annualLeaveYear: (y) => `${y} Annual Leave`,
       sickLeaveYear: (y) => `${y} Sick Leave`,
       usedOfQuota: (used, quota) => `Used ${used} of ${quota} days`,
+      modalTitle: "New Leave Request",
+      fromShort: "From",
+      toShort: "To",
       remainingDays: (n) => `${n} days remaining`,
     },
     ot: {
@@ -1006,6 +1101,10 @@ const LANG = {
       fullAccessSuffix: "— Full Access",
       permsNote:
         'What can each role do? Set it on the "Role Permissions" page (Superadmin only)',
+      confirmDelWithName: (name) =>
+        `Are you sure you want to delete account "${name}"?`,
+      fullName: "Full Name",
+      fullNamePlaceholder: "e.g. John Doe",
     },
     profile: {
       title: "My Profile",
@@ -1020,6 +1119,11 @@ const LANG = {
       pinWrongCurrent: "Current PIN is incorrect",
       pinTooShort: "New PIN must be at least 4 digits",
       pinMismatch: "PIN confirmation doesn't match",
+      joinedSince: "Joined since",
+      photoLabel: "Profile Photo",
+      choosePhoto: "Choose Photo",
+      phone: "Phone",
+      email: "Email",
     },
     qr: {
       title: "Employee Portal QR Code",
@@ -5535,22 +5639,26 @@ function EmployeeForm({
         <Input
           value={f.name}
           onChange={set("name")}
-          placeholder="ឧ. លោក សុវណ្ណ ដារា"
+          placeholder={t.emps.namePlaceholder}
         />
       </Field>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         <Field label={t.emps.code}>
-          <Input value={f.code} onChange={set("code")} placeholder="EMP-004" />
+          <Input
+            value={f.code}
+            onChange={set("code")}
+            placeholder={t.emps.codePlaceholder}
+          />
         </Field>
         <Field label={t.emps.role}>
           <Input
             value={f.role}
             onChange={set("role")}
-            placeholder="ឧ. Accountant"
+            placeholder={t.emps.rolePlaceholder}
           />
         </Field>
       </div>
-      <Field label="កូដសម្ងាត់ PIN (សម្រាប់ Login)">
+      <Field label={t.emps.pinLabel}>
         <div style={{ display: "flex", gap: 8 }}>
           <Input
             value={f.pin}
@@ -5565,12 +5673,12 @@ function EmployeeForm({
             size="sm"
             onClick={() => setF({ ...f, pin: randomPin() })}
           >
-            <KeyRound size={13} /> បង្កើតថ្មី
+            <KeyRound size={13} /> {t.emps.pinRegenerate}
           </Button>
         </div>
       </Field>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <Field label="នាយកដ្ឋាន">
+        <Field label={t.emps.dept}>
           <Select value={f.deptId} onChange={set("deptId")}>
             {departments.map((d) => (
               <option key={d.id} value={d.id}>
@@ -5579,7 +5687,7 @@ function EmployeeForm({
             ))}
           </Select>
         </Field>
-        <Field label="វេនធ្វើការ">
+        <Field label={t.emps.shift}>
           <Select value={f.shiftId} onChange={set("shiftId")}>
             {shifts.map((s) => (
               <option key={s.id} value={s.id}>
@@ -5590,14 +5698,14 @@ function EmployeeForm({
         </Field>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <Field label="អ៊ីមែល">
+        <Field label={t.emps.email}>
           <Input
             value={f.email}
             onChange={set("email")}
             placeholder="name@company.com"
           />
         </Field>
-        <Field label="លេខទូរស័ព្ទ">
+        <Field label={t.emps.phone}>
           <Input
             value={f.phone}
             onChange={set("phone")}
@@ -5606,7 +5714,7 @@ function EmployeeForm({
         </Field>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <Field label="ប្រាក់ខែ (USD)">
+        <Field label={`${t.emps.salary} (USD)`}>
           <Input
             type="number"
             value={f.salary}
@@ -5614,10 +5722,10 @@ function EmployeeForm({
             placeholder="600"
           />
         </Field>
-        <Field label="ស្ថានភាព">
+        <Field label={t.emps.status}>
           <Select value={f.status} onChange={set("status")}>
-            <option value="active">សកម្ម</option>
-            <option value="inactive">អសកម្ម</option>
+            <option value="active">{t.emps.active}</option>
+            <option value="inactive">{t.emps.inactive}</option>
           </Select>
         </Field>
       </div>
@@ -5688,9 +5796,9 @@ function EmployeeForm({
       <Field label={t.emps.joined}>
         <DatePicker value={f.joined || todayStr()} onChange={set("joined")} />
       </Field>
-      <Field label="សាខា (Branch)">
+      <Field label={t.emps.branch}>
         <Select value={f.officeId || ""} onChange={set("officeId")}>
-          <option value="">មិនទាន់កំណត់</option>
+          <option value="">{t.emps.branchNotSet}</option>
           {(offices || []).map((o) => (
             <option key={o.id} value={o.id}>
               {o.name}
@@ -5698,7 +5806,7 @@ function EmployeeForm({
           ))}
         </Select>
       </Field>
-      <Field label="ថ្ងៃច្បាប់ប្រចាំឆ្នាំ (ថ្ងៃ/ឆ្នាំ)">
+      <Field label={t.emps.annualLeaveDaysLabel}>
         <Input
           type="number"
           min={0}
@@ -5707,7 +5815,7 @@ function EmployeeForm({
           placeholder={String(DEFAULT_ANNUAL_LEAVE_DAYS)}
         />
       </Field>
-      <Field label="ថ្ងៃច្បាប់ឈឺ (ថ្ងៃ/ឆ្នាំ)">
+      <Field label={t.emps.sickLeaveDaysLabel}>
         <Input
           type="number"
           min={0}
@@ -5716,7 +5824,7 @@ function EmployeeForm({
           placeholder={String(DEFAULT_SICK_LEAVE_DAYS)}
         />
       </Field>
-      <Field label="ថ្ងៃឈប់សម្រាកប្រចាំសប្តាហ៍">
+      <Field label={t.emps.weeklyOffLabel}>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {WEEKDAY_LABELS.map((label, dow) => {
             const active = (f.weeklyOff || []).includes(dow);
@@ -5744,7 +5852,7 @@ function EmployeeForm({
           })}
         </div>
       </Field>
-      <Field label="ថ្ងៃឈប់សម្រាកពិសេស (កាលបរិច្ឆេទជាក់លាក់)">
+      <Field label={t.emps.customDaysOffLabel}>
         <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
           <DatePicker
             style={{ flex: 1 }}
@@ -5752,7 +5860,7 @@ function EmployeeForm({
             onChange={(e) => setNewOffDate(e.target.value)}
           />
           <Button type="button" variant="ghost" onClick={addCustomDayOff}>
-            <Plus size={14} /> បន្ថែម
+            <Plus size={14} /> {t.emps.addBtnShort}
           </Button>
         </div>
         {(f.customDaysOff || []).length > 0 && (
@@ -5907,7 +6015,7 @@ function Employees({
           />
           <Input
             style={{ paddingLeft: 34 }}
-            placeholder="ស្វែងរកបុគ្គលិក..."
+            placeholder={t.emps.searchPlaceholder}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -5918,7 +6026,7 @@ function Employees({
             value={branchFilter}
             onChange={(e) => setBranchFilter(e.target.value)}
           >
-            <option value="">គ្រប់សាខា</option>
+            <option value="">{t.emps.allBranches}</option>
             {offices.map((o) => (
               <option key={o.id} value={o.id}>
                 {o.name}
@@ -6146,7 +6254,7 @@ function Employees({
       )}
       {confirmDel && (
         <ConfirmDialog
-          text={`តើអ្នកពិតជាចង់លុប "${confirmDel.name}" មែនទេ?`}
+          text={t.emps.confirmDelWithName(confirmDel.name)}
           onCancel={() => setConfirmDel(null)}
           onConfirm={() => {
             setEmployees(employees.filter((e) => e.id !== confirmDel.id));
@@ -6177,17 +6285,21 @@ function DeptForm({ initial, onSave, onCancel }) {
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   return (
     <div>
-      <Field label="ឈ្មោះនាយកដ្ឋាន">
+      <Field label={t.depts.nameLabel}>
         <Input
           value={f.name}
           onChange={set("name")}
-          placeholder="ឧ. ធនធានមនុស្ស"
+          placeholder={t.depts.namePlaceholder}
         />
       </Field>
-      <Field label="កូដ">
-        <Input value={f.code} onChange={set("code")} placeholder="ឧ. HR" />
+      <Field label={t.depts.codeLabel}>
+        <Input
+          value={f.code}
+          onChange={set("code")}
+          placeholder={t.depts.codePlaceholder}
+        />
       </Field>
-      <Field label="ការពិពណ៌នា">
+      <Field label={t.depts.descLabel}>
         <textarea
           className="wf-input"
           rows={2}
@@ -6343,7 +6455,10 @@ function Departments({ departments, setDepartments, employees, isSuperAdmin }) {
       )}
       {confirmDel && (
         <ConfirmDialog
-          text={`តើអ្នកពិតជាចង់លុបនាយកដ្ឋាន "${confirmDel.name}" មែនទេ? (មានបុគ្គលិក ${countIn(confirmDel.id)} នាក់)`}
+          text={t.depts.confirmDelWithCount(
+            confirmDel.name,
+            countIn(confirmDel.id),
+          )}
           onCancel={() => setConfirmDel(null)}
           onConfirm={() => {
             setDepartments(departments.filter((d) => d.id !== confirmDel.id));
@@ -6366,18 +6481,18 @@ function ShiftForm({ initial, onSave, onCancel }) {
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   return (
     <div>
-      <Field label="ឈ្មោះវេន">
+      <Field label={t.sh.nameLabel}>
         <Input
           value={f.name}
           onChange={set("name")}
-          placeholder="ឧ. វេនព្រឹក"
+          placeholder={t.sh.namePlaceholder}
         />
       </Field>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <Field label="ម៉ោងចូល">
+        <Field label={t.sh.startLabel}>
           <TimePicker value={f.start} onChange={set("start")} />
         </Field>
-        <Field label="ម៉ោងចេញ">
+        <Field label={t.sh.endLabel}>
           <TimePicker value={f.end} onChange={set("end")} />
         </Field>
       </div>
@@ -6390,7 +6505,7 @@ function ShiftForm({ initial, onSave, onCancel }) {
             marginBottom: 14,
           }}
         >
-          ⓘ វេននេះលើសពាក់កណ្តាលអធ្រាត្រ (ឧ. ចូលយប់ ចេញព្រឹក)
+          {t.sh.overnightHint}
         </p>
       )}
       <div
@@ -6480,7 +6595,7 @@ function Shifts({ shifts, setShifts, employees, isSuperAdmin }) {
                     }}
                   >
                     {hhmm(s.start)} – {hhmm(s.end)}
-                    {isOvernightShift(s) ? " (ឆ្លងអធ្រាត្រ)" : ""}
+                    {isOvernightShift(s) ? ` ${t.sh.overnightTag}` : ""}
                   </div>
                 </div>
               </div>
@@ -6530,7 +6645,7 @@ function Shifts({ shifts, setShifts, employees, isSuperAdmin }) {
       </div>
       {modal && (
         <Modal
-          title={modal.mode === "add" ? "បន្ថែមវេនថ្មី" : "កែសម្រួលវេន"}
+          title={modal.mode === "add" ? t.sh.addTitle : t.sh.editTitle}
           onClose={() => setModal(null)}
         >
           <ShiftForm
@@ -6542,7 +6657,10 @@ function Shifts({ shifts, setShifts, employees, isSuperAdmin }) {
       )}
       {confirmDel && (
         <ConfirmDialog
-          text={`តើអ្នកពិតជាចង់លុបវេន "${confirmDel.name}" មែនទេ? (មានបុគ្គលិក ${countIn(confirmDel.id)} នាក់កំពុងប្រើវេននេះ)`}
+          text={t.sh.confirmDelWithCount(
+            confirmDel.name,
+            countIn(confirmDel.id),
+          )}
           onCancel={() => setConfirmDel(null)}
           onConfirm={() => {
             setShifts(shifts.filter((s) => s.id !== confirmDel.id));
@@ -7239,7 +7357,7 @@ function OfficeForm({ initial, onSave, onCancel }) {
         lng: coords.longitude.toFixed(6),
       }));
     } catch {
-      setError("មិនអាចទាញយកទីតាំង GPS បច្ចុប្បន្នបានទេ");
+      setError(t.att.officeGpsFailed);
     } finally {
       setBusy(false);
     }
@@ -7251,11 +7369,11 @@ function OfficeForm({ initial, onSave, onCancel }) {
     const lng = Number(f.lng);
     const radius = Number(f.radius);
     if (!name) {
-      setError("សូមបញ្ចូលឈ្មោះសាខា/ការិយាល័យ");
+      setError(t.att.officeNameRequired);
       return;
     }
     if (!lat || !lng || !radius) {
-      setError("សូមបំពេញកូអរដោនេ និងកាំឲ្យត្រឹមត្រូវ");
+      setError(t.att.officeCoordsRequired);
       return;
     }
     setError("");
@@ -7264,11 +7382,11 @@ function OfficeForm({ initial, onSave, onCancel }) {
 
   return (
     <div>
-      <Field label="ឈ្មោះសាខា / ការិយាល័យ">
+      <Field label={t.att.officeNameLabel}>
         <Input
           value={f.name}
           onChange={set("name")}
-          placeholder="ការិយាល័យកណ្តាល, សាខាទួលគោក..."
+          placeholder={t.att.officeNamePlaceholder}
         />
       </Field>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -7279,7 +7397,7 @@ function OfficeForm({ initial, onSave, onCancel }) {
           <Input value={f.lng} onChange={set("lng")} placeholder="104.9282" />
         </Field>
       </div>
-      <Field label="កាំអនុញ្ញាត (ម៉ែត្រ)">
+      <Field label={t.att.officeRadiusLabel}>
         <Input
           type="number"
           value={f.radius}
@@ -7308,7 +7426,7 @@ function OfficeForm({ initial, onSave, onCancel }) {
           onClick={useCurrentLocation}
           disabled={busy}
         >
-          <MapPin size={13} /> ប្រើទីតាំងបច្ចុប្បន្ន
+          <MapPin size={13} /> {t.att.officeUseCurrentLoc}
         </Button>
         <div style={{ display: "flex", gap: 8 }}>
           <Button variant="ghost" size="sm" onClick={onCancel}>
@@ -7486,14 +7604,16 @@ function OfficeLocationSettings({ offices, setOffices }) {
               size="sm"
               onClick={() => setFormOpen("add")}
             >
-              <Plus size={13} /> បន្ថែមសាខា
+              <Plus size={13} /> {t.att.officeAddBtn}
             </Button>
           </div>
         </div>
       )}
       {formOpen && (
         <Modal
-          title={formOpen === "add" ? "បន្ថែមសាខា" : "កែសម្រួលសាខា"}
+          title={
+            formOpen === "add" ? t.att.officeAddBtn : t.att.officeEditTitle
+          }
           onClose={() => setFormOpen(null)}
         >
           <OfficeForm
@@ -7505,7 +7625,7 @@ function OfficeLocationSettings({ offices, setOffices }) {
       )}
       {confirmDel && (
         <ConfirmDialog
-          text={`តើអ្នកពិតជាចង់លុបសាខា "${confirmDel.name}" មែនទេ?`}
+          text={t.att.officeConfirmDel(confirmDel.name)}
           onCancel={() => setConfirmDel(null)}
           onConfirm={() => {
             setOffices(offices.filter((o) => o.id !== confirmDel.id));
@@ -7562,7 +7682,7 @@ function ManualAttendanceForm({ employees, initial, onSave, onCancel }) {
   const emp = employees.find((e) => e.id === f.employeeId);
   return (
     <div>
-      <Field label="បុគ្គលិក">
+      <Field label={t.employee}>
         {editing ? (
           <div
             style={{
@@ -7600,10 +7720,10 @@ function ManualAttendanceForm({ employees, initial, onSave, onCancel }) {
           </Select>
         )}
       </Field>
-      <Field label="កាលបរិច្ឆេទ">
+      <Field label={t.att.date}>
         <DatePicker value={f.date} onChange={set("date")} disabled={editing} />
       </Field>
-      <Field label="ស្ថានភាព">
+      <Field label={t.status}>
         <Select
           value={f.status}
           onChange={(e) => {
@@ -7617,20 +7737,20 @@ function ManualAttendanceForm({ employees, initial, onSave, onCancel }) {
             });
           }}
         >
-          <option value="present">មកធ្វើការ</option>
-          <option value="late">មកយឺត</option>
-          <option value="absent">អវត្តមាន (មិនបានអនុញ្ញាត)</option>
-          <option value="leave">ឈប់សម្រាក (មានប្រាក់ខែ)</option>
+          <option value="present">{t.att.statusPresent}</option>
+          <option value="late">{t.att.statusLate}</option>
+          <option value="absent">{t.att.statusAbsent}</option>
+          <option value="leave">{t.att.statusLeavePaid}</option>
         </Select>
       </Field>
       {f.status !== "absent" && f.status !== "leave" && (
         <div
           style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
         >
-          <Field label="ម៉ោងចូល">
+          <Field label={t.att.inTime}>
             <TimePicker value={f.checkIn} onChange={set("checkIn")} />
           </Field>
-          <Field label="ម៉ោងចេញ">
+          <Field label={t.att.outTime}>
             <TimePicker value={f.checkOut} onChange={set("checkOut")} />
           </Field>
         </div>
@@ -8680,8 +8800,8 @@ function LeaveRequests({
             <thead>
               <tr>
                 <th>{t.lv.type}</th>
-                <th>ចាប់ពី</th>
-                <th>ដល់</th>
+                <th>{t.lv.fromShort}</th>
+                <th>{t.lv.toShort}</th>
                 <th>{t.lv.reason}</th>
                 <th>{t.status}</th>
               </tr>
@@ -8723,7 +8843,7 @@ function LeaveRequests({
           </table>
         </Card>
         {modal && (
-          <Modal title="ស្នើសុំច្បាប់ឈប់សម្រាក" onClose={() => setModal(false)}>
+          <Modal title={t.lv.modalTitle} onClose={() => setModal(false)}>
             <LeaveRequestForm
               remaining={{ annual: bal.remaining, sick: sickBal.remaining }}
               onSave={submit}
@@ -8747,10 +8867,10 @@ function LeaveRequests({
         <table className="wf-table">
           <thead>
             <tr>
-              <th>បុគ្គលិក</th>
+              <th>{t.employee}</th>
               <th>{t.lv.type}</th>
-              <th>ចាប់ពី</th>
-              <th>ដល់</th>
+              <th>{t.lv.fromShort}</th>
+              <th>{t.lv.toShort}</th>
               <th>{t.lv.reason}</th>
               <th>{t.status}</th>
               <th></th>
@@ -9459,7 +9579,7 @@ function OvertimeRequests({
         <table className="wf-table">
           <thead>
             <tr>
-              <th>បុគ្គលិក</th>
+              <th>{t.employee}</th>
               <th>{t.ot.date}</th>
               <th>{t.ot.hours}</th>
               <th>{t.ot.dayType}</th>
@@ -11032,11 +11152,11 @@ function AdminAccountForm({ initial, onSave, onCancel }) {
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   return (
     <div>
-      <Field label="ឈ្មោះពេញ">
+      <Field label={t.admAcc.fullName}>
         <Input
           value={f.name}
           onChange={set("name")}
-          placeholder="ឧ. សុខ សម្បត្តិ"
+          placeholder={t.admAcc.fullNamePlaceholder}
         />
       </Field>
       <Field label={t.admAcc.username}>
@@ -11341,8 +11461,8 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
           <thead>
             <tr>
               <th>{t.emps.name}</th>
-              <th>Username</th>
-              <th>សិទ្ធិ</th>
+              <th>{t.admAcc.username}</th>
+              <th>{t.admAcc.roleLabel}</th>
               <th></th>
             </tr>
           </thead>
@@ -11461,7 +11581,7 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
       )}
       {confirmDel && (
         <ConfirmDialog
-          text={`តើអ្នកពិតជាចង់លុបគណនី "${confirmDel.name}" មែនទេ?`}
+          text={t.admAcc.confirmDelWithName(confirmDel.name)}
           onCancel={() => setConfirmDel(null)}
           onConfirm={() => {
             setAdmins(admins.filter((a) => a.id !== confirmDel.id));
@@ -11691,7 +11811,7 @@ function MyProfile({
           </div>
           <div>⏰ {shiftLabel(shift)}</div>
           <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <BadgeCheck size={12} color={T.muted} /> ចូលបម្រើការតាំងពី{" "}
+            <BadgeCheck size={12} color={T.muted} /> {t.profile.joinedSince}{" "}
             {currentEmp.joined}
           </div>
         </div>
@@ -11711,7 +11831,7 @@ function MyProfile({
             {nameError}
           </p>
         )}
-        <Field label="រូបភាពប្រវត្តិរូប">
+        <Field label={t.profile.photoLabel}>
           <label
             className="wf-btn wf-btn-ghost"
             style={{ cursor: "pointer", display: "inline-flex" }}
@@ -11728,7 +11848,7 @@ function MyProfile({
                 overflow: "hidden",
               }}
             />
-            <UserCircle2 size={14} /> ជ្រើសរើសរូបភាព
+            <UserCircle2 size={14} /> {t.profile.choosePhoto}
           </label>
         </Field>
         {photoError && (
@@ -11736,10 +11856,10 @@ function MyProfile({
             {photoError}
           </p>
         )}
-        <Field label="លេខទូរស័ព្ទ">
+        <Field label={t.profile.phone}>
           <Input value={f.phone} onChange={set("phone")} />
         </Field>
-        <Field label="អ៊ីមែល">
+        <Field label={t.profile.email}>
           <Input value={f.email} onChange={set("email")} type="email" />
         </Field>
         {attemptedSave && saveError && (
