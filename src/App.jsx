@@ -4393,6 +4393,7 @@ function ConfirmDialog({ text, onCancel, onConfirm }) {
 /* ---------------------------------------------------------------
    Login screens — redesigned with smooth animations + language toggle
 ----------------------------------------------------------------*/
+const APP_VERSION = "1.0.0";
 const LOGIN_CSS_ID = "wf-login-style";
 const LOGIN_CSS = `
 @keyframes wf-float-up { from { opacity:0; transform:translateY(28px) scale(.96); } to { opacity:1; transform:translateY(0) scale(1); } }
@@ -4404,7 +4405,7 @@ const LOGIN_CSS = `
 @keyframes wf-orb-c { 0%,100% { transform:translate(0,0) scale(1); } 40% { transform:translate(70px,50px) scale(.88); } 75% { transform:translate(-50px,-30px) scale(1.1); } }
 @keyframes wf-orb-d { 0%,100% { transform:translate(0,0) scale(1); } 45% { transform:translate(-55px,-50px) scale(1.12); } }
 .wf-login-root {
-  display:flex; align-items:center; justify-content:center;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
   min-height:100vh; min-height:100dvh; position:relative; overflow:hidden;
   background: linear-gradient(160deg, #050810 0%, #0A0F1A 55%, #0D1420 100%);
 }
@@ -4513,7 +4514,18 @@ const LOGIN_CSS = `
   border-radius:8px; font-size:11px; color:#8891A6;
   line-height:1.7; border:1px solid rgba(255,255,255,0.07);
 }
+.wf-login-credit {
+  margin-top:32px; text-align:center; font-size:10.5px;
+  letter-spacing:0.3px; color:#5B6478; opacity:0.6;
+}
 `;
+function LoginCredit() {
+  return (
+    <div className="wf-login-credit">
+      v{APP_VERSION} &middot; Developed by Ou SoThon
+    </div>
+  );
+}
 function useLoginStyle() {
   useEffect(() => {
     if (!document.getElementById(LOGIN_CSS_ID)) {
@@ -4695,6 +4707,7 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
           </button>
         </form>
       </div>
+      <LoginCredit />
     </div>
   );
 }
@@ -4851,6 +4864,7 @@ function AdminLoginScreen({ admins, onLogin, go }) {
           </button>
         </form>
       </div>
+      <LoginCredit />
     </div>
   );
 }
