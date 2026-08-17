@@ -15095,6 +15095,7 @@ function AppInner() {
       lat: Number(r.lat),
       lng: Number(r.lng),
       radius: Number(r.radius),
+      qrSecret: r.qr_secret || "",
     }),
     toDb: (r) => ({
       id: r.id,
@@ -15102,6 +15103,7 @@ function AppInner() {
       lat: r.lat,
       lng: r.lng,
       radius: r.radius,
+      qr_secret: r.qrSecret || null,
     }),
     orderBy: "name",
     audit: true,
