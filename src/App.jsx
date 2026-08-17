@@ -265,7 +265,9 @@ const LANG = {
       scanQrTitle: "ស្កេន QR សាខា",
       scanQrDesc: "ដាក់កាមេរ៉ាឲ្យត្រង់ QR code នៅសាខារបស់អ្នក",
       scanQrHint: "កំពុងស្វែងរក QR...",
+      scanQrOpeningCamera: "កំពុងបើកកាមេរ៉ា...",
       qrNoMatch: "QR នេះមិនមែនជារបស់សាខាណាមួយឡើយ សូមសាកល្បងម្តងទៀត",
+      qrExpired: "QR នេះផុតកំណត់ហើយ សូមស្កេន QR ថ្មីនៅលើអេក្រង់/ក្រដាសនៅសាខា",
       cameraDenied:
         "មិនអាចបើកកាមេរ៉ាបានទេ សូមអនុញ្ញាតការប្រើប្រាស់កាមេរ៉ាសម្រាប់កម្មវិធីនេះ",
       cameraNotFound: "រកមិនឃើញកាមេរ៉ានៅលើឧបករណ៍នេះទេ",
@@ -273,8 +275,9 @@ const LANG = {
       officeQrBtn: "QR Code",
       officeQrTitle: (name) => `QR Code · ${name}`,
       officeQrDesc:
-        "បោះពុម្ព ឬបិទ QR នេះនៅសាខា ដើម្បីឲ្យបុគ្គលិកស្កេន check-in/check-out",
-      printBtn: "បោះពុម្ព",
+        "បង្ហាញអេក្រង់នេះនៅច្រកចូលសាខា (ឧ. លើថេប្លេត/អេក្រង់តាំងទុក) ដើម្បីឲ្យបុគ្គលិកស្កេន check-in/check-out។ កុំបោះពុម្ពដាក់ជាផ្ទាំង ព្រោះ QR នេះនឹងលែងដំណើរការក្រោយពេលវាផ្លាស់ប្តូរ",
+      officeQrRefreshHint:
+        "QR នេះនឹងផ្លាស់ប្តូរដោយស្វ័យប្រវត្តិរៀងរាល់ ២០ វិនាទី ដើម្បីសុវត្ថិភាព — សូមកុំថតទុករូបនេះសម្រាប់ប្រើក្រោយ",
     },
     lv: {
       addBtn: "សំណើច្បាប់ថ្មី",
@@ -789,7 +792,10 @@ const LANG = {
       scanQrTitle: "Scan Branch QR",
       scanQrDesc: "Point your camera at the QR code at your branch",
       scanQrHint: "Looking for a QR code...",
+      scanQrOpeningCamera: "Opening camera...",
       qrNoMatch: "That QR code doesn't match any branch — try again",
+      qrExpired:
+        "That QR code has expired — scan the current one at the branch",
       cameraDenied:
         "Couldn't access the camera. Please allow camera access for this app.",
       cameraNotFound: "No camera was found on this device",
@@ -797,8 +803,9 @@ const LANG = {
       officeQrBtn: "QR Code",
       officeQrTitle: (name) => `QR Code · ${name}`,
       officeQrDesc:
-        "Print or post this QR at the branch so employees can scan to check in/out",
-      printBtn: "Print",
+        "Display this screen at the branch entrance (e.g. on a tablet or monitor) so employees can scan to check in/out. Don't print it as a static poster — this QR stops working once it rotates.",
+      officeQrRefreshHint:
+        "This QR refreshes automatically every 20 seconds for security — don't save a screenshot to reuse later.",
     },
     lv: {
       addBtn: "New Leave Request",
@@ -2233,16 +2240,63 @@ function nearestOffice(offices, lat, lng) {
   return best;
 }
 // Payload encoded into an office's printable check-in QR code, and the
-// matching parser. Prefixed so scanning a random/unrelated QR code is
-// safely ignored instead of matched by accident.
+// matching verifier. The payload embeds a token that rotates every
+// QR_ROTATE_MS derived from each office's own `qrSecret` (generated once
+// per office, stored alongside it) — this means a screenshot of the QR
+// only works for a short window after it's taken, closing off the easy
+// "photograph the QR and text it to a friend who isn't on-site" version
+// of buddy-punching that a static QR would allow. It is NOT meant to be
+// unbreakable cryptography (the secret lives in the same client bundle
+// as everything else in this app) — it raises the bar from "trivial" to
+// "would need to be relayed within ~20-40s", which is the realistic goal
+// for a self-service kiosk-style check-in.
 const OFFICE_QR_PREFIX = "WFOFFICE:";
-function officeQrPayload(officeId) {
-  return `${OFFICE_QR_PREFIX}${officeId}`;
+const QR_ROTATE_MS = 20000;
+function fnv1aHash(str) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(36);
 }
-function parseOfficeQrOfficeId(text) {
+function officeQrWindow(windowMs = QR_ROTATE_MS) {
+  return Math.floor(Date.now() / windowMs);
+}
+function officeQrToken(office, win) {
+  return fnv1aHash(`${office.qrSecret || ""}:${office.id}:${win}`);
+}
+function officeQrPayload(office, windowMs = QR_ROTATE_MS) {
+  const win = officeQrWindow(windowMs);
+  return `${OFFICE_QR_PREFIX}${office.id}:${win}:${officeQrToken(office, win)}`;
+}
+// Verifies a scanned QR payload against the known offices list and
+// reports *why* it failed, so the scanner can show a more useful
+// message than a blanket "invalid" (expired vs. simply wrong/unknown).
+// Accepts the current time window OR the previous one — a short grace
+// period so a QR that rotated a split-second before the scan finished
+// still works.
+function evaluateOfficeQrPayload(offices, text, windowMs = QR_ROTATE_MS) {
   if (typeof text !== "string" || !text.startsWith(OFFICE_QR_PREFIX))
-    return null;
-  return text.slice(OFFICE_QR_PREFIX.length).trim() || null;
+    return { status: "invalid" };
+  const parts = text.slice(OFFICE_QR_PREFIX.length).split(":");
+  if (parts.length !== 3) return { status: "invalid" };
+  const [officeId, winStr, token] = parts;
+  const win = Number(winStr);
+  if (!officeId || !token || !Number.isFinite(win))
+    return { status: "invalid" };
+  const office = (offices || []).find((o) => o.id === officeId);
+  if (!office || !office.qrSecret) return { status: "invalid" };
+  if (officeQrToken(office, win) !== token) return { status: "invalid" };
+  const currentWin = officeQrWindow(windowMs);
+  if (win === currentWin || win === currentWin - 1)
+    return { status: "ok", office };
+  return { status: "expired" };
+}
+// Convenience wrapper for callers that only care whether it matched.
+function verifyOfficeQrPayload(offices, text, windowMs = QR_ROTATE_MS) {
+  const result = evaluateOfficeQrPayload(offices, text, windowMs);
+  return result.status === "ok" ? result.office : null;
 }
 // Promise wrapper around the browser geolocation API.
 function getCurrentPosition(options) {
@@ -6533,6 +6587,7 @@ function QrScanModal({ offices, onMatch, onClose }) {
   const streamRef = useRef(null);
   const rafRef = useRef(null);
   const [error, setError] = useState("");
+  const [ready, setReady] = useState(false); // true once the video has real frames to scan
 
   useEffect(() => {
     let cancelled = false;
@@ -6546,11 +6601,12 @@ function QrScanModal({ offices, onMatch, onClose }) {
     };
 
     const handleDecoded = (text) => {
-      const officeId = parseOfficeQrOfficeId(text);
-      const office = officeId && offices.find((o) => o.id === officeId);
-      if (office) {
+      const result = evaluateOfficeQrPayload(offices, text);
+      if (result.status === "ok") {
         stop();
-        onMatch(office);
+        onMatch(result.office);
+      } else if (result.status === "expired") {
+        setError(t.att.qrExpired);
       } else {
         setError(t.att.qrNoMatch);
       }
@@ -6592,32 +6648,31 @@ function QrScanModal({ offices, onMatch, onClose }) {
       rafRef.current = requestAnimationFrame(() => tickJsQR(jsQR));
     };
 
-    const start = async () => {
+    // Tries the rear ("environment") camera first — the natural choice
+    // for scanning something in front of you — but falls back to
+    // whatever camera is available (e.g. front-only tablets/laptops)
+    // instead of failing outright when the rear camera can't be
+    // satisfied.
+    const openCamera = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment" },
+        return await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" } },
         });
-        if (cancelled) {
-          stream.getTracks().forEach((tr) => tr.stop());
-          return;
+      } catch (err) {
+        if (
+          err &&
+          (err.name === "OverconstrainedError" || err.name === "NotFoundError")
+        ) {
+          return navigator.mediaDevices.getUserMedia({ video: true });
         }
-        streamRef.current = stream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play();
-        }
-        if (typeof window.BarcodeDetector !== "undefined") {
-          try {
-            const bd = new window.BarcodeDetector({ formats: ["qr_code"] });
-            tickBarcodeDetector(bd);
-            return;
-          } catch {
-            // unsupported format/config — fall through to jsQR
-          }
-        }
-        const jsQR = await loadJsQR();
-        if (cancelled) return;
-        tickJsQR(jsQR);
+        throw err;
+      }
+    };
+
+    const start = async () => {
+      let stream;
+      try {
+        stream = await openCamera();
       } catch (err) {
         if (cancelled) return;
         setError(
@@ -6625,6 +6680,40 @@ function QrScanModal({ offices, onMatch, onClose }) {
             ? t.att.cameraNotFound
             : t.att.cameraDenied,
         );
+        return;
+      }
+      if (cancelled) {
+        stream.getTracks().forEach((tr) => tr.stop());
+        return;
+      }
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        try {
+          await videoRef.current.play();
+        } catch {
+          // Autoplay can be blocked until a user gesture on some
+          // browsers — the video's onLoadedData handler still fires
+          // once frames are actually available, so scanning starts
+          // either way.
+        }
+      }
+      try {
+        if (typeof window.BarcodeDetector !== "undefined") {
+          const bd = new window.BarcodeDetector({ formats: ["qr_code"] });
+          tickBarcodeDetector(bd);
+          return;
+        }
+      } catch {
+        // unsupported format/config — fall through to jsQR
+      }
+      try {
+        const jsQR = await loadJsQR();
+        if (cancelled) return;
+        tickJsQR(jsQR);
+      } catch {
+        if (cancelled) return;
+        setError(t.att.cameraDenied);
       }
     };
 
@@ -6653,8 +6742,27 @@ function QrScanModal({ offices, onMatch, onClose }) {
             ref={videoRef}
             muted
             playsInline
+            onLoadedData={() => setReady(true)}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
+          {!ready && !error && (
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "rgba(0,0,0,0.35)",
+              }}
+            >
+              <Loader2
+                size={28}
+                color="#fff"
+                style={{ animation: "spin 1s linear infinite" }}
+              />
+            </div>
+          )}
         </div>
         <canvas ref={canvasRef} style={{ display: "none" }} />
         {error ? (
@@ -6663,7 +6771,7 @@ function QrScanModal({ offices, onMatch, onClose }) {
           </p>
         ) : (
           <p style={{ fontSize: 12.5, color: T.muted, textAlign: "center" }}>
-            {t.att.scanQrHint}
+            {ready ? t.att.scanQrHint : t.att.scanQrOpeningCamera}
           </p>
         )}
       </div>
@@ -7225,10 +7333,14 @@ function OfficeLocationSettings({ offices, setOffices }) {
   const [formOpen, setFormOpen] = useState(null); // null | "add" | <office being edited>
   const [confirmDel, setConfirmDel] = useState(null);
   const [qrOffice, setQrOffice] = useState(null); // office currently shown in the QR modal
+  const [qrTick, setQrTick] = useState(0); // bumped on an interval to force the QR to re-render as it rotates
 
   const saveOffice = (data) => {
     if (formOpen === "add") {
-      setOffices([...offices, { ...data, id: uid("off") }]);
+      setOffices([
+        ...offices,
+        { ...data, id: uid("off"), qrSecret: uid("qs") },
+      ]);
     } else {
       setOffices(
         offices.map((o) => (o.id === formOpen.id ? { ...o, ...data } : o)),
@@ -7236,6 +7348,28 @@ function OfficeLocationSettings({ offices, setOffices }) {
     }
     setFormOpen(null);
   };
+
+  // Opens the QR modal for an office, generating its rotating-QR secret
+  // on first use if it predates this feature (older offices won't have
+  // one yet).
+  const openQr = (office) => {
+    if (office.qrSecret) {
+      setQrOffice(office);
+      return;
+    }
+    const withSecret = { ...office, qrSecret: uid("qs") };
+    setOffices(offices.map((o) => (o.id === office.id ? withSecret : o)));
+    setQrOffice(withSecret);
+  };
+
+  // While the QR modal is open, force a re-render every QR_ROTATE_MS so
+  // the displayed image (recomputed from the current time window) rotates
+  // in front of the admin's eyes rather than only on next open.
+  useEffect(() => {
+    if (!qrOffice) return;
+    const iv = setInterval(() => setQrTick((n) => n + 1), QR_ROTATE_MS);
+    return () => clearInterval(iv);
+  }, [qrOffice]);
 
   return (
     <Card style={{ padding: 16, marginBottom: 16 }}>
@@ -7310,7 +7444,7 @@ function OfficeLocationSettings({ offices, setOffices }) {
               </div>
               <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
                 <button
-                  onClick={() => setQrOffice(o)}
+                  onClick={() => openQr(o)}
                   title={t.att.officeQrBtn}
                   style={{
                     background: "none",
@@ -7381,14 +7515,22 @@ function OfficeLocationSettings({ offices, setOffices }) {
       )}
       {qrOffice && (
         <QrModal
-          data={officeQrPayload(qrOffice.id)}
+          key={qrTick}
+          data={officeQrPayload(qrOffice)}
           title={t.att.officeQrTitle(qrOffice.name)}
           desc={t.att.officeQrDesc}
           onClose={() => setQrOffice(null)}
           footer={
-            <Button variant="ghost" size="sm" onClick={() => window.print()}>
-              <FileText size={13} /> {t.att.printBtn}
-            </Button>
+            <p
+              style={{
+                fontSize: 11,
+                color: T.mutedLight,
+                textAlign: "center",
+                margin: 0,
+              }}
+            >
+              {t.att.officeQrRefreshHint}
+            </p>
           }
         />
       )}
