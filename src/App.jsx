@@ -167,6 +167,11 @@ const LANG = {
       todayStatus: "ស្ថានភាពថ្ងៃនេះ",
       payrollStatus: "ស្ថានភាពប្រាក់ខែ",
       notCheckedIn: "មិនទាន់ចូលធ្វើការ",
+      workingNow: "កំពុងធ្វើការឥឡូវនេះ",
+      workingNowSub: (n) => `${n} នាក់កំពុងបើកកម្មវិធីធ្វើការ`,
+      noOneWorkingNow: "មិនទាន់មានបុគ្គលិកចូលធ្វើការនៅឡើយទេ",
+      unassignedBranch: "មិនកំណត់សាខា",
+      sinceLabel: "តាំងពី",
     },
     analytics: {
       title: "វិភាគទិន្នន័យ",
@@ -745,6 +750,11 @@ const LANG = {
       todayStatus: "Today's Status",
       payrollStatus: "Payroll Status",
       notCheckedIn: "Not checked in",
+      workingNow: "Working Now",
+      workingNowSub: (n) => `${n} clocked in right now`,
+      noOneWorkingNow: "No one is checked in yet",
+      unassignedBranch: "Unassigned branch",
+      sinceLabel: "Since",
     },
     analytics: {
       title: "Analytics",
@@ -5002,9 +5012,44 @@ function Dashboard({
   role,
   currentEmp,
   shifts,
+  offices,
 }) {
   const { t, lang } = useLang();
   const today = todayStr();
+  // "Working now" = checked in today, not checked out yet, and not on
+  // leave/absent. Driven straight off the `attendance` array, which is
+  // kept live via the shared Supabase realtime channel (see
+  // REALTIME_TABLES), so this list updates on its own as people punch
+  // in/out — no polling needed here.
+  const workingNowByBranch = useMemo(() => {
+    if (role !== "admin") return [];
+    const active = attendance.filter(
+      (a) =>
+        a.date === today &&
+        a.checkIn &&
+        !a.checkOut &&
+        (a.status === "present" || a.status === "late"),
+    );
+    const groups = new Map();
+    active.forEach((a) => {
+      const emp = employees.find((e) => e.id === a.employeeId);
+      if (!emp) return;
+      const officeId = a.officeId || emp.officeId || "";
+      const office = (offices || []).find((o) => o.id === officeId);
+      const key = office?.id || "unassigned";
+      if (!groups.has(key)) {
+        groups.set(key, { office, entries: [] });
+      }
+      groups.get(key).entries.push({ emp, checkIn: a.checkIn });
+    });
+    return Array.from(groups.values()).sort(
+      (a, b) => b.entries.length - a.entries.length,
+    );
+  }, [role, attendance, employees, offices, today]);
+  const workingNowTotal = workingNowByBranch.reduce(
+    (sum, g) => sum + g.entries.length,
+    0,
+  );
   const activeEmployees = employees.filter((e) => e.status === "active");
   const presentToday = attendance.filter((a) => a.date === today).length;
   const mk = monthKey();
@@ -5190,6 +5235,151 @@ function Dashboard({
           </Card>
         ))}
       </div>
+
+      {role === "admin" && offices && offices.length > 0 && (
+        <Card style={{ padding: 18, marginBottom: 22 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 12,
+            }}
+          >
+            <h3
+              style={{
+                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                fontWeight: 600,
+                color: T.ink,
+                fontSize: 14,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <span
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: 999,
+                  background: T.forest,
+                  display: "inline-block",
+                  boxShadow: `0 0 0 4px ${T.forestSoft}`,
+                }}
+              />
+              {t.dash.workingNow}
+            </h3>
+            <span
+              style={{
+                fontSize: 11,
+                color: T.muted,
+                fontFamily: "'JetBrains Mono',monospace",
+              }}
+            >
+              {t.dash.workingNowSub(workingNowTotal)}
+            </span>
+          </div>
+          {workingNowByBranch.length === 0 ? (
+            <p
+              style={{
+                fontSize: 13,
+                color: T.muted,
+                textAlign: "center",
+                padding: "28px 0",
+              }}
+            >
+              {t.dash.noOneWorkingNow}
+            </p>
+          ) : (
+            <div
+              className="wf-grid"
+              style={{
+                gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))",
+                gap: 12,
+              }}
+            >
+              {workingNowByBranch.map((g) => (
+                <div
+                  key={g.office?.id || "unassigned"}
+                  style={{
+                    border: `1px solid ${T.divider}`,
+                    borderRadius: 12,
+                    padding: 12,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: T.ink,
+                      marginBottom: 8,
+                    }}
+                  >
+                    <Store size={13} color={T.blue} />
+                    {g.office?.name || t.dash.unassignedBranch}
+                    <span
+                      style={{
+                        marginLeft: "auto",
+                        fontFamily: "'JetBrains Mono',monospace",
+                        color: T.muted,
+                        fontWeight: 500,
+                      }}
+                    >
+                      {g.entries.length}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 6,
+                    }}
+                  >
+                    {g.entries.map(({ emp, checkIn }) => (
+                      <div
+                        key={emp.id}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        <Avatar name={emp.name} photo={emp.photo} size={24} />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div
+                            style={{
+                              fontSize: 12,
+                              color: T.ink,
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {emp.name}
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 10,
+                            color: T.muted,
+                            fontFamily: "'JetBrains Mono',monospace",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {t.dash.sinceLabel} {checkIn}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
 
       <Card style={{ padding: 18 }}>
         <h3
@@ -15908,6 +16098,7 @@ function AppInner() {
                   role={role}
                   currentEmp={currentEmp}
                   shifts={shifts}
+                  offices={offices}
                 />
               )}
               {page === "analytics" && role === "admin" && (
