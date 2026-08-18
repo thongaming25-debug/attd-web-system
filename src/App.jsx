@@ -145,6 +145,11 @@ const LANG = {
     selectDate: "ជ្រើសរើសកាលបរិច្ឆេទ",
     noResults: "មិនមានលទ្ធផលទេ",
     pagination: { of: "នៃ" },
+    popupBlockedTitle: "កម្មវិធីរុករករារ Pop-up",
+    popupBlockedPayslip:
+      "សូមអនុញ្ញាត pop-up សម្រាប់គេហទំព័រនេះ ដើម្បីទាញយកបញ្ជីប្រាក់ខែ",
+    popupBlockedBadge:
+      "សូមអនុញ្ញាត pop-up សម្រាប់គេហទំព័រនេះ ដើម្បីបោះពុម្ពកាតសម្គាល់",
     dash: {
       welcome: "សូមអញ្ជើញ",
       totalEmp: "បុគ្គលិកសរុប",
@@ -730,6 +735,10 @@ const LANG = {
     selectDate: "Select a date",
     noResults: "No results found",
     pagination: { of: "of" },
+    popupBlockedTitle: "Pop-up Blocked",
+    popupBlockedPayslip:
+      "Please allow pop-ups for this site to download the payslip",
+    popupBlockedBadge: "Please allow pop-ups for this site to print the badge",
     dash: {
       welcome: "Welcome",
       totalEmp: "Total Employees",
@@ -6163,6 +6172,7 @@ function Employees({
   const [docsFor, setDocsFor] = useState(null);
   const [query, setQuery] = useState("");
   const [branchFilter, setBranchFilter] = useState("");
+  const [badgePopupBlocked, setBadgePopupBlocked] = useState(false);
   const filtered = useMemo(
     () =>
       employees.filter(
@@ -6426,6 +6436,7 @@ function Employees({
                   officeText: officeName(e.officeId),
                   statusLabel:
                     e.status === "active" ? t.emps.active : t.emps.inactive,
+                  onPopupBlocked: () => setBadgePopupBlocked(true),
                 })
               }
             >
@@ -6490,6 +6501,13 @@ function Employees({
           setDocuments={setDocuments}
           isSuperAdmin={isSuperAdmin}
           onClose={() => setDocsFor(null)}
+        />
+      )}
+      {badgePopupBlocked && (
+        <LoginActAlertDialog
+          title={t.popupBlockedTitle}
+          message={t.popupBlockedBadge}
+          onClose={() => setBadgePopupBlocked(false)}
         />
       )}
     </div>
@@ -13839,10 +13857,11 @@ function printPayslip({
   mk,
   rows, // [{ label, value, tone: "neg"|"pos"|undefined }]
   net,
+  onPopupBlocked,
 }) {
   const win = window.open("", "_blank", "width=480,height=720");
   if (!win) {
-    alert("Please allow pop-ups to download the payslip.");
+    onPopupBlocked?.();
     return;
   }
   const rowsHtml = rows
@@ -13964,10 +13983,11 @@ function printEmployeeBadge({
   shiftText,
   officeText,
   statusLabel,
+  onPopupBlocked,
 }) {
   const win = window.open("", "_blank", "width=420,height=620");
   if (!win) {
-    alert("Please allow pop-ups to print the badge.");
+    onPopupBlocked?.();
     return;
   }
   const initials = getInitials(emp.name);
@@ -14096,6 +14116,7 @@ function Payslip({
 }) {
   const { t, lang } = useLang();
   const { branding } = useBranding();
+  const [popupBlocked, setPopupBlocked] = useState(false);
   const {
     absentDays,
     leaveDays,
@@ -14165,204 +14186,216 @@ function Payslip({
       mk,
       rows,
       net: fmtMoney(net),
+      onPopupBlocked: () => setPopupBlocked(true),
     });
   };
   return (
-    <Modal title="" onClose={onClose} width={460}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 16,
-        }}
-      >
+    <>
+      <Modal title="" onClose={onClose} width={460}>
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 8,
-            color: T.forest,
-            fontWeight: 700,
-            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            justifyContent: "space-between",
+            marginBottom: 16,
           }}
         >
-          <Receipt size={20} /> {t.nav.myPayroll}
-        </div>
-        <span
-          style={{
-            fontSize: 12,
-            color: T.muted,
-            fontFamily: "'JetBrains Mono',monospace",
-          }}
-        >
-          {mk}
-        </span>
-      </div>
-      <div
-        style={{
-          border: `1px solid ${T.lineSoft}`,
-          borderRadius: 10,
-          padding: 14,
-          marginBottom: 16,
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>
-            {emp.name}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              color: T.forest,
+              fontWeight: 700,
+              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            }}
+          >
+            <Receipt size={20} /> {t.nav.myPayroll}
+          </div>
+          <span
+            style={{
+              fontSize: 12,
+              color: T.muted,
+              fontFamily: "'JetBrains Mono',monospace",
+            }}
+          >
+            {mk}
           </span>
-          {usesCustomRate && (
-            <span
+        </div>
+        <div
+          style={{
+            border: `1px solid ${T.lineSoft}`,
+            borderRadius: 10,
+            padding: 14,
+            marginBottom: 16,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>
+              {emp.name}
+            </span>
+            {usesCustomRate && (
+              <span
+                style={{
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  color: T.goldText,
+                  background: T.goldSoft,
+                  padding: "2px 6px",
+                  borderRadius: 6,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {t.pay.customRateBadge}
+              </span>
+            )}
+          </div>
+          <div
+            style={{
+              fontSize: 11,
+              color: T.muted,
+              fontFamily: "'JetBrains Mono',monospace",
+            }}
+          >
+            {emp.code} · {emp.role}
+          </div>
+        </div>
+        <div
+          style={{
+            fontSize: 13,
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+            marginBottom: 12,
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <span style={{ color: T.textSoft }}>{t.pay.baseSalary}</span>
+            <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+              {fmtMoney(emp.salary)}
+            </span>
+          </div>
+          {absentDays > 0 && (
+            <div
               style={{
-                fontSize: 9.5,
-                fontWeight: 700,
-                color: T.goldText,
-                background: T.goldSoft,
-                padding: "2px 6px",
-                borderRadius: 6,
-                whiteSpace: "nowrap",
+                display: "flex",
+                justifyContent: "space-between",
+                color: T.rose,
               }}
             >
-              {t.pay.customRateBadge}
-            </span>
+              <span>
+                {t.pay.absentDed} ({absentDays} × {fmtMoney(dailyRate)})
+              </span>
+              <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                -{fmtMoney(absenceDeduction)}
+              </span>
+            </div>
+          )}
+          {leaveDays > 0 && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                color: T.blue,
+                fontSize: 12,
+              }}
+            >
+              <span>{t.lv.approved}</span>
+              <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                {leaveDays} ថ្ងៃ
+              </span>
+            </div>
+          )}
+          {deductionApplies && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                color: T.rose,
+              }}
+            >
+              <span>
+                {t.pay.taxLabel} ({taxRate}%)
+              </span>
+              <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                -{fmtMoney(tax)}
+              </span>
+            </div>
+          )}
+          {deductionApplies && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                color: T.rose,
+              }}
+            >
+              <span>
+                {t.pay.insuranceLabel} ({insuranceRate}%)
+              </span>
+              <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                -{fmtMoney(insurance)}
+              </span>
+            </div>
+          )}
+          {otHours > 0 && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                color: T.forestText,
+              }}
+            >
+              <span>
+                {t.pay.otPay} ({otHours} {t.ot.hoursShort})
+              </span>
+              <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                +{fmtMoney(otPay)}
+              </span>
+            </div>
           )}
         </div>
         <div
           style={{
-            fontSize: 11,
-            color: T.muted,
-            fontFamily: "'JetBrains Mono',monospace",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            background: BRAND.ink,
+            color: "#fff",
+            borderRadius: 10,
+            padding: "12px 16px",
+            marginTop: 16,
           }}
         >
-          {emp.code} · {emp.role}
-        </div>
-      </div>
-      <div
-        style={{
-          fontSize: 13,
-          display: "flex",
-          flexDirection: "column",
-          gap: 8,
-          marginBottom: 12,
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span style={{ color: T.textSoft }}>{t.pay.baseSalary}</span>
-          <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-            {fmtMoney(emp.salary)}
+          <span style={{ fontWeight: 600, fontSize: 13 }}>
+            {t.pay.netSalary}
+          </span>
+          <span
+            style={{
+              fontWeight: 700,
+              fontSize: 18,
+              fontFamily: "'JetBrains Mono',monospace",
+            }}
+          >
+            {fmtMoney(net)}
           </span>
         </div>
-        {absentDays > 0 && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              color: T.rose,
-            }}
-          >
-            <span>
-              {t.pay.absentDed} ({absentDays} × {fmtMoney(dailyRate)})
-            </span>
-            <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-              -{fmtMoney(absenceDeduction)}
-            </span>
-          </div>
-        )}
-        {leaveDays > 0 && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              color: T.blue,
-              fontSize: 12,
-            }}
-          >
-            <span>{t.lv.approved}</span>
-            <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-              {leaveDays} ថ្ងៃ
-            </span>
-          </div>
-        )}
-        {deductionApplies && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              color: T.rose,
-            }}
-          >
-            <span>
-              {t.pay.taxLabel} ({taxRate}%)
-            </span>
-            <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-              -{fmtMoney(tax)}
-            </span>
-          </div>
-        )}
-        {deductionApplies && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              color: T.rose,
-            }}
-          >
-            <span>
-              {t.pay.insuranceLabel} ({insuranceRate}%)
-            </span>
-            <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-              -{fmtMoney(insurance)}
-            </span>
-          </div>
-        )}
-        {otHours > 0 && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              color: T.forestText,
-            }}
-          >
-            <span>
-              {t.pay.otPay} ({otHours} {t.ot.hoursShort})
-            </span>
-            <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-              +{fmtMoney(otPay)}
-            </span>
-          </div>
-        )}
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          background: BRAND.ink,
-          color: "#fff",
-          borderRadius: 10,
-          padding: "12px 16px",
-          marginTop: 16,
-        }}
-      >
-        <span style={{ fontWeight: 600, fontSize: 13 }}>{t.pay.netSalary}</span>
-        <span
-          style={{
-            fontWeight: 700,
-            fontSize: 18,
-            fontFamily: "'JetBrains Mono',monospace",
-          }}
+        <Button
+          variant="ghost"
+          style={{ width: "100%", marginTop: 12, justifyContent: "center" }}
+          onClick={handleDownload}
         >
-          {fmtMoney(net)}
-        </span>
-      </div>
-      <Button
-        variant="ghost"
-        style={{ width: "100%", marginTop: 12, justifyContent: "center" }}
-        onClick={handleDownload}
-      >
-        <Download size={16} /> {t.pay.downloadPdf}
-      </Button>
-    </Modal>
+          <Download size={16} /> {t.pay.downloadPdf}
+        </Button>
+      </Modal>
+      {popupBlocked && (
+        <LoginActAlertDialog
+          title={t.popupBlockedTitle}
+          message={t.popupBlockedPayslip}
+          onClose={() => setPopupBlocked(false)}
+        />
+      )}
+    </>
   );
 }
 
