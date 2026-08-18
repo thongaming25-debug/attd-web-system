@@ -6958,7 +6958,53 @@ function loadJsQR() {
   return jsQRLoadPromise;
 }
 
-function QrScanModal({ offices, onMatch, onClose }) {
+// Short two-tone "success" chime played the instant a QR scan matches a
+// branch (see handleDecoded below) — built with the Web Audio API rather
+// than an audio file so it needs no extra asset/network request and
+// still works on an offline-for-a-moment kiosk tablet. Silently no-ops
+// if AudioContext is unavailable or blocked (e.g. autoplay policy); the
+// on-screen "matched" state already confirms success on its own.
+// `mode` picks the tone shape: "in" rises (bright/welcoming, for
+// check-in) and "out" falls (softer, for check-out) so an admin
+// listening from another room can tell which one just happened.
+function playScanBeep(mode) {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    const now = ctx.currentTime;
+    const tones =
+      mode === "out"
+        ? [
+            { freq: 987.77, start: 0, dur: 0.09 },
+            { freq: 659.25, start: 0.1, dur: 0.16 },
+          ]
+        : [
+            { freq: 880, start: 0, dur: 0.09 },
+            { freq: 1318.5, start: 0.1, dur: 0.15 },
+          ];
+    tones.forEach(({ freq, start, dur }) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, now + start);
+      gain.gain.linearRampToValueAtTime(0.35, now + start + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + start + dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + start);
+      osc.stop(now + start + dur + 0.02);
+    });
+    // Close the context once both tones finish, so a scanner left open
+    // all day doesn't accumulate one AudioContext per scan.
+    setTimeout(() => ctx.close(), 400);
+  } catch {
+    // Ignore — see comment above.
+  }
+}
+
+function QrScanModal({ offices, mode, onMatch, onClose }) {
   const { t } = useLang();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -6982,6 +7028,7 @@ function QrScanModal({ offices, onMatch, onClose }) {
       const result = evaluateOfficeQrPayload(offices, text);
       if (result.status === "ok") {
         stop();
+        playScanBeep(mode);
         onMatch(result.office);
       } else if (result.status === "expired") {
         setError(t.att.qrExpired);
@@ -7575,6 +7622,7 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
       {scanOpen && (
         <QrScanModal
           offices={offices}
+          mode={!rec ? "in" : "out"}
           onMatch={handleScanMatch}
           onClose={() => setScanOpen(false)}
         />
