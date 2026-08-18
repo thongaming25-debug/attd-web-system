@@ -573,6 +573,8 @@ const LANG = {
       chooseLogo: "ជ្រើសរើសឡូហ្គោ",
       removeLogo: "លុបឡូហ្គោ",
       brandingSaved: "បានរក្សាទុកម៉ាកយីហោដោយជោគជ័យ",
+      empPortalDesc:
+        "ចែករំលែកតំណ ឬ QR Code នេះទៅបុគ្គលិក ដើម្បីឲ្យពួកគេចូលប្រើប្រព័ន្ធ",
     },
     audit: {
       title: "កំណត់ត្រាសកម្មភាព",
@@ -1161,6 +1163,8 @@ const LANG = {
       chooseLogo: "Choose Logo",
       removeLogo: "Remove Logo",
       brandingSaved: "Branding saved successfully",
+      empPortalDesc:
+        "Share this link or QR code with employees so they can access the portal",
     },
     audit: {
       title: "Audit Log",
@@ -4926,7 +4930,7 @@ function QrModal({ url, data, title, desc, onClose, footer }) {
     </Modal>
   );
 }
-function EmployeeLinkCard() {
+function EmployeeLinkCard({ variant = "card" }) {
   const { t } = useLang();
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState(false);
@@ -4942,18 +4946,32 @@ function EmployeeLinkCard() {
     setTimeout(() => setCopied(false), 1800);
   };
 
+  // "card" (default): a standalone Card, used wherever this needs to sit
+  // on its own (e.g. previously on the Dashboard). "inline": just the
+  // row content with no outer Card/margin, for embedding inside another
+  // Card (e.g. the Settings page) that already provides its own padding.
+  const Wrapper = variant === "inline" ? "div" : Card;
+  const wrapperStyle =
+    variant === "inline"
+      ? {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 16,
+          flexWrap: "wrap",
+        }
+      : {
+          padding: "16px 18px",
+          marginBottom: 22,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 16,
+          flexWrap: "wrap",
+        };
+
   return (
-    <Card
-      style={{
-        padding: "16px 18px",
-        marginBottom: 22,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 16,
-        flexWrap: "wrap",
-      }}
-    >
+    <Wrapper style={wrapperStyle}>
       <div
         style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}
       >
@@ -5000,7 +5018,7 @@ function EmployeeLinkCard() {
         </Button>
       </div>
       {showQr && <QrModal url={url} onClose={() => setShowQr(false)} />}
-    </Card>
+    </Wrapper>
   );
 }
 
@@ -5183,8 +5201,6 @@ function Dashboard({
           })}
         </p>
       </Card>
-
-      {role === "admin" && <EmployeeLinkCard />}
 
       <div
         className="wf-grid"
@@ -12623,6 +12639,27 @@ function AdminSettings({
           </Button>
         </Card>
       )}
+
+      <Card style={{ padding: 20 }}>
+        <h3
+          style={{
+            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontWeight: 600,
+            color: T.ink,
+            marginBottom: 4,
+            fontSize: 14,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <Store size={16} /> {t.dash.empPortalLink}
+        </h3>
+        <p style={{ fontSize: 12, color: T.muted, marginBottom: 16 }}>
+          {t.settings.empPortalDesc}
+        </p>
+        <EmployeeLinkCard variant="inline" />
+      </Card>
     </div>
   );
 }
