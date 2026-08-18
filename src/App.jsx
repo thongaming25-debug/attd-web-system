@@ -327,6 +327,11 @@ const LANG = {
         "បង្ហាញអេក្រង់នេះនៅច្រកចូលសាខា (ឧ. លើថេប្លេត/អេក្រង់តាំងទុក) ដើម្បីឲ្យបុគ្គលិកស្កេន check-in/check-out។ កុំបោះពុម្ពដាក់ជាផ្ទាំង ព្រោះ QR នេះនឹងលែងដំណើរការក្រោយពេលវាផ្លាស់ប្តូរ",
       officeQrRefreshHint:
         "QR នេះនឹងផ្លាស់ប្តូរដោយស្វ័យប្រវត្តិរៀងរាល់ ២០ វិនាទី ដើម្បីសុវត្ថិភាព — សូមកុំថតទុករូបនេះសម្រាប់ប្រើក្រោយ",
+      openKioskBtn: "បើកអេក្រង់បង្ហាញ QR",
+      kioskScanHint: "ស្កេនកូដដើម្បីចូល ឬ ចេញការងារ",
+      kioskRefreshHint: "កូដនេះប្តូរដោយស្វ័យប្រវត្តិរៀងរាល់ ២០ វិនាទី",
+      kioskNotFoundTitle: "រកមិនឃើញសាខានេះទេ",
+      kioskNotFoundDesc: "តំណនេះមិនត្រឹមត្រូវទេ ឬសាខានេះត្រូវបានលុបហើយ",
     },
     lv: {
       addBtn: "សំណើច្បាប់ថ្មី",
@@ -919,6 +924,11 @@ const LANG = {
         "Display this screen at the branch entrance (e.g. on a tablet or monitor) so employees can scan to check in/out. Don't print it as a static poster — this QR stops working once it rotates.",
       officeQrRefreshHint:
         "This QR refreshes automatically every 20 seconds for security — don't save a screenshot to reuse later.",
+      openKioskBtn: "Open Kiosk Display",
+      kioskScanHint: "Scan the code to check in or check out",
+      kioskRefreshHint: "This code refreshes automatically every 20 seconds",
+      kioskNotFoundTitle: "Branch not found",
+      kioskNotFoundDesc: "This link is invalid, or the branch was deleted",
     },
     lv: {
       addBtn: "New Leave Request",
@@ -2570,7 +2580,12 @@ function computePayroll(
 function normalizeHash(h) {
   const clean = (h || "").replace(/^#\/?/, "");
   const [portalPart, ...rest] = clean.split("/");
-  const portal = portalPart === "employee" ? "employee" : "admin";
+  const portal =
+    portalPart === "employee"
+      ? "employee"
+      : portalPart === "kiosk"
+        ? "kiosk"
+        : "admin";
   const page = rest.filter(Boolean).join("/") || null;
   return { portal, page };
 }
@@ -4902,6 +4917,13 @@ function AdminLoginScreen({ admins, onLogin, go }) {
 function employeePortalUrl() {
   const { origin, pathname } = window.location;
   return `${origin}${pathname}#/employee`;
+}
+// Public, unauthenticated URL for one office's kiosk display (see
+// KioskDisplay below) — meant to be left open on a tablet/monitor
+// mounted at that branch's entrance.
+function officeKioskUrl(officeId) {
+  const { origin, pathname } = window.location;
+  return `${origin}${pathname}#/kiosk/${officeId}`;
 }
 // Generic QR display modal. Pass `url` for the existing employee-portal
 // link use case (kept for backwards compatibility), or `data` for any
@@ -7683,6 +7705,200 @@ function OfficeForm({ initial, onSave, onCancel }) {
 // check-in/check-out. Each branch has its own name, lat/lng, and radius —
 // an employee's punch is accepted if they're within range of ANY branch,
 // and the matched branch's name is stamped onto the attendance record.
+// Fullscreen, unauthenticated display for one office's rotating check-in
+// QR — the link (see officeKioskUrl above) is meant to be opened once on
+// a tablet or monitor mounted at that branch's entrance and then left
+// running, so it deliberately needs no admin/employee login. It reads
+// `offices` (already loaded by AppInner for every portal) to find the
+// matching branch and regenerates the QR image every QR_ROTATE_MS, the
+// same rotation window QrScanModal verifies against.
+function KioskDisplay({ officeId, offices, branding }) {
+  const { t } = useLang();
+  const [now, setNow] = useState(() => new Date());
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  useEffect(() => {
+    const iv = setInterval(() => setTick((n) => n + 1), QR_ROTATE_MS);
+    return () => clearInterval(iv);
+  }, []);
+  const office = (offices || []).find((o) => o.id === officeId);
+  const brandName = branding?.name?.trim() || t.appName;
+  const hh = String(now.getHours()).padStart(2, "0");
+  const mm = String(now.getMinutes()).padStart(2, "0");
+  const ss = String(now.getSeconds()).padStart(2, "0");
+
+  const shellStyle = {
+    minHeight: "100vh",
+    width: "100%",
+    position: "relative",
+    overflow: "hidden",
+    background: BRAND.ink,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 32,
+  };
+
+  if (!office) {
+    return (
+      <div style={shellStyle}>
+        <LoginBackground />
+        <div
+          style={{
+            position: "relative",
+            zIndex: 1,
+            textAlign: "center",
+            color: "#fff",
+            maxWidth: 360,
+          }}
+        >
+          <MapPin size={40} color="#8A93A8" style={{ marginBottom: 14 }} />
+          <h1
+            style={{
+              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+              fontSize: 19,
+              fontWeight: 600,
+              marginBottom: 8,
+            }}
+          >
+            {t.att.kioskNotFoundTitle}
+          </h1>
+          <p style={{ fontSize: 13, color: "#A9B4C7" }}>
+            {t.att.kioskNotFoundDesc}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const qrPayload = officeQrPayload(office);
+  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=420x420&data=${encodeURIComponent(qrPayload)}`;
+
+  return (
+    <div style={shellStyle}>
+      <LoginBackground />
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          width: "100%",
+          maxWidth: 520,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            marginBottom: 26,
+          }}
+        >
+          {branding?.logo ? (
+            <img
+              src={branding.logo}
+              alt=""
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 10,
+                objectFit: "cover",
+              }}
+            />
+          ) : (
+            <div className="wf-logo-badge">{getInitials(brandName)}</div>
+          )}
+          <span
+            style={{
+              color: "#fff",
+              fontWeight: 700,
+              fontSize: 18,
+              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            }}
+          >
+            {brandName}
+          </span>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 7,
+            color: "#A9B4C7",
+            fontSize: 13.5,
+            fontWeight: 600,
+            marginBottom: 8,
+          }}
+        >
+          <Store size={15} />
+          {office.name}
+        </div>
+        <h1
+          style={{
+            color: "#fff",
+            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontSize: 21,
+            fontWeight: 600,
+            marginBottom: 26,
+            textAlign: "center",
+          }}
+        >
+          {t.att.kioskScanHint}
+        </h1>
+        <div
+          key={tick}
+          style={{
+            background: "#fff",
+            padding: 18,
+            borderRadius: 20,
+            boxShadow: "0 24px 60px rgba(0,0,0,0.4)",
+          }}
+        >
+          <img
+            src={qrSrc}
+            alt="QR"
+            width={300}
+            height={300}
+            style={{ display: "block", width: 300, height: 300 }}
+          />
+        </div>
+        <p
+          style={{
+            color: "#8A93A8",
+            fontSize: 12.5,
+            marginTop: 20,
+            textAlign: "center",
+          }}
+        >
+          {t.att.kioskRefreshHint}
+        </p>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "baseline",
+            gap: 4,
+            marginTop: 34,
+            fontFamily: "'JetBrains Mono',monospace",
+            color: "#fff",
+            fontSize: 30,
+            fontWeight: 700,
+            fontVariantNumeric: "tabular-nums",
+          }}
+        >
+          {hh}:{mm}
+          <span style={{ fontSize: 16, color: "#8A93A8" }}>:{ss}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function OfficeLocationSettings({ offices, setOffices }) {
   const { t } = useLang();
   const [open, setOpen] = useState(false);
@@ -7705,17 +7921,31 @@ function OfficeLocationSettings({ offices, setOffices }) {
     setFormOpen(null);
   };
 
+  // Ensures an office has a rotating-QR secret before it's used anywhere
+  // (the in-app QR modal, or the kiosk display link below) — offices
+  // created before this feature existed won't have one yet. Returns the
+  // office (with a freshly-generated secret persisted to Supabase if it
+  // was missing) so the caller always has a usable one synchronously.
+  const ensureQrSecret = (office) => {
+    if (office.qrSecret) return office;
+    const withSecret = { ...office, qrSecret: uid("qs") };
+    setOffices(offices.map((o) => (o.id === office.id ? withSecret : o)));
+    return withSecret;
+  };
+
   // Opens the QR modal for an office, generating its rotating-QR secret
   // on first use if it predates this feature (older offices won't have
   // one yet).
   const openQr = (office) => {
-    if (office.qrSecret) {
-      setQrOffice(office);
-      return;
-    }
-    const withSecret = { ...office, qrSecret: uid("qs") };
-    setOffices(offices.map((o) => (o.id === office.id ? withSecret : o)));
-    setQrOffice(withSecret);
+    setQrOffice(ensureQrSecret(office));
+  };
+
+  // Opens this office's public kiosk display link in a new tab — same
+  // lazy secret-generation as openQr, so a branch that has never had its
+  // in-app QR modal opened still gets a working kiosk on first use.
+  const openKiosk = (office) => {
+    const ready = ensureQrSecret(office);
+    window.open(officeKioskUrl(ready.id), "_blank");
   };
 
   // While the QR modal is open, force a re-render every QR_ROTATE_MS so
@@ -7810,6 +8040,18 @@ function OfficeLocationSettings({ offices, setOffices }) {
                   }}
                 >
                   <QrCode size={14} />
+                </button>
+                <button
+                  onClick={() => openKiosk(o)}
+                  title={t.att.openKioskBtn}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: T.muted,
+                  }}
+                >
+                  <Monitor size={14} />
                 </button>
                 <button
                   onClick={() => setFormOpen(o)}
@@ -15757,6 +15999,20 @@ function AppInner() {
           }
         </style>
       </div>
+    );
+  }
+
+  // The kiosk portal is public and unauthenticated by design (see
+  // officeKioskUrl / KioskDisplay) — it renders standalone, before the
+  // login-screen branch below, and never touches sessionAdmin/
+  // sessionEmployee.
+  if (portal === "kiosk") {
+    return (
+      <KioskDisplay
+        officeId={routedPage}
+        offices={offices}
+        branding={branding}
+      />
     );
   }
 
