@@ -445,6 +445,22 @@ const LANG_RAW = {
       lateDeductionDisabledHint:
         "កំណត់ចំនួនកាត់ឲ្យធំជាង ០ ដើម្បីបើកការកាត់ប្រាក់មកយឺត",
       lateBadgeShort: (grace) => `យឺត > ${grace}`,
+      ulPolicyDesc:
+        "កំណត់របៀបកាត់ប្រាក់សម្រាប់ច្បាប់គ្មានប្រាក់ខែ (Unpaid Leave/UL)។ លំនាំដើម កាត់ពេញមួយថ្ងៃ (ប្រាក់ខែ/26) ក្នុងមួយថ្ងៃ UL ប៉ុន្តែអាចប្តូរជាចំនួនថេរ ឬភាគរយបាន។",
+      ulDeductionTypeLabel: "របៀបកាត់ប្រាក់ UL",
+      ulDeductionTypeFullDay: "ពេញមួយថ្ងៃ (ប្រាក់ខែ/26)",
+      ulDeductionTypeFixed: "ចំនួនថេរ ($) ក្នុងមួយថ្ងៃ",
+      ulDeductionTypePercent: "% នៃប្រាក់ថ្ងៃ",
+      ulDeductionValueFixedLabel: "ចំនួនកាត់ ($/ថ្ងៃ)",
+      ulDeductionValuePercentLabel: "ភាគរយកាត់ (%)",
+      ulDeductionHint:
+        "រាល់ថ្ងៃ UL ដែលបានអនុម័ត នឹងត្រូវកាត់ប្រាក់តាមអត្រានេះ (ចំនួនថ្ងៃ × អត្រា)",
+      ulBadgeShort: (type) =>
+        type === "fixed"
+          ? "UL · ថេរ"
+          : type === "percentDaily"
+            ? "UL · %"
+            : "UL · ពេញថ្ងៃ",
       downloadPdf: "ទាញយក PDF",
       payslipTitle: "សន្លឹកប្រាក់ខែ",
       payPeriod: "រយៈពេលបើកប្រាក់ខែ",
@@ -459,6 +475,10 @@ const LANG_RAW = {
       customLatePolicyHint:
         "នៅពេលបើក បុគ្គលិកនេះនឹងប្រើចំនួនដងអនុញ្ញាត និងអត្រាកាត់ប្រាក់ដែលកំណត់ខាងក្រោម ជំនួសគោលការណ៍ទូទៅរបស់ក្រុមហ៊ុន",
       customLatePolicyBadge: "គោលការណ៍យឺតផ្ទាល់ខ្លួន",
+      customUlPolicyToggle: "កំណត់គោលការណ៍កាត់ប្រាក់ UL ផ្ទាល់ខ្លួន",
+      customUlPolicyHint:
+        "នៅពេលបើក បុគ្គលិកនេះនឹងប្រើរបៀបកាត់ប្រាក់ UL ដែលកំណត់ខាងក្រោម ជំនួសគោលការណ៍ទូទៅរបស់ក្រុមហ៊ុន",
+      customUlPolicyBadge: "គោលការណ៍ UL ផ្ទាល់ខ្លួន",
       historicalBtn: "របាយការណ៍ខែចាស់",
       historicalTitle: "របាយការណ៍ប្រាក់ខែខែចាស់",
       historicalDesc:
@@ -1077,6 +1097,22 @@ const LANG_RAW = {
       lateDeductionDisabledHint:
         "Set the deduction amount above 0 to enable late-arrival deductions",
       lateBadgeShort: (grace) => `late > ${grace}`,
+      ulPolicyDesc:
+        "Set how Unpaid Leave (UL) days are deducted. By default a full day's pay (salary/26) is docked per UL day, but this can be changed to a fixed amount or a percentage instead.",
+      ulDeductionTypeLabel: "UL deduction type",
+      ulDeductionTypeFullDay: "Full day (salary/26)",
+      ulDeductionTypeFixed: "Fixed amount ($) per day",
+      ulDeductionTypePercent: "% of daily rate",
+      ulDeductionValueFixedLabel: "Deduction amount ($/day)",
+      ulDeductionValuePercentLabel: "Deduction percentage (%)",
+      ulDeductionHint:
+        "Every approved UL day is deducted at this rate (days × rate)",
+      ulBadgeShort: (type) =>
+        type === "fixed"
+          ? "UL · fixed"
+          : type === "percentDaily"
+            ? "UL · %"
+            : "UL · full day",
       downloadPdf: "Download PDF",
       payslipTitle: "Payslip",
       payPeriod: "Pay Period",
@@ -1091,6 +1127,10 @@ const LANG_RAW = {
       customLatePolicyHint:
         "When enabled, this employee uses the grace count and deduction rate set below instead of the company-wide policy",
       customLatePolicyBadge: "Custom late policy",
+      customUlPolicyToggle: "Custom UL-deduction policy for this employee",
+      customUlPolicyHint:
+        "When enabled, this employee uses the UL deduction rule set below instead of the company-wide policy",
+      customUlPolicyBadge: "Custom UL policy",
       historicalBtn: "Older Months Report",
       historicalTitle: "Historical Payroll Report",
       historicalDesc:
@@ -2405,6 +2445,12 @@ const DEFAULT_PAYROLL_POLICY = {
   lateGraceCount: 3,
   lateDeductionType: "fixed",
   lateDeductionValue: 0,
+  // Unpaid Leave (UL) deduction: "fullDay" docks a full day's pay
+  // (salary/WORKING_DAYS_PER_MONTH) per UL day — this is the original
+  // behavior. "fixed" docks a flat $ amount per UL day; "percentDaily"
+  // docks a percentage of the employee's daily rate per UL day.
+  ulDeductionType: "fullDay",
+  ulDeductionValue: 0,
 };
 // Named tone recipes for the QR check-in/out chime (see playScanBeep).
 // Each preset gives a short tone sequence for "in" and a separate one
@@ -3027,12 +3073,30 @@ function computePayroll(
   const { absentDays, leaveDays, lateDays, unpaidLeaveDays } =
     monthAttendanceStats(attendance, emp.id, mk);
   const dailyRate = emp.salary / WORKING_DAYS_PER_MONTH;
-  // Unpaid absences and approved Unpaid Leave (UL) both dock a full day's
-  // pay each, at the employee's daily rate.
+  // Unauthorized absences always dock a full day's pay at the daily rate.
   const absenceDeduction = Math.min(emp.salary, absentDays * dailyRate);
+  // Approved Unpaid Leave (UL) is docked per the UL policy in effect:
+  // "fullDay" (default, same as before) docks a full day's pay per UL
+  // day; "fixed" docks a flat $ amount per UL day; "percentDaily" docks
+  // a percentage of the daily rate per UL day. An employee can override
+  // the company-wide UL policy with their own, the same way the late
+  // policy and tax/insurance rates can be overridden.
+  const usesCustomUlPolicy = !!emp.useCustomUlPolicy;
+  const ulDeductionType = usesCustomUlPolicy
+    ? emp.customUlDeductionType || "fullDay"
+    : policy.ulDeductionType || "fullDay";
+  const ulDeductionValue = usesCustomUlPolicy
+    ? Number(emp.customUlDeductionValue) || 0
+    : Number(policy.ulDeductionValue) || 0;
+  const ulDeductionPerDay =
+    ulDeductionType === "percentDaily"
+      ? dailyRate * (ulDeductionValue / 100)
+      : ulDeductionType === "fixed"
+        ? ulDeductionValue
+        : dailyRate; // "fullDay"
   const unpaidLeaveDeduction = Math.min(
     emp.salary - absenceDeduction,
-    unpaidLeaveDays * dailyRate,
+    unpaidLeaveDays * ulDeductionPerDay,
   );
   // Late-arrival deduction: the first `lateGraceCount` late days each month
   // are free; every late day beyond that is docked, either a fixed $
@@ -3095,6 +3159,10 @@ function computePayroll(
     dailyRate,
     absenceDeduction,
     unpaidLeaveDeduction,
+    usesCustomUlPolicy,
+    ulDeductionType,
+    ulDeductionValue,
+    ulDeductionPerDay,
     usesCustomLatePolicy,
     lateGraceCount,
     excessLateDays,
@@ -3970,6 +4038,10 @@ function usePayrollPolicy() {
           lateDeductionValue:
             data.late_deduction_value ??
             DEFAULT_PAYROLL_POLICY.lateDeductionValue,
+          ulDeductionType:
+            data.ul_deduction_type ?? DEFAULT_PAYROLL_POLICY.ulDeductionType,
+          ulDeductionValue:
+            data.ul_deduction_value ?? DEFAULT_PAYROLL_POLICY.ulDeductionValue,
         });
       } else {
         setValueState(DEFAULT_PAYROLL_POLICY);
@@ -3992,6 +4064,8 @@ function usePayrollPolicy() {
         late_grace_count: next.lateGraceCount,
         late_deduction_type: next.lateDeductionType,
         late_deduction_value: next.lateDeductionValue,
+        ul_deduction_type: next.ulDeductionType,
+        ul_deduction_value: next.ulDeductionValue,
       });
       if (error)
         console.error(
@@ -6471,6 +6545,9 @@ function EmployeeForm({
       customLateGraceCount: "",
       customLateDeductionType: "fixed",
       customLateDeductionValue: "",
+      useCustomUlPolicy: false,
+      customUlDeductionType: "fullDay",
+      customUlDeductionValue: "",
     },
   );
   const [newOffDate, setNewOffDate] = useState("");
@@ -6748,6 +6825,82 @@ function EmployeeForm({
           </>
         )}
       </div>
+      <div
+        style={{
+          border: `1px solid ${T.lineSoft}`,
+          borderRadius: 10,
+          padding: "10px 12px",
+          marginBottom: 14,
+        }}
+      >
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            cursor: "pointer",
+            fontSize: 13,
+            fontWeight: 600,
+            color: T.ink,
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={!!f.useCustomUlPolicy}
+            onChange={(e) =>
+              setF({ ...f, useCustomUlPolicy: e.target.checked })
+            }
+            style={{ width: 15, height: 15, accentColor: T.forest }}
+          />
+          {t.pay.customUlPolicyToggle}
+        </label>
+        <p
+          style={{
+            fontSize: 11.5,
+            color: T.muted,
+            marginTop: 6,
+            marginBottom: f.useCustomUlPolicy ? 12 : 0,
+          }}
+        >
+          {t.pay.customUlPolicyHint}
+        </p>
+        {f.useCustomUlPolicy && (
+          <>
+            <Field label={t.pay.ulDeductionTypeLabel}>
+              <Select
+                value={f.customUlDeductionType || "fullDay"}
+                onChange={set("customUlDeductionType")}
+              >
+                <option value="fullDay">{t.pay.ulDeductionTypeFullDay}</option>
+                <option value="fixed">{t.pay.ulDeductionTypeFixed}</option>
+                <option value="percentDaily">
+                  {t.pay.ulDeductionTypePercent}
+                </option>
+              </Select>
+            </Field>
+            {f.customUlDeductionType !== "fullDay" && (
+              <div style={{ marginTop: 12 }}>
+                <Field
+                  label={
+                    f.customUlDeductionType === "percentDaily"
+                      ? t.pay.ulDeductionValuePercentLabel
+                      : t.pay.ulDeductionValueFixedLabel
+                  }
+                >
+                  <Input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    value={f.customUlDeductionValue}
+                    onChange={set("customUlDeductionValue")}
+                    placeholder="0"
+                  />
+                </Field>
+              </div>
+            )}
+          </>
+        )}
+      </div>
       <Field label={t.emps.joined}>
         <DatePicker value={f.joined || todayStr()} onChange={set("joined")} />
       </Field>
@@ -6941,6 +7094,13 @@ function Employees({
         : null,
       customLateDeductionValue: data.useCustomLatePolicy
         ? Number(data.customLateDeductionValue) || 0
+        : null,
+      useCustomUlPolicy: !!data.useCustomUlPolicy,
+      customUlDeductionType: data.useCustomUlPolicy
+        ? data.customUlDeductionType || "fullDay"
+        : null,
+      customUlDeductionValue: data.useCustomUlPolicy
+        ? Number(data.customUlDeductionValue) || 0
         : null,
     };
     if (modal.mode === "add")
@@ -10552,6 +10712,8 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
       lateGraceCount: Number(f.lateGraceCount) || 0,
       lateDeductionType: f.lateDeductionType || "fixed",
       lateDeductionValue: Number(f.lateDeductionValue) || 0,
+      ulDeductionType: f.ulDeductionType || "fullDay",
+      ulDeductionValue: Number(f.ulDeductionValue) || 0,
     });
     setOpen(false);
   };
@@ -10587,6 +10749,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
           {Number(payrollPolicy.lateDeductionValue) > 0
             ? ` · ${t.pay.lateBadgeShort(Number(payrollPolicy.lateGraceCount) || 0)}`
             : ""}
+          {` · ${t.pay.ulBadgeShort(payrollPolicy.ulDeductionType || "fullDay")}`}
         </span>
       </div>
       {open && (
@@ -10700,6 +10863,60 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
                   : t.pay.lateDeductionDisabledHint}
               </p>
             </div>
+          </div>
+          <div
+            style={{
+              marginTop: 16,
+              paddingTop: 16,
+              borderTop: `1px solid ${T.lineSoft}`,
+            }}
+          >
+            <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
+              {t.pay.ulPolicyDesc}
+            </p>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 12,
+              }}
+            >
+              <Field label={t.pay.ulDeductionTypeLabel}>
+                <Select
+                  value={f.ulDeductionType || "fullDay"}
+                  onChange={set("ulDeductionType")}
+                >
+                  <option value="fullDay">
+                    {t.pay.ulDeductionTypeFullDay}
+                  </option>
+                  <option value="fixed">{t.pay.ulDeductionTypeFixed}</option>
+                  <option value="percentDaily">
+                    {t.pay.ulDeductionTypePercent}
+                  </option>
+                </Select>
+              </Field>
+              {f.ulDeductionType !== "fullDay" && (
+                <Field
+                  label={
+                    f.ulDeductionType === "percentDaily"
+                      ? t.pay.ulDeductionValuePercentLabel
+                      : t.pay.ulDeductionValueFixedLabel
+                  }
+                >
+                  <Input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    placeholder="0"
+                    value={f.ulDeductionValue}
+                    onChange={set("ulDeductionValue")}
+                  />
+                </Field>
+              )}
+            </div>
+            <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+              {t.pay.ulDeductionHint}
+            </p>
           </div>
           <div
             style={{
@@ -15341,6 +15558,8 @@ function Payslip({
     leaveDays,
     unpaidLeaveDays,
     unpaidLeaveDeduction,
+    ulDeductionPerDay,
+    usesCustomUlPolicy,
     usesCustomLatePolicy,
     excessLateDays,
     lateDeduction,
@@ -15378,7 +15597,7 @@ function Payslip({
       ...(unpaidLeaveDays > 0
         ? [
             {
-              label: `${t.pay.unpaidLeaveDed} (${unpaidLeaveDays} × ${fmtMoney(dailyRate)})`,
+              label: `${t.pay.unpaidLeaveDed} (${unpaidLeaveDays} × ${fmtMoney(ulDeductionPerDay)})`,
               value: fmtMoney(unpaidLeaveDeduction),
               tone: "neg",
             },
@@ -15506,6 +15725,21 @@ function Payslip({
                 {t.pay.customLatePolicyBadge}
               </span>
             )}
+            {usesCustomUlPolicy && (
+              <span
+                style={{
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  color: T.goldText,
+                  background: T.goldSoft,
+                  padding: "2px 6px",
+                  borderRadius: 6,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {t.pay.customUlPolicyBadge}
+              </span>
+            )}
           </div>
           <div
             style={{
@@ -15558,7 +15792,7 @@ function Payslip({
             >
               <span>
                 {t.pay.unpaidLeaveDed} ({unpaidLeaveDays} ×{" "}
-                {fmtMoney(dailyRate)})
+                {fmtMoney(ulDeductionPerDay)})
               </span>
               <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
                 -{fmtMoney(unpaidLeaveDeduction)}
@@ -16195,6 +16429,7 @@ function Payroll({
                 otHours,
                 usesCustomRate,
                 usesCustomLatePolicy,
+                usesCustomUlPolicy,
               } = computePayroll(
                 e,
                 attendance,
@@ -16255,6 +16490,21 @@ function Payroll({
                               }}
                             >
                               {t.pay.customLatePolicyBadge}
+                            </span>
+                          )}
+                          {usesCustomUlPolicy && (
+                            <span
+                              style={{
+                                fontSize: 9.5,
+                                fontWeight: 700,
+                                color: T.goldText,
+                                background: T.goldSoft,
+                                padding: "2px 6px",
+                                borderRadius: 6,
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {t.pay.customUlPolicyBadge}
                             </span>
                           )}
                         </div>
@@ -16531,6 +16781,9 @@ function AppInner() {
         customLateGraceCount: r.custom_late_grace_count,
         customLateDeductionType: r.custom_late_deduction_type,
         customLateDeductionValue: r.custom_late_deduction_value,
+        useCustomUlPolicy: !!r.use_custom_ul_policy,
+        customUlDeductionType: r.custom_ul_deduction_type,
+        customUlDeductionValue: r.custom_ul_deduction_value,
       }),
       toDb: (r) => ({
         id: r.id,
@@ -16570,6 +16823,13 @@ function AppInner() {
         custom_late_deduction_value: r.useCustomLatePolicy
           ? Number(r.customLateDeductionValue) || 0
           : null,
+        use_custom_ul_policy: !!r.useCustomUlPolicy,
+        custom_ul_deduction_type: r.useCustomUlPolicy
+          ? r.customUlDeductionType || "fullDay"
+          : null,
+        custom_ul_deduction_value: r.useCustomUlPolicy
+          ? Number(r.customUlDeductionValue) || 0
+          : null,
       }),
       audit: true,
       actorRef,
@@ -16604,8 +16864,14 @@ function AppInner() {
       id: r.id,
       employee_id: r.employeeId,
       date: r.date,
-      check_in: r.checkIn,
-      check_out: r.checkOut,
+      // check_in/check_out are Postgres `time` columns, which reject an
+      // empty string ("") with a 400 — only null or a valid "HH:MM" is
+      // accepted. Any upstream code path (manual entry, self-punch,
+      // corrections, leave approval) that leaves these as "" instead of
+      // null would otherwise fail the whole batch upsert silently
+      // (console-only error), so normalize defensively right here.
+      check_in: r.checkIn || null,
+      check_out: r.checkOut || null,
       status: r.status,
       check_in_loc: r.checkInLoc,
       check_out_loc: r.checkOutLoc,
