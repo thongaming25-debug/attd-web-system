@@ -69,7 +69,7 @@ import {
 /* ---------------------------------------------------------------
    Language / i18n  — add new keys here as needed
 ----------------------------------------------------------------*/
-const LANG = {
+const LANG_RAW = {
   km: {
     appName: "Workforce Suite",
     login: {
@@ -1287,6 +1287,273 @@ const LANG = {
         "Delete was blocked by the database (RLS policy) — the entry is still there. Check that Super Admin has delete permission on the login_activity table.",
     },
   },
+  // Chinese (Simplified) is a partial translation covering the most
+  // visible screens (nav, dashboard, attendance/QR, settings, login).
+  // Anything not listed here falls back to English automatically — see
+  // mergeLangFallback / the LANG export below — rather than showing
+  // undefined or crashing.
+  zh: {
+    appName: "Workforce Suite",
+    login: {
+      employeeId: "员工编号",
+      employeeIdPlaceholder: "EMP-001",
+      pin: "密码 (PIN)",
+      pinPlaceholder: "••••",
+      submit: "登录系统",
+      adminSubmit: "管理员登录",
+      username: "账号 (Username)",
+      usernamePlaceholder: "admin",
+      password: "管理员密码",
+      passwordPlaceholder: "••••••••",
+      adminTitle: "管理员登录",
+      employeePortal: "员工登录",
+      demoLabel: "测试账号：",
+      errNoEmp: "找不到此员工编号",
+      errInactive: "此账号尚未启用，请联系管理员",
+      errPin: "PIN 密码不正确",
+      errNoAdmin: "找不到此管理员账号",
+      errPass: "密码不正确",
+      back: "返回",
+      switchToAdmin: "管理员？请从这里登录",
+    },
+    nav: {
+      dashboard: "仪表板",
+      announcements: "公告",
+      employees: "员工",
+      departments: "部门",
+      shifts: "班次",
+      attendance: "考勤",
+      holidays: "法定假日",
+      leave: "请假",
+      overtime: "加班 (OT)",
+      payroll: "工资",
+      performance: "绩效考核",
+      attCorrection: "考勤更正申请",
+      admins: "管理员账号",
+      myAttendance: "我的考勤",
+      myLeave: "我的请假",
+      myOvertime: "我的加班 (OT)",
+      myPayroll: "我的工资",
+      myPerformance: "我的绩效考核",
+      myDocuments: "我的文件",
+      myAttCorrection: "申请考勤更正",
+      myProfile: "我的个人资料",
+      settings: "设置",
+      audits: "操作日志",
+      loginActivity: "登录记录",
+      analytics: "数据分析",
+      rolePerms: "角色权限",
+    },
+    logout: "登出",
+    notifications: "通知",
+    markAllRead: "标记全部已读",
+    noNotif: "没有通知",
+    confirmDelete: "确认删除",
+    cancel: "取消",
+    delete: "删除",
+    edit: "编辑",
+    save: "保存",
+    add: "添加",
+    search: "搜索...",
+    employee: "员工",
+    status: "状态",
+    actions: "操作",
+    noData: "没有数据",
+    exportCsv: "导出 CSV",
+    exportExcel: "导出 Excel",
+    clear: "清除",
+    today: "今天",
+    now: "现在",
+    timeLabel: "时间",
+    selectDate: "选择日期",
+    noResults: "没有找到结果",
+    pagination: { of: "之" },
+    popupBlockedTitle: "浏览器已阻止弹出窗口",
+    popupBlockedPayslip: "请允许此网站的弹出窗口，以下载工资单",
+    popupBlockedBadge: "请允许此网站的弹出窗口，以打印工作证",
+    dash: {
+      welcome: "欢迎",
+      totalEmp: "员工总数",
+      active: "在职",
+      totalDept: "部门",
+      totalDeptSub: "部门总数",
+      presentToday: "今日出勤",
+      attendRate: "出勤率",
+      pendingPayroll: "待发工资",
+      thisMonth: "本月",
+      recentAttend: "今日考勤记录",
+      noAttend: "今天还没有打卡记录",
+      empPortalLink: "员工入口链接",
+      showQR: "显示 QR Code",
+      copyLink: "复制链接",
+      copied: "已复制！",
+      noEmpWarn: '还没有员工，请前往"员工"页面添加',
+      myDept: "我的部门",
+      myShift: "我的班次",
+      todayStatus: "今日状态",
+      payrollStatus: "工资状态",
+      notCheckedIn: "尚未打卡",
+      workingNow: "正在工作",
+      workingNowSub: (n) => `目前有 ${n} 人正在打卡上班`,
+      noOneWorkingNow: "目前还没有员工打卡上班",
+      unassignedBranch: "未分配分店",
+      sinceLabel: "自",
+    },
+    analytics: {
+      title: "数据分析",
+      subtitle: "考勤、工资和加班趋势总览",
+      attendTrend: "出勤率（近 6 个月）",
+      attendTrendSub: "出勤/迟到百分比，对比每月总记录",
+      deptCost: "各部门工资净支出",
+      deptCostSub: "当前月份，仅计算在职员工",
+      otTrend: "已批准加班时数（近 6 个月）",
+      otTrendSub: "所有部门已批准的加班时数总和",
+      noChartData: "暂无足够数据可显示",
+      totalOt: "加班总数",
+      hours: "小时",
+    },
+    att: {
+      checkIn: "上班打卡",
+      checkOut: "下班打卡",
+      present: "出勤",
+      absent: "缺勤",
+      late: "迟到",
+      onLeave: "请假",
+      date: "日期",
+      inTime: "上班时间",
+      outTime: "下班时间",
+      setOffice: "设置办公室位置",
+      noRecord: "还没有记录",
+      absentDays: "缺勤天数",
+      branch: "分店",
+      liveClockLabel: "当前时间",
+      punchOutBtn: "打卡下班",
+      awayFromOffice: (name, dist, radius) =>
+        `您距离办公室"${name}" ${dist}m（允许范围 ${radius}m）— 无法打卡`,
+      cannotVerifyLoc: "无法验证位置",
+      wrongBranchWarning: (name) =>
+        `⚠️ 您正在分店"${name}"打卡，但您被分配在其他分店工作`,
+      gpsFailed: "无法获取 GPS 位置，请为此应用开启定位服务",
+      gpsRequiredHint: (n) => `需要在 ${n} 个分店之一的 GPS 范围内`,
+      noData: "没有数据",
+      manualEntry: "手动登记",
+      dayOffNote: "🛌 今天是您的休息日 — 如果您来上班仍可以打卡",
+      officeGeofenceTitle: "多分店 GPS 打卡范围设置",
+      officeGeofenceDesc:
+        "设置各分店的位置，要求员工自助打卡时必须在其中一个分店附近。员工所在的分店名称会与其考勤记录一起保存。若未添加任何分店，位置限制将不会生效。",
+      officeCountLabel: (n) => `${n} 个分店`,
+      officeNotSet: "尚未设置",
+      officeNoneYet: "还没有分店",
+      officeNameLabel: "分店 / 办公室名称",
+      officeNamePlaceholder: "总部, 分店...",
+      officeRadiusLabel: "允许半径（米）",
+      officeUseCurrentLoc: "使用当前位置",
+      officeGpsFailed: "无法获取当前 GPS 位置",
+      officeNameRequired: "请输入分店/办公室名称",
+      officeCoordsRequired: "请正确填写坐标和半径",
+      officeAddBtn: "添加分店",
+      officeEditTitle: "编辑分店",
+      officeConfirmDel: (name) => `确定要删除分店"${name}"吗？`,
+      statusPresent: "出勤",
+      statusLate: "迟到",
+      statusAbsent: "缺勤（未批准）",
+      statusLeavePaid: "请假（带薪）",
+      scanQrBtn: "扫描分店 QR",
+      scanQrOr: "或",
+      scanQrTitle: "扫描分店 QR",
+      scanQrDesc: "将摄像头对准您分店的 QR code",
+      scanQrHint: "正在寻找 QR...",
+      scanQrOpeningCamera: "正在打开摄像头...",
+      qrNoMatch: "此 QR 不属于任何分店，请再试一次",
+      qrExpired: "此 QR 已过期，请扫描分店屏幕/纸张上的最新 QR",
+      cameraDenied: "无法打开摄像头，请为此应用开启摄像头权限",
+      cameraNotFound: "在此设备上找不到摄像头",
+      viaQrLabel: "QR 扫描",
+      officeQrBtn: "QR Code",
+      officeQrTitle: (name) => `QR Code · ${name}`,
+      officeQrDesc:
+        "将此屏幕显示在分店入口（例如平板电脑/固定屏幕上），供员工扫描打卡上下班。请勿打印张贴，因为该 QR 刷新后将失效",
+      officeQrRefreshHint:
+        "为了安全，此 QR 每 20 秒会自动更换 — 请勿截图留存以后使用",
+      openKioskBtn: "打开 QR 展示屏幕",
+      kioskScanHint: "扫描此码以打卡上/下班",
+      kioskRefreshHint: "此码每 20 秒会自动更换",
+      kioskNotFoundTitle: "找不到此分店",
+      kioskNotFoundDesc: "此链接无效，或该分店已被删除",
+    },
+    qr: {
+      title: "员工 QR Code",
+      desc: "扫描以直接打开员工登录页面",
+    },
+    settings: {
+      title: "账号设置",
+      photoLabel: "个人头像",
+      choosePhoto: "选择照片",
+      nameLabel: "姓名",
+      namePlaceholder: "请输入您的姓名",
+      appearance: "外观",
+      lightMode: "浅色 (Light)",
+      darkMode: "深色 (Dark)",
+      appearanceDesc: "切换此设备的显示外观",
+      saved: "保存成功",
+      saveFailed: "保存失败：",
+      nameRequired: "请输入姓名",
+      brandingTitle: "公司品牌",
+      brandingDesc: "设置自定义公司名称和标志，以替换默认名称和标志",
+      companyNameLabel: "公司名称",
+      companyNamePlaceholder: "Workforce Suite",
+      companyLogoLabel: "公司标志",
+      chooseLogo: "选择标志",
+      removeLogo: "移除标志",
+      brandingSaved: "品牌信息保存成功",
+      empPortalDesc: "将此链接或 QR code 分享给员工，方便他们进入系统",
+      soundTitle: "QR 扫描提示音",
+      soundDesc: "选择员工成功扫描 QR 打卡上/下班时播放的提示音",
+      soundPresets: {
+        chime: "铃声（默认）",
+        bell: "钟声",
+        marimba: "马林巴琴声",
+        pop: "短促音",
+        classic: "经典提示音",
+        silent: "静音",
+      },
+      soundPreview: "试听",
+      soundSaved: "提示音保存成功",
+    },
+  },
+};
+
+// Fills in any key missing from `override` using the matching key from
+// `base`, recursively — used so a partial translation (currently `zh`)
+// never shows "undefined" or crashes: anything not yet translated just
+// reads in English until someone adds it above. Functions/arrays/other
+// non-plain-object leaves are taken whole from whichever side has them.
+function mergeLangFallback(override, base) {
+  if (
+    typeof base !== "object" ||
+    base === null ||
+    Array.isArray(base) ||
+    typeof override === "function"
+  ) {
+    return override === undefined ? base : override;
+  }
+  if (typeof override !== "object" || override === null) {
+    return override === undefined ? base : override;
+  }
+  const result = {};
+  for (const key of Object.keys(base)) {
+    result[key] = mergeLangFallback(override[key], base[key]);
+  }
+  for (const key of Object.keys(override)) {
+    if (!(key in result)) result[key] = override[key];
+  }
+  return result;
+}
+
+const LANG = {
+  km: LANG_RAW.km,
+  en: LANG_RAW.en,
+  zh: mergeLangFallback(LANG_RAW.zh, LANG_RAW.en),
 };
 
 const LangContext = createContext({
@@ -1347,31 +1614,106 @@ function ThemeToggle({ variant = "dark" }) {
   );
 }
 
+// Language options for LangToggle, in display order. Flags are decorative
+// emoji, not a claim about a country's language policy.
+const LANG_OPTIONS = [
+  { code: "en", flag: "🇬🇧", label: "English" },
+  { code: "km", flag: "🇰🇭", label: "ខ្មែរ" },
+  { code: "zh", flag: "🇨🇳", label: "中文" },
+];
+
 function LangToggle({ variant = "dark" }) {
   const { lang, setLang } = useLang();
   const isDark = variant === "dark";
+  const [open, setOpen] = useState(false);
+  const boxRef = useRef(null);
+  const current = LANG_OPTIONS.find((o) => o.code === lang) || LANG_OPTIONS[0];
+
+  useEffect(() => {
+    function onDocClick(e) {
+      if (boxRef.current && !boxRef.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, []);
+
   return (
-    <button
-      onClick={() => setLang(lang === "km" ? "en" : "km")}
-      title="Switch language / ប្តូរភាសា"
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 5,
-        background: isDark ? "rgba(255,255,255,0.10)" : T.paper,
-        border: `1px solid ${isDark ? "rgba(255,255,255,0.18)" : T.line}`,
-        borderRadius: 8,
-        color: isDark ? "#fff" : T.ink,
-        fontSize: 12,
-        fontWeight: 600,
-        padding: "5px 10px",
-        cursor: "pointer",
-        transition: "background .15s, border-color .15s",
-        backdropFilter: "blur(4px)",
-      }}
-    >
-      {lang === "km" ? "🇬🇧 EN" : "🇰🇭 KM"}
-    </button>
+    <div ref={boxRef} style={{ position: "relative" }}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        title="Switch language / ប្តូរភាសា / 切换语言"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          background: isDark ? "rgba(255,255,255,0.10)" : T.paper,
+          border: `1px solid ${isDark ? "rgba(255,255,255,0.18)" : T.line}`,
+          borderRadius: 8,
+          color: isDark ? "#fff" : T.ink,
+          fontSize: 12,
+          fontWeight: 600,
+          padding: "5px 10px",
+          cursor: "pointer",
+          transition: "background .15s, border-color .15s",
+          backdropFilter: "blur(4px)",
+        }}
+      >
+        <span>{current.flag}</span>
+        <span>{current.label}</span>
+        <ChevronLeft
+          size={12}
+          style={{
+            transform: open ? "rotate(90deg)" : "rotate(-90deg)",
+            transition: "transform .15s",
+            opacity: 0.7,
+          }}
+        />
+      </button>
+      {open && (
+        <div
+          style={{
+            position: "absolute",
+            top: "calc(100% + 6px)",
+            right: 0,
+            minWidth: 130,
+            background: T.paper,
+            border: `1px solid ${T.line}`,
+            borderRadius: 10,
+            boxShadow: "0 12px 30px rgba(0,0,0,0.18)",
+            padding: 4,
+            zIndex: 60,
+          }}
+        >
+          {LANG_OPTIONS.map((o) => (
+            <button
+              key={o.code}
+              onClick={() => {
+                setLang(o.code);
+                setOpen(false);
+              }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                width: "100%",
+                background: o.code === lang ? T.forestSoft : "transparent",
+                border: "none",
+                borderRadius: 7,
+                color: T.ink,
+                fontSize: 13,
+                fontWeight: o.code === lang ? 700 : 500,
+                padding: "7px 10px",
+                cursor: "pointer",
+                textAlign: "left",
+              }}
+            >
+              <span>{o.flag}</span>
+              <span>{o.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 // Live ledger-style clock shown in the header — a small functional nod to
