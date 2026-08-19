@@ -18028,7 +18028,91 @@ function AppInner() {
   );
 }
 
+// Installs the app as a PWA. Everything except the service worker is
+// generated right here and injected into <head> at runtime — the
+// manifest and the app icon are both built as data: URIs, so there's
+// no manifest.json or icons/ folder to deploy separately. The one
+// exception is the service worker itself (registered at /sw.js):
+// browsers require it to be a real same-origin script file reachable
+// at a stable URL — that's a platform security rule, not something we
+// can inline into the JS bundle. Deliberately does NOT cache or queue
+// Supabase writes — checking in/out, payroll, etc. still need a live
+// connection; this only makes the shell load fast and work when the
+// network blips.
+const PWA_ICON_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
+  '<rect width="100" height="100" rx="22" fill="#0A0F1A"/>' +
+  '<circle cx="50" cy="50" r="30" fill="none" stroke="#1FA26B" stroke-width="4.5"/>' +
+  '<path d="M32 52 L45 65 L70 35" fill="none" stroke="#F0A83B" ' +
+  'stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>' +
+  "</svg>";
+const PWA_ICON_URL = `data:image/svg+xml;base64,${btoa(PWA_ICON_SVG)}`;
+
+function usePwaSetup() {
+  useEffect(() => {
+    const addTag = (tag, attrs) => {
+      if (
+        document.querySelector(
+          `${tag}[${Object.keys(attrs)[0]}="${Object.values(attrs)[0]}"]`,
+        )
+      )
+        return; // already present (e.g. hot-reload) — don't duplicate
+      const el = document.createElement(tag);
+      Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+      document.head.appendChild(el);
+    };
+
+    const manifest = {
+      name: "Workforce Suite",
+      short_name: "Workforce",
+      start_url: "/",
+      scope: "/",
+      display: "standalone",
+      background_color: "#0A0F1A",
+      theme_color: "#0A0F1A",
+      icons: [
+        {
+          src: PWA_ICON_URL,
+          sizes: "192x192",
+          type: "image/svg+xml",
+          purpose: "any",
+        },
+        {
+          src: PWA_ICON_URL,
+          sizes: "512x512",
+          type: "image/svg+xml",
+          purpose: "any",
+        },
+        {
+          src: PWA_ICON_URL,
+          sizes: "512x512",
+          type: "image/svg+xml",
+          purpose: "maskable",
+        },
+      ],
+    };
+    const manifestUrl = `data:application/manifest+json,${encodeURIComponent(
+      JSON.stringify(manifest),
+    )}`;
+
+    addTag("link", { rel: "manifest", href: manifestUrl });
+    addTag("meta", { name: "theme-color", content: "#0A0F1A" });
+    // iOS Safari ignores the web manifest for its home-screen icon and
+    // reads this tag instead — a data: URI works here too.
+    addTag("link", { rel: "apple-touch-icon", href: PWA_ICON_URL });
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .catch((err) =>
+          console.error("[pwa] service worker registration failed:", err),
+        );
+    }
+  }, []);
+}
+
 export default function App() {
+  usePwaSetup();
   const [lang, setLang] = useLocalStorage("hrsuite:lang", "km");
   const t = LANG[lang] || LANG.km;
   const [theme, setTheme] = useLocalStorage("hrsuite:theme", "light");
