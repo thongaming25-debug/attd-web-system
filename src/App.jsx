@@ -63,6 +63,7 @@ import {
   Monitor,
   BarChart3,
   FileSpreadsheet,
+  Volume2,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -585,6 +586,18 @@ const LANG = {
       brandingSaved: "បានរក្សាទុកម៉ាកយីហោដោយជោគជ័យ",
       empPortalDesc:
         "ចែករំលែកតំណ ឬ QR Code នេះទៅបុគ្គលិក ដើម្បីឲ្យពួកគេចូលប្រើប្រព័ន្ធ",
+      soundTitle: "សំឡេងពេលស្កេន QR",
+      soundDesc: "ជ្រើសរើសសំឡេងដែលនឹងឮពេលបុគ្គលិកស្កេន QR ចូល/ចេញការងារជោគជ័យ",
+      soundPresets: {
+        chime: "សំឡេងកណ្តឹង (លំនាំដើម)",
+        bell: "សំឡេងកណ្តឹងវត្ត",
+        marimba: "សំឡេងម៉ារីមបា",
+        pop: "សំឡេងខ្លីៗ",
+        classic: "សំឡេងធម្មតា",
+        silent: "គ្មានសំឡេង",
+      },
+      soundPreview: "ស្តាប់សាកល្បង",
+      soundSaved: "បានរក្សាទុកសំឡេងដោយជោគជ័យ",
     },
     audit: {
       title: "កំណត់ត្រាសកម្មភាព",
@@ -1184,6 +1197,19 @@ const LANG = {
       brandingSaved: "Branding saved successfully",
       empPortalDesc:
         "Share this link or QR code with employees so they can access the portal",
+      soundTitle: "QR Scan Sound",
+      soundDesc:
+        "Choose the sound that plays when an employee successfully scans a QR to check in/out",
+      soundPresets: {
+        chime: "Chime (default)",
+        bell: "Bell",
+        marimba: "Marimba",
+        pop: "Pop",
+        classic: "Classic beep",
+        silent: "Silent",
+      },
+      soundPreview: "Preview",
+      soundSaved: "Sound saved successfully",
     },
     audit: {
       title: "Audit Log",
@@ -1941,6 +1967,46 @@ const DEFAULT_PAYROLL_POLICY = {
   // 0 means the deduction applies to every employee regardless of salary.
   minSalaryThreshold: 0,
 };
+// Named tone recipes for the QR check-in/out chime (see playScanBeep).
+// Each preset gives a short tone sequence for "in" and a separate one
+// for "out" so the two stay distinguishable by ear. Frequencies are in
+// Hz; `type` is the oscillator waveform. "silent" is the mute option.
+const SOUND_PRESETS = {
+  chime: {
+    in: [
+      { freq: 880, start: 0, dur: 0.09, type: "sine" },
+      { freq: 1318.5, start: 0.1, dur: 0.15, type: "sine" },
+    ],
+    out: [
+      { freq: 987.77, start: 0, dur: 0.09, type: "sine" },
+      { freq: 659.25, start: 0.1, dur: 0.16, type: "sine" },
+    ],
+  },
+  bell: {
+    in: [{ freq: 1567.98, start: 0, dur: 0.4, type: "triangle" }],
+    out: [{ freq: 1046.5, start: 0, dur: 0.4, type: "triangle" }],
+  },
+  marimba: {
+    in: [
+      { freq: 659.25, start: 0, dur: 0.13, type: "sine" },
+      { freq: 987.77, start: 0.09, dur: 0.2, type: "sine" },
+    ],
+    out: [
+      { freq: 587.33, start: 0, dur: 0.13, type: "sine" },
+      { freq: 440, start: 0.09, dur: 0.2, type: "sine" },
+    ],
+  },
+  pop: {
+    in: [{ freq: 1200, start: 0, dur: 0.06, type: "square" }],
+    out: [{ freq: 500, start: 0, dur: 0.06, type: "square" }],
+  },
+  classic: {
+    in: [{ freq: 1000, start: 0, dur: 0.13, type: "sine" }],
+    out: [{ freq: 1000, start: 0, dur: 0.13, type: "sine" }],
+  },
+  silent: { in: [], out: [] },
+};
+const DEFAULT_SOUND_POLICY = { preset: "chime" };
 const DEFAULT_SHIFTS = [
   { id: "s1", name: "វេនព្រឹក", start: "06:00", end: "14:00" },
   { id: "s2", name: "វេនថ្ងៃ", start: "14:00", end: "22:00" },
@@ -3445,6 +3511,56 @@ function usePayrollPolicy() {
           "[supabase] save failed on payroll_policy:",
           error.message,
         );
+    })();
+  }, []);
+
+  return [value, setValue, ready];
+}
+// sound_policy is a single settings row (id = 1) holding which chime
+// preset (see SOUND_PRESETS) plays on a QR check-in/out scan. Falls back
+// to DEFAULT_SOUND_POLICY until a superadmin saves one.
+function useSoundPolicy() {
+  const [value, setValueState] = useState(DEFAULT_SOUND_POLICY);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("sound_policy")
+        .select("*")
+        .eq("id", 1)
+        .maybeSingle();
+      if (cancelled) return;
+      if (error) {
+        console.error("[supabase] failed to load sound_policy:", error.message);
+        setValueState(DEFAULT_SOUND_POLICY);
+      } else if (data) {
+        setValueState({
+          preset:
+            data.preset && SOUND_PRESETS[data.preset]
+              ? data.preset
+              : DEFAULT_SOUND_POLICY.preset,
+        });
+      } else {
+        setValueState(DEFAULT_SOUND_POLICY);
+      }
+      setReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const setValue = useCallback((next) => {
+    setValueState(next);
+    (async () => {
+      const { error } = await supabase.from("sound_policy").upsert({
+        id: 1,
+        preset: next.preset,
+      });
+      if (error)
+        console.error("[supabase] save failed on sound_policy:", error.message);
     })();
   }, []);
 
@@ -6961,32 +7077,28 @@ function loadJsQR() {
 // Short two-tone "success" chime played the instant a QR scan matches a
 // branch (see handleDecoded below) — built with the Web Audio API rather
 // than an audio file so it needs no extra asset/network request and
-// still works on an offline-for-a-moment kiosk tablet. Silently no-ops
-// if AudioContext is unavailable or blocked (e.g. autoplay policy); the
+// Short "success" chime played the instant a QR scan matches a branch
+// (see handleDecoded below) — built with the Web Audio API rather than
+// an audio file so it needs no extra asset/network request and still
+// works on an offline-for-a-moment kiosk tablet. Silently no-ops if
+// AudioContext is unavailable or blocked (e.g. autoplay policy); the
 // on-screen "matched" state already confirms success on its own.
-// `mode` picks the tone shape: "in" rises (bright/welcoming, for
-// check-in) and "out" falls (softer, for check-out) so an admin
-// listening from another room can tell which one just happened.
-function playScanBeep(mode) {
+// `mode` ("in"/"out") picks which half of the preset plays, so
+// check-in and check-out stay distinguishable by ear. `preset` selects
+// the tone recipe from SOUND_PRESETS — defaults to "chime" when unset.
+function playScanBeep(mode, preset) {
   try {
     const Ctx = window.AudioContext || window.webkitAudioContext;
     if (!Ctx) return;
+    const recipe = SOUND_PRESETS[preset] || SOUND_PRESETS.chime;
+    const tones = (mode === "out" ? recipe.out : recipe.in) || [];
+    if (tones.length === 0) return; // "silent" preset, or nothing to play
     const ctx = new Ctx();
     const now = ctx.currentTime;
-    const tones =
-      mode === "out"
-        ? [
-            { freq: 987.77, start: 0, dur: 0.09 },
-            { freq: 659.25, start: 0.1, dur: 0.16 },
-          ]
-        : [
-            { freq: 880, start: 0, dur: 0.09 },
-            { freq: 1318.5, start: 0.1, dur: 0.15 },
-          ];
-    tones.forEach(({ freq, start, dur }) => {
+    tones.forEach(({ freq, start, dur, type }) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = "sine";
+      osc.type = type || "sine";
       osc.frequency.value = freq;
       gain.gain.setValueAtTime(0, now + start);
       gain.gain.linearRampToValueAtTime(0.35, now + start + 0.01);
@@ -6996,15 +7108,16 @@ function playScanBeep(mode) {
       osc.start(now + start);
       osc.stop(now + start + dur + 0.02);
     });
-    // Close the context once both tones finish, so a scanner left open
+    // Close the context once every tone finishes, so a scanner left open
     // all day doesn't accumulate one AudioContext per scan.
-    setTimeout(() => ctx.close(), 400);
+    const longest = Math.max(...tones.map((tn) => tn.start + tn.dur));
+    setTimeout(() => ctx.close(), longest * 1000 + 250);
   } catch {
     // Ignore — see comment above.
   }
 }
 
-function QrScanModal({ offices, mode, onMatch, onClose }) {
+function QrScanModal({ offices, mode, soundPreset, onMatch, onClose }) {
   const { t } = useLang();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -7028,7 +7141,7 @@ function QrScanModal({ offices, mode, onMatch, onClose }) {
       const result = evaluateOfficeQrPayload(offices, text);
       if (result.status === "ok") {
         stop();
-        playScanBeep(mode);
+        playScanBeep(mode, soundPreset);
         onMatch(result.office);
       } else if (result.status === "expired") {
         setError(t.att.qrExpired);
@@ -7204,7 +7317,14 @@ function QrScanModal({ offices, mode, onMatch, onClose }) {
   );
 }
 
-function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
+function SelfPunch({
+  emp,
+  shift,
+  attendance,
+  setAttendance,
+  offices,
+  soundPreset,
+}) {
   const { t, lang } = useLang();
   const today = todayStr();
   const rec = attendance.find(
@@ -7623,6 +7743,7 @@ function SelfPunch({ emp, shift, attendance, setAttendance, offices }) {
         <QrScanModal
           offices={offices}
           mode={!rec ? "in" : "out"}
+          soundPreset={soundPreset}
           onMatch={handleScanMatch}
           onClose={() => setScanOpen(false)}
         />
@@ -8539,6 +8660,7 @@ function Attendance({
   offices,
   setOffices,
   holidays,
+  soundPreset,
 }) {
   const { t, lang } = useLang();
   const [date, setDate] = useState(todayStr());
@@ -8597,6 +8719,7 @@ function Attendance({
           attendance={attendance}
           setAttendance={setAttendance}
           offices={offices}
+          soundPreset={soundPreset}
         />
         <Card style={{ padding: 16 }}>
           <h3
@@ -12573,6 +12696,8 @@ function AdminSettings({
   setAdmins,
   isSuperAdmin,
   saveError,
+  soundPolicy,
+  setSoundPolicy,
 }) {
   const { t, lang } = useLang();
   const { theme, setTheme } = useTheme();
@@ -12622,6 +12747,16 @@ function AdminSettings({
   const saveBranding = () => {
     setBranding({ name: brandForm.name.trim(), logo: brandForm.logo || null });
     setBrandSaved(true);
+  };
+
+  const [soundForm, setSoundForm] = useState(soundPolicy?.preset || "chime");
+  const [soundSaved, setSoundSaved] = useState(false);
+  const saveSound = () => {
+    setSoundPolicy({ preset: soundForm });
+    setSoundSaved(true);
+  };
+  const previewSound = (presetId, presetMode) => {
+    playScanBeep(presetMode, presetId);
   };
 
   const onPhotoChange = async (e) => {
@@ -12943,6 +13078,114 @@ function AdminSettings({
             </p>
           )}
           <Button variant="accent" onClick={saveBranding}>
+            {t.save}
+          </Button>
+        </Card>
+      )}
+
+      {isSuperAdmin && (
+        <Card style={{ padding: 20 }}>
+          <h3
+            style={{
+              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+              fontWeight: 600,
+              color: T.ink,
+              marginBottom: 4,
+              fontSize: 14,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <Bell size={16} /> {t.settings.soundTitle}
+          </h3>
+          <p style={{ fontSize: 12, color: T.muted, marginBottom: 16 }}>
+            {t.settings.soundDesc}
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {Object.keys(SOUND_PRESETS).map((id) => (
+              <label
+                key={id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "10px 12px",
+                  borderRadius: 10,
+                  border: `1px solid ${
+                    soundForm === id ? T.forest : T.divider
+                  }`,
+                  background: soundForm === id ? T.forestSoft : "transparent",
+                  cursor: "pointer",
+                }}
+              >
+                <input
+                  type="radio"
+                  name="soundPreset"
+                  checked={soundForm === id}
+                  onChange={() => {
+                    setSoundForm(id);
+                    setSoundSaved(false);
+                  }}
+                  style={{ accentColor: T.forest }}
+                />
+                <span
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: T.ink,
+                    flex: 1,
+                  }}
+                >
+                  {t.settings.soundPresets[id]}
+                </span>
+                {id !== "silent" && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      previewSound(id, "in");
+                    }}
+                    title={t.settings.soundPreview}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 4,
+                      background: "none",
+                      border: `1px solid ${T.divider}`,
+                      borderRadius: 8,
+                      padding: "4px 9px",
+                      fontSize: 11.5,
+                      color: T.muted,
+                      cursor: "pointer",
+                    }}
+                  >
+                    <Volume2 size={12} /> {t.settings.soundPreview}
+                  </button>
+                )}
+              </label>
+            ))}
+          </div>
+          {soundSaved && (
+            <p
+              style={{
+                fontSize: 12,
+                color: T.forest,
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                marginTop: 14,
+                marginBottom: 10,
+              }}
+            >
+              <CheckCircle2 size={14} /> {t.settings.soundSaved}
+            </p>
+          )}
+          <Button
+            variant="accent"
+            onClick={saveSound}
+            style={{ marginTop: soundSaved ? 0 : 14 }}
+          >
             {t.save}
           </Button>
         </Card>
@@ -15796,6 +16039,7 @@ function AppInner() {
   const [otPolicy, setOtPolicy, otPolicyReady] = useOtPolicy();
   const [payrollPolicy, setPayrollPolicy, payrollPolicyReady] =
     usePayrollPolicy();
+  const [soundPolicy, setSoundPolicy, soundPolicyReady] = useSoundPolicy();
   // Superadmin-editable permission matrix: one row per rank (Officer,
   // Senior, Supervisor, Manager, Senior Manager, Admin), each holding
   // which modules that rank can access. `id` IS the rank name (e.g.
@@ -15917,6 +16161,7 @@ function AppInner() {
     officesReady &&
     otPolicyReady &&
     payrollPolicyReady &&
+    soundPolicyReady &&
     brandingReady &&
     sAdminReady &&
     sEmpReady;
@@ -16537,6 +16782,7 @@ function AppInner() {
                     offices={offices}
                     setOffices={setOffices}
                     holidays={holidays}
+                    soundPreset={soundPolicy.preset}
                   />
                 )}
               {page === "holidays" && role === "admin" && (
@@ -16660,6 +16906,8 @@ function AppInner() {
                   setAdmins={setAdmins}
                   isSuperAdmin={isSuperAdmin}
                   saveError={adminsSaveError}
+                  soundPolicy={soundPolicy}
+                  setSoundPolicy={setSoundPolicy}
                 />
               )}
               {page === "audits" &&
