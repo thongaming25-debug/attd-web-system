@@ -8674,6 +8674,9 @@ function KioskDisplay({ officeId, offices, branding }) {
     return (
       <div style={shellStyle}>
         <LoginBackground />
+        <div style={{ position: "absolute", top: 20, right: 20, zIndex: 2 }}>
+          <LangToggle variant="dark" />
+        </div>
         <div
           style={{
             position: "relative",
@@ -8708,6 +8711,9 @@ function KioskDisplay({ officeId, offices, branding }) {
   return (
     <div style={shellStyle}>
       <LoginBackground />
+      <div style={{ position: "absolute", top: 20, right: 20, zIndex: 2 }}>
+        <LangToggle variant="dark" />
+      </div>
       <div
         style={{
           position: "relative",
