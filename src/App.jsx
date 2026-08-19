@@ -310,6 +310,7 @@ const LANG_RAW = {
       statusLate: "មកយឺត",
       statusAbsent: "អវត្តមាន (មិនបានអនុញ្ញាត)",
       statusLeavePaid: "ឈប់សម្រាក (មានប្រាក់ខែ)",
+      statusUnpaid: "ច្បាប់គ្មានប្រាក់ខែ (UL)",
       scanQrBtn: "ស្កេន QR សាខា",
       scanQrOr: "ឬ",
       scanQrTitle: "ស្កេន QR សាខា",
@@ -355,7 +356,10 @@ const LANG_RAW = {
       noRequest: "មិនទាន់មានសំណើទេ",
       typeAnnual: "ច្បាប់ប្រចាំឆ្នាំ",
       typeSick: "ច្បាប់ឈឺ",
+      typeUnpaid: "ច្បាប់គ្មានប្រាក់ខែ (UL)",
       typeOther: "ផ្សេងៗ",
+      unpaidHint:
+        "ថ្ងៃច្បាប់ប្រភេទនេះនឹងមិនបានទទួលប្រាក់ខែទេ — គិតកាត់ដូចថ្ងៃអវត្តមាន",
       remainingAnnual: (n) => `នៅសល់ ${n} ថ្ងៃច្បាប់ប្រចាំឆ្នាំ`,
       remainingSick: (n) => `នៅសល់ ${n} ថ្ងៃច្បាប់ឈឺ`,
       overQuotaWarning: (days, typeLabel, remaining) =>
@@ -409,6 +413,8 @@ const LANG_RAW = {
       unpaid: "មិនទាន់បើក",
       totalPaid: "ចំណាយប្រាក់ខែសរុប",
       absentDed: "ថ្ងៃអវត្តមាន",
+      unpaidLeaveDed: "ច្បាប់គ្មានប្រាក់ខែ (UL)",
+      lateDed: "កាត់ប្រាក់មកយឺត",
       otPay: "ប្រាក់ OT",
       viewSlip: "មើលសន្លឹកប្រាក់ខែ",
       unmarkPaid: "ដកសញ្ញាបានបើក",
@@ -426,6 +432,19 @@ const LANG_RAW = {
       minSalaryThresholdHint:
         "បុគ្គលិកដែលមានប្រាក់ខែមូលដ្ឋានតិចជាងចំនួននេះ នឹងមិនត្រូវកាត់ពន្ធ/ធានារ៉ាប់រងទេ",
       noThreshold: "អនុវត្តលើគ្រប់បុគ្គលិកទាំងអស់",
+      latePolicyDesc:
+        "កំណត់ចំនួនដងអនុញ្ញាតឲ្យមកយឺតដោយឥតកាត់ប្រាក់ក្នុងមួយខែ (grace count)។ ចាប់ពីលើសពីនេះទៅ ថ្ងៃមកយឺតនីមួយៗនឹងត្រូវកាត់ប្រាក់ខែ តាមអត្រាដែលកំណត់ខាងក្រោម។",
+      lateGraceCountLabel: "ចំនួនដងអនុញ្ញាតឲ្យយឺត/ខែ",
+      lateDeductionTypeLabel: "របៀបកាត់ប្រាក់",
+      lateDeductionTypeFixed: "ចំនួនថេរ ($) ក្នុងមួយថ្ងៃ",
+      lateDeductionTypePercent: "% នៃប្រាក់ថ្ងៃ",
+      lateDeductionValueFixedLabel: "ចំនួនកាត់ ($/ថ្ងៃ)",
+      lateDeductionValuePercentLabel: "ភាគរយកាត់ (%)",
+      lateDeductionHint: (grace) =>
+        `បុគ្គលិកអាចយឺតបាន ${grace} ដងដោយឥតកាត់ប្រាក់ ចាប់ពីដងទី ${grace + 1} ទៅ ថ្ងៃនីមួយៗនឹងត្រូវកាត់ប្រាក់`,
+      lateDeductionDisabledHint:
+        "កំណត់ចំនួនកាត់ឲ្យធំជាង ០ ដើម្បីបើកការកាត់ប្រាក់មកយឺត",
+      lateBadgeShort: (grace) => `យឺត > ${grace}`,
       downloadPdf: "ទាញយក PDF",
       payslipTitle: "សន្លឹកប្រាក់ខែ",
       payPeriod: "រយៈពេលបើកប្រាក់ខែ",
@@ -436,6 +455,10 @@ const LANG_RAW = {
       customTaxRateLabel: "អត្រាពន្ធផ្ទាល់ខ្លួន (%)",
       customInsuranceRateLabel: "អត្រាធានារ៉ាប់រងផ្ទាល់ខ្លួន (%)",
       customRateBadge: "អត្រាផ្ទាល់ខ្លួន",
+      customLatePolicyToggle: "កំណត់គោលការណ៍កាត់ប្រាក់មកយឺតផ្ទាល់ខ្លួន",
+      customLatePolicyHint:
+        "នៅពេលបើក បុគ្គលិកនេះនឹងប្រើចំនួនដងអនុញ្ញាត និងអត្រាកាត់ប្រាក់ដែលកំណត់ខាងក្រោម ជំនួសគោលការណ៍ទូទៅរបស់ក្រុមហ៊ុន",
+      customLatePolicyBadge: "គោលការណ៍យឺតផ្ទាល់ខ្លួន",
       historicalBtn: "របាយការណ៍ខែចាស់",
       historicalTitle: "របាយការណ៍ប្រាក់ខែខែចាស់",
       historicalDesc:
@@ -918,6 +941,7 @@ const LANG_RAW = {
       statusLate: "Late",
       statusAbsent: "Absent (Unexcused)",
       statusLeavePaid: "On Leave (Paid)",
+      statusUnpaid: "Unpaid Leave (UL)",
       scanQrBtn: "Scan Branch QR",
       scanQrOr: "or",
       scanQrTitle: "Scan Branch QR",
@@ -964,7 +988,10 @@ const LANG_RAW = {
       noRequest: "No requests yet",
       typeAnnual: "Annual Leave",
       typeSick: "Sick Leave",
+      typeUnpaid: "Unpaid Leave (UL)",
       typeOther: "Other",
+      unpaidHint:
+        "Days under this leave type are not paid — deducted like an absence.",
       remainingAnnual: (n) => `${n} annual leave days remaining`,
       remainingSick: (n) => `${n} sick leave days remaining`,
       overQuotaWarning: (days, typeLabel, remaining) =>
@@ -1018,6 +1045,8 @@ const LANG_RAW = {
       unpaid: "Unpaid",
       totalPaid: "Total Payroll",
       absentDed: "Absent days",
+      unpaidLeaveDed: "Unpaid Leave (UL)",
+      lateDed: "Late-arrival deduction",
       otPay: "OT Pay",
       viewSlip: "View Payslip",
       unmarkPaid: "Unmark as Paid",
@@ -1035,6 +1064,19 @@ const LANG_RAW = {
       minSalaryThresholdHint:
         "Employees earning less than this base salary won't have tax/insurance deducted",
       noThreshold: "Applies to all employees",
+      latePolicyDesc:
+        "Set how many times an employee can arrive late each month before it's deducted (grace count). Every late day beyond that grace count is deducted at the rate set below.",
+      lateGraceCountLabel: "Grace count (late days/month)",
+      lateDeductionTypeLabel: "Deduction type",
+      lateDeductionTypeFixed: "Fixed amount ($) per day",
+      lateDeductionTypePercent: "% of daily rate",
+      lateDeductionValueFixedLabel: "Deduction amount ($/day)",
+      lateDeductionValuePercentLabel: "Deduction percentage (%)",
+      lateDeductionHint: (grace) =>
+        `Employees can be late ${grace} time(s) with no penalty. From the ${grace + 1}th time on, each late day is deducted.`,
+      lateDeductionDisabledHint:
+        "Set the deduction amount above 0 to enable late-arrival deductions",
+      lateBadgeShort: (grace) => `late > ${grace}`,
       downloadPdf: "Download PDF",
       payslipTitle: "Payslip",
       payPeriod: "Pay Period",
@@ -1045,6 +1087,10 @@ const LANG_RAW = {
       customTaxRateLabel: "Custom Tax Rate (%)",
       customInsuranceRateLabel: "Custom Insurance Rate (%)",
       customRateBadge: "Custom rate",
+      customLatePolicyToggle: "Custom late-deduction policy for this employee",
+      customLatePolicyHint:
+        "When enabled, this employee uses the grace count and deduction rate set below instead of the company-wide policy",
+      customLatePolicyBadge: "Custom late policy",
       historicalBtn: "Older Months Report",
       historicalTitle: "Historical Payroll Report",
       historicalDesc:
@@ -2352,6 +2398,13 @@ const DEFAULT_PAYROLL_POLICY = {
   // Minimum base salary at which tax/insurance start being deducted.
   // 0 means the deduction applies to every employee regardless of salary.
   minSalaryThreshold: 0,
+  // Late-arrival deduction: an employee can be late up to `lateGraceCount`
+  // times per month with no penalty. Every late day beyond that grace
+  // count is deducted, either as a fixed $ amount per day ("fixed") or
+  // as a percentage of that employee's daily rate ("percentDaily").
+  lateGraceCount: 3,
+  lateDeductionType: "fixed",
+  lateDeductionValue: 0,
 };
 // Named tone recipes for the QR check-in/out chime (see playScanBeep).
 // Each preset gives a short tone sequence for "in" and a separate one
@@ -2908,13 +2961,15 @@ function monthAttendanceStats(attendance, employeeId, mk) {
   let absentDays = 0;
   let leaveDays = 0;
   let lateDays = 0;
+  let unpaidLeaveDays = 0;
   for (const a of attendance) {
     if (a.employeeId !== employeeId || !a.date.startsWith(mk)) continue;
     if (a.status === "absent") absentDays++;
     else if (a.status === "leave") leaveDays++;
     else if (a.status === "late") lateDays++;
+    else if (a.status === "unpaid") unpaidLeaveDays++;
   }
-  return { absentDays, leaveDays, lateDays };
+  return { absentDays, leaveDays, lateDays, unpaidLeaveDays };
 }
 // Suggests a default OT day type from a "YYYY-MM-DD" date: a date on the
 // company holiday calendar suggests "holiday"; Saturday/Sunday suggest
@@ -2969,14 +3024,41 @@ function computePayroll(
   payrollPolicy,
 ) {
   const policy = payrollPolicy || DEFAULT_PAYROLL_POLICY;
-  const { absentDays, leaveDays, lateDays } = monthAttendanceStats(
-    attendance,
-    emp.id,
-    mk,
-  );
+  const { absentDays, leaveDays, lateDays, unpaidLeaveDays } =
+    monthAttendanceStats(attendance, emp.id, mk);
   const dailyRate = emp.salary / WORKING_DAYS_PER_MONTH;
+  // Unpaid absences and approved Unpaid Leave (UL) both dock a full day's
+  // pay each, at the employee's daily rate.
   const absenceDeduction = Math.min(emp.salary, absentDays * dailyRate);
-  const adjustedBase = emp.salary - absenceDeduction;
+  const unpaidLeaveDeduction = Math.min(
+    emp.salary - absenceDeduction,
+    unpaidLeaveDays * dailyRate,
+  );
+  // Late-arrival deduction: the first `lateGraceCount` late days each month
+  // are free; every late day beyond that is docked, either a fixed $
+  // amount or a percentage of the daily rate. An employee can override
+  // the company-wide late policy with their own grace count/rate, the
+  // same way tax/insurance rates can be overridden below.
+  const usesCustomLatePolicy = !!emp.useCustomLatePolicy;
+  const lateGraceCount = usesCustomLatePolicy
+    ? Number(emp.customLateGraceCount) || 0
+    : Number(policy.lateGraceCount) || 0;
+  const lateDeductionType = usesCustomLatePolicy
+    ? emp.customLateDeductionType || "fixed"
+    : policy.lateDeductionType || "fixed";
+  const lateDeductionValue = usesCustomLatePolicy
+    ? Number(emp.customLateDeductionValue) || 0
+    : Number(policy.lateDeductionValue) || 0;
+  const excessLateDays = Math.max(0, lateDays - lateGraceCount);
+  const lateDeductionPerDay =
+    lateDeductionType === "percentDaily"
+      ? dailyRate * (lateDeductionValue / 100)
+      : lateDeductionValue;
+  const lateDeduction = Math.min(
+    emp.salary - absenceDeduction - unpaidLeaveDeduction,
+    excessLateDays * lateDeductionPerDay,
+  );
+  const adjustedBase = emp.salary - absenceDeduction - unpaidLeaveDeduction;
   // An employee can override the company-wide tax/insurance rates with
   // their own. When active, the override applies unconditionally (the
   // policy's minimum-salary threshold is only meant to gate the
@@ -3004,13 +3086,21 @@ function computePayroll(
     mk,
     otPolicy,
   );
-  const net = adjustedBase - tax - insurance + otPay;
+  const net = adjustedBase - tax - insurance + otPay - lateDeduction;
   return {
     absentDays,
     leaveDays,
     lateDays,
+    unpaidLeaveDays,
     dailyRate,
     absenceDeduction,
+    unpaidLeaveDeduction,
+    usesCustomLatePolicy,
+    lateGraceCount,
+    excessLateDays,
+    lateDeductionType,
+    lateDeductionValue,
+    lateDeduction,
     adjustedBase,
     tax,
     insurance,
@@ -3872,6 +3962,14 @@ function usePayrollPolicy() {
           minSalaryThreshold:
             data.min_salary_threshold ??
             DEFAULT_PAYROLL_POLICY.minSalaryThreshold,
+          lateGraceCount:
+            data.late_grace_count ?? DEFAULT_PAYROLL_POLICY.lateGraceCount,
+          lateDeductionType:
+            data.late_deduction_type ??
+            DEFAULT_PAYROLL_POLICY.lateDeductionType,
+          lateDeductionValue:
+            data.late_deduction_value ??
+            DEFAULT_PAYROLL_POLICY.lateDeductionValue,
         });
       } else {
         setValueState(DEFAULT_PAYROLL_POLICY);
@@ -3891,6 +3989,9 @@ function usePayrollPolicy() {
         tax_rate: next.taxRate,
         insurance_rate: next.insuranceRate,
         min_salary_threshold: next.minSalaryThreshold,
+        late_grace_count: next.lateGraceCount,
+        late_deduction_type: next.lateDeductionType,
+        late_deduction_value: next.lateDeductionValue,
       });
       if (error)
         console.error(
@@ -4031,6 +4132,11 @@ function getStatusMap(lang) {
       label: en ? "Absent" : "អវត្តមាន",
     },
     leave: { bg: "#E7ECF6", fg: T.blue, label: en ? "On Leave" : "ឈប់សម្រាក" },
+    unpaid: {
+      bg: T.roseSoft,
+      fg: T.roseDark,
+      label: en ? "Unpaid Leave" : "ច្បាប់គ្មានប្រាក់ខែ",
+    },
     pending: {
       bg: T.goldSoft,
       fg: T.goldText,
@@ -4054,6 +4160,7 @@ function getLeaveTypeLabel(lang) {
   return {
     annual: en ? "Annual Leave" : "ច្បាប់ប្រចាំឆ្នាំ",
     sick: en ? "Sick Leave" : "ច្បាប់ឈឺ",
+    unpaid: en ? "Unpaid Leave (UL)" : "ច្បាប់គ្មានប្រាក់ខែ (UL)",
     other: en ? "Other" : "ផ្សេងៗ",
   };
 }
@@ -6360,6 +6467,10 @@ function EmployeeForm({
       useCustomRate: false,
       customTaxRate: "",
       customInsuranceRate: "",
+      useCustomLatePolicy: false,
+      customLateGraceCount: "",
+      customLateDeductionType: "fixed",
+      customLateDeductionValue: "",
     },
   );
   const [newOffDate, setNewOffDate] = useState("");
@@ -6546,6 +6657,97 @@ function EmployeeForm({
           </div>
         )}
       </div>
+      <div
+        style={{
+          border: `1px solid ${T.lineSoft}`,
+          borderRadius: 10,
+          padding: "10px 12px",
+          marginBottom: 14,
+        }}
+      >
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            cursor: "pointer",
+            fontSize: 13,
+            fontWeight: 600,
+            color: T.ink,
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={!!f.useCustomLatePolicy}
+            onChange={(e) =>
+              setF({ ...f, useCustomLatePolicy: e.target.checked })
+            }
+            style={{ width: 15, height: 15, accentColor: T.forest }}
+          />
+          {t.pay.customLatePolicyToggle}
+        </label>
+        <p
+          style={{
+            fontSize: 11.5,
+            color: T.muted,
+            marginTop: 6,
+            marginBottom: f.useCustomLatePolicy ? 12 : 0,
+          }}
+        >
+          {t.pay.customLatePolicyHint}
+        </p>
+        {f.useCustomLatePolicy && (
+          <>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 12,
+              }}
+            >
+              <Field label={t.pay.lateGraceCountLabel}>
+                <Input
+                  type="number"
+                  step="1"
+                  min="0"
+                  value={f.customLateGraceCount}
+                  onChange={set("customLateGraceCount")}
+                  placeholder="0"
+                />
+              </Field>
+              <Field label={t.pay.lateDeductionTypeLabel}>
+                <Select
+                  value={f.customLateDeductionType || "fixed"}
+                  onChange={set("customLateDeductionType")}
+                >
+                  <option value="fixed">{t.pay.lateDeductionTypeFixed}</option>
+                  <option value="percentDaily">
+                    {t.pay.lateDeductionTypePercent}
+                  </option>
+                </Select>
+              </Field>
+            </div>
+            <div style={{ marginTop: 12 }}>
+              <Field
+                label={
+                  f.customLateDeductionType === "percentDaily"
+                    ? t.pay.lateDeductionValuePercentLabel
+                    : t.pay.lateDeductionValueFixedLabel
+                }
+              >
+                <Input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={f.customLateDeductionValue}
+                  onChange={set("customLateDeductionValue")}
+                  placeholder="0"
+                />
+              </Field>
+            </div>
+          </>
+        )}
+      </div>
       <Field label={t.emps.joined}>
         <DatePicker value={f.joined || todayStr()} onChange={set("joined")} />
       </Field>
@@ -6729,6 +6931,16 @@ function Employees({
         : null,
       customInsuranceRate: data.useCustomRate
         ? Number(data.customInsuranceRate) || 0
+        : null,
+      useCustomLatePolicy: !!data.useCustomLatePolicy,
+      customLateGraceCount: data.useCustomLatePolicy
+        ? Number(data.customLateGraceCount) || 0
+        : null,
+      customLateDeductionType: data.useCustomLatePolicy
+        ? data.customLateDeductionType || "fixed"
+        : null,
+      customLateDeductionValue: data.useCustomLatePolicy
+        ? Number(data.customLateDeductionValue) || 0
         : null,
     };
     if (modal.mode === "add")
@@ -8763,7 +8975,8 @@ function ManualAttendanceForm({ employees, initial, onSave, onCancel }) {
           value={f.status}
           onChange={(e) => {
             const status = e.target.value;
-            const noTime = status === "absent" || status === "leave";
+            const noTime =
+              status === "absent" || status === "leave" || status === "unpaid";
             setF({
               ...f,
               status,
@@ -8776,20 +8989,23 @@ function ManualAttendanceForm({ employees, initial, onSave, onCancel }) {
           <option value="late">{t.att.statusLate}</option>
           <option value="absent">{t.att.statusAbsent}</option>
           <option value="leave">{t.att.statusLeavePaid}</option>
+          <option value="unpaid">{t.att.statusUnpaid}</option>
         </Select>
       </Field>
-      {f.status !== "absent" && f.status !== "leave" && (
-        <div
-          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
-        >
-          <Field label={t.att.inTime}>
-            <TimePicker value={f.checkIn} onChange={set("checkIn")} />
-          </Field>
-          <Field label={t.att.outTime}>
-            <TimePicker value={f.checkOut} onChange={set("checkOut")} />
-          </Field>
-        </div>
-      )}
+      {f.status !== "absent" &&
+        f.status !== "leave" &&
+        f.status !== "unpaid" && (
+          <div
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
+          >
+            <Field label={t.att.inTime}>
+              <TimePicker value={f.checkIn} onChange={set("checkIn")} />
+            </Field>
+            <Field label={t.att.outTime}>
+              <TimePicker value={f.checkOut} onChange={set("checkOut")} />
+            </Field>
+          </div>
+        )}
       <div
         style={{
           display: "flex",
@@ -9443,9 +9659,22 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
         <Select value={f.type} onChange={set("type")}>
           <option value="annual">{t.lv.typeAnnual}</option>
           <option value="sick">{t.lv.typeSick}</option>
+          <option value="unpaid">{t.lv.typeUnpaid}</option>
           <option value="other">{t.lv.typeOther}</option>
         </Select>
       </Field>
+      {f.type === "unpaid" && (
+        <p
+          style={{
+            fontSize: 12,
+            color: T.muted,
+            marginTop: -8,
+            marginBottom: 12,
+          }}
+        >
+          {t.lv.unpaidHint}
+        </p>
+      )}
       {f.type === "annual" && typeof remainingForType === "number" && (
         <p
           style={{
@@ -9633,15 +9862,18 @@ function LeaveRequests({
   const [confirmDel, setConfirmDel] = useState(null);
   const empOf = (id) => employees.find((e) => e.id === id);
 
-  // Approving a request marks every day in its range as paid leave in
-  // attendance, so payroll (which already treats "leave" as paid) picks
-  // it up automatically — no separate payroll logic needed.
+  // Approving a request marks every day in its range as leave in
+  // attendance. Annual/sick/other leave is marked "leave" (paid, no
+  // payroll deduction). "unpaid" (UL) requests are marked "unpaid" so
+  // payroll docks a full day's pay for each of those days, same as an
+  // unexcused absence.
   // Days the employee has already actually checked into (e.g. a same-day
   // leave request approved after they clocked in that morning, or a
   // leave range that overlaps a day they already worked) are left alone
   // — approving leave elsewhere must never erase real attendance.
   const applyLeaveToAttendance = (req) => {
     const days = dateRange(req.startDate, req.endDate);
+    const status = req.type === "unpaid" ? "unpaid" : "leave";
     let next = attendance;
     for (const d of days) {
       const existing = next.find(
@@ -9651,7 +9883,7 @@ function LeaveRequests({
       if (existing) {
         next = next.map((a) =>
           a.id === existing.id
-            ? { ...a, status: "leave", checkIn: null, checkOut: null }
+            ? { ...a, status, checkIn: null, checkOut: null }
             : a,
         );
       } else {
@@ -9661,7 +9893,7 @@ function LeaveRequests({
             id: uid("a"),
             employeeId: req.employeeId,
             date: d,
-            status: "leave",
+            status,
             checkIn: null,
             checkOut: null,
           },
@@ -10317,6 +10549,9 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
       taxRate: Number(f.taxRate) || 0,
       insuranceRate: Number(f.insuranceRate) || 0,
       minSalaryThreshold: Number(f.minSalaryThreshold) || 0,
+      lateGraceCount: Number(f.lateGraceCount) || 0,
+      lateDeductionType: f.lateDeductionType || "fixed",
+      lateDeductionValue: Number(f.lateDeductionValue) || 0,
     });
     setOpen(false);
   };
@@ -10348,6 +10583,9 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
           {payrollPolicy.taxRate}% / {payrollPolicy.insuranceRate}%
           {Number(payrollPolicy.minSalaryThreshold) > 0
             ? ` · ≥ ${fmtMoney(payrollPolicy.minSalaryThreshold)}`
+            : ""}
+          {Number(payrollPolicy.lateDeductionValue) > 0
+            ? ` · ${t.pay.lateBadgeShort(Number(payrollPolicy.lateGraceCount) || 0)}`
             : ""}
         </span>
       </div>
@@ -10400,6 +10638,68 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
                 ? t.pay.minSalaryThresholdHint
                 : t.pay.noThreshold}
             </p>
+          </div>
+          <div
+            style={{
+              marginTop: 16,
+              paddingTop: 16,
+              borderTop: `1px solid ${T.lineSoft}`,
+            }}
+          >
+            <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
+              {t.pay.latePolicyDesc}
+            </p>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 12,
+              }}
+            >
+              <Field label={t.pay.lateGraceCountLabel}>
+                <Input
+                  type="number"
+                  step="1"
+                  min="0"
+                  value={f.lateGraceCount}
+                  onChange={set("lateGraceCount")}
+                />
+              </Field>
+              <Field label={t.pay.lateDeductionTypeLabel}>
+                <Select
+                  value={f.lateDeductionType || "fixed"}
+                  onChange={set("lateDeductionType")}
+                >
+                  <option value="fixed">{t.pay.lateDeductionTypeFixed}</option>
+                  <option value="percentDaily">
+                    {t.pay.lateDeductionTypePercent}
+                  </option>
+                </Select>
+              </Field>
+            </div>
+            <div style={{ marginTop: 12 }}>
+              <Field
+                label={
+                  f.lateDeductionType === "percentDaily"
+                    ? t.pay.lateDeductionValuePercentLabel
+                    : t.pay.lateDeductionValueFixedLabel
+                }
+              >
+                <Input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  placeholder="0"
+                  value={f.lateDeductionValue}
+                  onChange={set("lateDeductionValue")}
+                />
+              </Field>
+              <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+                {Number(f.lateDeductionValue) > 0
+                  ? t.pay.lateDeductionHint(Number(f.lateGraceCount) || 0)
+                  : t.pay.lateDeductionDisabledHint}
+              </p>
+            </div>
           </div>
           <div
             style={{
@@ -15039,6 +15339,11 @@ function Payslip({
   const {
     absentDays,
     leaveDays,
+    unpaidLeaveDays,
+    unpaidLeaveDeduction,
+    usesCustomLatePolicy,
+    excessLateDays,
+    lateDeduction,
     dailyRate,
     absenceDeduction,
     tax,
@@ -15066,6 +15371,24 @@ function Payslip({
             {
               label: `${t.pay.absentDed} (${absentDays} × ${fmtMoney(dailyRate)})`,
               value: fmtMoney(absenceDeduction),
+              tone: "neg",
+            },
+          ]
+        : []),
+      ...(unpaidLeaveDays > 0
+        ? [
+            {
+              label: `${t.pay.unpaidLeaveDed} (${unpaidLeaveDays} × ${fmtMoney(dailyRate)})`,
+              value: fmtMoney(unpaidLeaveDeduction),
+              tone: "neg",
+            },
+          ]
+        : []),
+      ...(excessLateDays > 0
+        ? [
+            {
+              label: `${t.pay.lateDed} (${excessLateDays})`,
+              value: fmtMoney(lateDeduction),
               tone: "neg",
             },
           ]
@@ -15168,6 +15491,21 @@ function Payslip({
                 {t.pay.customRateBadge}
               </span>
             )}
+            {usesCustomLatePolicy && (
+              <span
+                style={{
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  color: T.goldText,
+                  background: T.goldSoft,
+                  padding: "2px 6px",
+                  borderRadius: 6,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {t.pay.customLatePolicyBadge}
+              </span>
+            )}
           </div>
           <div
             style={{
@@ -15207,6 +15545,39 @@ function Payslip({
               </span>
               <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
                 -{fmtMoney(absenceDeduction)}
+              </span>
+            </div>
+          )}
+          {unpaidLeaveDays > 0 && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                color: T.rose,
+              }}
+            >
+              <span>
+                {t.pay.unpaidLeaveDed} ({unpaidLeaveDays} ×{" "}
+                {fmtMoney(dailyRate)})
+              </span>
+              <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                -{fmtMoney(unpaidLeaveDeduction)}
+              </span>
+            </div>
+          )}
+          {excessLateDays > 0 && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                color: T.rose,
+              }}
+            >
+              <span>
+                {t.pay.lateDed} ({excessLateDays})
+              </span>
+              <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                -{fmtMoney(lateDeduction)}
               </span>
             </div>
           )}
@@ -15816,15 +16187,22 @@ function Payroll({
           <tbody>
             {list.map((e) => {
               const paid = !!payrollPaid[`${e.id}-${mk}`];
-              const { net, absentDays, otHours, usesCustomRate } =
-                computePayroll(
-                  e,
-                  attendance,
-                  mk,
-                  overtimeRequests,
-                  otPolicy,
-                  payrollPolicy,
-                );
+              const {
+                net,
+                absentDays,
+                unpaidLeaveDays,
+                excessLateDays,
+                otHours,
+                usesCustomRate,
+                usesCustomLatePolicy,
+              } = computePayroll(
+                e,
+                attendance,
+                mk,
+                overtimeRequests,
+                otPolicy,
+                payrollPolicy,
+              );
               return (
                 <tr key={e.id}>
                   <td>
@@ -15864,10 +16242,35 @@ function Payroll({
                               {t.pay.customRateBadge}
                             </span>
                           )}
+                          {usesCustomLatePolicy && (
+                            <span
+                              style={{
+                                fontSize: 9.5,
+                                fontWeight: 700,
+                                color: T.goldText,
+                                background: T.goldSoft,
+                                padding: "2px 6px",
+                                borderRadius: 6,
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {t.pay.customLatePolicyBadge}
+                            </span>
+                          )}
                         </div>
                         {absentDays > 0 && (
                           <div style={{ fontSize: 10.5, color: T.rose }}>
                             {t.att.absentDays} {absentDays}
+                          </div>
+                        )}
+                        {unpaidLeaveDays > 0 && (
+                          <div style={{ fontSize: 10.5, color: T.rose }}>
+                            {t.pay.unpaidLeaveDed}: {unpaidLeaveDays}
+                          </div>
+                        )}
+                        {excessLateDays > 0 && (
+                          <div style={{ fontSize: 10.5, color: T.rose }}>
+                            {t.pay.lateDed}: {excessLateDays}
                           </div>
                         )}
                         {otHours > 0 && (
@@ -16124,6 +16527,10 @@ function AppInner() {
         useCustomRate: !!r.use_custom_rate,
         customTaxRate: r.custom_tax_rate,
         customInsuranceRate: r.custom_insurance_rate,
+        useCustomLatePolicy: !!r.use_custom_late_policy,
+        customLateGraceCount: r.custom_late_grace_count,
+        customLateDeductionType: r.custom_late_deduction_type,
+        customLateDeductionValue: r.custom_late_deduction_value,
       }),
       toDb: (r) => ({
         id: r.id,
@@ -16152,6 +16559,16 @@ function AppInner() {
         custom_tax_rate: r.useCustomRate ? Number(r.customTaxRate) || 0 : null,
         custom_insurance_rate: r.useCustomRate
           ? Number(r.customInsuranceRate) || 0
+          : null,
+        use_custom_late_policy: !!r.useCustomLatePolicy,
+        custom_late_grace_count: r.useCustomLatePolicy
+          ? Number(r.customLateGraceCount) || 0
+          : null,
+        custom_late_deduction_type: r.useCustomLatePolicy
+          ? r.customLateDeductionType || "fixed"
+          : null,
+        custom_late_deduction_value: r.useCustomLatePolicy
+          ? Number(r.customLateDeductionValue) || 0
           : null,
       }),
       audit: true,
