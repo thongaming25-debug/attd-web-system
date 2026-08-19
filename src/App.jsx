@@ -1614,12 +1614,56 @@ function ThemeToggle({ variant = "dark" }) {
   );
 }
 
-// Language options for LangToggle, in display order. Flags are decorative
-// emoji, not a claim about a country's language policy.
+// Small inline SVG flags for LangToggle — plain emoji flags (🇬🇧🇰🇭🇨🇳)
+// render as two-letter text codes on Windows (no color flag glyphs in
+// the default font there, unlike macOS/iOS), so we draw them ourselves
+// for a consistent look on every OS.
+function FlagIcon({ code }) {
+  const common = {
+    width: 18,
+    height: 13,
+    style: { flexShrink: 0, borderRadius: 2 },
+  };
+  if (code === "gb") {
+    return (
+      <svg {...common} viewBox="0 0 60 40">
+        <rect width="60" height="40" fill="#00247d" />
+        <path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" strokeWidth="8" />
+        <path d="M0,0 L60,40 M60,0 L0,40" stroke="#cf142b" strokeWidth="3" />
+        <path d="M30,0 V40 M0,20 H60" stroke="#fff" strokeWidth="12" />
+        <path d="M30,0 V40 M0,20 H60" stroke="#cf142b" strokeWidth="7" />
+      </svg>
+    );
+  }
+  if (code === "kh") {
+    return (
+      <svg {...common} viewBox="0 0 60 40">
+        <rect width="60" height="40" fill="#032ea1" />
+        <rect y="9" width="60" height="22" fill="#e00025" />
+        <rect x="21" y="13" width="18" height="14" fill="#fff" />
+      </svg>
+    );
+  }
+  if (code === "cn") {
+    return (
+      <svg {...common} viewBox="0 0 60 40">
+        <rect width="60" height="40" fill="#de2910" />
+        <polygon
+          points="11,7 13,13 19,13 14,17 16,23 11,19 6,23 8,17 3,13 9,13"
+          fill="#ffde00"
+        />
+      </svg>
+    );
+  }
+  return null;
+}
+
+// Language options for LangToggle, in display order. `flag` is the code
+// FlagIcon draws — see above.
 const LANG_OPTIONS = [
-  { code: "en", flag: "🇬🇧", label: "English" },
-  { code: "km", flag: "🇰🇭", label: "ខ្មែរ" },
-  { code: "zh", flag: "🇨🇳", label: "中文" },
+  { code: "en", flag: "gb", label: "English" },
+  { code: "km", flag: "kh", label: "ខ្មែរ" },
+  { code: "zh", flag: "cn", label: "中文" },
 ];
 
 function LangToggle({ variant = "dark" }) {
@@ -1658,7 +1702,7 @@ function LangToggle({ variant = "dark" }) {
           backdropFilter: "blur(4px)",
         }}
       >
-        <span>{current.flag}</span>
+        <FlagIcon code={current.flag} />
         <span>{current.label}</span>
         <ChevronLeft
           size={12}
@@ -1707,7 +1751,7 @@ function LangToggle({ variant = "dark" }) {
                 textAlign: "left",
               }}
             >
-              <span>{o.flag}</span>
+              <FlagIcon code={o.flag} />
               <span>{o.label}</span>
             </button>
           ))}
