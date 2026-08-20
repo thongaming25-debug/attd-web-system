@@ -3604,6 +3604,14 @@ function useSupabaseArray(
     // that don't grow that way (employees, departments, ...).
     dateField,
     daysBack,
+    // Optional: (evt) => pushPayload | null, called once per created row
+    // (evt = { type: "create", row }) and once per updated row (evt =
+    // { type: "update", row, old }). Return a push_notify request body
+    // (userType, userId?, title, body, page, portal, tag) to fire a real
+    // Web Push for that change, or null/undefined to skip. Best-effort:
+    // failures are logged, never surfaced to the user or thrown, since a
+    // push failing shouldn't block the save that triggered it.
+    notify,
   } = {},
 ) {
   const [value, setValueState] = useState([]);
@@ -3818,8 +3826,28 @@ function useSupabaseArray(
           }),
         );
       }
+
+      if (notify) {
+        const sendPush = (body) => {
+          if (!body) return;
+          supabase.functions.invoke("push_notify", { body }).then(
+            ({ error }) => {
+              if (error)
+                console.error(
+                  `[push] send failed for ${table}:`,
+                  error.message,
+                );
+            },
+            (err) => console.error(`[push] send failed for ${table}:`, err),
+          );
+        };
+        createdRows.forEach((row) => sendPush(notify({ type: "create", row })));
+        updatedRows.forEach(({ row, old }) =>
+          sendPush(notify({ type: "update", row, old })),
+        );
+      }
     },
-    [table, mapToDb, audit, actorRef, labelOf],
+    [table, mapToDb, audit, actorRef, labelOf, notify],
   );
 
   return [value, setValue, ready, saveError];
@@ -17170,6 +17198,39 @@ function AppInner() {
       audit: true,
       actorRef,
       entityLabel: (r) => `${r.type || "leave"} · ${r.employeeId || "?"}`,
+      notify: ({ type, row, old }) => {
+        const LEAVE_TYPE_LABEL = getLeaveTypeLabel("km");
+        if (type === "create" && row.status === "pending") {
+          const emp = employees.find((e) => e.id === row.employeeId);
+          return {
+            userType: "admin",
+            title: "សំណើសុំច្បាប់ថ្មី",
+            body: `${emp?.name || "?"} បានស្នើសុំ${LEAVE_TYPE_LABEL[row.type] || "ច្បាប់"}`,
+            page: "leave",
+            portal: "admin",
+            tag: `leave-req-${row.id}`,
+          };
+        }
+        if (
+          type === "update" &&
+          old?.status !== row.status &&
+          (row.status === "approved" || row.status === "rejected")
+        ) {
+          return {
+            userType: "employee",
+            userId: row.employeeId,
+            title:
+              row.status === "approved"
+                ? "សំណើសុំច្បាប់របស់អ្នកត្រូវបានអនុម័ត"
+                : "សំណើសុំច្បាប់របស់អ្នកត្រូវបានបដិសេធ",
+            body: `${LEAVE_TYPE_LABEL[row.type] || "ច្បាប់"} (${row.startDate} – ${row.endDate})`,
+            page: "leave",
+            portal: "employee",
+            tag: `leave-dec-${row.id}`,
+          };
+        }
+        return null;
+      },
     },
   );
   const [overtimeRequests, setOvertimeRequests, otrReady] = useSupabaseArray(
@@ -17208,6 +17269,38 @@ function AppInner() {
       audit: true,
       actorRef,
       entityLabel: (r) => `OT ${r.hours ?? "?"}h · ${r.employeeId || "?"}`,
+      notify: ({ type, row, old }) => {
+        if (type === "create" && row.status === "pending") {
+          const emp = employees.find((e) => e.id === row.employeeId);
+          return {
+            userType: "admin",
+            title: "សំណើសុំ OT ថ្មី",
+            body: `${emp?.name || "?"} បានស្នើសុំ OT ចំនួន ${row.hours} ម៉ោង នៅថ្ងៃទី ${row.date}`,
+            page: "ot",
+            portal: "admin",
+            tag: `ot-req-${row.id}`,
+          };
+        }
+        if (
+          type === "update" &&
+          old?.status !== row.status &&
+          (row.status === "approved" || row.status === "rejected")
+        ) {
+          return {
+            userType: "employee",
+            userId: row.employeeId,
+            title:
+              row.status === "approved"
+                ? "សំណើសុំ OT របស់អ្នកត្រូវបានអនុម័ត"
+                : "សំណើសុំ OT របស់អ្នកត្រូវបានបដិសេធ",
+            body: `${row.date} · ${row.hours} ម៉ោង`,
+            page: "ot",
+            portal: "employee",
+            tag: `ot-dec-${row.id}`,
+          };
+        }
+        return null;
+      },
     },
   );
   const [performanceReviews, setPerformanceReviews, prReady] = useSupabaseArray(
@@ -17331,6 +17424,38 @@ function AppInner() {
       audit: true,
       actorRef,
       entityLabel: (r) => `${r.date || "?"} · ${r.employeeId || "?"}`,
+      notify: ({ type, row, old }) => {
+        if (type === "create" && row.status === "pending") {
+          const emp = employees.find((e) => e.id === row.employeeId);
+          return {
+            userType: "admin",
+            title: "សំណើកែតម្រូវវត្តមានថ្មី",
+            body: `${emp?.name || "?"} បានស្នើសុំកែតម្រូវវត្តមាននៅថ្ងៃទី ${row.date}`,
+            page: "attcorr",
+            portal: "admin",
+            tag: `ac-req-${row.id}`,
+          };
+        }
+        if (
+          type === "update" &&
+          old?.status !== row.status &&
+          (row.status === "approved" || row.status === "rejected")
+        ) {
+          return {
+            userType: "employee",
+            userId: row.employeeId,
+            title:
+              row.status === "approved"
+                ? "សំណើកែតម្រូវវត្តមានរបស់អ្នកត្រូវបានអនុម័ត"
+                : "សំណើកែតម្រូវវត្តមានរបស់អ្នកត្រូវបានបដិសេធ",
+            body: row.date,
+            page: "attcorr",
+            portal: "employee",
+            tag: `ac-dec-${row.id}`,
+          };
+        }
+        return null;
+      },
     });
   const [admins, setAdmins, adminsReady, adminsSaveError] = useSupabaseArray(
     "admins",
