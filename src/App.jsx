@@ -2364,7 +2364,7 @@ html,body,#root{height:100%;}
 .wf-dp-title{font-size:13px;font-weight:700;color:${T.ink};font-family:'Sora','Noto Sans Khmer',sans-serif;}
 .wf-dp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
 .wf-dp-dow{font-size:10px;font-weight:700;color:${T.muted};text-align:center;padding:4px 0;text-transform:uppercase;}
-.wf-dp-day{font-size:12.5px;text-align:center;padding:7px 0;border-radius:6px;cursor:pointer;color:${T.text};background:none;border:1px solid transparent;transition:background .12s ease,color .12s ease;}
+.wf-dp-day{position:relative;font-size:12.5px;text-align:center;padding:7px 0;border-radius:6px;cursor:pointer;color:${T.text};background:none;border:1px solid transparent;transition:background .12s ease,color .12s ease;}
 .wf-dp-day:hover{background:${T.tableHeadBg};}
 .wf-dp-day.outside{color:${T.mutedLight};}
 .wf-dp-day.today{border-color:${T.gold};font-weight:700;}
@@ -2373,6 +2373,26 @@ html,body,#root{height:100%;}
 .wf-dp-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid ${T.lineSoft};}
 .wf-dp-link{background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:${T.forestText};padding:2px 4px;border-radius:6px;}
 .wf-dp-link:hover{background:${T.forestSoft};}
+.wf-dr-triggers{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.wf-dp-pop-wide{min-width:520px;padding:14px;}
+.wf-dp-head-dual{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;}
+.wf-dp-dual-titles{display:flex;flex:1;justify-content:space-around;}
+.wf-dp-dual{display:flex;gap:22px;}
+.wf-dp-panel{flex:1;min-width:0;}
+.wf-dp-grid-range{gap:0;row-gap:3px;}
+.wf-dp-day-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;position:relative;z-index:1;margin:0 auto;transition:background .12s ease,color .12s ease;}
+.wf-dp-day.in-range::before,.wf-dp-day.range-start::before,.wf-dp-day.range-end::before{content:'';position:absolute;top:3px;bottom:3px;left:0;right:0;background:${T.forestSoft};z-index:0;}
+.wf-dp-day.range-start::before{left:50%;}
+.wf-dp-day.range-end::before{right:50%;}
+.wf-dp-day.range-single::before{content:none;}
+.wf-dp-day.range-start .wf-dp-day-num,.wf-dp-day.range-end .wf-dp-day-num,.wf-dp-day.range-single .wf-dp-day-num{background:${T.forest};color:#fff;font-weight:700;}
+.wf-dp-day:hover .wf-dp-day-num{background:${T.tableHeadBg};}
+.wf-dp-day.range-start:hover .wf-dp-day-num,.wf-dp-day.range-end:hover .wf-dp-day-num,.wf-dp-day.range-single:hover .wf-dp-day-num{background:${T.forestDark};}
+@media (max-width:640px){
+  .wf-dp-pop-wide{min-width:0;width:min(94vw,320px);padding:12px;}
+  .wf-dp-dual{flex-direction:column;gap:14px;}
+  .wf-dp-dual-titles{flex-direction:column;align-items:center;gap:2px;}
+}
 .wf-tp-pop{position:absolute;z-index:60;top:calc(100% + 6px);left:0;background:${T.card};border:1px solid ${T.line};border-radius:10px;box-shadow:0 12px 32px rgba(5,8,16,0.28);padding:10px;display:flex;flex-direction:column;animation:wf-pop .15s cubic-bezier(.2,.9,.3,1.2);}
 .wf-tp-cols{display:flex;align-items:center;gap:6px;}
 .wf-tp-col{width:50px;height:168px;overflow-y:auto;scroll-snap-type:y mandatory;border-radius:8px;background:${T.tableHeadBg};scrollbar-width:none;}
@@ -5215,6 +5235,226 @@ function DatePicker({ value, onChange, placeholder, style, disabled }) {
                 fire(new Date());
                 setOpen(false);
               }}
+            >
+              {t.today}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Range variant of DatePicker: Start/End sit side by side but share ONE
+// two-month calendar popover (like common "date range" pickers), with the
+// days between start and end highlighted as a continuous band across both
+// months — click a day to set the start of a fresh range, then click a
+// later day to set the end (the popover closes automatically once the end
+// is picked). Clicking an earlier day while only the start is set moves
+// the start instead.
+function buildCalendarCells(year, month) {
+  const firstDow = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrevMonth = new Date(year, month, 0).getDate();
+  const totalCells = Math.ceil((firstDow + daysInMonth) / 7) * 7;
+  const cells = [];
+  for (let i = 0; i < firstDow; i++) {
+    const day = daysInPrevMonth - firstDow + 1 + i;
+    cells.push({ day, outside: true, date: new Date(year, month - 1, day) });
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push({ day: d, outside: false, date: new Date(year, month, d) });
+  }
+  let nextDay = 1;
+  while (cells.length < totalCells) {
+    cells.push({
+      day: nextDay,
+      outside: true,
+      date: new Date(year, month + 1, nextDay),
+    });
+    nextDay++;
+  }
+  return cells;
+}
+function monthTitleFor(year, month) {
+  let title = `${year}-${month + 1}`;
+  try {
+    title = new Intl.DateTimeFormat("km-KH", {
+      year: "numeric",
+      month: "long",
+    }).format(new Date(year, month, 1));
+  } catch {}
+  return title;
+}
+function DateRangePicker({
+  startValue,
+  endValue,
+  onChangeStart,
+  onChangeEnd,
+  startLabel,
+  endLabel,
+  placeholder,
+  style,
+}) {
+  const { t } = useLang();
+  const [open, setOpen] = useState(false);
+  const startSel = parseYMD(startValue);
+  const endSel = parseYMD(endValue);
+  const [cursor, setCursor] = useState(() => startSel || new Date());
+  const wrapRef = useRef(null);
+  useCloseOnOutside(wrapRef, () => setOpen(false));
+
+  useEffect(() => {
+    if (open) setCursor(startSel || endSel || new Date());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  const today = todayStr();
+  const leftYear = cursor.getFullYear();
+  const leftMonth = cursor.getMonth();
+  const rightRef = new Date(leftYear, leftMonth + 1, 1);
+  const rightYear = rightRef.getFullYear();
+  const rightMonth = rightRef.getMonth();
+  const leftCells = buildCalendarCells(leftYear, leftMonth);
+  const rightCells = buildCalendarCells(rightYear, rightMonth);
+  const leftTitle = monthTitleFor(leftYear, leftMonth);
+  const rightTitle = monthTitleFor(rightYear, rightMonth);
+
+  const pick = (d) => {
+    const ymd = fmtYMD(d);
+    if (!startValue || (startValue && endValue)) {
+      // Nothing picked yet, or a full range already exists — start fresh.
+      onChangeStart && onChangeStart({ target: { value: ymd } });
+      onChangeEnd && onChangeEnd({ target: { value: "" } });
+    } else if (ymd < startValue) {
+      // Picked something earlier than the current start — move the start.
+      onChangeStart && onChangeStart({ target: { value: ymd } });
+    } else {
+      // Completes the range.
+      onChangeEnd && onChangeEnd({ target: { value: ymd } });
+      setOpen(false);
+    }
+  };
+
+  const clear = () => {
+    onChangeStart && onChangeStart({ target: { value: "" } });
+    onChangeEnd && onChangeEnd({ target: { value: "" } });
+  };
+
+  const inRange = (ymd) =>
+    startValue && endValue && ymd > startValue && ymd < endValue;
+
+  const renderPanel = (cells, key) => (
+    <div className="wf-dp-panel" key={key}>
+      <div className="wf-dp-grid wf-dp-grid-range">
+        {DP_DOW.map((w, i) => (
+          <div className="wf-dp-dow" key={i}>
+            {w}
+          </div>
+        ))}
+        {cells.map((c, i) => {
+          const ymd = fmtYMD(c.date);
+          const isStart = startValue && ymd === startValue;
+          const isEnd = endValue && ymd === endValue;
+          const isSingle = isStart && isEnd;
+          const isToday = ymd === today;
+          const within = inRange(ymd);
+          return (
+            <button
+              type="button"
+              key={i}
+              className={`wf-dp-day${c.outside ? " outside" : ""}${
+                isToday ? " today" : ""
+              }${within ? " in-range" : ""}${
+                isSingle
+                  ? " range-single"
+                  : isStart
+                    ? " range-start"
+                    : isEnd
+                      ? " range-end"
+                      : ""
+              }`}
+              onClick={() => pick(c.date)}
+            >
+              <span className="wf-dp-day-num">{c.day}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="wf-dp-wrap" ref={wrapRef} style={style}>
+      <div className="wf-dr-triggers">
+        <div>
+          <span className="wf-field-label">{startLabel}</span>
+          <button
+            type="button"
+            className={`wf-dp-trigger${open ? " open" : ""}`}
+            onClick={() => setOpen((o) => !o)}
+          >
+            <span className={startValue ? "" : "wf-dp-placeholder"}>
+              {startValue
+                ? fmtDateDisplay(startValue)
+                : placeholder || t.selectDate}
+            </span>
+            <CalendarDays size={15} style={{ opacity: 0.55, flexShrink: 0 }} />
+          </button>
+        </div>
+        <div>
+          <span className="wf-field-label">{endLabel}</span>
+          <button
+            type="button"
+            className={`wf-dp-trigger${open ? " open" : ""}`}
+            onClick={() => setOpen((o) => !o)}
+          >
+            <span className={endValue ? "" : "wf-dp-placeholder"}>
+              {endValue
+                ? fmtDateDisplay(endValue)
+                : placeholder || t.selectDate}
+            </span>
+            <CalendarDays size={15} style={{ opacity: 0.55, flexShrink: 0 }} />
+          </button>
+        </div>
+      </div>
+      {open && (
+        <div
+          className="wf-dp-pop wf-dp-pop-wide"
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          <div className="wf-dp-head-dual">
+            <button
+              type="button"
+              className="wf-dp-nav"
+              onClick={() => setCursor(new Date(leftYear, leftMonth - 1, 1))}
+            >
+              <ChevronLeft size={15} />
+            </button>
+            <div className="wf-dp-dual-titles">
+              <span className="wf-dp-title">{leftTitle}</span>
+              <span className="wf-dp-title">{rightTitle}</span>
+            </div>
+            <button
+              type="button"
+              className="wf-dp-nav"
+              onClick={() => setCursor(new Date(leftYear, leftMonth + 1, 1))}
+            >
+              <ChevronRight size={15} />
+            </button>
+          </div>
+          <div className="wf-dp-dual">
+            {renderPanel(leftCells, "left")}
+            {renderPanel(rightCells, "right")}
+          </div>
+          <div className="wf-dp-foot">
+            <button type="button" className="wf-dp-link" onClick={clear}>
+              {t.clear}
+            </button>
+            <button
+              type="button"
+              className="wf-dp-link"
+              onClick={() => pick(new Date())}
             >
               {t.today}
             </button>
@@ -10489,14 +10729,15 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
           {t.lv.remainingSick(remainingForType)}
         </p>
       )}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <Field label={t.lv.startDate}>
-          <DatePicker value={f.startDate} onChange={set("startDate")} />
-        </Field>
-        <Field label={t.lv.endDate}>
-          <DatePicker value={f.endDate} onChange={set("endDate")} />
-        </Field>
-      </div>
+      <DateRangePicker
+        startValue={f.startDate}
+        endValue={f.endDate}
+        onChangeStart={set("startDate")}
+        onChangeEnd={set("endDate")}
+        startLabel={t.lv.startDate}
+        endLabel={t.lv.endDate}
+        style={{ marginBottom: 14 }}
+      />
       {invalidRange && (
         <p
           style={{
