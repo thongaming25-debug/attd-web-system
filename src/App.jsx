@@ -18377,6 +18377,23 @@ function usePwaSetup() {
     // iOS Safari ignores the web manifest for its home-screen icon and
     // reads this tag instead — a data: URI works here too.
     addTag("link", { rel: "apple-touch-icon", href: PWA_ICON_URL });
+    // iOS Safari also ignores the manifest's "display": "standalone" —
+    // without this tag, tapping the Home Screen icon just opens the
+    // URL inside a normal Safari tab (with the browser chrome), not a
+    // true standalone app. That matters beyond cosmetics: iOS only
+    // exposes window.PushManager (and therefore Web Push) to pages
+    // running in that real standalone mode, so without this tag Push
+    // Notifications silently stays unsupported on iOS even after the
+    // user adds the app to their Home Screen.
+    addTag("meta", { name: "apple-mobile-web-app-capable", content: "yes" });
+    addTag("meta", {
+      name: "apple-mobile-web-app-status-bar-style",
+      content: "black-translucent",
+    });
+    addTag("meta", {
+      name: "apple-mobile-web-app-title",
+      content: "Workforce",
+    });
 
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
