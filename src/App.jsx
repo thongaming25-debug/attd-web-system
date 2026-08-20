@@ -64,6 +64,7 @@ import {
   BarChart3,
   FileSpreadsheet,
   Volume2,
+  Package,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -107,6 +108,7 @@ const LANG_RAW = {
       payroll: "ប្រាក់ខែ",
       performance: "ការវាយតម្លៃការងារ",
       attCorrection: "សំណើកែតម្រូវវត្តមាន",
+      assets: "ទ្រព្យសម្បត្តិក្រុមហ៊ុន",
       admins: "គណនីអ្នកគ្រប់គ្រង",
       myAttendance: "វត្តមានរបស់ខ្ញុំ",
       myLeave: "ច្បាប់ឈប់សម្រាករបស់ខ្ញុំ",
@@ -206,6 +208,31 @@ const LANG_RAW = {
       codePlaceholder: "ឧ. HR",
       confirmDelWithCount: (name, n) =>
         `តើអ្នកពិតជាចង់លុបនាយកដ្ឋាន "${name}" មែនទេ? (មានបុគ្គលិក ${n} នាក់)`,
+    },
+    assets: {
+      title: "ទ្រព្យសម្បត្តិក្រុមហ៊ុន",
+      addBtn: "បន្ថែមទ្រព្យសម្បត្តិ",
+      editTitle: "កែសម្រួលទ្រព្យសម្បត្តិ",
+      addTitle: "បន្ថែមទ្រព្យសម្បត្តិ",
+      name: "ឈ្មោះទ្រព្យសម្បត្តិ",
+      category: "ប្រភេទ",
+      serial: "លេខស៊េរី / លេខកូដ",
+      assignedTo: "កាន់កាប់ដោយ",
+      unassigned: "មិនទាន់ចាត់តាំង",
+      status: "ស្ថានភាព",
+      statusAvailable: "នៅសល់",
+      statusAssigned: "កំពុងប្រើប្រាស់",
+      statusMaintenance: "កំពុងជួសជុល",
+      statusRetired: "ឈប់ប្រើ",
+      purchaseDate: "ថ្ងៃទិញ",
+      notes: "កំណត់ចំណាំ",
+      namePlaceholder: "ឧ. កុំព្យូទ័រយួរដៃ Dell",
+      categoryPlaceholder: "ឧ. កុំព្យូទ័រ, យានយន្ត, ទូរស័ព្ទ",
+      serialPlaceholder: "ឧ. SN-00123",
+      searchPlaceholder: "ស្វែងរកទ្រព្យសម្បត្តិ...",
+      allStatus: "ស្ថានភាពទាំងអស់",
+      noAssets: "មិនទាន់មានទ្រព្យសម្បត្តិទេ",
+      confirmDelWithName: (name) => `តើអ្នកប្រាកដទេថាចង់លុប "${name}"?`,
     },
     emps: {
       addBtn: "បន្ថែមបុគ្គលិក",
@@ -766,6 +793,7 @@ const LANG_RAW = {
       payroll: "Payroll",
       performance: "Performance Reviews",
       attCorrection: "Attendance Corrections",
+      assets: "Company Assets",
       admins: "Admin Accounts",
       myAttendance: "My Attendance",
       myLeave: "My Leave",
@@ -864,6 +892,32 @@ const LANG_RAW = {
       codePlaceholder: "e.g. HR",
       confirmDelWithCount: (name, n) =>
         `Are you sure you want to delete "${name}"? (${n} staff assigned)`,
+    },
+    assets: {
+      title: "Company Assets",
+      addBtn: "Add Asset",
+      editTitle: "Edit Asset",
+      addTitle: "Add Asset",
+      name: "Asset Name",
+      category: "Category",
+      serial: "Serial / Asset Code",
+      assignedTo: "Assigned To",
+      unassigned: "Unassigned",
+      status: "Status",
+      statusAvailable: "Available",
+      statusAssigned: "In Use",
+      statusMaintenance: "In Maintenance",
+      statusRetired: "Retired",
+      purchaseDate: "Purchase Date",
+      notes: "Notes",
+      namePlaceholder: "e.g. Dell Laptop",
+      categoryPlaceholder: "e.g. Computer, Vehicle, Phone",
+      serialPlaceholder: "e.g. SN-00123",
+      searchPlaceholder: "Search assets...",
+      allStatus: "All Status",
+      noAssets: "No assets yet",
+      confirmDelWithName: (name) =>
+        `Are you sure you want to delete "${name}"?`,
     },
     emps: {
       addBtn: "Add Employee",
@@ -2027,6 +2081,7 @@ const PERMISSION_MODULES = [
   "manageAnnouncements",
   "manageSettings",
   "viewAuditLog",
+  "manageAssets",
 ];
 const PERMISSION_LABEL = {
   km: {
@@ -2038,6 +2093,7 @@ const PERMISSION_LABEL = {
     manageAnnouncements: "គ្រប់គ្រងសេចក្តីប្រកាស",
     manageSettings: "គ្រប់គ្រងការកំណត់ក្រុមហ៊ុន",
     viewAuditLog: "មើលកំណត់ត្រាសកម្មភាព",
+    manageAssets: "គ្រប់គ្រងទ្រព្យសម្បត្តិក្រុមហ៊ុន",
   },
   en: {
     manageDepartments: "Manage Departments/Shifts",
@@ -2048,6 +2104,7 @@ const PERMISSION_LABEL = {
     manageAnnouncements: "Manage Announcements",
     manageSettings: "Manage Company Settings",
     viewAuditLog: "View Audit Log",
+    manageAssets: "Manage Company Assets",
   },
 };
 // Fixed id under which the Employee Self-Service module toggles are saved
@@ -2144,6 +2201,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     manageAnnouncements: false,
     manageSettings: false,
     viewAuditLog: false,
+    manageAssets: false,
   },
   officer: {
     manageDepartments: false,
@@ -2154,6 +2212,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     manageAnnouncements: false,
     manageSettings: false,
     viewAuditLog: false,
+    manageAssets: false,
   },
   senior: {
     manageDepartments: false,
@@ -2164,6 +2223,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     manageAnnouncements: false,
     manageSettings: false,
     viewAuditLog: false,
+    manageAssets: true,
   },
   supervisor: {
     manageDepartments: false,
@@ -2174,6 +2234,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     manageAnnouncements: false,
     manageSettings: false,
     viewAuditLog: false,
+    manageAssets: true,
   },
   manager: {
     manageDepartments: true,
@@ -2184,6 +2245,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     manageAnnouncements: true,
     manageSettings: false,
     viewAuditLog: false,
+    manageAssets: true,
   },
   seniorManager: {
     manageDepartments: true,
@@ -2194,6 +2256,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     manageAnnouncements: true,
     manageSettings: true,
     viewAuditLog: true,
+    manageAssets: true,
   },
   admin: {
     manageDepartments: true,
@@ -2204,6 +2267,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     manageAnnouncements: true,
     manageSettings: true,
     viewAuditLog: true,
+    manageAssets: true,
   },
 };
 // Admin role names follow the app's km/en language toggle (like every
@@ -3524,6 +3588,7 @@ const REALTIME_TABLES = [
   "offices",
   "payroll_paid",
   "role_permissions",
+  "assets",
 ];
 const realtimeHandlers = new Map(REALTIME_TABLES.map((t) => [t, new Set()]));
 let realtimeChannel = null;
@@ -7783,6 +7848,381 @@ function Departments({ departments, setDepartments, employees, isSuperAdmin }) {
           onCancel={() => setConfirmDel(null)}
           onConfirm={() => {
             setDepartments(departments.filter((d) => d.id !== confirmDel.id));
+            setConfirmDel(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   Assets (company equipment tracked and optionally assigned to a
+   specific employee — laptops, phones, vehicles, tools, etc.)
+----------------------------------------------------------------*/
+const ASSET_STATUSES = ["available", "assigned", "maintenance", "retired"];
+const ASSET_STATUS_COLOR = {
+  available: { bg: "#E6F4EA", fg: "#1E7B3C" },
+  assigned: { bg: "#E8F0FE", fg: "#1A56C4" },
+  maintenance: { bg: "#FFF4E0", fg: "#B5720B" },
+  retired: { bg: "#F1F1F1", fg: "#666" },
+};
+function AssetStatusPill({ status }) {
+  const { t } = useLang();
+  const labelKey = {
+    available: "statusAvailable",
+    assigned: "statusAssigned",
+    maintenance: "statusMaintenance",
+    retired: "statusRetired",
+  }[status];
+  const c = ASSET_STATUS_COLOR[status] || ASSET_STATUS_COLOR.available;
+  return (
+    <span className="wf-badge" style={{ background: c.bg, color: c.fg }}>
+      {t.assets[labelKey] || status}
+    </span>
+  );
+}
+function AssetForm({ initial, employees, onSave, onCancel }) {
+  const { t } = useLang();
+  const [f, setF] = useState(
+    initial || {
+      name: "",
+      category: "",
+      serial: "",
+      assignedTo: "",
+      status: "available",
+      purchaseDate: "",
+      notes: "",
+    },
+  );
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  return (
+    <div>
+      <Field label={t.assets.name}>
+        <Input
+          value={f.name}
+          onChange={set("name")}
+          placeholder={t.assets.namePlaceholder}
+        />
+      </Field>
+      <Field label={t.assets.category}>
+        <Input
+          value={f.category}
+          onChange={set("category")}
+          placeholder={t.assets.categoryPlaceholder}
+        />
+      </Field>
+      <Field label={t.assets.serial}>
+        <Input
+          value={f.serial}
+          onChange={set("serial")}
+          placeholder={t.assets.serialPlaceholder}
+        />
+      </Field>
+      <Field label={t.assets.status}>
+        <Select value={f.status} onChange={set("status")}>
+          {ASSET_STATUSES.map((s) => (
+            <option key={s} value={s}>
+              {
+                t.assets[
+                  {
+                    available: "statusAvailable",
+                    assigned: "statusAssigned",
+                    maintenance: "statusMaintenance",
+                    retired: "statusRetired",
+                  }[s]
+                ]
+              }
+            </option>
+          ))}
+        </Select>
+      </Field>
+      <Field label={t.assets.assignedTo}>
+        <Select value={f.assignedTo || ""} onChange={set("assignedTo")}>
+          <option value="">{t.assets.unassigned}</option>
+          {employees.map((e) => (
+            <option key={e.id} value={e.id}>
+              {e.name}
+            </option>
+          ))}
+        </Select>
+      </Field>
+      <Field label={t.assets.purchaseDate}>
+        <DatePicker
+          value={f.purchaseDate}
+          onChange={(v) => setF({ ...f, purchaseDate: v })}
+        />
+      </Field>
+      <Field label={t.assets.notes}>
+        <textarea
+          className="wf-input"
+          rows={2}
+          value={f.notes}
+          onChange={set("notes")}
+        />
+      </Field>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          marginTop: 16,
+          paddingTop: 14,
+          borderTop: `1px solid ${T.lineSoft}`,
+        }}
+      >
+        <Button variant="ghost" onClick={onCancel}>
+          {t.cancel}
+        </Button>
+        <Button variant="accent" onClick={() => onSave(f)} disabled={!f.name}>
+          {t.save}
+        </Button>
+      </div>
+    </div>
+  );
+}
+function Assets({ assets, setAssets, employees, isSuperAdmin }) {
+  const { t } = useLang();
+  const [modal, setModal] = useState(null);
+  const [confirmDel, setConfirmDel] = useState(null);
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const empName = (id) => employees.find((e) => e.id === id)?.name || "";
+  const filtered = useMemo(
+    () =>
+      assets.filter(
+        (a) =>
+          (a.name + a.category + a.serial + empName(a.assignedTo))
+            .toLowerCase()
+            .includes(query.toLowerCase()) &&
+          (!statusFilter || a.status === statusFilter),
+      ),
+    [assets, employees, query, statusFilter],
+  );
+  const save = (data) => {
+    if (modal.mode === "add")
+      setAssets([...assets, { ...data, id: uid("as") }]);
+    else setAssets(assets.map((a) => (a.id === data.id ? data : a)));
+    setModal(null);
+  };
+  return (
+    <div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          marginBottom: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <div
+          style={{
+            position: "relative",
+            flex: 1,
+            minWidth: 200,
+            maxWidth: 320,
+          }}
+        >
+          <Search
+            size={15}
+            style={{
+              position: "absolute",
+              left: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: T.muted,
+            }}
+          />
+          <Input
+            style={{ paddingLeft: 34 }}
+            placeholder={t.assets.searchPlaceholder}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
+        <Select
+          style={{ maxWidth: 180 }}
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option value="">{t.assets.allStatus}</option>
+          {ASSET_STATUSES.map((s) => (
+            <option key={s} value={s}>
+              {
+                t.assets[
+                  {
+                    available: "statusAvailable",
+                    assigned: "statusAssigned",
+                    maintenance: "statusMaintenance",
+                    retired: "statusRetired",
+                  }[s]
+                ]
+              }
+            </option>
+          ))}
+        </Select>
+        <Button
+          variant="ghost"
+          onClick={() =>
+            exportCsv(
+              `assets-${todayStr()}.csv`,
+              [
+                t.assets.name,
+                t.assets.category,
+                t.assets.serial,
+                t.assets.assignedTo,
+                t.assets.status,
+                t.assets.purchaseDate,
+              ],
+              filtered.map((a) => [
+                a.name,
+                a.category,
+                a.serial,
+                a.assignedTo ? empName(a.assignedTo) : t.assets.unassigned,
+                t.assets[
+                  {
+                    available: "statusAvailable",
+                    assigned: "statusAssigned",
+                    maintenance: "statusMaintenance",
+                    retired: "statusRetired",
+                  }[a.status]
+                ],
+                a.purchaseDate,
+              ]),
+            )
+          }
+        >
+          <Download size={15} /> {t.exportCsv}
+        </Button>
+        <Button variant="accent" onClick={() => setModal({ mode: "add" })}>
+          <Plus size={15} /> {t.assets.addBtn}
+        </Button>
+      </div>
+
+      {filtered.length === 0 ? (
+        <Card style={{ padding: 24, textAlign: "center", color: T.muted }}>
+          {t.assets.noAssets}
+        </Card>
+      ) : (
+        <div
+          className="wf-grid"
+          style={{
+            gridTemplateColumns: "repeat(auto-fill, minmax(260px,1fr))",
+          }}
+        >
+          {filtered.map((a) => (
+            <Card key={a.id} accent={colorFor(a.name)} style={{ padding: 16 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: 10,
+                      background: T.paper,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Package size={18} color={T.ink} />
+                  </div>
+                  <div>
+                    <div
+                      style={{ fontWeight: 600, color: T.ink, fontSize: 13 }}
+                    >
+                      {a.name}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: T.muted,
+                        fontFamily: "'JetBrains Mono',monospace",
+                      }}
+                    >
+                      {a.serial || "—"}
+                    </div>
+                  </div>
+                </div>
+                <AssetStatusPill status={a.status} />
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: T.textSoft,
+                  marginTop: 12,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
+                }}
+              >
+                <div>🏷️ {a.category || "—"}</div>
+                <div>
+                  👤{" "}
+                  {a.assignedTo ? empName(a.assignedTo) : t.assets.unassigned}
+                </div>
+                {a.purchaseDate && <div>📅 {a.purchaseDate}</div>}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 8,
+                  paddingTop: 12,
+                  marginTop: 12,
+                  borderTop: `1px solid ${T.divider}`,
+                }}
+              >
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  style={{ flex: 1, justifyContent: "center" }}
+                  onClick={() => setModal({ mode: "edit", data: a })}
+                >
+                  <Pencil size={13} /> {t.edit}
+                </Button>
+                {isSuperAdmin && (
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    style={{ flex: 1, justifyContent: "center" }}
+                    onClick={() => setConfirmDel(a)}
+                  >
+                    <Trash2 size={13} /> {t.delete}
+                  </Button>
+                )}
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {modal && (
+        <Modal
+          title={modal.mode === "add" ? t.assets.addTitle : t.assets.editTitle}
+          onClose={() => setModal(null)}
+        >
+          <AssetForm
+            initial={modal.data}
+            employees={employees}
+            onSave={save}
+            onCancel={() => setModal(null)}
+          />
+        </Modal>
+      )}
+      {confirmDel && (
+        <ConfirmDialog
+          text={t.assets.confirmDelWithName(confirmDel.name)}
+          onCancel={() => setConfirmDel(null)}
+          onConfirm={() => {
+            setAssets(assets.filter((a) => a.id !== confirmDel.id));
             setConfirmDel(null);
           }}
         />
@@ -16926,6 +17366,12 @@ function buildNavAdmin(n) {
       permission: "approveRequests",
     },
     {
+      id: "assets",
+      label: n.assets,
+      icon: Package,
+      permission: "manageAssets",
+    },
+    {
       id: "admins",
       label: n.admins,
       icon: ShieldCheck,
@@ -17037,6 +17483,30 @@ function AppInner() {
       actorRef,
     },
   );
+  const [assets, setAssets, assetsReady] = useSupabaseArray("assets", {
+    fromDb: (r) => ({
+      id: r.id,
+      name: r.name,
+      category: r.category,
+      serial: r.serial_number,
+      assignedTo: r.assigned_to,
+      status: r.status,
+      purchaseDate: r.purchase_date,
+      notes: r.notes,
+    }),
+    toDb: (r) => ({
+      id: r.id,
+      name: r.name,
+      category: r.category,
+      serial_number: r.serial,
+      assigned_to: r.assignedTo || null,
+      status: r.status,
+      purchase_date: r.purchaseDate || null,
+      notes: r.notes,
+    }),
+    audit: true,
+    actorRef,
+  });
   const [employees, setEmployees, eReady, employeesSaveError] =
     useSupabaseArray("employees", {
       fromDb: (r) => ({
@@ -18240,6 +18710,16 @@ function AppInner() {
                   isSuperAdmin={isSuperAdmin || can("manageDepartments")}
                 />
               )}
+              {page === "assets" &&
+                role === "admin" &&
+                (isSuperAdmin || can("manageAssets")) && (
+                  <Assets
+                    assets={assets}
+                    setAssets={setAssets}
+                    employees={employees}
+                    isSuperAdmin={isSuperAdmin || can("manageAssets")}
+                  />
+                )}
               {page === "attendance" &&
                 (role === "admin" || moduleEnabled("attendance")) && (
                   <Attendance
