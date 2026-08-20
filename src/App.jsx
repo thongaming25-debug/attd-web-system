@@ -2375,6 +2375,8 @@ html,body,#root{height:100%;}
 .wf-dp-link:hover{background:${T.forestSoft};}
 .wf-dr-triggers{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .wf-dp-pop-wide{width:520px;max-width:calc(100vw - 64px);padding:14px;}
+.wf-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media (max-width:480px){.wf-grid-2{grid-template-columns:1fr;}}
 .wf-dp-head-dual{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;}
 .wf-dp-dual-titles{display:flex;flex:1;justify-content:space-around;}
 .wf-dp-dual{display:flex;gap:22px;}
@@ -2407,7 +2409,7 @@ html,body,#root{height:100%;}
 .wf-modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid ${T.lineSoft};position:sticky;top:0;z-index:5;background:${T.card};border-radius:11px 11px 0 0;}
 .wf-avatar{border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;flex-shrink:0;}
 .wf-badge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.02em;white-space:nowrap;}
-.wf-table{width:100%;font-size:13px;border-collapse:collapse;}
+.wf-table{width:100%;min-width:640px;font-size:13px;border-collapse:collapse;}
 .wf-table th{text-align:left;font-size:10.5px;color:${T.muted};text-transform:uppercase;padding:11px 16px;background:${T.tableHeadBg};border-bottom:1px solid ${T.lineSoft};font-weight:700;letter-spacing:.05em;font-family:'JetBrains Mono',monospace;}
 .wf-table td{padding:10px 16px;border-bottom:1px solid ${T.lineSoft};}
 .wf-table tr:last-child td{border-bottom:none;}
@@ -7075,7 +7077,7 @@ function EmployeeForm({
           placeholder={t.emps.namePlaceholder}
         />
       </Field>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div className="wf-grid-2">
         <Field label={t.emps.code}>
           <Input
             value={f.code}
@@ -7110,7 +7112,7 @@ function EmployeeForm({
           </Button>
         </div>
       </Field>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div className="wf-grid-2">
         <Field label={t.emps.dept}>
           <Select value={f.deptId} onChange={set("deptId")}>
             {departments.map((d) => (
@@ -7130,7 +7132,7 @@ function EmployeeForm({
           </Select>
         </Field>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div className="wf-grid-2">
         <Field label={t.emps.email}>
           <Input
             value={f.email}
@@ -7146,7 +7148,7 @@ function EmployeeForm({
           />
         </Field>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div className="wf-grid-2">
         <Field label={`${t.emps.salary} (USD)`}>
           <Input
             type="number"
@@ -7200,9 +7202,7 @@ function EmployeeForm({
           {t.pay.customRateHint}
         </p>
         {f.useCustomRate && (
-          <div
-            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
-          >
+          <div className="wf-grid-2">
             <Field label={t.pay.customTaxRateLabel}>
               <Input
                 type="number"
@@ -7267,13 +7267,7 @@ function EmployeeForm({
         </p>
         {f.useCustomLatePolicy && (
           <>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 12,
-              }}
-            >
+            <div className="wf-grid-2">
               <Field label={t.pay.lateGraceCountLabel}>
                 <Input
                   type="number"
@@ -8486,7 +8480,7 @@ function ShiftForm({ initial, onSave, onCancel }) {
           placeholder={t.sh.namePlaceholder}
         />
       </Field>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div className="wf-grid-2">
         <Field label={t.sh.startLabel}>
           <TimePicker value={f.start} onChange={set("start")} />
         </Field>
@@ -9440,7 +9434,7 @@ function OfficeForm({ initial, onSave, onCancel }) {
           placeholder={t.att.officeNamePlaceholder}
         />
       </Field>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div className="wf-grid-2">
         <Field label="Latitude">
           <Input value={f.lat} onChange={set("lat")} placeholder="11.5564" />
         </Field>
@@ -10025,9 +10019,7 @@ function ManualAttendanceForm({ employees, initial, onSave, onCancel }) {
       {f.status !== "absent" &&
         f.status !== "leave" &&
         f.status !== "unpaid" && (
-          <div
-            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
-          >
+          <div className="wf-grid-2">
             <Field label={t.att.inTime}>
               <TimePicker value={f.checkIn} onChange={set("checkIn")} />
             </Field>
@@ -10997,14 +10989,7 @@ function LeaveRequests({
     const sickBal = sickLeaveBalance(currentEmp, leaveRequests);
     return (
       <div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 12,
-            marginBottom: 16,
-          }}
-        >
+        <div className="wf-grid-2" style={{ marginBottom: 16 }}>
           <Card
             accent={bal.remaining <= 0 ? T.rose : T.forest}
             style={{
@@ -11357,7 +11342,7 @@ function OvertimeRequestForm({ onSave, onCancel, holidays }) {
   const invalid = !f.date || !hoursNum || hoursNum <= 0 || hoursNum > 16;
   return (
     <div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div className="wf-grid-2">
         <Field label={t.ot.date}>
           <DatePicker value={f.date} onChange={set("date")} />
         </Field>
@@ -11514,9 +11499,7 @@ function OvertimePolicySettings({ otPolicy, setOtPolicy }) {
           <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
             {t.ot.policyDesc}
           </p>
-          <div
-            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
-          >
+          <div className="wf-grid-2">
             <Field label={t.ot.rateNormal}>
               <Input
                 type="number"
@@ -11638,9 +11621,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
           <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
             {t.pay.policyDesc}
           </p>
-          <div
-            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
-          >
+          <div className="wf-grid-2">
             <Field label={t.pay.taxRateLabel}>
               <Input
                 type="number"
@@ -11687,13 +11668,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
             <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
               {t.pay.latePolicyDesc}
             </p>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 12,
-              }}
-            >
+            <div className="wf-grid-2">
               <Field label={t.pay.lateGraceCountLabel}>
                 <Input
                   type="number"
@@ -11749,13 +11724,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
             <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
               {t.pay.ulPolicyDesc}
             </p>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 12,
-              }}
-            >
+            <div className="wf-grid-2">
               <Field label={t.pay.ulDeductionTypeLabel}>
                 <Select
                   value={f.ulDeductionType || "fullDay"}
@@ -12240,7 +12209,7 @@ function AttendanceCorrectionForm({ onSave, onCancel }) {
       <Field label={t.ac.date}>
         <DatePicker value={f.date} onChange={set("date")} />
       </Field>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div className="wf-grid-2">
         <Field label={t.ac.requestedCheckIn}>
           <TimePicker
             value={f.requestedCheckIn}
