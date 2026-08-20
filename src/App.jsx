@@ -7948,10 +7948,7 @@ function AssetForm({ initial, employees, onSave, onCancel }) {
         </Select>
       </Field>
       <Field label={t.assets.purchaseDate}>
-        <DatePicker
-          value={f.purchaseDate}
-          onChange={(v) => setF({ ...f, purchaseDate: v })}
-        />
+        <DatePicker value={f.purchaseDate} onChange={set("purchaseDate")} />
       </Field>
       <Field label={t.assets.notes}>
         <textarea
