@@ -2374,7 +2374,7 @@ html,body,#root{height:100%;}
 .wf-dp-link{background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:${T.forestText};padding:2px 4px;border-radius:6px;}
 .wf-dp-link:hover{background:${T.forestSoft};}
 .wf-dr-triggers{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.wf-dp-pop-wide{min-width:520px;padding:14px;}
+.wf-dp-pop-wide{width:520px;max-width:calc(100vw - 64px);padding:14px;}
 .wf-dp-head-dual{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;}
 .wf-dp-dual-titles{display:flex;flex:1;justify-content:space-around;}
 .wf-dp-dual{display:flex;gap:22px;}
@@ -2403,8 +2403,8 @@ html,body,#root{height:100%;}
 .wf-tp-item.selected{background:${T.gold};color:#1A1300;font-weight:700;}
 .wf-tp-sep{font-weight:700;color:${T.muted};padding-bottom:2px;}
 .wf-modal-overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(3,5,10,0.65);backdrop-filter:blur(2px);animation:wf-fade .15s ease;}
-.wf-modal{background:${T.card};border-radius:11px;border:1px solid ${T.line};box-shadow:0 24px 64px rgba(3,5,10,0.5);width:100%;max-height:90vh;overflow-y:auto;animation:wf-pop .18s cubic-bezier(.2,.9,.3,1.2);}
-.wf-modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid ${T.lineSoft};position:sticky;top:0;background:${T.card};border-radius:11px 11px 0 0;}
+.wf-modal{background:${T.card};border-radius:11px;border:1px solid ${T.line};box-shadow:0 24px 64px rgba(3,5,10,0.5);width:100%;max-height:90vh;overflow-y:auto;overflow-x:hidden;animation:wf-pop .18s cubic-bezier(.2,.9,.3,1.2);}
+.wf-modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid ${T.lineSoft};position:sticky;top:0;z-index:5;background:${T.card};border-radius:11px 11px 0 0;}
 .wf-avatar{border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;flex-shrink:0;}
 .wf-badge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.02em;white-space:nowrap;}
 .wf-table{width:100%;font-size:13px;border-collapse:collapse;}
@@ -11143,7 +11143,11 @@ function LeaveRequests({
           </table>
         </Card>
         {modal && (
-          <Modal title={t.lv.modalTitle} onClose={() => setModal(false)}>
+          <Modal
+            title={t.lv.modalTitle}
+            onClose={() => setModal(false)}
+            width={620}
+          >
             <LeaveRequestForm
               remaining={{ annual: bal.remaining, sick: sickBal.remaining }}
               onSave={submit}
