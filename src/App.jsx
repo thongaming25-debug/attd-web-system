@@ -641,6 +641,15 @@ const LANG_RAW = {
       },
       soundPreview: "ស្តាប់សាកល្បង",
       soundSaved: "បានរក្សាទុកសំឡេងដោយជោគជ័យ",
+      pushTitle: "ការជូនដំណឹងលើឧបករណ៍ (Push)",
+      pushDesc:
+        "បើកដើម្បីទទួលការជូនដំណឹងភ្លាមៗនៅលើឧបករណ៍នេះ ទោះបីអ្នកមិនបានបើកកម្មវិធីនេះក៏ដោយ",
+      pushEnable: "បើកការជូនដំណឹង",
+      pushDisable: "បិទការជូនដំណឹងលើឧបករណ៍នេះ",
+      pushEnabledMsg: "ការជូនដំណឹងលើឧបករណ៍នេះកំពុងបើក",
+      pushBlocked:
+        "ការជូនដំណឹងត្រូវបានទប់ស្កាត់សម្រាប់គេហទំព័រនេះ សូមកែសម្រួលការអនុញ្ញាតនៅក្នុងកម្មវិធីរុករក",
+      pushError: "មិនអាចបើកការជូនដំណឹងបានទេ៖",
     },
     audit: {
       title: "កំណត់ត្រាសកម្មភាព",
@@ -1296,6 +1305,15 @@ const LANG_RAW = {
       },
       soundPreview: "Preview",
       soundSaved: "Sound saved successfully",
+      pushTitle: "Push Notifications",
+      pushDesc:
+        "Turn on to get instant notifications on this device, even when the app isn't open",
+      pushEnable: "Enable notifications",
+      pushDisable: "Disable on this device",
+      pushEnabledMsg: "Push notifications are on for this device",
+      pushBlocked:
+        "Notifications are blocked for this site — check your browser's site permissions",
+      pushError: "Couldn't enable notifications:",
     },
     audit: {
       title: "Audit Log",
@@ -1605,6 +1623,13 @@ const LANG_RAW = {
       },
       soundPreview: "试听",
       soundSaved: "提示音保存成功",
+      pushTitle: "推送通知",
+      pushDesc: "开启后，即使未打开本应用，也可在此设备上收到即时通知",
+      pushEnable: "开启通知",
+      pushDisable: "关闭此设备的通知",
+      pushEnabledMsg: "此设备的推送通知已开启",
+      pushBlocked: "此网站的通知已被屏蔽，请在浏览器的网站权限中调整",
+      pushError: "无法开启通知：",
     },
   },
 };
@@ -4126,6 +4151,140 @@ function useSoundPolicy() {
   }, []);
 
   return [value, setValue, ready];
+}
+// Public VAPID key for Web Push (base64url, generated once for this
+// deployment via `npx web-push generate-vapid-keys`). Push subscribe UI
+// hides itself entirely when this is blank, so leaving it empty is safe.
+// The matching PRIVATE key never goes in client code — it lives only in
+// the server-side function that actually sends push messages (see
+// push_subscriptions table + Edge Function, deployed separately).
+const PUSH_VAPID_PUBLIC_KEY =
+  "BEUW05cxGKpj15XXpvr-2EmtTAoXll3zWKBHj8S7Lj-18APot7YlEjNI4MsxbbJLLkDS4TPyWiBYE80DSToaFis";
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; i++)
+    outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+// Manages this device's Web Push subscription for either an admin or an
+// employee (userType/userId identify who to notify). The subscription
+// itself — endpoint + keys — is stored per-device in Supabase so a
+// server-side function can look up who to send a push to; this hook only
+// handles the browser side (permission, subscribe/unsubscribe, syncing
+// that one row). Silently reports unsupported when PUSH_VAPID_PUBLIC_KEY
+// isn't configured yet, or the browser has no Push support (e.g. iOS
+// Safari unless the app is installed to the home screen).
+function usePushSubscription(userType, userId) {
+  const supported =
+    typeof window !== "undefined" &&
+    "serviceWorker" in navigator &&
+    "PushManager" in window &&
+    "Notification" in window &&
+    !!PUSH_VAPID_PUBLIC_KEY;
+  const [permission, setPermission] = useState(
+    supported ? Notification.permission : "unsupported",
+  );
+  const [subscribed, setSubscribed] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!supported || !userId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const reg = await navigator.serviceWorker.ready;
+        const sub = await reg.pushManager.getSubscription();
+        if (!cancelled) setSubscribed(!!sub);
+      } catch {
+        // Service worker not ready yet (e.g. first paint) — leave as-is,
+        // the user can still tap Enable to trigger registration.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [supported, userId]);
+
+  const subscribe = useCallback(async () => {
+    if (!supported || !userId) return;
+    setBusy(true);
+    setError("");
+    try {
+      const perm = await Notification.requestPermission();
+      setPermission(perm);
+      if (perm !== "granted") {
+        setBusy(false);
+        return;
+      }
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) {
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(PUSH_VAPID_PUBLIC_KEY),
+        });
+      }
+      const json = sub.toJSON();
+      const { error: dbError } = await supabase
+        .from("push_subscriptions")
+        .upsert(
+          {
+            endpoint: json.endpoint,
+            user_type: userType,
+            user_id: userId,
+            p256dh: json.keys?.p256dh,
+            auth: json.keys?.auth,
+          },
+          { onConflict: "endpoint" },
+        );
+      if (dbError) throw dbError;
+      setSubscribed(true);
+    } catch (err) {
+      console.error("[push] subscribe failed:", err.message);
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  }, [supported, userId, userType]);
+
+  const unsubscribe = useCallback(async () => {
+    if (!supported) return;
+    setBusy(true);
+    setError("");
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      if (sub) {
+        const endpoint = sub.endpoint;
+        await sub.unsubscribe();
+        const { error: dbError } = await supabase
+          .from("push_subscriptions")
+          .delete()
+          .eq("endpoint", endpoint);
+        if (dbError) throw dbError;
+      }
+      setSubscribed(false);
+    } catch (err) {
+      console.error("[push] unsubscribe failed:", err.message);
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  }, [supported]);
+
+  return {
+    supported,
+    permission,
+    subscribed,
+    busy,
+    error,
+    subscribe,
+    unsubscribe,
+  };
 }
 function useLocalStorage(key, fallback) {
   const [value, setValueState] = useState(() => {
@@ -13537,6 +13696,7 @@ function MyProfile({
       </Card>
 
       <AppearanceCard />
+      <PushNotificationCard userType="employee" userId={currentEmp.id} />
     </div>
   );
 }
@@ -13592,6 +13752,94 @@ function AppearanceCard() {
           <Moon size={14} /> {t.settings.darkMode}
         </button>
       </div>
+    </Card>
+  );
+}
+
+// Per-device push-notification opt-in card, shared by AdminSettings and
+// MyProfile. Renders nothing when push isn't supported/configured
+// (see usePushSubscription), so it's safe to drop in unconditionally.
+function PushNotificationCard({ userType, userId }) {
+  const { t } = useLang();
+  const {
+    supported,
+    permission,
+    subscribed,
+    busy,
+    error,
+    subscribe,
+    unsubscribe,
+  } = usePushSubscription(userType, userId);
+
+  if (!supported) return null;
+
+  return (
+    <Card style={{ padding: 20 }}>
+      <h3
+        style={{
+          fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+          fontWeight: 600,
+          color: T.ink,
+          marginBottom: 4,
+          fontSize: 14,
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+        }}
+      >
+        <Bell size={16} /> {t.settings.pushTitle}
+      </h3>
+      <p style={{ fontSize: 12, color: T.muted, marginBottom: 16 }}>
+        {t.settings.pushDesc}
+      </p>
+      {permission === "denied" ? (
+        <p
+          style={{
+            fontSize: 12,
+            color: T.rose,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
+          <AlertCircle size={14} /> {t.settings.pushBlocked}
+        </p>
+      ) : (
+        <Button
+          variant={subscribed ? "ghost" : "accent"}
+          onClick={subscribed ? unsubscribe : subscribe}
+          disabled={busy}
+        >
+          {busy ? (
+            <Loader2
+              size={14}
+              style={{ animation: "spin 1s linear infinite" }}
+            />
+          ) : (
+            <Bell size={14} />
+          )}{" "}
+          {subscribed ? t.settings.pushDisable : t.settings.pushEnable}
+        </Button>
+      )}
+      {subscribed && permission !== "denied" && (
+        <p
+          style={{
+            fontSize: 12,
+            color: T.forest,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            marginTop: 12,
+          }}
+        >
+          <CheckCircle2 size={14} /> {t.settings.pushEnabledMsg}
+        </p>
+      )}
+      {error && (
+        <p style={{ fontSize: 12, color: T.rose, marginTop: 10 }}>
+          {t.settings.pushError} {error}
+        </p>
+      )}
     </Card>
   );
 }
@@ -13867,6 +14115,8 @@ function AdminSettings({
           </button>
         </div>
       </Card>
+
+      <PushNotificationCard userType="admin" userId={currentAdmin.id} />
 
       {isSuperAdmin && (
         <Card style={{ padding: 20 }}>
@@ -17223,6 +17473,27 @@ function AppInner() {
   // (e.g. a bare #/employee link) — otherwise refreshing always restores
   // whatever page was open, for both the admin and staff portals.
   const page = routedPage || "dashboard";
+
+  // A tap on a Web Push notification (see sw.js "notificationclick") posts
+  // this message to any already-open tab instead of doing a hard
+  // navigation, so in-memory state (unsaved forms, scroll position) isn't
+  // lost. Switches portal first when the notification was for the other
+  // one (e.g. an admin push arriving while an employee tab is focused),
+  // then jumps to the target page.
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+    const onMessage = (event) => {
+      if (event.data?.type !== "push-navigate") return;
+      const { page: targetPage, portal: targetPortal } = event.data;
+      if (targetPortal && targetPortal !== portal) {
+        goPortal(targetPortal);
+      }
+      if (targetPage) setPage(targetPage);
+    };
+    navigator.serviceWorker.addEventListener("message", onMessage);
+    return () =>
+      navigator.serviceWorker.removeEventListener("message", onMessage);
+  }, [portal, goPortal, setPage]);
 
   const ready =
     dReady &&
