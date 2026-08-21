@@ -65,6 +65,8 @@ import {
   FileSpreadsheet,
   Volume2,
   Package,
+  Repeat,
+  Award,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -108,6 +110,7 @@ const LANG_RAW = {
       payroll: "ប្រាក់ខែ",
       performance: "ការវាយតម្លៃការងារ",
       attCorrection: "សំណើកែតម្រូវវត្តមាន",
+      shiftSwap: "សំណើដូរវេន",
       assets: "ទ្រព្យសម្បត្តិក្រុមហ៊ុន",
       admins: "គណនីអ្នកគ្រប់គ្រង",
       myAttendance: "វត្តមានរបស់ខ្ញុំ",
@@ -117,6 +120,7 @@ const LANG_RAW = {
       myPerformance: "ការវាយតម្លៃការងាររបស់ខ្ញុំ",
       myDocuments: "ឯកសាររបស់ខ្ញុំ",
       myAttCorrection: "ស្នើសុំកែតម្រូវវត្តមាន",
+      myShiftSwap: "ស្នើសុំដូរវេន",
       myProfile: "ប្រវត្តិរូបរបស់ខ្ញុំ",
       settings: "ការកំណត់",
       audits: "កំណត់ត្រាសកម្មភាព",
@@ -562,6 +566,42 @@ const LANG_RAW = {
       view: "មើល/ទាញយក",
       myTitle: "ឯកសាររបស់ខ្ញុំ",
     },
+    cert: {
+      btn: "ចេញវិញ្ញាបនបត្រ",
+      modalTitle: "ចេញវិញ្ញាបនបត្រ",
+      type: "ប្រភេទវិញ្ញាបនបត្រ",
+      typeEmployment: "លិខិតបញ្ជាក់ការងារ",
+      typeSalary: "លិខិតបញ្ជាក់ប្រាក់ខែ",
+      typeService: "លិខិតបញ្ជាក់រយៈពេលបម្រើការងារ",
+      typeCustom: "អត្ថបទផ្ទាល់ខ្លួន",
+      titleLabel: "ចំណងជើងវិញ្ញាបនបត្រ",
+      refNo: "លេខយោង",
+      issueDate: "កាលបរិច្ឆេទចេញ",
+      endDate: "ដល់ថ្ងៃទី (ប្រសិនបើឈប់ការងារ)",
+      endDateHint: "ទុកទទេ ប្រសិនបើនៅបម្រើការងារបន្ត",
+      purpose: "គោលបំណង / ជូនចំពោះ",
+      purposePlaceholder: "ឧ. សម្រាប់ដាក់ពាក្យធ្វើទិដ្ឋាការ",
+      customBody: "អត្ថបទវិញ្ញាបនបត្រ",
+      customBodyPlaceholder: "សរសេរខ្លឹមសារវិញ្ញាបនបត្រនៅទីនេះ...",
+      signatoryName: "ឈ្មោះអ្នកចុះហត្ថលេខា",
+      signatoryTitle: "តួនាទីអ្នកចុះហត្ថលេខា",
+      generate: "បង្កើត និង បោះពុម្ព",
+      toWhomItMayConcern: "ជូនចំពោះជាទីគោរព",
+      signatureLine: "ហត្ថលេខា និង ត្រា",
+      issuedOn: "ចេញឱ្យនៅថ្ងៃទី",
+      toPresent: "រហូតដល់បច្ចុប្បន្ន",
+      toDate: "រហូតដល់ថ្ងៃទី {date}",
+      defaultPurpose: "តាមការស្នើសុំ",
+      bodyEmployment:
+        "សូមបញ្ជាក់ថា {name} (លេខសម្គាល់៖ {code}) បច្ចុប្បន្នកំពុងបម្រើការងារនៅ {company} ក្នុងតួនាទីជា {position} ចាប់ពីថ្ងៃទី {joinDate} រហូតដល់បច្ចុប្បន្ន។ លិខិតបញ្ជាក់នេះត្រូវបានចេញ {purpose}។",
+      bodySalary:
+        "សូមបញ្ជាក់ថា {name} (លេខសម្គាល់៖ {code}) កំពុងបម្រើការងារនៅ {company} ក្នុងតួនាទីជា {position} ដោយទទួលបានប្រាក់ខែប្រចាំខែចំនួន {salary}។ លិខិតបញ្ជាក់នេះត្រូវបានចេញ {purpose}។",
+      bodyService:
+        "សូមបញ្ជាក់ថា {name} (លេខសម្គាល់៖ {code}) បានបម្រើការងារនៅ {company} ក្នុងតួនាទីជា {position} ចាប់ពីថ្ងៃទី {joinDate} {endPart}។ លិខិតបញ្ជាក់នេះត្រូវបានចេញ {purpose}។",
+      generatedOn: "បង្កើតនៅថ្ងៃទី",
+      popupBlocked:
+        "កម្មវិធីរុករករបស់អ្នកបានទប់ស្កាត់បង្អួចវិញ្ញាបនបត្រ។ សូមអនុញ្ញាត pop-up រួចសាកល្បងម្តងទៀត។",
+    },
     hol: {
       addBtn: "បន្ថែមថ្ងៃឈប់សម្រាក",
       editTitle: "កែសម្រួលថ្ងៃឈប់សម្រាកជាតិ",
@@ -593,6 +633,29 @@ const LANG_RAW = {
       confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបសំណើនេះ?",
       noRequest: "មិនទាន់មានសំណើកែតម្រូវវត្តមានទេ",
       needOneField: "សូមបញ្ចូលម៉ោងចូល ឬម៉ោងចេញ យ៉ាងហោចណាស់មួយ",
+    },
+    ss: {
+      addBtn: "ស្នើសុំដូរវេន",
+      date: "ថ្ងៃចង់ឱ្យប្តូរចូលជាធរមាន",
+      myShift: "វេនរបស់អ្នក",
+      fromShift: "វេនបច្ចុប្បន្ន",
+      toShift: "ដូរទៅវេន",
+      shiftChange: "ការផ្លាស់ប្តូរវេន",
+      noOtherShift: "គ្មានវេនផ្សេងទៀតដើម្បីស្នើសុំដូរទេ",
+      reason: "មូលហេតុ",
+      reasonPlaceholder: "ឧ. មានកិច្ចការគ្រួសារនៅថ្ងៃនោះ...",
+      approve: "អនុម័ត",
+      reject: "បដិសេធ",
+      approvedBy: "អនុម័តដោយ",
+      rejectedBy: "បដិសេធដោយ",
+      rejectTitle: "បដិសេធសំណើដូរវេន",
+      rejectReason: "មូលហេតុបដិសេធ",
+      rejectReasonPlaceholder: "សូមបញ្ជាក់មូលហេតុបដិសេធ...",
+      rejectReasonRequired: "សូមបញ្ចូលមូលហេតុបដិសេធ",
+      confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបសំណើនេះ?",
+      noRequest: "មិនទាន់មានសំណើដូរវេនទេ",
+      needReason: "សូមបញ្ចូលមូលហេតុ",
+      note: "ចំណាំ៖ ពេលអនុម័ត វេនរបស់បុគ្គលិកនឹងផ្លាស់ប្តូរដោយស្វ័យប្រវត្តិទៅតាមវេនដែលបានស្នើសុំភ្លាមៗ គ្មានចាំបាច់កែដោយដៃទៀតទេ។",
     },
     admAcc: {
       addBtn: "បន្ថែមអ្នកគ្រប់គ្រង",
@@ -793,6 +856,7 @@ const LANG_RAW = {
       payroll: "Payroll",
       performance: "Performance Reviews",
       attCorrection: "Attendance Corrections",
+      shiftSwap: "Shift Swap Requests",
       assets: "Company Assets",
       admins: "Admin Accounts",
       myAttendance: "My Attendance",
@@ -802,6 +866,7 @@ const LANG_RAW = {
       myPerformance: "My Performance Reviews",
       myDocuments: "My Documents",
       myAttCorrection: "Attendance Correction",
+      myShiftSwap: "Shift Swap Request",
       myProfile: "My Profile",
       settings: "Settings",
       audits: "Audit Log",
@@ -1250,6 +1315,42 @@ const LANG_RAW = {
       view: "View / Download",
       myTitle: "My Documents",
     },
+    cert: {
+      btn: "Issue Certificate",
+      modalTitle: "Issue Certificate",
+      type: "Certificate Type",
+      typeEmployment: "Employment Certificate",
+      typeSalary: "Salary Certificate",
+      typeService: "Certificate of Service",
+      typeCustom: "Custom Text",
+      titleLabel: "Certificate Title",
+      refNo: "Reference No.",
+      issueDate: "Issue Date",
+      endDate: "End Date (if no longer employed)",
+      endDateHint: "Leave blank if still employed",
+      purpose: "Purpose / Addressed To",
+      purposePlaceholder: "e.g. For visa application",
+      customBody: "Certificate Body",
+      customBodyPlaceholder: "Write the certificate content here...",
+      signatoryName: "Signatory Name",
+      signatoryTitle: "Signatory Title",
+      generate: "Generate & Print",
+      toWhomItMayConcern: "To Whom It May Concern",
+      signatureLine: "Signature & Stamp",
+      issuedOn: "Issued on",
+      toPresent: "to present",
+      toDate: "to {date}",
+      defaultPurpose: "upon request",
+      bodyEmployment:
+        "This is to certify that {name} (ID: {code}) is currently employed at {company} as {position}, since {joinDate} to present. This certificate is issued {purpose}.",
+      bodySalary:
+        "This is to certify that {name} (ID: {code}) is currently employed at {company} as {position}, with a current monthly salary of {salary}. This certificate is issued {purpose}.",
+      bodyService:
+        "This is to certify that {name} (ID: {code}) has been employed at {company} as {position}, from {joinDate} {endPart}. This certificate is issued {purpose}.",
+      generatedOn: "Generated on",
+      popupBlocked:
+        "Your browser blocked the certificate window. Please allow pop-ups and try again.",
+    },
     hol: {
       addBtn: "Add Holiday",
       editTitle: "Edit Public Holiday",
@@ -1281,6 +1382,29 @@ const LANG_RAW = {
       confirmDel: "Are you sure you want to delete this request?",
       noRequest: "No correction requests yet",
       needOneField: "Please enter at least a check-in or check-out time",
+    },
+    ss: {
+      addBtn: "Request Shift Swap",
+      date: "Requested effective date",
+      myShift: "Your shift",
+      fromShift: "Current shift",
+      toShift: "Change to shift",
+      shiftChange: "Shift change",
+      noOtherShift: "No other shift available to request a swap to",
+      reason: "Reason",
+      reasonPlaceholder: "e.g. Family matter that day...",
+      approve: "Approve",
+      reject: "Reject",
+      approvedBy: "Approved by",
+      rejectedBy: "Rejected by",
+      rejectTitle: "Reject Shift Swap Request",
+      rejectReason: "Rejection Reason",
+      rejectReasonPlaceholder: "Please state the rejection reason...",
+      rejectReasonRequired: "Please enter a rejection reason",
+      confirmDel: "Are you sure you want to delete this request?",
+      noRequest: "No shift swap requests yet",
+      needReason: "Please enter a reason",
+      note: "Note: on approval, the employee's shift is updated automatically to the requested shift — no manual edit needed afterward.",
     },
     admAcc: {
       addBtn: "Add Admin",
@@ -1487,6 +1611,7 @@ const LANG_RAW = {
       payroll: "工资",
       performance: "绩效考核",
       attCorrection: "考勤更正申请",
+      shiftSwap: "换班申请",
       admins: "管理员账号",
       myAttendance: "我的考勤",
       myLeave: "我的请假",
@@ -1495,6 +1620,7 @@ const LANG_RAW = {
       myPerformance: "我的绩效考核",
       myDocuments: "我的文件",
       myAttCorrection: "申请考勤更正",
+      myShiftSwap: "申请换班",
       myProfile: "我的个人资料",
       settings: "设置",
       audits: "操作日志",
@@ -2126,6 +2252,7 @@ const EMPLOYEE_MODULES = [
   "payroll",
   "review",
   "attcorr",
+  "shiftswap",
   "documents",
   "loginActivity",
   "profile",
@@ -2139,6 +2266,7 @@ const EMPLOYEE_MODULE_LABEL = {
     payroll: "ប្រាក់ខែផ្ទាល់ខ្លួន",
     review: "ការវាយតម្លៃការងារ",
     attcorr: "សំណើកែតម្រូវវត្តមាន",
+    shiftswap: "សំណើដូរវេន",
     documents: "ឯកសារផ្ទាល់ខ្លួន",
     loginActivity: "សកម្មភាពចូលប្រើ",
     profile: "ប្រវត្តិរូបផ្ទាល់ខ្លួន",
@@ -2151,6 +2279,7 @@ const EMPLOYEE_MODULE_LABEL = {
     payroll: "My Payroll",
     review: "My Performance Reviews",
     attcorr: "Attendance Correction",
+    shiftswap: "Shift Swap Request",
     documents: "My Documents",
     loginActivity: "Login Activity",
     profile: "My Profile",
@@ -2181,6 +2310,7 @@ const DEFAULT_EMPLOYEE_MODULES = {
   payroll: true,
   review: true,
   attcorr: true,
+  shiftswap: true,
   documents: true,
   loginActivity: true,
   profile: true,
@@ -2829,6 +2959,7 @@ function buildNotifications({
   performanceReviews = [],
   announcements = [],
   attendanceCorrections = [],
+  shiftSwapRequests = [],
   lang = "km",
 }) {
   const LEAVE_TYPE_LABEL = getLeaveTypeLabel(lang);
@@ -2877,6 +3008,21 @@ function buildNotifications({
           message: en
             ? `${emp?.name || "?"} requested a correction on ${r.date}`
             : `${emp?.name || "?"} បានស្នើសុំកែតម្រូវវត្តមាននៅថ្ងៃទី ${r.date}`,
+          time: r.createdAt,
+        });
+      });
+    shiftSwapRequests
+      .filter((r) => r.status === "pending")
+      .forEach((r) => {
+        const emp = employees.find((e) => e.id === r.employeeId);
+        list.push({
+          id: `ss-pending-${r.id}`,
+          page: "shiftswap",
+          tone: "gold",
+          title: en ? "New shift swap request" : "សំណើដូរវេនថ្មី",
+          message: en
+            ? `${emp?.name || "?"} requested coverage on ${r.date}`
+            : `${emp?.name || "?"} បានស្នើសុំគ្របដណ្តប់វេននៅថ្ងៃទី ${r.date}`,
           time: r.createdAt,
         });
       });
@@ -2980,6 +3126,30 @@ function buildNotifications({
               : en
                 ? "Your attendance correction was rejected"
                 : "សំណើកែតម្រូវវត្តមានរបស់អ្នកត្រូវបានបដិសេធ",
+          message: r.date,
+          time: r.reviewedAt,
+        });
+      });
+    shiftSwapRequests
+      .filter(
+        (r) =>
+          r.employeeId === currentEmp.id &&
+          (r.status === "approved" || r.status === "rejected") &&
+          r.reviewedAt,
+      )
+      .forEach((r) => {
+        list.push({
+          id: `ss-decided-${r.id}`,
+          page: "shiftswap",
+          tone: r.status === "approved" ? "forest" : "rose",
+          title:
+            r.status === "approved"
+              ? en
+                ? "Your shift swap request was approved"
+                : "សំណើដូរវេនរបស់អ្នកត្រូវបានអនុម័ត"
+              : en
+                ? "Your shift swap request was rejected"
+                : "សំណើដូរវេនរបស់អ្នកត្រូវបានបដិសេធ",
           message: r.date,
           time: r.reviewedAt,
         });
@@ -3577,12 +3747,13 @@ function writeLoginActivity({ actor, action, sessionId }) {
 //
 // Each useSupabaseArray(table) call used to open its own
 // `supabase.channel("realtime:"+table)` — fine with a handful of tables,
-// but this app calls useSupabaseArray for 13 different tables on every
+// but this app calls useSupabaseArray for 14 different tables on every
 // login (departments, employees, shifts, attendance, leave_requests,
 // overtime_requests, performance_reviews, announcements,
-// employee_documents, holidays, attendance_corrections, admins,
-// offices), all mounted together in AppInner regardless of which page
-// is showing. That's 13 open channels per signed-in user — at 1000+
+// employee_documents, holidays, attendance_corrections,
+// shift_swap_requests, admins, offices), all mounted together in
+// AppInner regardless of which page is showing. That's 14 open
+// channels per signed-in user — at 1000+
 // concurrent staff, ~13,000 channels, which can run into a Supabase
 // project's realtime connection limits (plan-dependent) and slow down
 // delivery for everyone.
@@ -3606,6 +3777,7 @@ const REALTIME_TABLES = [
   "employee_documents",
   "holidays",
   "attendance_corrections",
+  "shift_swap_requests",
   "admins",
   "offices",
   "payroll_paid",
@@ -4729,6 +4901,7 @@ function NotificationBell({
   performanceReviews,
   announcements,
   attendanceCorrections,
+  shiftSwapRequests,
   setPage,
 }) {
   const { t, lang } = useLang();
@@ -4757,6 +4930,7 @@ function NotificationBell({
         performanceReviews,
         announcements,
         attendanceCorrections,
+        shiftSwapRequests,
         lang,
       }),
     [
@@ -4770,6 +4944,7 @@ function NotificationBell({
       performanceReviews,
       announcements,
       attendanceCorrections,
+      shiftSwapRequests,
     ],
   );
   const unread = notifications.filter((n) => !readIds.includes(n.id));
@@ -7535,6 +7710,7 @@ function Employees({
   const [modal, setModal] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
   const [docsFor, setDocsFor] = useState(null);
+  const [certFor, setCertFor] = useState(null);
   const [query, setQuery] = useState("");
   const [branchFilter, setBranchFilter] = useState("");
   const [badgePopupBlocked, setBadgePopupBlocked] = useState(false);
@@ -7832,6 +8008,14 @@ function Employees({
             >
               <FileText size={13} /> {t.doc.title}
             </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              style={{ width: "100%", justifyContent: "center", marginTop: 8 }}
+              onClick={() => setCertFor(e)}
+            >
+              <Award size={13} /> {t.cert.btn}
+            </Button>
           </Card>
         ))}
         {filtered.length === 0 && (
@@ -7883,6 +8067,13 @@ function Employees({
           setDocuments={setDocuments}
           isSuperAdmin={isSuperAdmin}
           onClose={() => setDocsFor(null)}
+        />
+      )}
+      {certFor && (
+        <CertificateModal
+          emp={certFor}
+          deptLabel={deptName(certFor.deptId)}
+          onClose={() => setCertFor(null)}
         />
       )}
       {badgePopupBlocked && (
@@ -12615,6 +12806,516 @@ function AttendanceCorrections({
 }
 
 /* ---------------------------------------------------------------
+   Shift Swap Requests — an employee asks a named colleague to cover
+   their shift on a specific date; admin approves or rejects (same
+   single-decider flow as Attendance Corrections). Approval is a
+   record/notification only — it does NOT auto-edit shiftId or the
+   Shifts schedule, since shifts in this app are a static per-employee
+   assignment rather than a per-date roster. Admin still updates the
+   actual schedule by hand if the coverage needs to be reflected there.
+----------------------------------------------------------------*/
+function SsRejectModal({ onCancel, onConfirm }) {
+  const { t } = useLang();
+  const [reason, setReason] = useState("");
+  const trimmed = reason.trim();
+  return (
+    <Modal title={t.ss.rejectTitle} onClose={onCancel} width={420}>
+      <Field label={t.ss.rejectReason}>
+        <textarea
+          className="wf-input"
+          rows={3}
+          style={{ resize: "vertical", fontFamily: "inherit" }}
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          placeholder={t.ss.rejectReasonPlaceholder}
+        />
+      </Field>
+      {reason !== "" && !trimmed && (
+        <p
+          style={{
+            fontSize: 12.5,
+            color: T.rose,
+            marginTop: -8,
+            marginBottom: 12,
+          }}
+        >
+          {t.ss.rejectReasonRequired}
+        </p>
+      )}
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+        <Button variant="ghost" onClick={onCancel}>
+          {t.cancel}
+        </Button>
+        <Button
+          variant="danger-solid"
+          disabled={!trimmed}
+          onClick={() => onConfirm(trimmed)}
+        >
+          {t.ss.reject}
+        </Button>
+      </div>
+    </Modal>
+  );
+}
+
+function SsDecisionNote({ r, admins }) {
+  const { t } = useLang();
+  if (r.status !== "approved" && r.status !== "rejected") return null;
+  const decider = admins.find((a) => a.id === r.decidedById);
+  const name = r.decidedByName || decider?.name || "—";
+  return (
+    <div style={{ fontSize: 11.5, color: T.textSoft, marginTop: 3 }}>
+      {r.status === "approved" ? (
+        <span>
+          {t.ss.approvedBy} <strong>{name}</strong>
+        </span>
+      ) : (
+        <span style={{ color: T.rose }}>
+          {t.ss.rejectedBy} <strong>{name}</strong>
+          {r.decisionReason ? ` — ${r.decisionReason}` : ""}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function ShiftSwapRequestForm({ currentEmp, shifts, onSave, onCancel }) {
+  const { t } = useLang();
+  const myShift = shifts?.find((s) => s.id === currentEmp?.shiftId);
+  // Every shift except the one the employee is already on — swapping
+  // "into" your own current shift isn't a real request.
+  const otherShifts = (shifts || []).filter(
+    (s) => s.id !== currentEmp?.shiftId,
+  );
+  const [f, setF] = useState({
+    toShiftId: otherShifts[0]?.id || "",
+    date: todayStr(),
+    reason: "",
+  });
+  const set = (k) => (e) =>
+    setF({ ...f, [k]: typeof e === "string" ? e : e.target.value });
+  const invalid = !f.toShiftId || !f.date || !f.reason.trim();
+  if (otherShifts.length === 0) {
+    return (
+      <div style={{ padding: "8px 0" }}>
+        <p style={{ fontSize: 13, color: T.textSoft }}>{t.ss.noOtherShift}</p>
+        <div
+          style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}
+        >
+          <Button variant="ghost" onClick={onCancel}>
+            {t.cancel}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div>
+      {myShift && (
+        <Field label={t.ss.fromShift}>
+          <div
+            style={{
+              fontSize: 13,
+              color: T.ink,
+              background: T.chipBg || "rgba(91,141,239,0.08)",
+              borderRadius: 8,
+              padding: "8px 12px",
+            }}
+          >
+            {shiftLabel(myShift)}
+          </div>
+        </Field>
+      )}
+      <Field label={t.ss.toShift}>
+        <Select value={f.toShiftId} onChange={set("toShiftId")}>
+          {otherShifts.map((s) => (
+            <option key={s.id} value={s.id}>
+              {shiftLabel(s)}
+            </option>
+          ))}
+        </Select>
+      </Field>
+      <Field label={t.ss.date}>
+        <DatePicker value={f.date} onChange={set("date")} />
+      </Field>
+      <Field label={t.ss.reason}>
+        <textarea
+          className="wf-input"
+          rows={3}
+          style={{ resize: "vertical", fontFamily: "inherit" }}
+          value={f.reason}
+          onChange={set("reason")}
+          placeholder={t.ss.reasonPlaceholder}
+        />
+      </Field>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          marginTop: 16,
+          paddingTop: 14,
+          borderTop: `1px solid ${T.lineSoft}`,
+        }}
+      >
+        <Button variant="ghost" onClick={onCancel}>
+          {t.cancel}
+        </Button>
+        <Button
+          variant="accent"
+          onClick={() =>
+            onSave({
+              fromShiftId: myShift?.id || null,
+              toShiftId: f.toShiftId,
+              date: f.date,
+              reason: f.reason.trim(),
+            })
+          }
+          disabled={invalid}
+        >
+          {t.save}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function ShiftSwapRequests({
+  role,
+  currentAdmin,
+  currentEmp,
+  employees,
+  setEmployees,
+  shifts,
+  admins,
+  shiftSwapRequests,
+  setShiftSwapRequests,
+  isSuperAdmin,
+  canApprove,
+}) {
+  const { t } = useLang();
+  const [modal, setModal] = useState(false);
+  const [rejectFor, setRejectFor] = useState(null);
+  const [confirmDel, setConfirmDel] = useState(null);
+  const empOf = (id) => employees.find((e) => e.id === id);
+  const shiftOf = (id) => shifts.find((s) => s.id === id);
+
+  // Approving doesn't just flip the request's status — it also applies
+  // the requested shift straight onto the employee record, so admin
+  // never has to go re-edit it by hand on the Employees/Shifts page
+  // afterward.
+  const approve = (req) => {
+    setShiftSwapRequests(
+      shiftSwapRequests.map((r) =>
+        r.id === req.id
+          ? {
+              ...r,
+              status: "approved",
+              decidedById: currentAdmin?.id || null,
+              decidedByName: currentAdmin?.name || "",
+              decisionReason: "",
+              reviewedAt: new Date().toISOString(),
+            }
+          : r,
+      ),
+    );
+    if (req.toShiftId) {
+      setEmployees(
+        employees.map((e) =>
+          e.id === req.employeeId ? { ...e, shiftId: req.toShiftId } : e,
+        ),
+      );
+    }
+  };
+  const reject = (req, reason) => {
+    setShiftSwapRequests(
+      shiftSwapRequests.map((r) =>
+        r.id === req.id
+          ? {
+              ...r,
+              status: "rejected",
+              decidedById: currentAdmin?.id || null,
+              decidedByName: currentAdmin?.name || "",
+              decisionReason: reason,
+              reviewedAt: new Date().toISOString(),
+            }
+          : r,
+      ),
+    );
+    setRejectFor(null);
+  };
+
+  const submit = (f) => {
+    if (!currentEmp) return;
+    setShiftSwapRequests([
+      ...shiftSwapRequests,
+      {
+        id: uid("ss"),
+        employeeId: currentEmp.id,
+        fromShiftId: f.fromShiftId,
+        toShiftId: f.toShiftId,
+        date: f.date,
+        reason: f.reason,
+        status: "pending",
+        decidedById: null,
+        decidedByName: "",
+        decisionReason: "",
+        createdAt: new Date().toISOString(),
+        reviewedAt: null,
+      },
+    ]);
+    setModal(false);
+  };
+
+  const ShiftChangeCell = ({ r }) => (
+    <div
+      style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5 }}
+    >
+      <span style={{ color: T.textSoft }}>
+        {shiftLabel(shiftOf(r.fromShiftId))}
+      </span>
+      <span style={{ color: T.mutedLight }}>→</span>
+      <span style={{ color: T.ink, fontWeight: 500 }}>
+        {shiftLabel(shiftOf(r.toShiftId))}
+      </span>
+    </div>
+  );
+
+  if (role !== "admin" && currentEmp) {
+    const mine = shiftSwapRequests
+      .filter((r) => r.employeeId === currentEmp.id)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    return (
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: 16,
+          }}
+        >
+          <Button variant="accent" onClick={() => setModal(true)}>
+            <Plus size={15} /> {t.ss.addBtn}
+          </Button>
+        </div>
+        <Card style={{ overflowX: "auto" }}>
+          <table className="wf-table">
+            <thead>
+              <tr>
+                <th>{t.ss.date}</th>
+                <th>{t.ss.shiftChange}</th>
+                <th>{t.ss.reason}</th>
+                <th>{t.status}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {mine.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={4}
+                    style={{
+                      textAlign: "center",
+                      color: T.muted,
+                      padding: "24px 0",
+                    }}
+                  >
+                    {t.ss.noRequest}
+                  </td>
+                </tr>
+              )}
+              {mine.map((r) => (
+                <tr key={r.id}>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                    {r.date}
+                  </td>
+                  <td>
+                    <ShiftChangeCell r={r} />
+                  </td>
+                  <td
+                    style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}
+                  >
+                    {r.reason || "—"}
+                  </td>
+                  <td>
+                    <StatusPill status={r.status} />
+                    <SsDecisionNote r={r} admins={admins} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+        {modal && (
+          <Modal title={t.ss.addBtn} onClose={() => setModal(false)}>
+            <ShiftSwapRequestForm
+              currentEmp={currentEmp}
+              shifts={shifts}
+              onSave={submit}
+              onCancel={() => setModal(false)}
+            />
+          </Modal>
+        )}
+      </div>
+    );
+  }
+
+  // Admin view — pending requests surfaced on top, newest first.
+  const sorted = [...shiftSwapRequests].sort((a, b) => {
+    if (a.status === "pending" && b.status !== "pending") return -1;
+    if (a.status !== "pending" && b.status === "pending") return 1;
+    return b.createdAt.localeCompare(a.createdAt);
+  });
+  return (
+    <div>
+      <p style={{ fontSize: 12.5, color: T.textSoft, marginBottom: 12 }}>
+        {t.ss.note}
+      </p>
+      <Card style={{ overflowX: "auto" }}>
+        <table className="wf-table">
+          <thead>
+            <tr>
+              <th>{t.employee}</th>
+              <th>{t.ss.date}</th>
+              <th>{t.ss.shiftChange}</th>
+              <th>{t.ss.reason}</th>
+              <th>{t.status}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.length === 0 && (
+              <tr>
+                <td
+                  colSpan={6}
+                  style={{
+                    textAlign: "center",
+                    color: T.muted,
+                    padding: "24px 0",
+                  }}
+                >
+                  {t.ss.noRequest}
+                </td>
+              </tr>
+            )}
+            {sorted.map((r) => {
+              const emp = empOf(r.employeeId);
+              return (
+                <tr key={r.id}>
+                  <td>
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 10 }}
+                    >
+                      <Avatar
+                        name={emp?.name || "?"}
+                        photo={emp?.photo}
+                        size={30}
+                      />
+                      <div>
+                        <div
+                          style={{
+                            fontWeight: 500,
+                            color: T.ink,
+                            fontSize: 13,
+                          }}
+                        >
+                          {emp?.name || "—"}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 10.5,
+                            color: T.muted,
+                            fontFamily: "'JetBrains Mono',monospace",
+                          }}
+                        >
+                          {emp?.code}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                    {r.date}
+                  </td>
+                  <td>
+                    <ShiftChangeCell r={r} />
+                  </td>
+                  <td
+                    style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}
+                  >
+                    {r.reason || "—"}
+                  </td>
+                  <td>
+                    <StatusPill status={r.status} />
+                    <SsDecisionNote r={r} admins={admins} />
+                  </td>
+                  <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                    {r.status === "pending"
+                      ? canApprove && (
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: 6,
+                              justifyContent: "flex-end",
+                            }}
+                          >
+                            <Button
+                              size="sm"
+                              variant="accent"
+                              onClick={() => approve(r)}
+                            >
+                              <ThumbsUp size={13} /> {t.ss.approve}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="danger"
+                              onClick={() => setRejectFor(r)}
+                            >
+                              <ThumbsDown size={13} /> {t.ss.reject}
+                            </Button>
+                          </div>
+                        )
+                      : isSuperAdmin && (
+                          <button
+                            onClick={() => setConfirmDel(r)}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              color: T.mutedLight,
+                            }}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </Card>
+      {rejectFor && (
+        <SsRejectModal
+          onCancel={() => setRejectFor(null)}
+          onConfirm={(reason) => reject(rejectFor, reason)}
+        />
+      )}
+      {confirmDel && (
+        <ConfirmDialog
+          text={t.ss.confirmDel}
+          onCancel={() => setConfirmDel(null)}
+          onConfirm={() => {
+            setShiftSwapRequests(
+              shiftSwapRequests.filter((r) => r.id !== confirmDel.id),
+            );
+            setConfirmDel(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
    Announcements — admin posts company-wide messages that every
    employee (and admin) sees in a shared feed, newest first.
 ----------------------------------------------------------------*/
@@ -16476,6 +17177,338 @@ function printEmployeeBadge({
   }, 350);
 }
 
+// Builds a formal, letterhead-style certificate (Employment / Salary /
+// Service / free-form Custom text) for one employee and opens it in a
+// print-ready window — mirrors printPayslip/printEmployeeBadge's
+// window.open + write + print pattern. Intentionally leaves a blank
+// signature line rather than embedding a signature image: these are
+// meant to be printed and wet-ink signed/stamped by the signatory.
+function printCertificate({
+  brandName,
+  brandLogo,
+  titleText,
+  refNo,
+  issueDateText,
+  bodyText,
+  signatoryName,
+  signatoryTitle,
+  signatureLineLabel,
+  generatedOnLabel,
+  onPopupBlocked,
+}) {
+  const win = window.open("", "_blank", "width=560,height=760");
+  if (!win) {
+    onPopupBlocked?.();
+    return;
+  }
+  const generatedOn = new Date().toLocaleDateString();
+  const html = `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>${escapeHtml(titleText)}</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans Khmer', 'Segoe UI', Arial, sans-serif;
+    color: #16213a;
+    margin: 0;
+    padding: 40px 48px;
+    background: #fff;
+  }
+  .cert-frame {
+    border: 2px solid #16213a;
+    padding: 32px 36px;
+    min-height: 620px;
+    display: flex;
+    flex-direction: column;
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #d8dbe3;
+    margin-bottom: 6px;
+  }
+  .header img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; }
+  .brand { font-size: 15px; font-weight: 700; }
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 10px;
+    margin-bottom: 22px;
+  }
+  .title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: .02em;
+    margin: 8px 0 4px;
+  }
+  .title-underline {
+    width: 90px;
+    height: 3px;
+    background: #16213a;
+    margin: 0 auto 26px;
+    border-radius: 2px;
+  }
+  .body-text {
+    font-size: 14px;
+    line-height: 2;
+    text-align: justify;
+    flex: 1;
+  }
+  .sign-block {
+    margin-top: 48px;
+    align-self: flex-end;
+    text-align: center;
+    min-width: 220px;
+  }
+  .sign-line {
+    border-bottom: 1px solid #16213a;
+    height: 56px;
+    margin-bottom: 6px;
+  }
+  .sign-caption { font-size: 11px; color: #9ca3af; margin-bottom: 2px; }
+  .sign-name { font-size: 13px; font-weight: 700; }
+  .sign-title { font-size: 11.5px; color: #6b7280; margin-top: 1px; }
+  .footer {
+    margin-top: 24px;
+    font-size: 9.5px;
+    color: #9ca3af;
+    text-align: center;
+  }
+  @media print {
+    body { padding: 0; }
+  }
+</style>
+</head>
+<body>
+  <div class="cert-frame">
+    <div class="header">
+      ${brandLogo ? `<img src="${escapeHtml(brandLogo)}" />` : ""}
+      <div class="brand">${escapeHtml(brandName)}</div>
+    </div>
+    <div class="meta">
+      <span>${refNo ? escapeHtml(refNo) : ""}</span>
+      <span>${escapeHtml(issueDateText)}</span>
+    </div>
+    <div class="title">${escapeHtml(titleText)}</div>
+    <div class="title-underline"></div>
+    <div class="body-text">${escapeHtml(bodyText)}</div>
+    <div class="sign-block">
+      <div class="sign-line"></div>
+      <div class="sign-caption">${escapeHtml(signatureLineLabel)}</div>
+      ${signatoryName ? `<div class="sign-name">${escapeHtml(signatoryName)}</div>` : ""}
+      ${signatoryTitle ? `<div class="sign-title">${escapeHtml(signatoryTitle)}</div>` : ""}
+    </div>
+  </div>
+  <div class="footer">${escapeHtml(generatedOnLabel)}: ${escapeHtml(generatedOn)}</div>
+</body>
+</html>`;
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(() => {
+    win.print();
+  }, 350);
+}
+
+// Fills a {token} style i18n template string with plain values. Missing
+// tokens resolve to an empty string rather than leaving the literal
+// "{token}" visible on a printed certificate.
+function fillCertTemplate(str, vars) {
+  return str.replace(/\{(\w+)\}/g, (_, k) => (vars[k] != null ? vars[k] : ""));
+}
+
+// Admin-facing form for issuing a certificate to one employee. Issuance
+// is immediate (no request/approval step, per how this company hands
+// out certificates) — filling the form and clicking Generate opens the
+// print-ready window straight away via printCertificate(). Nothing here
+// is persisted; the admin re-fills the form each time, matching how
+// Payslip/Badge printing already works in this app.
+function CertificateModal({ emp, deptLabel, onClose }) {
+  const { t } = useLang();
+  const { branding } = useBranding();
+  const [type, setType] = useState("employment");
+  const [refNo, setRefNo] = useState(
+    () => `CERT-${todayStr().replace(/-/g, "")}-${emp.code || ""}`,
+  );
+  const [issueDate, setIssueDate] = useState(todayStr());
+  const [endDate, setEndDate] = useState("");
+  const [purpose, setPurpose] = useState("");
+  const [customBody, setCustomBody] = useState("");
+  const [signatoryName, setSignatoryName] = useState("");
+  const [signatoryTitle, setSignatoryTitle] = useState("");
+  const [popupBlocked, setPopupBlocked] = useState(false);
+
+  const company = branding?.name?.trim() || t.appName;
+  const typeLabel = {
+    employment: t.cert.typeEmployment,
+    salary: t.cert.typeSalary,
+    service: t.cert.typeService,
+    custom: t.cert.typeCustom,
+  }[type];
+
+  // The big heading printed on the certificate. Defaults to the
+  // selected type's label, but the admin can overwrite it (e.g. rename
+  // "Custom Text" to "Recommendation Letter"). Once edited by hand it
+  // stops following the type dropdown, so switching type again won't
+  // clobber a title the admin already typed.
+  const [title, setTitle] = useState(typeLabel);
+  const [titleTouched, setTitleTouched] = useState(false);
+  useEffect(() => {
+    if (!titleTouched) setTitle(typeLabel);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [type]);
+
+  const handleGenerate = () => {
+    const purposeText = purpose.trim() || t.cert.defaultPurpose;
+    const vars = {
+      name: emp.name,
+      code: emp.code,
+      company,
+      position: emp.role || deptLabel || "",
+      joinDate: fmtDateDisplay(emp.joined) || emp.joined || "",
+      salary: fmtMoney(emp.salary),
+      purpose: purposeText,
+      endPart: endDate
+        ? fillCertTemplate(t.cert.toDate, { date: fmtDateDisplay(endDate) })
+        : t.cert.toPresent,
+    };
+    let bodyText;
+    if (type === "employment")
+      bodyText = fillCertTemplate(t.cert.bodyEmployment, vars);
+    else if (type === "salary")
+      bodyText = fillCertTemplate(t.cert.bodySalary, vars);
+    else if (type === "service")
+      bodyText = fillCertTemplate(t.cert.bodyService, vars);
+    else bodyText = customBody.trim();
+
+    printCertificate({
+      brandName: company,
+      brandLogo: branding?.logo || null,
+      titleText: title.trim() || typeLabel,
+      refNo: refNo.trim(),
+      issueDateText: `${t.cert.issuedOn}: ${fmtDateDisplay(issueDate) || issueDate}`,
+      bodyText,
+      signatoryName: signatoryName.trim(),
+      signatoryTitle: signatoryTitle.trim(),
+      signatureLineLabel: t.cert.signatureLine,
+      generatedOnLabel: t.cert.generatedOn,
+      onPopupBlocked: () => setPopupBlocked(true),
+    });
+  };
+
+  return (
+    <Modal title={`${t.cert.modalTitle} · ${emp.name}`} onClose={onClose} width={480}>
+      <Field label={t.cert.type}>
+        <Select value={type} onChange={(e) => setType(e.target.value)}>
+          <option value="employment">{t.cert.typeEmployment}</option>
+          <option value="salary">{t.cert.typeSalary}</option>
+          <option value="service">{t.cert.typeService}</option>
+          <option value="custom">{t.cert.typeCustom}</option>
+        </Select>
+      </Field>
+      <Field label={t.cert.titleLabel}>
+        <Input
+          value={title}
+          onChange={(e) => {
+            setTitle(e.target.value);
+            setTitleTouched(true);
+          }}
+          placeholder={typeLabel}
+        />
+      </Field>
+      <Field label={t.cert.refNo}>
+        <Input value={refNo} onChange={(e) => setRefNo(e.target.value)} />
+      </Field>
+      <Field label={t.cert.issueDate}>
+        <DatePicker value={issueDate} onChange={(e) => setIssueDate(e.target.value)} />
+      </Field>
+      {type === "service" && (
+        <Field label={t.cert.endDate}>
+          <DatePicker
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            placeholder={t.cert.endDateHint}
+          />
+          <span
+            style={{
+              fontSize: 11,
+              color: T.muted,
+              display: "block",
+              marginTop: 4,
+            }}
+          >
+            {t.cert.endDateHint}
+          </span>
+        </Field>
+      )}
+      {type !== "custom" ? (
+        <Field label={t.cert.purpose}>
+          <Input
+            value={purpose}
+            onChange={(e) => setPurpose(e.target.value)}
+            placeholder={t.cert.purposePlaceholder}
+          />
+        </Field>
+      ) : (
+        <Field label={t.cert.customBody}>
+          <textarea
+            className="wf-input"
+            rows={6}
+            value={customBody}
+            onChange={(e) => setCustomBody(e.target.value)}
+            placeholder={t.cert.customBodyPlaceholder}
+            style={{ resize: "vertical", lineHeight: 1.6 }}
+          />
+        </Field>
+      )}
+      <Field label={t.cert.signatoryName}>
+        <Input
+          value={signatoryName}
+          onChange={(e) => setSignatoryName(e.target.value)}
+        />
+      </Field>
+      <Field label={t.cert.signatoryTitle}>
+        <Input
+          value={signatoryTitle}
+          onChange={(e) => setSignatoryTitle(e.target.value)}
+        />
+      </Field>
+      {popupBlocked && (
+        <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 10 }}>
+          {t.cert.popupBlocked}
+        </p>
+      )}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          marginTop: 8,
+        }}
+      >
+        <Button variant="ghost" onClick={onClose}>
+          {t.cancel}
+        </Button>
+        <Button
+          variant="accent"
+          onClick={handleGenerate}
+          disabled={type === "custom" && !customBody.trim()}
+        >
+          <Award size={14} /> {t.cert.generate}
+        </Button>
+      </div>
+    </Modal>
+  );
+}
+
 function Payslip({
   emp,
   mk,
@@ -17577,6 +18610,12 @@ function buildNavAdmin(n) {
       permission: "approveRequests",
     },
     {
+      id: "shiftswap",
+      label: n.shiftSwap,
+      icon: Repeat,
+      permission: "approveRequests",
+    },
+    {
       id: "assets",
       label: n.assets,
       icon: Package,
@@ -17615,6 +18654,7 @@ function buildNavEmployee(n, enabledModules) {
     { id: "payroll", label: n.myPayroll, icon: Wallet },
     { id: "review", label: n.myPerformance, icon: Star },
     { id: "attcorr", label: n.myAttCorrection, icon: CalendarClock },
+    { id: "shiftswap", label: n.myShiftSwap, icon: Repeat },
     { id: "documents", label: n.myDocuments, icon: FileText },
     { id: "loginActivity", label: n.loginActivity, icon: Smartphone },
     { id: "profile", label: n.myProfile, icon: UserCircle2 },
@@ -18138,6 +19178,74 @@ function AppInner() {
         return null;
       },
     });
+  const [shiftSwapRequests, setShiftSwapRequests, ssReady] = useSupabaseArray(
+    "shift_swap_requests",
+    {
+      fromDb: (r) => ({
+        id: r.id,
+        employeeId: r.employee_id,
+        fromShiftId: r.from_shift_id,
+        toShiftId: r.to_shift_id,
+        date: r.date,
+        reason: r.reason,
+        status: r.status,
+        decidedById: r.decided_by_id,
+        decidedByName: r.decided_by_name,
+        decisionReason: r.decision_reason,
+        createdAt: r.created_at,
+        reviewedAt: r.reviewed_at,
+      }),
+      toDb: (r) => ({
+        id: r.id,
+        employee_id: r.employeeId,
+        from_shift_id: r.fromShiftId,
+        to_shift_id: r.toShiftId,
+        date: r.date,
+        reason: r.reason,
+        status: r.status,
+        decided_by_id: r.decidedById,
+        decided_by_name: r.decidedByName,
+        decision_reason: r.decisionReason,
+        created_at: r.createdAt,
+        reviewed_at: r.reviewedAt,
+      }),
+      audit: true,
+      actorRef,
+      entityLabel: (r) => `${r.date || "?"} · ${r.employeeId || "?"}`,
+      notify: ({ type, row, old }) => {
+        if (type === "create" && row.status === "pending") {
+          const emp = employees.find((e) => e.id === row.employeeId);
+          return {
+            userType: "admin",
+            title: "សំណើដូរវេនថ្មី",
+            body: `${emp?.name || "?"} បានស្នើសុំគ្របដណ្តប់វេននៅថ្ងៃទី ${row.date}`,
+            page: "shiftswap",
+            portal: "admin",
+            tag: `ss-req-${row.id}`,
+          };
+        }
+        if (
+          type === "update" &&
+          old?.status !== row.status &&
+          (row.status === "approved" || row.status === "rejected")
+        ) {
+          return {
+            userType: "employee",
+            userId: row.employeeId,
+            title:
+              row.status === "approved"
+                ? "សំណើដូរវេនរបស់អ្នកត្រូវបានអនុម័ត"
+                : "សំណើដូរវេនរបស់អ្នកត្រូវបានបដិសេធ",
+            body: row.date,
+            page: "shiftswap",
+            portal: "employee",
+            tag: `ss-dec-${row.id}`,
+          };
+        }
+        return null;
+      },
+    },
+  );
   const [admins, setAdmins, adminsReady, adminsSaveError] = useSupabaseArray(
     "admins",
     {
@@ -18202,6 +19310,7 @@ function AppInner() {
         payroll: r.emp_payroll ?? true,
         review: r.emp_review ?? true,
         attcorr: r.emp_attcorr ?? true,
+        shiftswap: r.emp_shiftswap ?? true,
         documents: r.emp_documents ?? true,
         loginActivity: r.emp_login_activity ?? true,
         profile: r.emp_profile ?? true,
@@ -18223,6 +19332,7 @@ function AppInner() {
         emp_payroll: r.payroll,
         emp_review: r.review,
         emp_attcorr: r.attcorr,
+        emp_shiftswap: r.shiftswap,
         emp_documents: r.documents,
         emp_login_activity: r.loginActivity,
         emp_profile: r.profile,
@@ -18823,6 +19933,7 @@ function AppInner() {
                 performanceReviews={performanceReviews}
                 announcements={announcements}
                 attendanceCorrections={attendanceCorrections}
+                shiftSwapRequests={shiftSwapRequests}
                 setPage={setPage}
               />
               <Avatar
@@ -19031,6 +20142,22 @@ function AppInner() {
                     setAttendanceCorrections={setAttendanceCorrections}
                     attendance={attendance}
                     setAttendance={setAttendance}
+                    isSuperAdmin={isSuperAdmin || can("approveRequests")}
+                    canApprove={isSuperAdmin || can("approveRequests")}
+                  />
+                )}
+              {page === "shiftswap" &&
+                (role === "admin" || moduleEnabled("shiftswap")) && (
+                  <ShiftSwapRequests
+                    role={role}
+                    currentAdmin={currentAdmin}
+                    currentEmp={currentEmp}
+                    employees={employees}
+                    setEmployees={setEmployees}
+                    shifts={shifts}
+                    admins={admins}
+                    shiftSwapRequests={shiftSwapRequests}
+                    setShiftSwapRequests={setShiftSwapRequests}
                     isSuperAdmin={isSuperAdmin || can("approveRequests")}
                     canApprove={isSuperAdmin || can("approveRequests")}
                   />
