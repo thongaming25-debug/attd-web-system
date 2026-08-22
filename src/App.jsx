@@ -67,6 +67,7 @@ import {
   Package,
   Repeat,
   Award,
+  Send,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -268,6 +269,9 @@ const LANG_RAW = {
       branchNotSet: "មិនទាន់កំណត់",
       annualLeaveDaysLabel: "ថ្ងៃច្បាប់ប្រចាំឆ្នាំ (ថ្ងៃ/ឆ្នាំ)",
       sickLeaveDaysLabel: "ថ្ងៃច្បាប់ឈឺ (ថ្ងៃ/ឆ្នាំ)",
+      dependentsLabel: "ចំនួនអាស្រ័យ (កូន/ប្តី-ប្រពន្ធ)",
+      dependentsHint:
+        "ប្រើសម្រាប់គណនាការកាត់ពន្ធលើប្រាក់បៀវត្សរ៍ (១៥០,០០០ រៀល/នាក់) នៅពេលបើកមុខងារគណនាតាមច្បាប់កម្ពុជា",
       weeklyOffLabel: "ថ្ងៃឈប់សម្រាកប្រចាំសប្តាហ៍",
       customDaysOffLabel: "ថ្ងៃឈប់សម្រាកពិសេស (កាលបរិច្ឆេទជាក់លាក់)",
       addBtnShort: "បន្ថែម",
@@ -519,6 +523,28 @@ const LANG_RAW = {
       historicalLoading: "កំពុងទាញយកទិន្នន័យ...",
       historicalEmpty: "គ្មានកំណត់ត្រាវត្តមានសម្រាប់ខែនេះទេ",
       historicalError: "មិនអាចទាញយកទិន្នន័យបានទេ សូមព្យាយាមម្តងទៀត",
+      taxModeLabel: "របៀបគណនាពន្ធ/ធានារ៉ាប់រង",
+      taxModeFlat: "ភាគរយថេរ (កំណត់ដោយខ្លួនឯង)",
+      taxModeKhmer:
+        "ស្វ័យប្រវត្តិតាមច្បាប់កម្ពុជា (NSSF + ពន្ធលើប្រាក់បៀវត្សរ៍)",
+      taxModeKhmerDesc:
+        "គណនាដោយស្វ័យប្រវត្តិ តាមតារាងអត្រាពន្ធជាដុំៗ (Progressive) របស់អគ្គនាយកដ្ឋានពន្ធដារ និងអត្រា NSSF ផ្លូវការ។ អត្រាទាំងនេះអាចផ្លាស់ប្តូរតាមច្បាប់ សូមពិនិត្យ និងកែសម្រួលបើចាំបាច់។",
+      exchangeRateLabel: "អត្រាប្តូរប្រាក់ (រៀល/ដុល្លារ)",
+      exchangeRateHint:
+        "ប្រើសម្រាប់បម្លែងប្រាក់ខែពីដុល្លារទៅរៀល មុននឹងគណនាតាមតារាងពន្ធ។ សូមធ្វើបច្ចុប្បន្នភាពតាមអត្រាធនាគារជាតិនៃកម្ពុជា",
+      nssfWageCapLabel: "កំរិតកំណត់ប្រាក់ខែសម្រាប់គណនា NSSF (រៀល)",
+      nssfWageCapHint:
+        "ភាគរយ NSSF គណនាតែលើប្រាក់ខែរហូតដល់កម្រិតកំណត់នេះប៉ុណ្ណោះ ទោះបីជាប្រាក់ខែពិតប្រាកដខ្ពស់ជាងនេះក៏ដោយ",
+      nssfPensionEmployeeLabel: "អត្រា NSSF សោធន (និយោជិត កាត់ពីប្រាក់ខែ) %",
+      nssfPensionEmployerLabel: "អត្រា NSSF សោធន (និយោជក បង់បន្ថែម) %",
+      nssfOrcLabel: "អត្រា NSSF ហានិភ័យការងារ (និយោជកទាំងអស់） %",
+      nssfHealthLabel: "អត្រា NSSF សុខភាព (និយោជកទាំងអស់) %",
+      nssfEmployerOnlyHint:
+        "អត្រាទាំងនេះជាបន្ទុករបស់និយោជកទាំងស្រុង មិនកាត់ពីប្រាក់ខែបុគ្គលិកទេ បង្ហាញត្រឹមជាព័ត៌មានប៉ុណ្ណោះ",
+      dependentsLabelShort: "អាស្រ័យ",
+      effectiveRateNote: "(អត្រាមធ្យម)",
+      employerNssfCostLabel: "បន្ទុក NSSF របស់ក្រុមហ៊ុន (មិនកាត់ពីប្រាក់ខែ)",
+      taxableIncomeLabel: "ប្រាក់ចំណូលជាប់ពន្ធ",
     },
     pr: {
       addBtn: "បន្ថែមការវាយតម្លៃ",
@@ -740,6 +766,29 @@ const LANG_RAW = {
       pushBlocked:
         "ការជូនដំណឹងត្រូវបានទប់ស្កាត់សម្រាប់គេហទំព័រនេះ សូមកែសម្រួលការអនុញ្ញាតនៅក្នុងកម្មវិធីរុករក",
       pushError: "មិនអាចបើកការជូនដំណឹងបានទេ៖",
+      telegramTitle: "ការជូនដំណឹងតាម Telegram",
+      telegramDesc:
+        "ភ្ជាប់ Telegram Bot ដើម្បីឲ្យក្រុមអ្នកគ្រប់គ្រងទទួលបានសារជូនដំណឹងភ្លាមៗ ពេលមានសំណើថ្មីរង់ចាំអនុម័ត (ច្បាប់ / OT / កែតម្រូវវត្តមាន / ដូរវេន) ចូលទៅក្នុងក្រុម Telegram របស់ក្រុមហ៊ុន",
+      telegramEnable: "បើកការជូនដំណឹងតាម Telegram",
+      telegramBotTokenLabel: "Bot Token",
+      telegramBotTokenPlaceholder: "ទទួលបានពី @BotFather",
+      telegramChatIdLabel: "Chat ID",
+      telegramChatIdPlaceholder: "ឧ. -1001234567890",
+      telegramChatIdHint:
+        "បន្ថែម Bot របស់អ្នកទៅក្រុម Telegram រួចប្រើ @userinfobot ឬ getUpdates API ដើម្បីរក Chat ID",
+      telegramCategoriesLabel: "ជូនដំណឹងសម្រាប់",
+      telegramCatLeave: "សំណើសុំច្បាប់",
+      telegramCatOt: "សំណើសុំ OT",
+      telegramCatAttcorr: "សំណើកែតម្រូវវត្តមាន",
+      telegramCatShiftswap: "សំណើដូរវេន",
+      telegramTestBtn: "ផ្ញើសារសាកល្បង",
+      telegramTestSending: "កំពុងផ្ញើ...",
+      telegramTestSuccess:
+        "បានផ្ញើសារសាកល្បងជោគជ័យ! សូមពិនិត្យក្រុម Telegram របស់អ្នក",
+      telegramTestError:
+        "មិនអាចផ្ញើសារបានទេ សូមពិនិត្យ Bot Token / Chat ID ឡើងវិញ",
+      telegramSaved: "បានរក្សាទុកការកំណត់ Telegram",
+      telegramNeedsSetup: "សូមបំពេញ Bot Token និង Chat ID ដើម្បីបើកមុខងារនេះ",
     },
     audit: {
       title: "កំណត់ត្រាសកម្មភាព",
@@ -1014,6 +1063,9 @@ const LANG_RAW = {
       branchNotSet: "Not set",
       annualLeaveDaysLabel: "Annual Leave Days (per year)",
       sickLeaveDaysLabel: "Sick Leave Days (per year)",
+      dependentsLabel: "Dependents (children / spouse)",
+      dependentsHint:
+        "Used to calculate the Tax on Salary dependent deduction (150,000 KHR each) when the Cambodia auto-calculation mode is enabled",
       weeklyOffLabel: "Weekly Day(s) Off",
       customDaysOffLabel: "Custom Days Off (specific dates)",
       addBtnShort: "Add",
@@ -1268,6 +1320,27 @@ const LANG_RAW = {
       historicalLoading: "Loading data...",
       historicalEmpty: "No attendance records found for this month",
       historicalError: "Couldn't load this data — please try again",
+      taxModeLabel: "Tax / Insurance Calculation Mode",
+      taxModeFlat: "Flat percentage (set manually)",
+      taxModeKhmer: "Automatic — Cambodia law (NSSF + Tax on Salary)",
+      taxModeKhmerDesc:
+        "Automatically computed using the General Department of Taxation's progressive salary-tax brackets and official NSSF rates. These rates can change by law — please review and adjust if needed.",
+      exchangeRateLabel: "Exchange Rate (KHR per USD)",
+      exchangeRateHint:
+        "Used to convert base salary from USD to KHR before applying the tax brackets. Update this to match the current National Bank of Cambodia rate",
+      nssfWageCapLabel: "NSSF Contributory Wage Cap (KHR)",
+      nssfWageCapHint:
+        "NSSF percentages are calculated only up to this wage cap, even if the employee's actual salary is higher",
+      nssfPensionEmployeeLabel: "NSSF Pension Rate (employee, deducted) %",
+      nssfPensionEmployerLabel: "NSSF Pension Rate (employer, extra) %",
+      nssfOrcLabel: "NSSF Occupational Risk Rate (employer-only) %",
+      nssfHealthLabel: "NSSF Healthcare Rate (employer-only) %",
+      nssfEmployerOnlyHint:
+        "These rates are fully paid by the employer and are not deducted from the employee's salary — shown for information only",
+      dependentsLabelShort: "Dependents",
+      effectiveRateNote: "(effective rate)",
+      employerNssfCostLabel: "Employer NSSF cost (not deducted from salary)",
+      taxableIncomeLabel: "Taxable Income",
     },
     pr: {
       addBtn: "Add Review",
@@ -1492,6 +1565,27 @@ const LANG_RAW = {
       pushBlocked:
         "Notifications are blocked for this site — check your browser's site permissions",
       pushError: "Couldn't enable notifications:",
+      telegramTitle: "Telegram Notifications",
+      telegramDesc:
+        "Connect a Telegram Bot so your admin team gets instant messages in a company Telegram group whenever a new request needs approval (leave / OT / attendance correction / shift swap)",
+      telegramEnable: "Enable Telegram notifications",
+      telegramBotTokenLabel: "Bot Token",
+      telegramBotTokenPlaceholder: "From @BotFather",
+      telegramChatIdLabel: "Chat ID",
+      telegramChatIdPlaceholder: "e.g. -1001234567890",
+      telegramChatIdHint:
+        "Add your bot to the Telegram group, then use @userinfobot or the getUpdates API to find the Chat ID",
+      telegramCategoriesLabel: "Notify for",
+      telegramCatLeave: "Leave requests",
+      telegramCatOt: "OT requests",
+      telegramCatAttcorr: "Attendance correction requests",
+      telegramCatShiftswap: "Shift swap requests",
+      telegramTestBtn: "Send test message",
+      telegramTestSending: "Sending...",
+      telegramTestSuccess: "Test message sent! Check your Telegram group",
+      telegramTestError: "Couldn't send — check the Bot Token / Chat ID",
+      telegramSaved: "Telegram settings saved",
+      telegramNeedsSetup: "Fill in the Bot Token and Chat ID to enable this",
     },
     audit: {
       title: "Audit Log",
@@ -2692,7 +2786,86 @@ const DEFAULT_PAYROLL_POLICY = {
   // docks a percentage of the employee's daily rate per UL day.
   ulDeductionType: "fullDay",
   ulDeductionValue: 0,
+  // Tax/insurance calculation mode: "flat" uses the taxRate/insuranceRate
+  // percentages above (original behavior, applied to any currency).
+  // "khmerProgressive" instead computes Cambodia's official Tax on
+  // Salary (ToS) progressive brackets and NSSF contributions, converting
+  // the USD base salary to KHR using exchangeRate. taxRate/insuranceRate
+  // are ignored in this mode.
+  taxMode: "flat",
+  // KHR per 1 USD, used only in "khmerProgressive" mode. Update this to
+  // track the official National Bank of Cambodia / GDT rate — it drifts
+  // over time and isn't something this app can look up on its own.
+  exchangeRate: 4100,
+  // NSSF contributions are calculated on the employee's wage only up to
+  // this cap (KHR), per NSSF's contributory-wage rules.
+  nssfWageCapKHR: 1200000,
+  // Pension scheme (Stage 1): shared 4% of contributory wage, split
+  // evenly. The employee half is what actually reduces net pay; the
+  // employer half is shown for cost transparency only.
+  nssfPensionEmployeeRate: 2,
+  nssfPensionEmployerRate: 2,
+  // Occupational Risk and Healthcare contributions are, by current NSSF
+  // rules, paid entirely by the employer — they never reduce an
+  // employee's net pay, but are tracked so the employer's true cost is
+  // visible on the payslip.
+  nssfOrcRate: 0.8,
+  nssfHealthRate: 2.6,
 };
+// Cambodia's monthly Tax on Salary (ToS) brackets for resident employees,
+// per Sub-Decree No. 48 ANKr.BK (11 March 2024) / GDT Instruction 017.
+// Amounts are in KHR. Tiered: each portion of taxable salary is taxed at
+// the rate for that bracket only, not the whole salary at one rate.
+// NOTE: this is current as of this app's release but Cambodian tax law
+// changes by sub-decree from time to time — double check against the
+// General Department of Taxation before relying on this for compliance,
+// and adjust the brackets here if the law changes.
+const KHMER_TOS_BRACKETS = [
+  { upTo: 1500000, rate: 0 },
+  { upTo: 2000000, rate: 0.05 },
+  { upTo: 8500000, rate: 0.1 },
+  { upTo: 12500000, rate: 0.15 },
+  { upTo: Infinity, rate: 0.2 },
+];
+// Dependent deduction (child under 14 / in full-time study up to 25, or
+// a non-earning spouse), per Sub-Decree 48 Article 3.2.
+const KHMER_DEPENDENT_DEDUCTION_KHR = 150000;
+// Computes Cambodia's progressive monthly Tax on Salary for a given
+// taxable amount (already net of dependent deductions), in KHR.
+function khmerSalaryTaxKHR(taxableKHR) {
+  const t = Math.max(0, taxableKHR);
+  let tax = 0;
+  let lower = 0;
+  for (const bracket of KHMER_TOS_BRACKETS) {
+    if (t <= lower) break;
+    const upper = Math.min(t, bracket.upTo);
+    tax += Math.max(0, upper - lower) * bracket.rate;
+    lower = bracket.upTo;
+  }
+  return tax;
+}
+// Computes NSSF contributions for one employee, in USD, given their base
+// salary (USD), the policy's exchange rate/cap/rates, and their
+// dependent count. Returns both the employee-deducted pension share and
+// the employer-only shares (pension top-up, occupational risk, health).
+function computeKhmerNssf(salaryUSD, policy) {
+  const rate = Number(policy.exchangeRate) || 4100;
+  const capKHR = Number(policy.nssfWageCapKHR) || 1200000;
+  const wageKHR = Math.min((Number(salaryUSD) || 0) * rate, capKHR);
+  const pensionEmployeeKHR =
+    wageKHR * ((Number(policy.nssfPensionEmployeeRate) || 0) / 100);
+  const pensionEmployerKHR =
+    wageKHR * ((Number(policy.nssfPensionEmployerRate) || 0) / 100);
+  const orcKHR = wageKHR * ((Number(policy.nssfOrcRate) || 0) / 100);
+  const healthKHR = wageKHR * ((Number(policy.nssfHealthRate) || 0) / 100);
+  return {
+    pensionEmployee: pensionEmployeeKHR / rate,
+    pensionEmployer: pensionEmployerKHR / rate,
+    orc: orcKHR / rate,
+    health: healthKHR / rate,
+    employerTotal: (pensionEmployerKHR + orcKHR + healthKHR) / rate,
+  };
+}
 // Named tone recipes for the QR check-in/out chime (see playScanBeep).
 // Each preset gives a short tone sequence for "in" and a separate one
 // for "out" so the two stay distinguishable by ear. Frequencies are in
@@ -3409,12 +3582,55 @@ function computePayroll(
   // policy's minimum-salary threshold is only meant to gate the
   // *default* rates, not an explicit per-employee rate).
   const usesCustomRate = !!emp.useCustomRate;
-  let minSalaryThreshold, deductionApplies, taxRate, insuranceRate;
-  if (usesCustomRate) {
+  const usesKhmerMode =
+    policy.taxMode === "khmerProgressive" && !usesCustomRate;
+  let minSalaryThreshold,
+    deductionApplies,
+    taxRate,
+    insuranceRate,
+    tax,
+    insurance,
+    khmer = null;
+  if (usesKhmerMode) {
+    // Cambodia mode: NSSF pension (employee share) always applies, and
+    // the Tax on Salary is computed from the official progressive
+    // brackets — the minSalaryThreshold setting doesn't apply here since
+    // the brackets already have their own tax-free floor (1.5M KHR).
+    minSalaryThreshold = 0;
+    deductionApplies = true;
+    const nssf = computeKhmerNssf(adjustedBase, policy);
+    const exchangeRate = Number(policy.exchangeRate) || 4100;
+    const dependents = Math.max(0, Number(emp.dependents) || 0);
+    const dependentDeductionKHR = dependents * KHMER_DEPENDENT_DEDUCTION_KHR;
+    const grossKHR = adjustedBase * exchangeRate;
+    // Employee pension contributions are deductible from taxable salary.
+    const taxableKHR = Math.max(
+      0,
+      grossKHR - dependentDeductionKHR - nssf.pensionEmployee * exchangeRate,
+    );
+    const taxKHR = khmerSalaryTaxKHR(taxableKHR);
+    tax = taxKHR / exchangeRate;
+    insurance = nssf.pensionEmployee;
+    taxRate =
+      adjustedBase > 0 ? Math.round((tax / adjustedBase) * 1000) / 10 : 0;
+    insuranceRate = Number(policy.nssfPensionEmployeeRate) || 0;
+    khmer = {
+      exchangeRate,
+      dependents,
+      dependentDeductionKHR,
+      taxableKHR,
+      nssfPensionEmployer: nssf.pensionEmployer,
+      nssfOrc: nssf.orc,
+      nssfHealth: nssf.health,
+      employerNssfTotal: nssf.employerTotal,
+    };
+  } else if (usesCustomRate) {
     minSalaryThreshold = 0;
     deductionApplies = true;
     taxRate = Number(emp.customTaxRate) || 0;
     insuranceRate = Number(emp.customInsuranceRate) || 0;
+    tax = adjustedBase * (taxRate / 100);
+    insurance = adjustedBase * (insuranceRate / 100);
   } else {
     minSalaryThreshold = Number(policy.minSalaryThreshold) || 0;
     // Tax/insurance only kick in once the employee's base salary reaches the
@@ -3422,9 +3638,9 @@ function computePayroll(
     deductionApplies = (Number(emp.salary) || 0) >= minSalaryThreshold;
     taxRate = deductionApplies ? Number(policy.taxRate) || 0 : 0;
     insuranceRate = deductionApplies ? Number(policy.insuranceRate) || 0 : 0;
+    tax = adjustedBase * (taxRate / 100);
+    insurance = adjustedBase * (insuranceRate / 100);
   }
-  const tax = adjustedBase * (taxRate / 100);
-  const insurance = adjustedBase * (insuranceRate / 100);
   const { otHours, otPay } = computeOvertimeForMonth(
     emp,
     overtimeRequests,
@@ -3458,6 +3674,8 @@ function computePayroll(
     minSalaryThreshold,
     deductionApplies,
     usesCustomRate,
+    usesKhmerMode,
+    khmer,
     otHours,
     otPay,
     net,
@@ -4100,10 +4318,46 @@ function useSupabaseArray(
             (err) => console.error(`[push] send failed for ${table}:`, err),
           );
         };
-        createdRows.forEach((row) => sendPush(notify({ type: "create", row })));
-        updatedRows.forEach(({ row, old }) =>
-          sendPush(notify({ type: "update", row, old })),
-        );
+        // Only the admin-facing case (a brand-new pending request that
+        // needs someone to act on it) gets forwarded to Telegram — the
+        // employee-facing "your request was approved/rejected" case
+        // stays as an in-app/push notification, since there's no
+        // per-employee Telegram chat to send it to. The edge function
+        // re-checks the enabled flag and the per-category toggle itself
+        // (using `category`, which matches `body.page`: "leave"/"ot"/
+        // "attcorr"/"shiftswap"), so this call is safe to fire even when
+        // Telegram isn't configured at all — it just no-ops server-side.
+        const sendTelegram = (body) => {
+          if (!body || body.userType !== "admin") return;
+          supabase.functions
+            .invoke("telegram_notify", {
+              body: {
+                text: `${body.title}\n${body.body}`,
+                category: body.page,
+              },
+            })
+            .then(
+              ({ error }) => {
+                if (error)
+                  console.error(
+                    `[telegram] send failed for ${table}:`,
+                    error.message,
+                  );
+              },
+              (err) =>
+                console.error(`[telegram] send failed for ${table}:`, err),
+            );
+        };
+        createdRows.forEach((row) => {
+          const body = notify({ type: "create", row });
+          sendPush(body);
+          sendTelegram(body);
+        });
+        updatedRows.forEach(({ row, old }) => {
+          const body = notify({ type: "update", row, old });
+          sendPush(body);
+          sendTelegram(body);
+        });
       }
     },
     [table, mapToDb, audit, actorRef, labelOf, notify],
@@ -4354,6 +4608,20 @@ function usePayrollPolicy() {
             data.ul_deduction_type ?? DEFAULT_PAYROLL_POLICY.ulDeductionType,
           ulDeductionValue:
             data.ul_deduction_value ?? DEFAULT_PAYROLL_POLICY.ulDeductionValue,
+          taxMode: data.tax_mode ?? DEFAULT_PAYROLL_POLICY.taxMode,
+          exchangeRate:
+            data.exchange_rate ?? DEFAULT_PAYROLL_POLICY.exchangeRate,
+          nssfWageCapKHR:
+            data.nssf_wage_cap_khr ?? DEFAULT_PAYROLL_POLICY.nssfWageCapKHR,
+          nssfPensionEmployeeRate:
+            data.nssf_pension_employee_rate ??
+            DEFAULT_PAYROLL_POLICY.nssfPensionEmployeeRate,
+          nssfPensionEmployerRate:
+            data.nssf_pension_employer_rate ??
+            DEFAULT_PAYROLL_POLICY.nssfPensionEmployerRate,
+          nssfOrcRate: data.nssf_orc_rate ?? DEFAULT_PAYROLL_POLICY.nssfOrcRate,
+          nssfHealthRate:
+            data.nssf_health_rate ?? DEFAULT_PAYROLL_POLICY.nssfHealthRate,
         });
       } else {
         setValueState(DEFAULT_PAYROLL_POLICY);
@@ -4378,6 +4646,13 @@ function usePayrollPolicy() {
         late_deduction_value: next.lateDeductionValue,
         ul_deduction_type: next.ulDeductionType,
         ul_deduction_value: next.ulDeductionValue,
+        tax_mode: next.taxMode || "flat",
+        exchange_rate: Number(next.exchangeRate) || 4100,
+        nssf_wage_cap_khr: Number(next.nssfWageCapKHR) || 1200000,
+        nssf_pension_employee_rate: Number(next.nssfPensionEmployeeRate) || 0,
+        nssf_pension_employer_rate: Number(next.nssfPensionEmployerRate) || 0,
+        nssf_orc_rate: Number(next.nssfOrcRate) || 0,
+        nssf_health_rate: Number(next.nssfHealthRate) || 0,
       });
       if (error)
         console.error(
@@ -4434,6 +4709,85 @@ function useSoundPolicy() {
       });
       if (error)
         console.error("[supabase] save failed on sound_policy:", error.message);
+    })();
+  }, []);
+
+  return [value, setValue, ready];
+}
+// telegram_settings is a single settings row (id = 1) holding the bot
+// credentials and which request categories should be forwarded to a
+// Telegram group chat. The bot_token/chat_id never need to leave the
+// server: the client only ever calls the `telegram_notify` edge
+// function with a plain text message + category, and that function
+// looks up these settings itself (via the service role) before
+// deciding whether/where to send. This hook exists purely so the
+// Settings screen can show/edit the row.
+const DEFAULT_TELEGRAM_SETTINGS = {
+  enabled: false,
+  botToken: "",
+  chatId: "",
+  notifyLeave: true,
+  notifyOt: true,
+  notifyAttcorr: true,
+  notifyShiftswap: true,
+};
+function useTelegramSettings() {
+  const [value, setValueState] = useState(DEFAULT_TELEGRAM_SETTINGS);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("telegram_settings")
+        .select("*")
+        .eq("id", 1)
+        .maybeSingle();
+      if (cancelled) return;
+      if (error) {
+        console.error(
+          "[supabase] failed to load telegram_settings:",
+          error.message,
+        );
+        setValueState(DEFAULT_TELEGRAM_SETTINGS);
+      } else if (data) {
+        setValueState({
+          enabled: !!data.enabled,
+          botToken: data.bot_token || "",
+          chatId: data.chat_id || "",
+          notifyLeave: data.notify_leave ?? true,
+          notifyOt: data.notify_ot ?? true,
+          notifyAttcorr: data.notify_attcorr ?? true,
+          notifyShiftswap: data.notify_shiftswap ?? true,
+        });
+      } else {
+        setValueState(DEFAULT_TELEGRAM_SETTINGS);
+      }
+      setReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const setValue = useCallback((next) => {
+    setValueState(next);
+    (async () => {
+      const { error } = await supabase.from("telegram_settings").upsert({
+        id: 1,
+        enabled: !!next.enabled,
+        bot_token: next.botToken || "",
+        chat_id: next.chatId || "",
+        notify_leave: !!next.notifyLeave,
+        notify_ot: !!next.notifyOt,
+        notify_attcorr: !!next.notifyAttcorr,
+        notify_shiftswap: !!next.notifyShiftswap,
+      });
+      if (error)
+        console.error(
+          "[supabase] save failed on telegram_settings:",
+          error.message,
+        );
     })();
   }, []);
 
@@ -7205,6 +7559,7 @@ function EmployeeForm({
       email: "",
       phone: "",
       salary: "",
+      dependents: 0,
       status: "active",
       joined: todayStr(),
       useCustomRate: false,
@@ -7338,6 +7693,21 @@ function EmployeeForm({
             <option value="inactive">{t.emps.inactive}</option>
           </Select>
         </Field>
+      </div>
+      <div style={{ marginBottom: 14 }}>
+        <Field label={t.emps.dependentsLabel}>
+          <Input
+            type="number"
+            min="0"
+            step="1"
+            value={f.dependents}
+            onChange={set("dependents")}
+            placeholder="0"
+          />
+        </Field>
+        <p style={{ fontSize: 11.5, color: T.muted, marginTop: 4 }}>
+          {t.emps.dependentsHint}
+        </p>
       </div>
       <div
         style={{
@@ -7734,6 +8104,7 @@ function Employees({
     const clean = {
       ...data,
       salary: Number(data.salary) || 0,
+      dependents: Math.max(0, Number(data.dependents) || 0),
       annualLeaveDays: Number.isFinite(Number(data.annualLeaveDays))
         ? Number(data.annualLeaveDays)
         : DEFAULT_ANNUAL_LEAVE_DAYS,
@@ -11763,9 +12134,17 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
       lateDeductionValue: Number(f.lateDeductionValue) || 0,
       ulDeductionType: f.ulDeductionType || "fullDay",
       ulDeductionValue: Number(f.ulDeductionValue) || 0,
+      taxMode: f.taxMode || "flat",
+      exchangeRate: Number(f.exchangeRate) || 4100,
+      nssfWageCapKHR: Number(f.nssfWageCapKHR) || 1200000,
+      nssfPensionEmployeeRate: Number(f.nssfPensionEmployeeRate) || 0,
+      nssfPensionEmployerRate: Number(f.nssfPensionEmployerRate) || 0,
+      nssfOrcRate: Number(f.nssfOrcRate) || 0,
+      nssfHealthRate: Number(f.nssfHealthRate) || 0,
     });
     setOpen(false);
   };
+  const isKhmerMode = f.taxMode === "khmerProgressive";
   return (
     <Card style={{ padding: 16, marginBottom: 16 }}>
       <div
@@ -11791,8 +12170,11 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
             fontFamily: "'JetBrains Mono',monospace",
           }}
         >
-          {payrollPolicy.taxRate}% / {payrollPolicy.insuranceRate}%
-          {Number(payrollPolicy.minSalaryThreshold) > 0
+          {payrollPolicy.taxMode === "khmerProgressive"
+            ? t.pay.taxModeKhmer
+            : `${payrollPolicy.taxRate}% / ${payrollPolicy.insuranceRate}%`}
+          {payrollPolicy.taxMode !== "khmerProgressive" &&
+          Number(payrollPolicy.minSalaryThreshold) > 0
             ? ` · ≥ ${fmtMoney(payrollPolicy.minSalaryThreshold)}`
             : ""}
           {Number(payrollPolicy.lateDeductionValue) > 0
@@ -11812,43 +12194,127 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
           <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
             {t.pay.policyDesc}
           </p>
-          <div className="wf-grid-2">
-            <Field label={t.pay.taxRateLabel}>
-              <Input
-                type="number"
-                step="0.1"
-                min="0"
-                value={f.taxRate}
-                onChange={set("taxRate")}
-              />
+          <div style={{ marginBottom: 14 }}>
+            <Field label={t.pay.taxModeLabel}>
+              <Select value={f.taxMode || "flat"} onChange={set("taxMode")}>
+                <option value="flat">{t.pay.taxModeFlat}</option>
+                <option value="khmerProgressive">{t.pay.taxModeKhmer}</option>
+              </Select>
             </Field>
-            <Field label={t.pay.insuranceRateLabel}>
-              <Input
-                type="number"
-                step="0.1"
-                min="0"
-                value={f.insuranceRate}
-                onChange={set("insuranceRate")}
-              />
-            </Field>
+            {isKhmerMode && (
+              <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+                {t.pay.taxModeKhmerDesc}
+              </p>
+            )}
           </div>
-          <div style={{ marginTop: 12 }}>
-            <Field label={t.pay.minSalaryThresholdLabel}>
-              <Input
-                type="number"
-                step="1"
-                min="0"
-                placeholder="0"
-                value={f.minSalaryThreshold}
-                onChange={set("minSalaryThreshold")}
-              />
-            </Field>
-            <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
-              {Number(f.minSalaryThreshold) > 0
-                ? t.pay.minSalaryThresholdHint
-                : t.pay.noThreshold}
-            </p>
-          </div>
+          {isKhmerMode ? (
+            <div>
+              <div className="wf-grid-2">
+                <Field label={t.pay.exchangeRateLabel}>
+                  <Input
+                    type="number"
+                    step="1"
+                    min="1"
+                    value={f.exchangeRate}
+                    onChange={set("exchangeRate")}
+                  />
+                </Field>
+                <Field label={t.pay.nssfWageCapLabel}>
+                  <Input
+                    type="number"
+                    step="1000"
+                    min="0"
+                    value={f.nssfWageCapKHR}
+                    onChange={set("nssfWageCapKHR")}
+                  />
+                </Field>
+              </div>
+              <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+                {t.pay.exchangeRateHint}
+              </p>
+              <div className="wf-grid-2" style={{ marginTop: 12 }}>
+                <Field label={t.pay.nssfPensionEmployeeLabel}>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    value={f.nssfPensionEmployeeRate}
+                    onChange={set("nssfPensionEmployeeRate")}
+                  />
+                </Field>
+                <Field label={t.pay.nssfPensionEmployerLabel}>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    value={f.nssfPensionEmployerRate}
+                    onChange={set("nssfPensionEmployerRate")}
+                  />
+                </Field>
+                <Field label={t.pay.nssfOrcLabel}>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    value={f.nssfOrcRate}
+                    onChange={set("nssfOrcRate")}
+                  />
+                </Field>
+                <Field label={t.pay.nssfHealthLabel}>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    value={f.nssfHealthRate}
+                    onChange={set("nssfHealthRate")}
+                  />
+                </Field>
+              </div>
+              <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+                {t.pay.nssfEmployerOnlyHint}
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="wf-grid-2">
+                <Field label={t.pay.taxRateLabel}>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    value={f.taxRate}
+                    onChange={set("taxRate")}
+                  />
+                </Field>
+                <Field label={t.pay.insuranceRateLabel}>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    value={f.insuranceRate}
+                    onChange={set("insuranceRate")}
+                  />
+                </Field>
+              </div>
+              <div style={{ marginTop: 12 }}>
+                <Field label={t.pay.minSalaryThresholdLabel}>
+                  <Input
+                    type="number"
+                    step="1"
+                    min="0"
+                    placeholder="0"
+                    value={f.minSalaryThreshold}
+                    onChange={set("minSalaryThreshold")}
+                  />
+                </Field>
+                <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+                  {Number(f.minSalaryThreshold) > 0
+                    ? t.pay.minSalaryThresholdHint
+                    : t.pay.noThreshold}
+                </p>
+              </div>
+            </>
+          )}
           <div
             style={{
               marginTop: 16,
@@ -15227,6 +15693,221 @@ function PushNotificationCard({ userType, userId }) {
 /* ---------------------------------------------------------------
    Admin — My Settings (name, photo, appearance)
 ----------------------------------------------------------------*/
+// Self-contained card for the Settings screen: reads/writes its own
+// telegram_settings row via useTelegramSettings, and lets a superadmin
+// send a one-off test message through the `telegram_notify` edge
+// function (bypassing the per-category toggles, since a test message
+// should always go through once enabled+configured) to confirm the bot
+// is wired up correctly before relying on it for real approvals.
+function TelegramSettingsCard() {
+  const { t } = useLang();
+  const [policy, setPolicy, ready] = useTelegramSettings();
+  const [f, setF] = useState(policy);
+  useEffect(() => setF(policy), [policy]);
+  const [saved, setSaved] = useState(false);
+  const [testState, setTestState] = useState("idle"); // idle|sending|ok|error
+
+  if (!ready) return null;
+
+  const set = (k) => (e) => setF((prev) => ({ ...prev, [k]: e.target.value }));
+  const toggle = (k) => () => setF((prev) => ({ ...prev, [k]: !prev[k] }));
+
+  const canEnable = !!(f.botToken?.trim() && f.chatId?.trim());
+
+  const save = () => {
+    setPolicy({ ...f, enabled: !!f.enabled && canEnable });
+    setSaved(true);
+  };
+
+  const sendTest = async () => {
+    setTestState("sending");
+    try {
+      const { error } = await supabase.functions.invoke("telegram_notify", {
+        body: {
+          text: "✅ Test message from Workforce Suite",
+          category: "test",
+        },
+      });
+      setTestState(error ? "error" : "ok");
+    } catch {
+      setTestState("error");
+    }
+  };
+
+  const categories = [
+    { key: "notifyLeave", label: t.settings.telegramCatLeave },
+    { key: "notifyOt", label: t.settings.telegramCatOt },
+    { key: "notifyAttcorr", label: t.settings.telegramCatAttcorr },
+    { key: "notifyShiftswap", label: t.settings.telegramCatShiftswap },
+  ];
+
+  return (
+    <Card style={{ padding: 20 }}>
+      <h3
+        style={{
+          fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+          fontWeight: 600,
+          color: T.ink,
+          marginBottom: 4,
+          fontSize: 14,
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+        }}
+      >
+        <Send size={16} /> {t.settings.telegramTitle}
+      </h3>
+      <p style={{ fontSize: 12, color: T.muted, marginBottom: 16 }}>
+        {t.settings.telegramDesc}
+      </p>
+      <label
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          marginBottom: 14,
+          cursor: "pointer",
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={!!f.enabled}
+          onChange={toggle("enabled")}
+          style={{ accentColor: T.forest, width: 16, height: 16 }}
+        />
+        <span style={{ fontSize: 13, fontWeight: 600, color: T.ink }}>
+          {t.settings.telegramEnable}
+        </span>
+      </label>
+      <div className="wf-grid-2">
+        <Field label={t.settings.telegramBotTokenLabel}>
+          <Input
+            type="password"
+            value={f.botToken}
+            onChange={set("botToken")}
+            placeholder={t.settings.telegramBotTokenPlaceholder}
+          />
+        </Field>
+        <Field label={t.settings.telegramChatIdLabel}>
+          <Input
+            value={f.chatId}
+            onChange={set("chatId")}
+            placeholder={t.settings.telegramChatIdPlaceholder}
+          />
+        </Field>
+      </div>
+      <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+        {t.settings.telegramChatIdHint}
+      </p>
+      <div style={{ marginTop: 16 }}>
+        <span
+          style={{
+            fontSize: 12,
+            fontWeight: 600,
+            color: T.ink,
+            display: "block",
+            marginBottom: 8,
+          }}
+        >
+          {t.settings.telegramCategoriesLabel}
+        </span>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {categories.map((c) => (
+            <label
+              key={c.key}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                cursor: "pointer",
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={!!f[c.key]}
+                onChange={toggle(c.key)}
+                style={{ accentColor: T.forest, width: 15, height: 15 }}
+              />
+              <span style={{ fontSize: 12.5, color: T.textSoft }}>
+                {c.label}
+              </span>
+            </label>
+          ))}
+        </div>
+      </div>
+      {!canEnable && (
+        <p style={{ fontSize: 11.5, color: T.rose, marginTop: 10 }}>
+          {t.settings.telegramNeedsSetup}
+        </p>
+      )}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          marginTop: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <Button variant="accent" onClick={save}>
+          {t.save}
+        </Button>
+        <Button
+          variant="ghost"
+          onClick={sendTest}
+          disabled={!canEnable || testState === "sending"}
+        >
+          <Send size={14} />
+          {testState === "sending"
+            ? t.settings.telegramTestSending
+            : t.settings.telegramTestBtn}
+        </Button>
+      </div>
+      {saved && (
+        <p
+          style={{
+            fontSize: 12,
+            color: T.forest,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            marginTop: 10,
+          }}
+        >
+          <CheckCircle2 size={14} /> {t.settings.telegramSaved}
+        </p>
+      )}
+      {testState === "ok" && (
+        <p
+          style={{
+            fontSize: 12,
+            color: T.forest,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            marginTop: 10,
+          }}
+        >
+          <CheckCircle2 size={14} /> {t.settings.telegramTestSuccess}
+        </p>
+      )}
+      {testState === "error" && (
+        <p
+          style={{
+            fontSize: 12,
+            color: T.rose,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            marginTop: 10,
+          }}
+        >
+          <AlertCircle size={14} /> {t.settings.telegramTestError}
+        </p>
+      )}
+    </Card>
+  );
+}
 function AdminSettings({
   currentAdmin,
   admins,
@@ -15729,6 +16410,8 @@ function AdminSettings({
           </Button>
         </Card>
       )}
+
+      {isSuperAdmin && <TelegramSettingsCard />}
 
       <Card style={{ padding: 20 }}>
         <h3
@@ -17405,7 +18088,11 @@ function CertificateModal({ emp, deptLabel, onClose }) {
   };
 
   return (
-    <Modal title={`${t.cert.modalTitle} · ${emp.name}`} onClose={onClose} width={480}>
+    <Modal
+      title={`${t.cert.modalTitle} · ${emp.name}`}
+      onClose={onClose}
+      width={480}
+    >
       <Field label={t.cert.type}>
         <Select value={type} onChange={(e) => setType(e.target.value)}>
           <option value="employment">{t.cert.typeEmployment}</option>
@@ -17428,7 +18115,10 @@ function CertificateModal({ emp, deptLabel, onClose }) {
         <Input value={refNo} onChange={(e) => setRefNo(e.target.value)} />
       </Field>
       <Field label={t.cert.issueDate}>
-        <DatePicker value={issueDate} onChange={(e) => setIssueDate(e.target.value)} />
+        <DatePicker
+          value={issueDate}
+          onChange={(e) => setIssueDate(e.target.value)}
+        />
       </Field>
       {type === "service" && (
         <Field label={t.cert.endDate}>
@@ -17539,6 +18229,8 @@ function Payslip({
     insuranceRate,
     deductionApplies,
     usesCustomRate,
+    usesKhmerMode,
+    khmer,
     otHours,
     otPay,
     net,
@@ -17586,7 +18278,7 @@ function Payslip({
       ...(deductionApplies
         ? [
             {
-              label: `${t.pay.taxLabel} (${taxRate}%)`,
+              label: `${t.pay.taxLabel} (${taxRate}%${usesKhmerMode ? ` ${t.pay.effectiveRateNote}` : ""})`,
               value: fmtMoney(tax),
               tone: "neg",
             },
@@ -17594,6 +18286,14 @@ function Payslip({
               label: `${t.pay.insuranceLabel} (${insuranceRate}%)`,
               value: fmtMoney(insurance),
               tone: "neg",
+            },
+          ]
+        : []),
+      ...(usesKhmerMode && khmer
+        ? [
+            {
+              label: t.pay.employerNssfCostLabel,
+              value: fmtMoney(khmer.employerNssfTotal),
             },
           ]
         : []),
@@ -17807,7 +18507,8 @@ function Payslip({
               }}
             >
               <span>
-                {t.pay.taxLabel} ({taxRate}%)
+                {t.pay.taxLabel} ({taxRate}%
+                {usesKhmerMode ? ` ${t.pay.effectiveRateNote}` : ""})
               </span>
               <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
                 -{fmtMoney(tax)}
@@ -17827,6 +18528,21 @@ function Payslip({
               </span>
               <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
                 -{fmtMoney(insurance)}
+              </span>
+            </div>
+          )}
+          {usesKhmerMode && khmer && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                color: T.textSoft,
+                fontSize: 11.5,
+              }}
+            >
+              <span>{t.pay.employerNssfCostLabel}</span>
+              <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                {fmtMoney(khmer.employerNssfTotal)}
               </span>
             </div>
           )}
@@ -18789,6 +19505,7 @@ function AppInner() {
         useCustomUlPolicy: !!r.use_custom_ul_policy,
         customUlDeductionType: r.custom_ul_deduction_type,
         customUlDeductionValue: r.custom_ul_deduction_value,
+        dependents: r.dependents ?? 0,
       }),
       toDb: (r) => ({
         id: r.id,
@@ -18835,6 +19552,7 @@ function AppInner() {
         custom_ul_deduction_value: r.useCustomUlPolicy
           ? Number(r.customUlDeductionValue) || 0
           : null,
+        dependents: Number(r.dependents) || 0,
       }),
       audit: true,
       actorRef,
