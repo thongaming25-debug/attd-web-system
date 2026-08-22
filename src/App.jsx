@@ -19644,7 +19644,7 @@ function AppInner() {
           return {
             userType: "admin",
             title: "សំណើសុំច្បាប់ថ្មី",
-            body: `${emp?.name || "?"} បានស្នើសុំ${LEAVE_TYPE_LABEL[row.type] || "ច្បាប់"}`,
+            body: `${emp?.name || "?"} (${emp?.code || row.employeeId}) បានស្នើសុំ${LEAVE_TYPE_LABEL[row.type] || "ច្បាប់"} (${row.startDate} – ${row.endDate})${row.reason ? `\nមូលហេតុ: ${row.reason}` : ""}`,
             page: "leave",
             portal: "admin",
             tag: `leave-req-${row.id}`,
@@ -19714,7 +19714,7 @@ function AppInner() {
           return {
             userType: "admin",
             title: "សំណើសុំ OT ថ្មី",
-            body: `${emp?.name || "?"} បានស្នើសុំ OT ចំនួន ${row.hours} ម៉ោង នៅថ្ងៃទី ${row.date}`,
+            body: `${emp?.name || "?"} (${emp?.code || row.employeeId}) បានស្នើសុំ OT ចំនួន ${row.hours} ម៉ោង នៅថ្ងៃទី ${row.date}${row.reason ? `\nមូលហេតុ: ${row.reason}` : ""}`,
             page: "ot",
             portal: "admin",
             tag: `ot-req-${row.id}`,
@@ -19869,7 +19869,7 @@ function AppInner() {
           return {
             userType: "admin",
             title: "សំណើកែតម្រូវវត្តមានថ្មី",
-            body: `${emp?.name || "?"} បានស្នើសុំកែតម្រូវវត្តមាននៅថ្ងៃទី ${row.date}`,
+            body: `${emp?.name || "?"} (${emp?.code || row.employeeId}) បានស្នើសុំកែតម្រូវវត្តមាននៅថ្ងៃទី ${row.date}${row.reason ? `\nមូលហេតុ: ${row.reason}` : ""}`,
             page: "attcorr",
             portal: "admin",
             tag: `ac-req-${row.id}`,
@@ -19936,7 +19936,7 @@ function AppInner() {
           return {
             userType: "admin",
             title: "សំណើដូរវេនថ្មី",
-            body: `${emp?.name || "?"} បានស្នើសុំគ្របដណ្តប់វេននៅថ្ងៃទី ${row.date}`,
+            body: `${emp?.name || "?"} (${emp?.code || row.employeeId}) បានស្នើសុំគ្របដណ្តប់វេននៅថ្ងៃទី ${row.date}${row.reason ? `\nមូលហេតុ: ${row.reason}` : ""}`,
             page: "shiftswap",
             portal: "admin",
             tag: `ss-req-${row.id}`,
