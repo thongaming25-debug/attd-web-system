@@ -781,6 +781,8 @@ const LANG_RAW = {
       telegramCatOt: "សំណើសុំ OT",
       telegramCatAttcorr: "សំណើកែតម្រូវវត្តមាន",
       telegramCatShiftswap: "សំណើដូរវេន",
+      telegramCatPayroll: "ប្រាក់ខែបានបើកចប់",
+      telegramCatLate: "បុគ្គលិកមកយឺត",
       telegramTestBtn: "ផ្ញើសារសាកល្បង",
       telegramTestSending: "កំពុងផ្ញើ...",
       telegramTestSuccess:
@@ -1580,6 +1582,8 @@ const LANG_RAW = {
       telegramCatOt: "OT requests",
       telegramCatAttcorr: "Attendance correction requests",
       telegramCatShiftswap: "Shift swap requests",
+      telegramCatPayroll: "Payroll completed",
+      telegramCatLate: "Employee checked in late",
       telegramTestBtn: "Send test message",
       telegramTestSending: "Sending...",
       telegramTestSuccess: "Test message sent! Check your Telegram group",
@@ -4334,6 +4338,12 @@ function useSupabaseArray(
               body: {
                 text: `${body.title}\n${body.body}`,
                 category: body.page,
+                // entityId intentionally omitted for now — leaving it
+                // out means telegram_notify won't attach the Approve/
+                // Reject buttons, since tapping them needs the
+                // telegram_webhook function (not set up yet). Add
+                // `entityId: body.entityId,` back once that's deployed
+                // and its webhook is registered with Telegram.
               },
             })
             .then(
@@ -4730,6 +4740,8 @@ const DEFAULT_TELEGRAM_SETTINGS = {
   notifyOt: true,
   notifyAttcorr: true,
   notifyShiftswap: true,
+  notifyPayroll: true,
+  notifyLate: true,
 };
 function useTelegramSettings() {
   const [value, setValueState] = useState(DEFAULT_TELEGRAM_SETTINGS);
@@ -4759,6 +4771,8 @@ function useTelegramSettings() {
           notifyOt: data.notify_ot ?? true,
           notifyAttcorr: data.notify_attcorr ?? true,
           notifyShiftswap: data.notify_shiftswap ?? true,
+          notifyPayroll: data.notify_payroll ?? true,
+          notifyLate: data.notify_late ?? true,
         });
       } else {
         setValueState(DEFAULT_TELEGRAM_SETTINGS);
@@ -4782,6 +4796,8 @@ function useTelegramSettings() {
         notify_ot: !!next.notifyOt,
         notify_attcorr: !!next.notifyAttcorr,
         notify_shiftswap: !!next.notifyShiftswap,
+        notify_payroll: !!next.notifyPayroll,
+        notify_late: !!next.notifyLate,
       });
       if (error)
         console.error(
@@ -15739,6 +15755,8 @@ function TelegramSettingsCard() {
     { key: "notifyOt", label: t.settings.telegramCatOt },
     { key: "notifyAttcorr", label: t.settings.telegramCatAttcorr },
     { key: "notifyShiftswap", label: t.settings.telegramCatShiftswap },
+    { key: "notifyPayroll", label: t.settings.telegramCatPayroll },
+    { key: "notifyLate", label: t.settings.telegramCatLate },
   ];
 
   return (
@@ -18876,7 +18894,29 @@ function Payroll({
       : activeEmployees.filter((e) => e.id === currentEmp?.id);
   const togglePaid = (empId) => {
     const key = `${empId}-${mk}`;
-    setPayrollPaid({ ...payrollPaid, [key]: !payrollPaid[key] });
+    const willBePaid = !payrollPaid[key];
+    setPayrollPaid({ ...payrollPaid, [key]: willBePaid });
+
+    // Only worth checking "is everyone done now?" on the transition
+    // into paid — unmarking someone can't complete the batch.
+    if (willBePaid) {
+      const allNowPaid = activeEmployees.every((e) =>
+        e.id === empId ? true : !!payrollPaid[`${e.id}-${mk}`],
+      );
+      if (allNowPaid && activeEmployees.length > 0) {
+        supabase.functions
+          .invoke("telegram_notify", {
+            body: {
+              text: `ប្រាក់ខែសម្រាប់ខែ ${mk} ត្រូវបានបើកផ្តល់ចប់សព្វគ្រប់ សម្រាប់និយោជិកទាំង ${activeEmployees.length} នាក់ សរុប $${totalNet.toFixed(2)}`,
+              category: "payroll",
+            },
+          })
+          .then(({ error }) => {
+            if (error)
+              console.error("[telegram] payroll notify failed:", error.message);
+          });
+      }
+    }
   };
   const totalNet = list.reduce(
     (sum, e) =>
@@ -19599,6 +19639,21 @@ function AppInner() {
       check_in_loc: r.checkInLoc,
       check_out_loc: r.checkOutLoc,
     }),
+    notify: ({ type, row }) => {
+      if (type === "create" && row.status === "late") {
+        const emp = employees.find((e) => e.id === row.employeeId);
+        const empShift = shifts.find((s) => s.id === emp?.shiftId);
+        const mins = lateMinutesForShift(row.checkIn, empShift);
+        return {
+          userType: "admin",
+          title: "បុគ្គលិកមកយឺត",
+          body: `${emp?.name || "?"} (${emp?.code || row.employeeId}) បានចូលធ្វើការនៅម៉ោង ${row.checkIn}${mins ? ` (យឺត ${mins} នាទី)` : ""}`,
+          page: "late",
+          portal: "admin",
+        };
+      }
+      return null;
+    },
   });
   const [payrollPaid, setPayrollPaid, pReady] = usePayrollPaid();
   const [leaveRequests, setLeaveRequests, lrReady] = useSupabaseArray(
@@ -19648,6 +19703,7 @@ function AppInner() {
             page: "leave",
             portal: "admin",
             tag: `leave-req-${row.id}`,
+            entityId: row.id,
           };
         }
         if (
@@ -19718,6 +19774,7 @@ function AppInner() {
             page: "ot",
             portal: "admin",
             tag: `ot-req-${row.id}`,
+            entityId: row.id,
           };
         }
         if (
@@ -19873,6 +19930,7 @@ function AppInner() {
             page: "attcorr",
             portal: "admin",
             tag: `ac-req-${row.id}`,
+            entityId: row.id,
           };
         }
         if (
@@ -19940,6 +19998,7 @@ function AppInner() {
             page: "shiftswap",
             portal: "admin",
             tag: `ss-req-${row.id}`,
+            entityId: row.id,
           };
         }
         if (
