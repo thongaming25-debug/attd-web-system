@@ -19644,10 +19644,11 @@ function AppInner() {
         const emp = employees.find((e) => e.id === row.employeeId);
         const empShift = shifts.find((s) => s.id === emp?.shiftId);
         const mins = lateMinutesForShift(row.checkIn, empShift);
+        const lateLabel = formatLateDuration(mins, "km"); // e.g. "មកយឺត 4 ម៉ោង 49 នាទី"
         return {
           userType: "admin",
           title: "បុគ្គលិកមកយឺត",
-          body: `${emp?.name || "?"} (${emp?.code || row.employeeId}) បានចូលធ្វើការនៅម៉ោង ${row.checkIn}${mins ? ` (យឺត ${mins} នាទី)` : ""}`,
+          body: `${emp?.name || "?"} (${emp?.code || row.employeeId}) បានចូលធ្វើការនៅម៉ោង ${row.checkIn}${lateLabel ? ` (${lateLabel})` : ""}`,
           page: "late",
           portal: "admin",
         };
