@@ -50,6 +50,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
+  Eye,
   Star,
   Megaphone,
   FileText,
@@ -113,6 +114,7 @@ const LANG_RAW = {
       attCorrection: "សំណើកែតម្រូវវត្តមាន",
       shiftSwap: "សំណើដូរវេន",
       assets: "ទ្រព្យសម្បត្តិក្រុមហ៊ុន",
+      docExpiry: "កិច្ចសន្យា/ឯកសារជិតផុតកំណត់",
       admins: "គណនីអ្នកគ្រប់គ្រង",
       myAttendance: "វត្តមានរបស់ខ្ញុំ",
       myLeave: "ច្បាប់ឈប់សម្រាករបស់ខ្ញុំ",
@@ -238,6 +240,26 @@ const LANG_RAW = {
       allStatus: "ស្ថានភាពទាំងអស់",
       noAssets: "មិនទាន់មានទ្រព្យសម្បត្តិទេ",
       confirmDelWithName: (name) => `តើអ្នកប្រាកដទេថាចង់លុប "${name}"?`,
+    },
+    contracts: {
+      title: "កិច្ចសន្យា និងឯកសារជិតផុតកំណត់",
+      subtitle:
+        "តាមដានឯកសារ (កិច្ចសន្យា, អត្តសញ្ញាណប័ណ្ណ ។ល។) ដែលមានកាលបរិច្ឆេទផុតកំណត់ គ្រប់បុគ្គលិកទាំងអស់",
+      searchPlaceholder: "ស្វែងរកតាមឈ្មោះបុគ្គលិក ឬឈ្មោះឯកសារ...",
+      allStatus: "ស្ថានភាពទាំងអស់",
+      statusExpired: "ផុតកំណត់ហើយ",
+      statusSoon: "ជិតផុតកំណត់",
+      statusValid: "នៅមានសុពលភាព",
+      noItems: "មិនទាន់មានឯកសារកំណត់ថ្ងៃផុតកំណត់ទេ",
+      noItemsHint:
+        'ដើម្បីតាមដាននៅទីនេះ សូមបញ្ចូល "ថ្ងៃផុតកំណត់" ពេលផ្ទុកឯកសារនៅផ្នែក "បុគ្គលិក" → ឯកសារ',
+      colEmployee: "បុគ្គលិក",
+      colDocument: "ឈ្មោះឯកសារ",
+      colCategory: "ប្រភេទ",
+      colExpiry: "ថ្ងៃផុតកំណត់",
+      colStatus: "ស្ថានភាព",
+      daysLeft: (n) => `${n} ថ្ងៃទៀត`,
+      daysAgo: (n) => `ផុតកំណត់ ${n} ថ្ងៃមុន`,
     },
     emps: {
       addBtn: "បន្ថែមបុគ្គលិក",
@@ -589,8 +611,14 @@ const LANG_RAW = {
       confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបឯកសារនេះ?",
       noDocs: "មិនទាន់មានឯកសារទេ",
       tooLarge: "ឯកសារធំពេក សូមជ្រើសរើសឯកសារតូចជាងនេះ (តិចជាង 4MB)",
-      view: "មើល/ទាញយក",
+      view: "មើល",
+      download: "ទាញយក",
       myTitle: "ឯកសាររបស់ខ្ញុំ",
+      expiryDate: "ថ្ងៃផុតកំណត់ (បើមាន)",
+      expiryDateHint: "ទុកទទេ ប្រសិនបើឯកសារនេះមិនផុតកំណត់",
+      expired: "ផុតកំណត់ហើយ",
+      expiringSoon: (n) => `ជិតផុតកំណត់ (${n} ថ្ងៃទៀត)`,
+      expiresOn: "ផុតកំណត់នៅ",
     },
     cert: {
       btn: "ចេញវិញ្ញាបនបត្រ",
@@ -909,6 +937,7 @@ const LANG_RAW = {
       attCorrection: "Attendance Corrections",
       shiftSwap: "Shift Swap Requests",
       assets: "Company Assets",
+      docExpiry: "Contracts & Expiring Docs",
       admins: "Admin Accounts",
       myAttendance: "My Attendance",
       myLeave: "My Leave",
@@ -1034,6 +1063,26 @@ const LANG_RAW = {
       noAssets: "No assets yet",
       confirmDelWithName: (name) =>
         `Are you sure you want to delete "${name}"?`,
+    },
+    contracts: {
+      title: "Contracts & Expiring Documents",
+      subtitle:
+        "Track documents (contracts, ID cards, etc.) with an expiry date, across all staff",
+      searchPlaceholder: "Search by employee or document name...",
+      allStatus: "All Status",
+      statusExpired: "Expired",
+      statusSoon: "Expiring Soon",
+      statusValid: "Valid",
+      noItems: "No documents with an expiry date yet",
+      noItemsHint:
+        'To track something here, set an "Expiry Date" when uploading it under Employees → Documents',
+      colEmployee: "Employee",
+      colDocument: "Document",
+      colCategory: "Category",
+      colExpiry: "Expiry Date",
+      colStatus: "Status",
+      daysLeft: (n) => `${n}d left`,
+      daysAgo: (n) => `Expired ${n}d ago`,
     },
     emps: {
       addBtn: "Add Employee",
@@ -1387,8 +1436,14 @@ const LANG_RAW = {
       confirmDel: "Are you sure you want to delete this document?",
       noDocs: "No documents yet",
       tooLarge: "File too large — please choose a file under 4MB",
-      view: "View / Download",
+      view: "View",
+      download: "Download",
       myTitle: "My Documents",
+      expiryDate: "Expiry Date (optional)",
+      expiryDateHint: "Leave blank if this document doesn't expire",
+      expired: "Expired",
+      expiringSoon: (n) => `Expiring soon (${n}d left)`,
+      expiresOn: "Expires",
     },
     cert: {
       btn: "Issue Certificate",
@@ -14434,8 +14489,153 @@ function getDocCategoryLabel(t) {
   };
 }
 
+// Days remaining until a document's expiry date (negative if already
+// expired). A document with no expiryDate never shows a status.
+const DOC_EXPIRY_WARN_DAYS = 30;
+function getDocExpiryInfo(expiryDate) {
+  if (!expiryDate) return null;
+  const today = parseYMD(todayStr());
+  const exp = parseYMD(expiryDate);
+  if (!exp) return null;
+  const daysLeft = Math.round((exp - today) / 86400000);
+  if (daysLeft < 0) return { status: "expired", daysLeft };
+  if (daysLeft <= DOC_EXPIRY_WARN_DAYS) return { status: "soon", daysLeft };
+  return { status: "valid", daysLeft };
+}
+const DOC_EXPIRY_COLOR = {
+  expired: { bg: "var(--wf-rose-soft)", fg: "#E5637A" },
+  soon: { bg: "var(--wf-gold-soft)", fg: "#F0A83B" },
+  valid: { bg: "var(--wf-forest-soft)", fg: "var(--wf-forest-text)" },
+};
+function DocExpiryBadge({ expiryDate }) {
+  const { t } = useLang();
+  const info = getDocExpiryInfo(expiryDate);
+  if (!info) return null;
+  const c = DOC_EXPIRY_COLOR[info.status];
+  const label =
+    info.status === "expired"
+      ? t.doc.expired
+      : info.status === "soon"
+        ? t.doc.expiringSoon(info.daysLeft)
+        : `${t.doc.expiresOn} ${fmtDateDisplay(expiryDate)}`;
+  return (
+    <span
+      className="wf-badge"
+      style={{ background: c.bg, color: c.fg, whiteSpace: "nowrap" }}
+    >
+      {label}
+    </span>
+  );
+}
+
+// Converts a "data:<mime>;base64,<...>" string (how documents are stored
+// — see MAX_DOC_BYTES above) into a Blob, so we can hand the browser a
+// blob: URL instead of navigating straight to the data: URL.
+function dataUrlToBlob(dataUrl) {
+  const commaIdx = dataUrl.indexOf(",");
+  const header = dataUrl.slice(0, commaIdx);
+  const base64 = dataUrl.slice(commaIdx + 1);
+  const mimeMatch = header.match(/data:(.*?);base64/);
+  const mime = mimeMatch ? mimeMatch[1] : "application/octet-stream";
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
+}
+
+// Chrome (and some other browsers) can open a new tab on a `data:` URL
+// but leave it blank/unpainted until something forces a repaint (e.g. the
+// user manually reloads) — worse the larger the base64 string is, which
+// is exactly the case for documents stored this way. Converting to a
+// short-lived `blob:` URL first sidesteps that entirely and always
+// renders immediately. The object URL is revoked a little while later,
+// once the browser has had time to load it into the new tab/download.
+function openDocBlobUrl(doc, { forceDownload } = {}) {
+  let url;
+  try {
+    url = URL.createObjectURL(dataUrlToBlob(doc.dataUrl));
+  } catch {
+    // Fallback: something about the stored data URL couldn't be parsed —
+    // fall back to the old (occasionally-blank-until-refresh) behavior
+    // rather than doing nothing.
+    url = doc.dataUrl;
+  }
+  if (forceDownload) {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = doc.fileName || "file";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } else {
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+  if (url.startsWith("blob:")) {
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
+}
+
+// Two distinct actions on a stored document, for both admin and staff:
+// "View" opens the file in a new tab so the browser previews it inline
+// whenever it can (PDF, images, plain text) instead of saving it to
+// disk. "Download" always forces a save-to-disk regardless of file
+// type. For formats the browser can't render on its own (docx, xlsx,
+// ...), View still opens the tab — the browser then falls back to its
+// own "can't preview, save instead" handling, same as any other website
+// without a bundled document viewer.
+function DocViewDownloadLinks({ doc, iconOnly }) {
+  const { t } = useLang();
+  const linkStyle = iconOnly
+    ? {
+        color: T.forestText,
+        display: "flex",
+        alignItems: "center",
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+        padding: 0,
+      }
+    : {
+        flex: 1,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 6,
+        fontSize: 12.5,
+        fontWeight: 600,
+        color: T.forestText,
+        padding: "6px 0",
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+      };
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => openDocBlobUrl(doc)}
+        style={linkStyle}
+        title={t.doc.view}
+      >
+        <Eye size={iconOnly ? 16 : 14} />
+        {!iconOnly && <span>{t.doc.view}</span>}
+      </button>
+      <button
+        type="button"
+        onClick={() => openDocBlobUrl(doc, { forceDownload: true })}
+        style={linkStyle}
+        title={t.doc.download}
+      >
+        <Download size={iconOnly ? 16 : 14} />
+        {!iconOnly && <span>{t.doc.download}</span>}
+      </button>
+    </>
+  );
+}
+
 function DocUploadRow({ emp, currentAdmin, documents, setDocuments, t }) {
   const [category, setCategory] = useState("cv");
+  const [expiryDate, setExpiryDate] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const inputRef = useRef(null);
@@ -14463,8 +14663,10 @@ function DocUploadRow({ emp, currentAdmin, documents, setDocuments, t }) {
           dataUrl,
           uploadedByName: currentAdmin?.name || "",
           createdAt: new Date().toISOString(),
+          expiryDate: expiryDate || "",
         },
       ]);
+      setExpiryDate("");
     } finally {
       setBusy(false);
       if (inputRef.current) inputRef.current.value = "";
@@ -14488,6 +14690,13 @@ function DocUploadRow({ emp, currentAdmin, documents, setDocuments, t }) {
           <option value="id">{t.doc.catId}</option>
           <option value="other">{t.doc.catOther}</option>
         </Select>
+      </Field>
+      <Field label={t.doc.expiryDate}>
+        <DatePicker
+          value={expiryDate}
+          onChange={(e) => setExpiryDate(e.target.value)}
+          style={{ minWidth: 150 }}
+        />
       </Field>
       <div>
         <input
@@ -14598,18 +14807,15 @@ function EmployeeDocumentsModal({
                   {CAT_LABEL[d.category] || d.category} · {t.doc.uploadedBy}{" "}
                   {d.uploadedByName || "—"}
                 </div>
+                {d.expiryDate && (
+                  <div style={{ marginTop: 4 }}>
+                    <DocExpiryBadge expiryDate={d.expiryDate} />
+                  </div>
+                )}
               </div>
             </div>
             <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-              <a
-                href={d.dataUrl}
-                download={d.fileName}
-                target="_blank"
-                rel="noreferrer"
-                style={{ color: T.forestText }}
-              >
-                <Download size={16} />
-              </a>
+              <DocViewDownloadLinks doc={d} iconOnly />
               {isSuperAdmin && (
                 <button
                   onClick={() => setConfirmDel(d)}
@@ -14702,20 +14908,242 @@ function MyDocuments({ currentEmp, documents }) {
                 <div style={{ fontSize: 11, color: T.muted }}>
                   {CAT_LABEL[d.category] || d.category}
                 </div>
+                {d.expiryDate && (
+                  <div style={{ marginTop: 4 }}>
+                    <DocExpiryBadge expiryDate={d.expiryDate} />
+                  </div>
+                )}
               </div>
             </div>
-            <a
-              href={d.dataUrl}
-              download={d.fileName}
-              target="_blank"
-              rel="noreferrer"
-              style={{ color: T.forestText, flexShrink: 0 }}
-            >
-              <Download size={18} />
-            </a>
+            <div style={{ display: "flex", gap: 10, flexShrink: 0 }}>
+              <DocViewDownloadLinks doc={d} iconOnly />
+            </div>
           </Card>
         ))}
       </div>
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   Contracts & Expiring Documents — a company-wide, read-only view
+   across every employee's uploaded documents that have an expiry
+   date set (contracts, ID cards, work permits, etc.), so admins
+   don't have to open each employee's Documents modal one by one to
+   catch something about to lapse. Uploading/editing still happens
+   from the per-employee Documents modal (Employees page); this page
+   is a monitoring/reporting surface on top of the same `documents`
+   data.
+----------------------------------------------------------------*/
+function DocumentExpiryPage({ documents, employees }) {
+  const { t } = useLang();
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const CAT_LABEL = getDocCategoryLabel(t);
+  const empName = (id) => employees.find((e) => e.id === id)?.name || "";
+
+  const rows = useMemo(() => {
+    return documents
+      .filter((d) => !!d.expiryDate)
+      .map((d) => ({ ...d, _info: getDocExpiryInfo(d.expiryDate) }))
+      .filter((d) => d._info)
+      .sort((a, b) => a._info.daysLeft - b._info.daysLeft);
+  }, [documents]);
+
+  const filtered = useMemo(
+    () =>
+      rows.filter(
+        (d) =>
+          (empName(d.employeeId) + d.fileName)
+            .toLowerCase()
+            .includes(query.toLowerCase()) &&
+          (!statusFilter || d._info.status === statusFilter),
+      ),
+    [rows, employees, query, statusFilter],
+  );
+
+  return (
+    <div>
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: 13, color: T.textSoft }}>
+          {t.contracts.subtitle}
+        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          marginBottom: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <div
+          style={{
+            position: "relative",
+            flex: 1,
+            minWidth: 200,
+            maxWidth: 320,
+          }}
+        >
+          <Search
+            size={15}
+            style={{
+              position: "absolute",
+              left: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: T.muted,
+            }}
+          />
+          <Input
+            style={{ paddingLeft: 34 }}
+            placeholder={t.contracts.searchPlaceholder}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
+        <Select
+          style={{ maxWidth: 200 }}
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option value="">{t.contracts.allStatus}</option>
+          <option value="expired">{t.contracts.statusExpired}</option>
+          <option value="soon">{t.contracts.statusSoon}</option>
+          <option value="valid">{t.contracts.statusValid}</option>
+        </Select>
+        <Button
+          variant="ghost"
+          onClick={() =>
+            exportCsv(
+              `contracts-expiry-${todayStr()}.csv`,
+              [
+                t.contracts.colEmployee,
+                t.contracts.colDocument,
+                t.contracts.colCategory,
+                t.contracts.colExpiry,
+                t.contracts.colStatus,
+              ],
+              filtered.map((d) => [
+                empName(d.employeeId),
+                d.fileName,
+                CAT_LABEL[d.category] || d.category,
+                d.expiryDate,
+                d._info.status === "expired"
+                  ? t.contracts.statusExpired
+                  : d._info.status === "soon"
+                    ? t.contracts.statusSoon
+                    : t.contracts.statusValid,
+              ]),
+            )
+          }
+        >
+          <Download size={15} /> {t.exportCsv}
+        </Button>
+      </div>
+
+      {filtered.length === 0 ? (
+        <Card style={{ padding: 24, textAlign: "center", color: T.muted }}>
+          <div>{t.contracts.noItems}</div>
+          <div style={{ fontSize: 11.5, marginTop: 6 }}>
+            {t.contracts.noItemsHint}
+          </div>
+        </Card>
+      ) : (
+        <div
+          className="wf-grid"
+          style={{
+            gridTemplateColumns: "repeat(auto-fill, minmax(260px,1fr))",
+          }}
+        >
+          {filtered.map((d) => (
+            <Card
+              key={d.id}
+              accent={colorFor(empName(d.employeeId) || d.fileName)}
+              style={{ padding: 16 }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  gap: 8,
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: 10,
+                      background: T.paper,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <FileText size={18} color={T.ink} />
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div
+                      style={{
+                        fontWeight: 600,
+                        color: T.ink,
+                        fontSize: 13,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {empName(d.employeeId) || "—"}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: T.muted,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {d.fileName}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: T.textSoft,
+                  marginTop: 12,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 6,
+                }}
+              >
+                <div>🏷️ {CAT_LABEL[d.category] || d.category}</div>
+                <div>
+                  <DocExpiryBadge expiryDate={d.expiryDate} />
+                </div>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 8,
+                  paddingTop: 12,
+                  marginTop: 12,
+                  borderTop: `1px solid ${T.divider}`,
+                }}
+              >
+                <DocViewDownloadLinks doc={d} />
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -19378,6 +19806,12 @@ function buildNavAdmin(n) {
       permission: "manageAssets",
     },
     {
+      id: "docExpiry",
+      label: n.docExpiry,
+      icon: AlertCircle,
+      permission: "manageDocuments",
+    },
+    {
       id: "admins",
       label: n.admins,
       icon: ShieldCheck,
@@ -19866,6 +20300,7 @@ function AppInner() {
         dataUrl: r.data_url,
         uploadedByName: r.uploaded_by_name,
         createdAt: r.created_at,
+        expiryDate: r.expiry_date || "",
       }),
       toDb: (r) => ({
         id: r.id,
@@ -19876,6 +20311,7 @@ function AppInner() {
         data_url: r.dataUrl,
         uploaded_by_name: r.uploadedByName,
         created_at: r.createdAt,
+        expiry_date: r.expiryDate || null,
       }),
       audit: true,
       actorRef,
@@ -20818,6 +21254,14 @@ function AppInner() {
                     setAssets={setAssets}
                     employees={employees}
                     isSuperAdmin={isSuperAdmin || can("manageAssets")}
+                  />
+                )}
+              {page === "docExpiry" &&
+                role === "admin" &&
+                (isSuperAdmin || can("manageDocuments")) && (
+                  <DocumentExpiryPage
+                    documents={documents}
+                    employees={employees}
                   />
                 )}
               {page === "attendance" &&
