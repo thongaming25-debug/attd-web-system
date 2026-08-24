@@ -69,6 +69,7 @@ import {
   Repeat,
   Award,
   Send,
+  GraduationCap,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -114,6 +115,7 @@ const LANG_RAW = {
       attCorrection: "សំណើកែតម្រូវវត្តមាន",
       shiftSwap: "សំណើដូរវេន",
       assets: "ទ្រព្យសម្បត្តិក្រុមហ៊ុន",
+      training: "ការបណ្តុះបណ្តាល & សញ្ញាបត្រ",
       docExpiry: "កិច្ចសន្យា/ឯកសារជិតផុតកំណត់",
       admins: "គណនីអ្នកគ្រប់គ្រង",
       myAttendance: "វត្តមានរបស់ខ្ញុំ",
@@ -121,6 +123,7 @@ const LANG_RAW = {
       myOvertime: "ការងារបន្ថែម (OT) របស់ខ្ញុំ",
       myPayroll: "ប្រាក់ខែរបស់ខ្ញុំ",
       myPerformance: "ការវាយតម្លៃការងាររបស់ខ្ញុំ",
+      myTraining: "ការបណ្តុះបណ្តាល & សញ្ញាបត្ររបស់ខ្ញុំ",
       myDocuments: "ឯកសាររបស់ខ្ញុំ",
       myAttCorrection: "ស្នើសុំកែតម្រូវវត្តមាន",
       myShiftSwap: "ស្នើសុំដូរវេន",
@@ -240,6 +243,39 @@ const LANG_RAW = {
       allStatus: "ស្ថានភាពទាំងអស់",
       noAssets: "មិនទាន់មានទ្រព្យសម្បត្តិទេ",
       confirmDelWithName: (name) => `តើអ្នកប្រាកដទេថាចង់លុប "${name}"?`,
+    },
+    training: {
+      title: "ការបណ្តុះបណ្តាល & សញ្ញាបត្រ",
+      subtitle: "តាមដានវគ្គបណ្តុះបណ្តាល និងសញ្ញាបត្រនៃបុគ្គលិកគ្រប់រូប",
+      addBtn: "បន្ថែមកំណត់ត្រា",
+      editTitle: "កែសម្រួលកំណត់ត្រាបណ្តុះបណ្តាល",
+      addTitle: "បន្ថែមកំណត់ត្រាបណ្តុះបណ្តាល",
+      employee: "បុគ្គលិក",
+      courseName: "ឈ្មោះវគ្គ/សញ្ញាបត្រ",
+      provider: "អ្នកផ្តល់វគ្គ/ស្ថាប័ន",
+      category: "ប្រភេទ",
+      startDate: "ថ្ងៃចាប់ផ្តើម",
+      completionDate: "ថ្ងៃបញ្ចប់",
+      certExpiry: "ថ្ងៃផុតកំណត់សញ្ញាបត្រ (បើមាន)",
+      status: "ស្ថានភាព",
+      statusPlanned: "គ្រោងទុក",
+      statusOngoing: "កំពុងរៀន",
+      statusCompleted: "បញ្ចប់ហើយ",
+      statusCancelled: "បានលុបចោល",
+      notes: "កំណត់ចំណាំ",
+      courseNamePlaceholder: "ឧ. វគ្គបណ្តុះបណ្តាលសុវត្ថិភាពការងារ",
+      providerPlaceholder: "ឧ. ក្រសួងការងារ, NGO មួយ, Coursera",
+      categoryPlaceholder: "ឧ. សុវត្ថិភាព, បច្ចេកទេស, ជំនាញទន់",
+      searchPlaceholder: "ស្វែងរកតាមឈ្មោះបុគ្គលិក ឬឈ្មោះវគ្គ...",
+      allStatus: "ស្ថានភាពទាំងអស់",
+      allEmployees: "បុគ្គលិកទាំងអស់",
+      noTrainings: "មិនទាន់មានកំណត់ត្រាបណ្តុះបណ្តាលទេ",
+      confirmDelWithName: (name) => `តើអ្នកប្រាកដទេថាចង់លុប "${name}"?`,
+      expired: "សញ្ញាបត្រផុតកំណត់ហើយ",
+      expiringSoon: (n) => `ជិតផុតកំណត់ក្នុងរយៈ ${n} ថ្ងៃទៀត`,
+      expiresOn: "ផុតកំណត់នៅ",
+      myTitle: "ការបណ្តុះបណ្តាល & សញ្ញាបត្ររបស់ខ្ញុំ",
+      noMyTrainings: "អ្នកមិនទាន់មានកំណត់ត្រាបណ្តុះបណ្តាលទេ",
     },
     contracts: {
       title: "កិច្ចសន្យា និងឯកសារជិតផុតកំណត់",
@@ -937,6 +973,7 @@ const LANG_RAW = {
       attCorrection: "Attendance Corrections",
       shiftSwap: "Shift Swap Requests",
       assets: "Company Assets",
+      training: "Training & Certifications",
       docExpiry: "Contracts & Expiring Docs",
       admins: "Admin Accounts",
       myAttendance: "My Attendance",
@@ -944,6 +981,7 @@ const LANG_RAW = {
       myOvertime: "My Overtime (OT)",
       myPayroll: "My Payroll",
       myPerformance: "My Performance Reviews",
+      myTraining: "My Training & Certifications",
       myDocuments: "My Documents",
       myAttCorrection: "Attendance Correction",
       myShiftSwap: "Shift Swap Request",
@@ -1063,6 +1101,40 @@ const LANG_RAW = {
       noAssets: "No assets yet",
       confirmDelWithName: (name) =>
         `Are you sure you want to delete "${name}"?`,
+    },
+    training: {
+      title: "Training & Certifications",
+      subtitle: "Track training courses and certificates for every employee",
+      addBtn: "Add Record",
+      editTitle: "Edit Training Record",
+      addTitle: "Add Training Record",
+      employee: "Employee",
+      courseName: "Course / Certificate Name",
+      provider: "Provider / Institution",
+      category: "Category",
+      startDate: "Start Date",
+      completionDate: "Completion Date",
+      certExpiry: "Certificate Expiry (optional)",
+      status: "Status",
+      statusPlanned: "Planned",
+      statusOngoing: "Ongoing",
+      statusCompleted: "Completed",
+      statusCancelled: "Cancelled",
+      notes: "Notes",
+      courseNamePlaceholder: "e.g. Workplace Safety Training",
+      providerPlaceholder: "e.g. Ministry of Labour, an NGO, Coursera",
+      categoryPlaceholder: "e.g. Safety, Technical, Soft Skills",
+      searchPlaceholder: "Search by employee or course name...",
+      allStatus: "All Status",
+      allEmployees: "All Employees",
+      noTrainings: "No training records yet",
+      confirmDelWithName: (name) =>
+        `Are you sure you want to delete "${name}"?`,
+      expired: "Certificate expired",
+      expiringSoon: (n) => `Expires in ${n} day(s)`,
+      expiresOn: "Expires on",
+      myTitle: "My Training & Certifications",
+      noMyTrainings: "You don't have any training records yet",
     },
     contracts: {
       title: "Contracts & Expiring Documents",
@@ -2404,6 +2476,7 @@ const EMPLOYEE_MODULES = [
   "ot",
   "payroll",
   "review",
+  "training",
   "attcorr",
   "shiftswap",
   "documents",
@@ -2418,6 +2491,7 @@ const EMPLOYEE_MODULE_LABEL = {
     ot: "ម៉ោងបន្ថែម (OT)",
     payroll: "ប្រាក់ខែផ្ទាល់ខ្លួន",
     review: "ការវាយតម្លៃការងារ",
+    training: "ការបណ្តុះបណ្តាល & សញ្ញាបត្រ",
     attcorr: "សំណើកែតម្រូវវត្តមាន",
     shiftswap: "សំណើដូរវេន",
     documents: "ឯកសារផ្ទាល់ខ្លួន",
@@ -2431,6 +2505,7 @@ const EMPLOYEE_MODULE_LABEL = {
     ot: "My Overtime (OT)",
     payroll: "My Payroll",
     review: "My Performance Reviews",
+    training: "My Training & Certifications",
     attcorr: "Attendance Correction",
     shiftswap: "Shift Swap Request",
     documents: "My Documents",
@@ -2462,6 +2537,7 @@ const DEFAULT_EMPLOYEE_MODULES = {
   ot: true,
   payroll: true,
   review: true,
+  training: true,
   attcorr: true,
   shiftswap: true,
   documents: true,
@@ -3846,6 +3922,102 @@ function writeAuditLog({ actor, action, table, entityId, label, changes }) {
 }
 
 /* ---------------------------------------------------------------
+   Global toast notifications — a lightweight pub/sub that lives
+   outside React state, so any hook or async closure (in particular
+   useSupabaseArray's save/delete handlers below, which run far from
+   the render tree and have no props to receive a dispatcher through)
+   can surface a toast without prop-drilling. <ToastHost/> — mounted
+   once near the app root — is the sole subscriber and owns the
+   on-screen list. This is what replaces the old silent-failure
+   pattern (a write rejected by Supabase used to only reach
+   console.error while the UI kept showing the optimistic local
+   change, e.g. the Training module toggle that looked saved but
+   wasn't).
+----------------------------------------------------------------*/
+let toastSeq = 0;
+const toastSubscribers = new Set();
+function pushToast(message, type = "success") {
+  if (!message) return;
+  const toast = { id: ++toastSeq, message, type };
+  toastSubscribers.forEach((fn) => fn(toast));
+}
+function ToastHost() {
+  const [toasts, setToasts] = useState([]);
+  useEffect(() => {
+    const onToast = (toast) => {
+      setToasts((cur) => [...cur, toast]);
+      const life = toast.type === "error" ? 6000 : 3000;
+      setTimeout(() => {
+        setToasts((cur) => cur.filter((x) => x.id !== toast.id));
+      }, life);
+    };
+    toastSubscribers.add(onToast);
+    return () => toastSubscribers.delete(onToast);
+  }, []);
+  const dismiss = (id) => setToasts((cur) => cur.filter((x) => x.id !== id));
+  if (!toasts.length) return null;
+  return (
+    <div
+      style={{
+        position: "fixed",
+        bottom: 20,
+        left: "50%",
+        transform: "translateX(-50%)",
+        zIndex: 9999,
+        display: "flex",
+        flexDirection: "column",
+        gap: 8,
+        alignItems: "stretch",
+        pointerEvents: "none",
+        width: "min(92vw, 420px)",
+      }}
+    >
+      {toasts.map((toast) => (
+        <div
+          key={toast.id}
+          onClick={() => dismiss(toast.id)}
+          role="status"
+          style={{
+            pointerEvents: "auto",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 10,
+            padding: "11px 14px",
+            borderRadius: 10,
+            fontSize: 13,
+            fontWeight: 500,
+            color: "#fff",
+            lineHeight: 1.45,
+            background:
+              toast.type === "error"
+                ? "#DC2626"
+                : toast.type === "info"
+                  ? "#2563EB"
+                  : "#16A34A",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.22)",
+            animation: "wfToastIn 0.22s ease-out",
+          }}
+        >
+          {toast.type === "error" ? (
+            <AlertCircle size={16} style={{ flexShrink: 0, marginTop: 1 }} />
+          ) : (
+            <CheckCircle2 size={16} style={{ flexShrink: 0, marginTop: 1 }} />
+          )}
+          <span style={{ flex: 1 }}>{toast.message}</span>
+        </div>
+      ))}
+      <style>{`
+        @keyframes wfToastIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
    Login activity — a dedicated, per-user record of sign-in/sign-out
    events plus a best-effort read of the device used. This is
    deliberately kept separate from audit_logs: audit_logs answers
@@ -4060,6 +4232,7 @@ const REALTIME_TABLES = [
   "payroll_paid",
   "role_permissions",
   "assets",
+  "trainings",
 ];
 const realtimeHandlers = new Map(REALTIME_TABLES.map((t) => [t, new Set()]));
 let realtimeChannel = null;
@@ -4159,6 +4332,11 @@ function useSupabaseArray(
   // previously such failures only went to console.error and the UI kept
   // showing optimistic local state until the next refresh reverted it.
   const [saveError, setSaveError] = useState(null);
+  // Every table gets a toast for free (see pushToast/ToastHost above),
+  // regardless of whether its screen also wires up the saveError banner
+  // below — so a write that silently fails on a page with no bespoke
+  // error UI (which, before this, was most pages) still tells the user.
+  const { t } = useLang();
   const prevRef = useRef([]);
   const mapFromDb = fromDb || ((r) => r);
   const mapToDb = toDb || ((r) => r);
@@ -4304,6 +4482,7 @@ function useSupabaseArray(
 
       setSaveError(null);
       (async () => {
+        let hadError = false;
         if (toDelete.length) {
           const { error } = await supabase
             .from(table)
@@ -4315,6 +4494,8 @@ function useSupabaseArray(
               error.message,
             );
             setSaveError(error.message);
+            pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
+            hadError = true;
           }
         }
         if (toUpsert.length) {
@@ -4327,7 +4508,16 @@ function useSupabaseArray(
               error.message,
             );
             setSaveError(error.message);
+            pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
+            hadError = true;
           }
+        }
+        // Confirms the optimistic update the UI already made actually
+        // stuck server-side. Only fires when something real changed
+        // (toDelete/toUpsert non-empty) — not on every re-render — so
+        // it stays a genuine confirmation rather than background noise.
+        if (!hadError && (toDelete.length || toUpsert.length)) {
+          pushToast(t.settings.saved, "success");
         }
       })();
 
@@ -4425,7 +4615,7 @@ function useSupabaseArray(
         });
       }
     },
-    [table, mapToDb, audit, actorRef, labelOf, notify],
+    [table, mapToDb, audit, actorRef, labelOf, notify, t],
   );
 
   return [value, setValue, ready, saveError];
@@ -4443,6 +4633,7 @@ function usePayrollPaid() {
   const [value, setValueState] = useState({});
   const [ready, setReady] = useState(false);
   const prevRef = useRef({});
+  const { t } = useLang();
 
   useEffect(() => {
     let cancelled = false;
@@ -4491,41 +4682,48 @@ function usePayrollPaid() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready]);
 
-  const setValue = useCallback((next) => {
-    const prev = prevRef.current;
-    prevRef.current = next;
-    setValueState(next);
+  const setValue = useCallback(
+    (next) => {
+      const prev = prevRef.current;
+      prevRef.current = next;
+      setValueState(next);
 
-    const changed = Object.keys(next).filter((k) => next[k] !== prev[k]);
-    const removed = Object.keys(prev).filter((k) => !(k in next));
+      const changed = Object.keys(next).filter((k) => next[k] !== prev[k]);
+      const removed = Object.keys(prev).filter((k) => !(k in next));
 
-    (async () => {
-      for (const key of changed) {
-        const [employeeId, month] = splitPayrollKey(key);
-        const { error } = await supabase
-          .from("payroll_paid")
-          .upsert({ employee_id: employeeId, month, paid: next[key] });
-        if (error)
-          console.error(
-            "[supabase] upsert failed on payroll_paid:",
-            error.message,
-          );
-      }
-      for (const key of removed) {
-        const [employeeId, month] = splitPayrollKey(key);
-        const { error } = await supabase
-          .from("payroll_paid")
-          .delete()
-          .eq("employee_id", employeeId)
-          .eq("month", month);
-        if (error)
-          console.error(
-            "[supabase] delete failed on payroll_paid:",
-            error.message,
-          );
-      }
-    })();
-  }, []);
+      (async () => {
+        for (const key of changed) {
+          const [employeeId, month] = splitPayrollKey(key);
+          const { error } = await supabase
+            .from("payroll_paid")
+            .upsert({ employee_id: employeeId, month, paid: next[key] });
+          if (error) {
+            console.error(
+              "[supabase] upsert failed on payroll_paid:",
+              error.message,
+            );
+            pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
+          }
+        }
+        for (const key of removed) {
+          const [employeeId, month] = splitPayrollKey(key);
+          const { error } = await supabase
+            .from("payroll_paid")
+            .delete()
+            .eq("employee_id", employeeId)
+            .eq("month", month);
+          if (error) {
+            console.error(
+              "[supabase] delete failed on payroll_paid:",
+              error.message,
+            );
+            pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
+          }
+        }
+      })();
+    },
+    [t],
+  );
 
   return [value, setValue, ready];
 }
@@ -4536,6 +4734,7 @@ function usePayrollPaid() {
 function useBrandingSettings() {
   const [value, setValueState] = useState({ name: "", logo: null });
   const [ready, setReady] = useState(false);
+  const { t } = useLang();
 
   useEffect(() => {
     let cancelled = false;
@@ -4561,18 +4760,25 @@ function useBrandingSettings() {
     };
   }, []);
 
-  const setValue = useCallback((next) => {
-    setValueState(next);
-    (async () => {
-      const { error } = await supabase.from("branding").upsert({
-        id: 1,
-        name: next.name || "",
-        logo: next.logo || null,
-      });
-      if (error)
-        console.error("[supabase] save failed on branding:", error.message);
-    })();
-  }, []);
+  const setValue = useCallback(
+    (next) => {
+      setValueState(next);
+      (async () => {
+        const { error } = await supabase.from("branding").upsert({
+          id: 1,
+          name: next.name || "",
+          logo: next.logo || null,
+        });
+        if (error) {
+          console.error("[supabase] save failed on branding:", error.message);
+          pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
+        } else {
+          pushToast(t.settings.saved, "success");
+        }
+      })();
+    },
+    [t],
+  );
 
   return [value, setValue, ready];
 }
@@ -4584,6 +4790,7 @@ function useBrandingSettings() {
 function useOtPolicy() {
   const [value, setValueState] = useState(DEFAULT_OT_POLICY);
   const [ready, setReady] = useState(false);
+  const { t } = useLang();
 
   useEffect(() => {
     let cancelled = false;
@@ -4614,20 +4821,27 @@ function useOtPolicy() {
     };
   }, []);
 
-  const setValue = useCallback((next) => {
-    setValueState(next);
-    (async () => {
-      const { error } = await supabase.from("ot_policy").upsert({
-        id: 1,
-        rate_normal: next.rateNormal,
-        rate_weekend: next.rateWeekend,
-        rate_holiday: next.rateHoliday,
-        hours_per_day: next.hoursPerDay,
-      });
-      if (error)
-        console.error("[supabase] save failed on ot_policy:", error.message);
-    })();
-  }, []);
+  const setValue = useCallback(
+    (next) => {
+      setValueState(next);
+      (async () => {
+        const { error } = await supabase.from("ot_policy").upsert({
+          id: 1,
+          rate_normal: next.rateNormal,
+          rate_weekend: next.rateWeekend,
+          rate_holiday: next.rateHoliday,
+          hours_per_day: next.hoursPerDay,
+        });
+        if (error) {
+          console.error("[supabase] save failed on ot_policy:", error.message);
+          pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
+        } else {
+          pushToast(t.settings.saved, "success");
+        }
+      })();
+    },
+    [t],
+  );
 
   return [value, setValue, ready];
 }
@@ -4637,6 +4851,7 @@ function useOtPolicy() {
 function usePayrollPolicy() {
   const [value, setValueState] = useState(DEFAULT_PAYROLL_POLICY);
   const [ready, setReady] = useState(false);
+  const { t } = useLang();
 
   useEffect(() => {
     let cancelled = false;
@@ -4698,34 +4913,41 @@ function usePayrollPolicy() {
     };
   }, []);
 
-  const setValue = useCallback((next) => {
-    setValueState(next);
-    (async () => {
-      const { error } = await supabase.from("payroll_policy").upsert({
-        id: 1,
-        tax_rate: next.taxRate,
-        insurance_rate: next.insuranceRate,
-        min_salary_threshold: next.minSalaryThreshold,
-        late_grace_count: next.lateGraceCount,
-        late_deduction_type: next.lateDeductionType,
-        late_deduction_value: next.lateDeductionValue,
-        ul_deduction_type: next.ulDeductionType,
-        ul_deduction_value: next.ulDeductionValue,
-        tax_mode: next.taxMode || "flat",
-        exchange_rate: Number(next.exchangeRate) || 4100,
-        nssf_wage_cap_khr: Number(next.nssfWageCapKHR) || 1200000,
-        nssf_pension_employee_rate: Number(next.nssfPensionEmployeeRate) || 0,
-        nssf_pension_employer_rate: Number(next.nssfPensionEmployerRate) || 0,
-        nssf_orc_rate: Number(next.nssfOrcRate) || 0,
-        nssf_health_rate: Number(next.nssfHealthRate) || 0,
-      });
-      if (error)
-        console.error(
-          "[supabase] save failed on payroll_policy:",
-          error.message,
-        );
-    })();
-  }, []);
+  const setValue = useCallback(
+    (next) => {
+      setValueState(next);
+      (async () => {
+        const { error } = await supabase.from("payroll_policy").upsert({
+          id: 1,
+          tax_rate: next.taxRate,
+          insurance_rate: next.insuranceRate,
+          min_salary_threshold: next.minSalaryThreshold,
+          late_grace_count: next.lateGraceCount,
+          late_deduction_type: next.lateDeductionType,
+          late_deduction_value: next.lateDeductionValue,
+          ul_deduction_type: next.ulDeductionType,
+          ul_deduction_value: next.ulDeductionValue,
+          tax_mode: next.taxMode || "flat",
+          exchange_rate: Number(next.exchangeRate) || 4100,
+          nssf_wage_cap_khr: Number(next.nssfWageCapKHR) || 1200000,
+          nssf_pension_employee_rate: Number(next.nssfPensionEmployeeRate) || 0,
+          nssf_pension_employer_rate: Number(next.nssfPensionEmployerRate) || 0,
+          nssf_orc_rate: Number(next.nssfOrcRate) || 0,
+          nssf_health_rate: Number(next.nssfHealthRate) || 0,
+        });
+        if (error) {
+          console.error(
+            "[supabase] save failed on payroll_policy:",
+            error.message,
+          );
+          pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
+        } else {
+          pushToast(t.settings.saved, "success");
+        }
+      })();
+    },
+    [t],
+  );
 
   return [value, setValue, ready];
 }
@@ -4735,6 +4957,7 @@ function usePayrollPolicy() {
 function useSoundPolicy() {
   const [value, setValueState] = useState(DEFAULT_SOUND_POLICY);
   const [ready, setReady] = useState(false);
+  const { t } = useLang();
 
   useEffect(() => {
     let cancelled = false;
@@ -4765,17 +4988,27 @@ function useSoundPolicy() {
     };
   }, []);
 
-  const setValue = useCallback((next) => {
-    setValueState(next);
-    (async () => {
-      const { error } = await supabase.from("sound_policy").upsert({
-        id: 1,
-        preset: next.preset,
-      });
-      if (error)
-        console.error("[supabase] save failed on sound_policy:", error.message);
-    })();
-  }, []);
+  const setValue = useCallback(
+    (next) => {
+      setValueState(next);
+      (async () => {
+        const { error } = await supabase.from("sound_policy").upsert({
+          id: 1,
+          preset: next.preset,
+        });
+        if (error) {
+          console.error(
+            "[supabase] save failed on sound_policy:",
+            error.message,
+          );
+          pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
+        } else {
+          pushToast(t.settings.saved, "success");
+        }
+      })();
+    },
+    [t],
+  );
 
   return [value, setValue, ready];
 }
@@ -4801,6 +5034,7 @@ const DEFAULT_TELEGRAM_SETTINGS = {
 function useTelegramSettings() {
   const [value, setValueState] = useState(DEFAULT_TELEGRAM_SETTINGS);
   const [ready, setReady] = useState(false);
+  const { t } = useLang();
 
   useEffect(() => {
     let cancelled = false;
@@ -4839,28 +5073,35 @@ function useTelegramSettings() {
     };
   }, []);
 
-  const setValue = useCallback((next) => {
-    setValueState(next);
-    (async () => {
-      const { error } = await supabase.from("telegram_settings").upsert({
-        id: 1,
-        enabled: !!next.enabled,
-        bot_token: next.botToken || "",
-        chat_id: next.chatId || "",
-        notify_leave: !!next.notifyLeave,
-        notify_ot: !!next.notifyOt,
-        notify_attcorr: !!next.notifyAttcorr,
-        notify_shiftswap: !!next.notifyShiftswap,
-        notify_payroll: !!next.notifyPayroll,
-        notify_late: !!next.notifyLate,
-      });
-      if (error)
-        console.error(
-          "[supabase] save failed on telegram_settings:",
-          error.message,
-        );
-    })();
-  }, []);
+  const setValue = useCallback(
+    (next) => {
+      setValueState(next);
+      (async () => {
+        const { error } = await supabase.from("telegram_settings").upsert({
+          id: 1,
+          enabled: !!next.enabled,
+          bot_token: next.botToken || "",
+          chat_id: next.chatId || "",
+          notify_leave: !!next.notifyLeave,
+          notify_ot: !!next.notifyOt,
+          notify_attcorr: !!next.notifyAttcorr,
+          notify_shiftswap: !!next.notifyShiftswap,
+          notify_payroll: !!next.notifyPayroll,
+          notify_late: !!next.notifyLate,
+        });
+        if (error) {
+          console.error(
+            "[supabase] save failed on telegram_settings:",
+            error.message,
+          );
+          pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
+        } else {
+          pushToast(t.settings.saved, "success");
+        }
+      })();
+    },
+    [t],
+  );
 
   return [value, setValue, ready];
 }
@@ -9090,6 +9331,514 @@ function Assets({ assets, setAssets, employees, isSuperAdmin }) {
             setConfirmDel(null);
           }}
         />
+      )}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   Training & Certifications
+----------------------------------------------------------------*/
+const TRAINING_STATUSES = ["planned", "ongoing", "completed", "cancelled"];
+const TRAINING_STATUS_COLOR = {
+  planned: { bg: "#EEF2FF", fg: "#4338CA" },
+  ongoing: { bg: "#FFF7ED", fg: "#C2410C" },
+  completed: { bg: "#ECFDF5", fg: "#047857" },
+  cancelled: { bg: "#F3F4F6", fg: "#6B7280" },
+};
+const TRAINING_STATUS_LABEL_KEY = {
+  planned: "statusPlanned",
+  ongoing: "statusOngoing",
+  completed: "statusCompleted",
+  cancelled: "statusCancelled",
+};
+function TrainingStatusPill({ status }) {
+  const { t } = useLang();
+  const c = TRAINING_STATUS_COLOR[status] || TRAINING_STATUS_COLOR.planned;
+  const labelKey = TRAINING_STATUS_LABEL_KEY[status] || "statusPlanned";
+  return (
+    <span className="wf-badge" style={{ background: c.bg, color: c.fg }}>
+      {t.training[labelKey] || status}
+    </span>
+  );
+}
+// Reuses the same expiry-window logic/colors already built for document
+// expiry tracking (getDocExpiryInfo / DOC_EXPIRY_COLOR) so a training
+// certificate that's about to lapse (e.g. first-aid, food-safety) shows
+// the same visual language as contract/document expiry elsewhere in the
+// app, instead of inventing a second parallel "expiring soon" system.
+function TrainingCertBadge({ expiryDate }) {
+  const { t } = useLang();
+  const info = getDocExpiryInfo(expiryDate);
+  if (!info) return null;
+  const c = DOC_EXPIRY_COLOR[info.status];
+  const label =
+    info.status === "expired"
+      ? t.training.expired
+      : info.status === "soon"
+        ? t.training.expiringSoon(info.daysLeft)
+        : `${t.training.expiresOn} ${fmtDateDisplay(expiryDate)}`;
+  return (
+    <span
+      className="wf-badge"
+      style={{ background: c.bg, color: c.fg, whiteSpace: "nowrap" }}
+    >
+      {label}
+    </span>
+  );
+}
+function TrainingForm({ initial, employees, onSave, onCancel }) {
+  const { t } = useLang();
+  const [f, setF] = useState(
+    initial || {
+      employeeId: employees[0]?.id || "",
+      courseName: "",
+      provider: "",
+      category: "",
+      startDate: "",
+      completionDate: "",
+      certExpiry: "",
+      status: "planned",
+      notes: "",
+    },
+  );
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  return (
+    <div>
+      <Field label={t.training.employee}>
+        <Select value={f.employeeId} onChange={set("employeeId")}>
+          {employees.map((e) => (
+            <option key={e.id} value={e.id}>
+              {e.name}
+            </option>
+          ))}
+        </Select>
+      </Field>
+      <Field label={t.training.courseName}>
+        <Input
+          value={f.courseName}
+          onChange={set("courseName")}
+          placeholder={t.training.courseNamePlaceholder}
+        />
+      </Field>
+      <Field label={t.training.provider}>
+        <Input
+          value={f.provider}
+          onChange={set("provider")}
+          placeholder={t.training.providerPlaceholder}
+        />
+      </Field>
+      <Field label={t.training.category}>
+        <Input
+          value={f.category}
+          onChange={set("category")}
+          placeholder={t.training.categoryPlaceholder}
+        />
+      </Field>
+      <Field label={t.training.status}>
+        <Select value={f.status} onChange={set("status")}>
+          {TRAINING_STATUSES.map((s) => (
+            <option key={s} value={s}>
+              {t.training[TRAINING_STATUS_LABEL_KEY[s]]}
+            </option>
+          ))}
+        </Select>
+      </Field>
+      <Field label={t.training.startDate}>
+        <DatePicker value={f.startDate} onChange={set("startDate")} />
+      </Field>
+      <Field label={t.training.completionDate}>
+        <DatePicker value={f.completionDate} onChange={set("completionDate")} />
+      </Field>
+      <Field label={t.training.certExpiry}>
+        <DatePicker value={f.certExpiry} onChange={set("certExpiry")} />
+      </Field>
+      <Field label={t.training.notes}>
+        <textarea
+          className="wf-input"
+          rows={2}
+          value={f.notes}
+          onChange={set("notes")}
+        />
+      </Field>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          marginTop: 16,
+          paddingTop: 14,
+          borderTop: `1px solid ${T.lineSoft}`,
+        }}
+      >
+        <Button variant="ghost" onClick={onCancel}>
+          {t.cancel}
+        </Button>
+        <Button
+          variant="accent"
+          onClick={() => onSave(f)}
+          disabled={!f.courseName || !f.employeeId}
+        >
+          {t.save}
+        </Button>
+      </div>
+    </div>
+  );
+}
+function Trainings({ trainings, setTrainings, employees, isSuperAdmin }) {
+  const { t } = useLang();
+  const [modal, setModal] = useState(null);
+  const [confirmDel, setConfirmDel] = useState(null);
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [empFilter, setEmpFilter] = useState("");
+  const empName = (id) => employees.find((e) => e.id === id)?.name || "";
+  const filtered = useMemo(
+    () =>
+      trainings
+        .filter(
+          (r) =>
+            (r.courseName + r.provider + empName(r.employeeId))
+              .toLowerCase()
+              .includes(query.toLowerCase()) &&
+            (!statusFilter || r.status === statusFilter) &&
+            (!empFilter || r.employeeId === empFilter),
+        )
+        .sort((a, b) => (b.startDate || "").localeCompare(a.startDate || "")),
+    [trainings, employees, query, statusFilter, empFilter],
+  );
+  const save = (data) => {
+    if (modal.mode === "add")
+      setTrainings([...trainings, { ...data, id: uid("tr") }]);
+    else setTrainings(trainings.map((r) => (r.id === data.id ? data : r)));
+    setModal(null);
+  };
+  return (
+    <div>
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ fontSize: 13, color: T.muted }}>
+          {t.training.subtitle}
+        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          marginBottom: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <div
+          style={{
+            position: "relative",
+            flex: 1,
+            minWidth: 200,
+            maxWidth: 320,
+          }}
+        >
+          <Search
+            size={15}
+            style={{
+              position: "absolute",
+              left: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: T.muted,
+            }}
+          />
+          <Input
+            style={{ paddingLeft: 34 }}
+            placeholder={t.training.searchPlaceholder}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
+        <Select
+          style={{ maxWidth: 180 }}
+          value={empFilter}
+          onChange={(e) => setEmpFilter(e.target.value)}
+        >
+          <option value="">{t.training.allEmployees}</option>
+          {employees.map((e) => (
+            <option key={e.id} value={e.id}>
+              {e.name}
+            </option>
+          ))}
+        </Select>
+        <Select
+          style={{ maxWidth: 160 }}
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option value="">{t.training.allStatus}</option>
+          {TRAINING_STATUSES.map((s) => (
+            <option key={s} value={s}>
+              {t.training[TRAINING_STATUS_LABEL_KEY[s]]}
+            </option>
+          ))}
+        </Select>
+        <Button
+          variant="ghost"
+          onClick={() =>
+            exportCsv(
+              `training-${todayStr()}.csv`,
+              [
+                t.training.employee,
+                t.training.courseName,
+                t.training.provider,
+                t.training.category,
+                t.training.status,
+                t.training.startDate,
+                t.training.completionDate,
+                t.training.certExpiry,
+              ],
+              filtered.map((r) => [
+                empName(r.employeeId),
+                r.courseName,
+                r.provider,
+                r.category,
+                t.training[TRAINING_STATUS_LABEL_KEY[r.status]],
+                r.startDate,
+                r.completionDate,
+                r.certExpiry,
+              ]),
+            )
+          }
+        >
+          <Download size={15} /> {t.exportCsv}
+        </Button>
+        <Button variant="accent" onClick={() => setModal({ mode: "add" })}>
+          <Plus size={15} /> {t.training.addBtn}
+        </Button>
+      </div>
+
+      {filtered.length === 0 ? (
+        <Card style={{ padding: 24, textAlign: "center", color: T.muted }}>
+          {t.training.noTrainings}
+        </Card>
+      ) : (
+        <div
+          className="wf-grid"
+          style={{
+            gridTemplateColumns: "repeat(auto-fill, minmax(280px,1fr))",
+          }}
+        >
+          {filtered.map((r) => (
+            <Card
+              key={r.id}
+              accent={colorFor(r.courseName)}
+              style={{ padding: 16 }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  gap: 8,
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: 10,
+                      background: T.paper,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <GraduationCap size={18} color={T.ink} />
+                  </div>
+                  <div>
+                    <div
+                      style={{ fontWeight: 600, color: T.ink, fontSize: 13 }}
+                    >
+                      {r.courseName}
+                    </div>
+                    <div style={{ fontSize: 11, color: T.muted }}>
+                      {empName(r.employeeId)}
+                    </div>
+                  </div>
+                </div>
+                <TrainingStatusPill status={r.status} />
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: T.textSoft,
+                  marginTop: 12,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
+                }}
+              >
+                {r.provider && <div>🏫 {r.provider}</div>}
+                {r.category && <div>🏷️ {r.category}</div>}
+                {(r.startDate || r.completionDate) && (
+                  <div>
+                    📅 {r.startDate || "—"} → {r.completionDate || "—"}
+                  </div>
+                )}
+              </div>
+              {r.certExpiry && (
+                <div style={{ marginTop: 10 }}>
+                  <TrainingCertBadge expiryDate={r.certExpiry} />
+                </div>
+              )}
+              <div
+                style={{
+                  display: "flex",
+                  gap: 8,
+                  paddingTop: 12,
+                  marginTop: 12,
+                  borderTop: `1px solid ${T.divider}`,
+                }}
+              >
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  style={{ flex: 1, justifyContent: "center" }}
+                  onClick={() => setModal({ mode: "edit", data: r })}
+                >
+                  <Pencil size={13} /> {t.edit}
+                </Button>
+                {isSuperAdmin && (
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    style={{ flex: 1, justifyContent: "center" }}
+                    onClick={() => setConfirmDel(r)}
+                  >
+                    <Trash2 size={13} /> {t.delete}
+                  </Button>
+                )}
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {modal && (
+        <Modal
+          title={
+            modal.mode === "add" ? t.training.addTitle : t.training.editTitle
+          }
+          onClose={() => setModal(null)}
+        >
+          <TrainingForm
+            initial={modal.data}
+            employees={employees}
+            onSave={save}
+            onCancel={() => setModal(null)}
+          />
+        </Modal>
+      )}
+      {confirmDel && (
+        <ConfirmDialog
+          text={t.training.confirmDelWithName(confirmDel.courseName)}
+          onCancel={() => setConfirmDel(null)}
+          onConfirm={() => {
+            setTrainings(trainings.filter((r) => r.id !== confirmDel.id));
+            setConfirmDel(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+// Read-only self-service view: an employee sees only their own training
+// and certification history, newest first, with the same expiry badge
+// used on the admin side so an approaching certificate renewal is just
+// as visible to the person who holds it as it is to HR.
+function MyTrainings({ currentEmp, trainings }) {
+  const { t } = useLang();
+  const mine = useMemo(
+    () =>
+      trainings
+        .filter((r) => r.employeeId === currentEmp?.id)
+        .sort((a, b) => (b.startDate || "").localeCompare(a.startDate || "")),
+    [trainings, currentEmp],
+  );
+  return (
+    <div>
+      {mine.length === 0 ? (
+        <Card style={{ padding: 24, textAlign: "center", color: T.muted }}>
+          {t.training.noMyTrainings}
+        </Card>
+      ) : (
+        <div
+          className="wf-grid"
+          style={{
+            gridTemplateColumns: "repeat(auto-fill, minmax(280px,1fr))",
+          }}
+        >
+          {mine.map((r) => (
+            <Card
+              key={r.id}
+              accent={colorFor(r.courseName)}
+              style={{ padding: 16 }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  gap: 8,
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: 10,
+                      background: T.paper,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <GraduationCap size={18} color={T.ink} />
+                  </div>
+                  <div style={{ fontWeight: 600, color: T.ink, fontSize: 13 }}>
+                    {r.courseName}
+                  </div>
+                </div>
+                <TrainingStatusPill status={r.status} />
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: T.textSoft,
+                  marginTop: 12,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
+                }}
+              >
+                {r.provider && <div>🏫 {r.provider}</div>}
+                {r.category && <div>🏷️ {r.category}</div>}
+                {(r.startDate || r.completionDate) && (
+                  <div>
+                    📅 {r.startDate || "—"} → {r.completionDate || "—"}
+                  </div>
+                )}
+                {r.notes && <div>📝 {r.notes}</div>}
+              </div>
+              {r.certExpiry && (
+                <div style={{ marginTop: 10 }}>
+                  <TrainingCertBadge expiryDate={r.certExpiry} />
+                </div>
+              )}
+            </Card>
+          ))}
+        </div>
       )}
     </div>
   );
@@ -19787,6 +20536,7 @@ function buildNavAdmin(n) {
     },
     { id: "payroll", label: n.payroll, icon: Wallet },
     { id: "review", label: n.performance, icon: Star },
+    { id: "training", label: n.training, icon: GraduationCap },
     {
       id: "attcorr",
       label: n.attCorrection,
@@ -19843,6 +20593,7 @@ function buildNavEmployee(n, enabledModules) {
     { id: "ot", label: n.myOvertime, icon: Timer },
     { id: "payroll", label: n.myPayroll, icon: Wallet },
     { id: "review", label: n.myPerformance, icon: Star },
+    { id: "training", label: n.myTraining, icon: GraduationCap },
     { id: "attcorr", label: n.myAttCorrection, icon: CalendarClock },
     { id: "shiftswap", label: n.myShiftSwap, icon: Repeat },
     { id: "documents", label: n.myDocuments, icon: FileText },
@@ -20264,6 +21015,38 @@ function AppInner() {
       entityLabel: (r) => `${r.period || "?"} · ${r.employeeId || "?"}`,
     },
   );
+  const [trainings, setTrainings, trainingsReady] = useSupabaseArray(
+    "trainings",
+    {
+      fromDb: (r) => ({
+        id: r.id,
+        employeeId: r.employee_id,
+        courseName: r.course_name,
+        provider: r.provider,
+        category: r.category,
+        startDate: r.start_date,
+        completionDate: r.completion_date,
+        certExpiry: r.cert_expiry,
+        status: r.status,
+        notes: r.notes,
+      }),
+      toDb: (r) => ({
+        id: r.id,
+        employee_id: r.employeeId,
+        course_name: r.courseName,
+        provider: r.provider,
+        category: r.category,
+        start_date: r.startDate || null,
+        completion_date: r.completionDate || null,
+        cert_expiry: r.certExpiry || null,
+        status: r.status,
+        notes: r.notes,
+      }),
+      audit: true,
+      actorRef,
+      entityLabel: (r) => r.courseName,
+    },
+  );
   const [announcements, setAnnouncements, annReady] = useSupabaseArray(
     "announcements",
     {
@@ -20523,6 +21306,7 @@ function AppInner() {
         ot: r.emp_ot ?? true,
         payroll: r.emp_payroll ?? true,
         review: r.emp_review ?? true,
+        training: r.emp_training ?? true,
         attcorr: r.emp_attcorr ?? true,
         shiftswap: r.emp_shiftswap ?? true,
         documents: r.emp_documents ?? true,
@@ -20545,6 +21329,7 @@ function AppInner() {
         emp_ot: r.ot,
         emp_payroll: r.payroll,
         emp_review: r.review,
+        emp_training: r.training,
         emp_attcorr: r.attcorr,
         emp_shiftswap: r.shiftswap,
         emp_documents: r.documents,
@@ -20746,25 +21531,69 @@ function AppInner() {
   }, [role]);
 
   if (!ready) {
+    // Shape-of-the-app skeleton (sidebar rail + topbar + card grid)
+    // instead of a bare spinner on a blank page — it gives the person
+    // something to look at that already resembles where they're headed,
+    // so the first load reads as "loading the dashboard" rather than
+    // "nothing has happened yet". Pure CSS shimmer, no extra libs.
+    const shimmer = {
+      background:
+        "linear-gradient(90deg, var(--wf-line-soft) 25%, var(--wf-line) 37%, var(--wf-line-soft) 63%)",
+      backgroundSize: "400% 100%",
+      animation: "wfShimmer 1.4s ease infinite",
+      borderRadius: 8,
+    };
     return (
       <div
         style={{
           minHeight: 500,
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
           background: T.paper,
           borderRadius: 12,
+          overflow: "hidden",
         }}
       >
-        <Loader2
-          size={28}
-          color={T.forest}
-          style={{ animation: "spin 1s linear infinite" }}
-        />
+        <div
+          style={{
+            width: 220,
+            padding: 18,
+            display: "flex",
+            flexDirection: "column",
+            gap: 10,
+            borderRight: `1px solid ${T.lineSoft}`,
+          }}
+        >
+          <div
+            style={{ ...shimmer, height: 28, width: "70%", marginBottom: 14 }}
+          />
+          {Array.from({ length: 7 }).map((_, i) => (
+            <div
+              key={i}
+              style={{ ...shimmer, height: 16, width: `${85 - (i % 3) * 12}%` }}
+            />
+          ))}
+        </div>
+        <div style={{ flex: 1, padding: 22 }}>
+          <div
+            style={{ ...shimmer, height: 22, width: 200, marginBottom: 20 }}
+          />
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+              gap: 14,
+              marginBottom: 20,
+            }}
+          >
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} style={{ ...shimmer, height: 70 }} />
+            ))}
+          </div>
+          <div style={{ ...shimmer, height: 220 }} />
+        </div>
         <style>
           {
-            "@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}"
+            "@keyframes wfShimmer{0%{background-position:100% 50%}100%{background-position:0% 50%}}"
           }
         </style>
       </div>
@@ -21346,6 +22175,20 @@ function AppInner() {
                     isSuperAdmin={isSuperAdmin}
                   />
                 )}
+              {page === "training" && role === "admin" && (
+                <Trainings
+                  trainings={trainings}
+                  setTrainings={setTrainings}
+                  employees={employees}
+                  isSuperAdmin={isSuperAdmin}
+                />
+              )}
+              {page === "training" &&
+                role !== "admin" &&
+                currentEmp &&
+                moduleEnabled("training") && (
+                  <MyTrainings currentEmp={currentEmp} trainings={trainings} />
+                )}
               {page === "documents" &&
                 role !== "admin" &&
                 currentEmp &&
@@ -21580,6 +22423,7 @@ export default function App() {
     <LangContext.Provider value={{ lang, t, setLang }}>
       <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
         <AppInner />
+        <ToastHost />
       </ThemeContext.Provider>
     </LangContext.Provider>
   );
