@@ -23917,6 +23917,30 @@ function useRealViewportHeight() {
       if (document.visibilityState === "visible") nudgeReflow();
     };
 
+    // Belt-and-suspenders for browsers that ignore the
+    // `interactive-widget=resizes-content` viewport hint above: when a
+    // focused input would be hidden behind the keyboard, WebKit can pan
+    // the whole page upward on its own (an internal visual-viewport
+    // offset, separate from a real scroll position) to keep it visible.
+    // On our `position:fixed` layout that pan can drift away from the
+    // fixed box's real top edge — cutting content off under the status
+    // bar at one end and exposing blank space at the other. Since the
+    // layout is already fixed/full-height and never needs the page
+    // itself to scroll, snapping back to (0,0) is always safe and
+    // cancels that pan. The keyboard's own show animation can re-apply
+    // the pan after our first attempt, so retry a couple of times while
+    // it settles.
+    const cancelKeyboardPan = () => {
+      window.scrollTo(0, 0);
+      setTimeout(() => window.scrollTo(0, 0), 120);
+      setTimeout(() => window.scrollTo(0, 0), 350);
+    };
+    const onFocusIn = (e) => {
+      if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || "")) {
+        cancelKeyboardPan();
+      }
+    };
+
     setHeight();
     // Also force the reflow on first mount, not only on later
     // resize/visibility/pageshow events — a cold launch straight from the
@@ -23930,6 +23954,8 @@ function useRealViewportHeight() {
     document.addEventListener("visibilitychange", onVisible);
     window.addEventListener("pageshow", nudgeReflow);
     window.addEventListener("focus", nudgeReflow);
+    document.addEventListener("focusin", onFocusIn);
+    window.visualViewport?.addEventListener("resize", cancelKeyboardPan);
 
     return () => {
       clearTimeout(reflowTimer);
@@ -23939,6 +23965,8 @@ function useRealViewportHeight() {
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("pageshow", nudgeReflow);
       window.removeEventListener("focus", nudgeReflow);
+      document.removeEventListener("focusin", onFocusIn);
+      window.visualViewport?.removeEventListener("resize", cancelKeyboardPan);
     };
   }, []);
 }
@@ -23971,9 +23999,20 @@ function usePwaSetup() {
       viewportTag.setAttribute("name", "viewport");
       document.head.appendChild(viewportTag);
     }
+    // `interactive-widget=resizes-content` (newer iOS/Android WebKit and
+    // Chromium) tells the browser to actually shrink the layout viewport
+    // when the on-screen keyboard opens, instead of leaving the layout
+    // viewport full-height and just overlaying the keyboard on top of it.
+    // Without it, WebKit's fallback for keeping a focused input visible
+    // above the keyboard is to *pan* the whole page upward internally
+    // (a visual-viewport offset, not a real scroll) — on a `position:
+    // fixed` layout like ours that pan can end up detached from the
+    // fixed box's actual top edge, which is what was cutting the input
+    // off under the status bar and leaving blank space where the app's
+    // real background no longer reaches.
     viewportTag.setAttribute(
       "content",
-      "width=device-width, initial-scale=1, viewport-fit=cover",
+      "width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content",
     );
 
     const manifest = {
