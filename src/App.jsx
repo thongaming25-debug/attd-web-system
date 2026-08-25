@@ -4654,8 +4654,12 @@ function useSupabaseArray(
   }, [table, ready]);
 
   const setValue = useCallback(
-    (next) => {
+    (nextOrUpdater) => {
       const prev = prevRef.current;
+      const next =
+        typeof nextOrUpdater === "function"
+          ? nextOrUpdater(prev)
+          : nextOrUpdater;
       prevRef.current = next;
       setValueState(next);
 
