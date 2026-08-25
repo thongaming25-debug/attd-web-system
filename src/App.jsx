@@ -2823,6 +2823,7 @@ const STYLE_ID = "wf-suite-style";
 const CSS = `
 *,*::before,*::after{box-sizing:border-box;}
 html,body,#root{height:100%;}
+html,body{background:var(--wf-paper);}
 :root{
   --wf-ink:#10141C; --wf-ink-dark:#050810; --wf-paper:#F3F4F7; --wf-card:#FFFFFF;
   --wf-forest-soft:#E4F5EC; --wf-forest-text:#127449; --wf-gold-soft:#FCF0DC; --wf-gold-text:#9A6212;
@@ -2851,7 +2852,7 @@ html,body,#root{height:100%;}
 .wf-nav-item.active{background:rgba(240,168,59,0.09);color:#fff;font-weight:600;}
 .wf-nav-item.active::before{content:"";position:absolute;left:-10px;top:6px;bottom:6px;width:2px;border-radius:0;background:${T.gold};}
 .wf-main{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;background:${T.paper};}
-.wf-header{background:${T.headerBg};backdrop-filter:blur(8px);border-bottom:1px solid ${T.lineSoft};padding:13px 22px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;transition:background .15s ease,border-color .15s ease;}
+.wf-header{background:${T.headerBg};backdrop-filter:blur(8px);border-bottom:1px solid ${T.lineSoft};padding:calc(13px + env(safe-area-inset-top)) 22px 13px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;transition:background .15s ease,border-color .15s ease;}
 .wf-content{flex:1;overflow-y:auto;padding:22px;overscroll-behavior-y:contain;}
 .wf-card{background:${T.card};border-radius:9px;border:1px solid ${T.line};box-shadow:none;transition:box-shadow .15s ease,background .15s ease,border-color .15s ease;}
 .wf-btn{display:inline-flex;align-items:center;gap:6px;font-weight:600;border-radius:7px;font-size:13px;padding:9px 15px;border:1px solid transparent;cursor:pointer;transition:background .15s ease,transform .1s ease,box-shadow .15s ease;}
@@ -2965,7 +2966,7 @@ html,body,#root{height:100%;}
   .wf-sidebar.open{transform:translateX(0);}
   .wf-menu-btn{display:inline-flex;}
   .wf-overlay-scrim.open{display:block;position:absolute;inset:0;background:rgba(18,32,61,0.45);z-index:35;backdrop-filter:blur(1px);}
-  .wf-header{padding:12px 16px;}
+  .wf-header{padding:calc(12px + env(safe-area-inset-top)) 16px 12px;}
   .wf-content{padding:16px;}
   .wf-role-badge{display:none;}
   .wf-bottomnav{display:flex;}
@@ -5579,11 +5580,36 @@ const PTR_MAX = 96;
 
 function PullToRefresh({ children, className }) {
   const containerRef = useRef(null);
+  const wrapRef = useRef(null);
+  const contentRef = useRef(null);
+  const iconRef = useRef(null);
   const startY = useRef(0);
   const pullingRef = useRef(false);
-  const [pullDistance, setPullDistance] = useState(0);
-  const [isPulling, setIsPulling] = useState(false);
+  const distanceRef = useRef(0);
+  const rafRef = useRef(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Applies the current pull distance straight to the DOM via a ref,
+  // skipping React's render cycle entirely for every pixel of finger
+  // movement — a setState per touchmove event was the cause of the
+  // stutter, since it forces React to re-render the whole subtree on
+  // every event. rAF-batched direct style writes track the finger at
+  // full frame rate instead.
+  const applyDistance = (d, animated) => {
+    const wrap = wrapRef.current;
+    const content = contentRef.current;
+    const icon = iconRef.current;
+    if (!wrap || !content || !icon) return;
+    const t = animated ? "height .2s ease" : "none";
+    const t2 = animated ? "transform .2s ease" : "none";
+    wrap.style.transition = t;
+    wrap.style.height = `${d}px`;
+    content.style.transition = t2;
+    content.style.transform = `translateY(${d}px)`;
+    icon.style.transition = animated ? "transform .15s ease" : "none";
+    icon.style.opacity = Math.min(d / PTR_THRESHOLD, 1);
+    icon.style.transform = `rotate(${d * 3}deg)`;
+  };
 
   useEffect(() => {
     const el = containerRef.current;
@@ -5604,27 +5630,30 @@ function PullToRefresh({ children, className }) {
       const delta = e.touches[0].clientY - startY.current;
       if (delta <= 0 || el.scrollTop > 0) {
         pullingRef.current = false;
-        setIsPulling(false);
-        setPullDistance(0);
+        distanceRef.current = 0;
+        applyDistance(0, true);
         return;
       }
       e.preventDefault();
-      setIsPulling(true);
-      setPullDistance(Math.min(delta * 0.5, PTR_MAX));
+      distanceRef.current = Math.min(delta * 0.5, PTR_MAX);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
+        applyDistance(distanceRef.current, false);
+      });
     };
 
     const onTouchEnd = () => {
       if (!pullingRef.current) return;
       pullingRef.current = false;
-      setIsPulling(false);
-      setPullDistance((d) => {
-        if (d >= PTR_THRESHOLD) {
-          setRefreshing(true);
-          setTimeout(() => window.location.reload(), 400);
-          return PTR_THRESHOLD;
-        }
-        return 0;
-      });
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (distanceRef.current >= PTR_THRESHOLD) {
+        setRefreshing(true);
+        applyDistance(PTR_THRESHOLD, true);
+        setTimeout(() => window.location.reload(), 400);
+      } else {
+        distanceRef.current = 0;
+        applyDistance(0, true);
+      }
     };
 
     el.addEventListener("touchstart", onTouchStart, { passive: true });
@@ -5636,10 +5665,9 @@ function PullToRefresh({ children, className }) {
       el.removeEventListener("touchmove", onTouchMove);
       el.removeEventListener("touchend", onTouchEnd);
       el.removeEventListener("touchcancel", onTouchEnd);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [refreshing]);
-
-  const spinning = refreshing || pullDistance >= PTR_THRESHOLD;
 
   return (
     <div
@@ -5648,6 +5676,7 @@ function PullToRefresh({ children, className }) {
       style={{ position: "relative" }}
     >
       <div
+        ref={wrapRef}
         style={{
           position: "absolute",
           top: 0,
@@ -5656,14 +5685,14 @@ function PullToRefresh({ children, className }) {
           display: "flex",
           justifyContent: "center",
           alignItems: "flex-end",
-          height: pullDistance,
+          height: 0,
           overflow: "hidden",
-          transition: isPulling ? "none" : "height .2s ease",
           pointerEvents: "none",
           zIndex: 5,
         }}
       >
         <div
+          ref={iconRef}
           style={{
             width: 30,
             height: 30,
@@ -5671,26 +5700,19 @@ function PullToRefresh({ children, className }) {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            opacity: Math.min(pullDistance / PTR_THRESHOLD, 1),
-            transform: `rotate(${pullDistance * 3}deg)`,
-            transition: isPulling ? "none" : "transform .15s ease",
+            opacity: 0,
           }}
         >
           <RefreshCw
             size={20}
             color={T.blue}
             style={
-              spinning ? { animation: "spin 1s linear infinite" } : undefined
+              refreshing ? { animation: "spin 1s linear infinite" } : undefined
             }
           />
         </div>
       </div>
-      <div
-        style={{
-          transform: `translateY(${pullDistance}px)`,
-          transition: isPulling ? "none" : "transform .2s ease",
-        }}
-      >
+      <div ref={contentRef} style={{ willChange: "transform" }}>
         {children}
       </div>
     </div>
@@ -23821,6 +23843,25 @@ function usePwaSetup() {
       Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
       document.head.appendChild(el);
     };
+
+    // The default viewport tag (set in index.html) doesn't include
+    // viewport-fit=cover, so the page content stops at the safe area
+    // instead of extending under the notch/status bar — combined with
+    // apple-mobile-web-app-status-bar-style=black-translucent above,
+    // that leaves a gap where the browser/OS chrome shows through
+    // instead of the app's own background. Force it here so the app
+    // draws edge-to-edge and the safe-area insets used elsewhere
+    // (env(safe-area-inset-*)) actually have something to inset from.
+    let viewportTag = document.querySelector('meta[name="viewport"]');
+    if (!viewportTag) {
+      viewportTag = document.createElement("meta");
+      viewportTag.setAttribute("name", "viewport");
+      document.head.appendChild(viewportTag);
+    }
+    viewportTag.setAttribute(
+      "content",
+      "width=device-width, initial-scale=1, viewport-fit=cover",
+    );
 
     const manifest = {
       name: "Workforce Suite",
