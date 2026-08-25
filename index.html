@@ -12,12 +12,9 @@
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
 
-    <!-- Default/fallback value. The inline script below overwrites this
-         (and the CSS variable it drives) with the correct light/dark
-         value before first paint, based on the saved theme. This meta
-         tag itself is also updated dynamically for Chrome/Android's
-         status bar / task-switcher chrome. -->
-    <meta name="theme-color" id="wf-theme-color-meta" content="#0A0F1A" />
+    <!-- Matches the app's dark theme background. Chrome/Android use
+         this to color the system status bar / task-switcher chrome. -->
+    <meta name="theme-color" content="#0A0F1A" />
 
     <!-- Marks the page as installable as a standalone app when added
          to the iOS home screen (without this, tapping the icon just
@@ -28,7 +25,7 @@
     <!-- "black-translucent" lets the page draw its own background
          under the status bar instead of iOS reserving a solid bar
          there — combined with viewport-fit=cover above and the
-         inline background below, this removes the white/black gap. -->
+         inline background below, this removes the white gap. -->
     <meta
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent"
@@ -36,63 +33,24 @@
     <meta name="apple-mobile-web-app-title" content="Workforce" />
     <!-- manifest + apple-touch-icon links are left to the JS in
          App.jsx (usePwaSetup), which already injects them at runtime
-         with a data: URI. -->
+         with a data: URI — not what's causing the white gap. -->
 
     <title>Workforce Suite</title>
 
-    <!-- These two hex values must stay in sync with the --wf-paper
-         light/dark tokens defined in App.jsx's injected stylesheet
-         (:root and .wf-dark). They're duplicated here only because,
-         at this point in <head>, that stylesheet hasn't loaded yet —
-         there is no CSS variable to read from on the very first
-         frame, so the same colors are hardcoded on both sides. If you
-         ever change --wf-paper in App.jsx, update these to match. -->
+    <!-- Inline (not injected by JS) so the very first frame — before
+         the JS bundle has even downloaded, let alone parsed and run
+         — already has the correct dark background. This is what
+         actually closes the "flash of white" gap: everything App.jsx
+         sets up via JS on mount happens too late for iOS to use it
+         when deciding the initial status-bar/background chrome. -->
     <style>
       html,
       body {
+        background: #dfe2e8;
         margin: 0;
         height: 100%;
-        background: #f3f4f7; /* light --wf-paper: overwritten below before paint if theme is dark */
       }
     </style>
-
-    <!-- Inline (not injected by JS, and not deferred) so the very
-         first frame — before the JS bundle has even downloaded, let
-         alone parsed and run — already has the correct light/dark
-         background. Runs synchronously as the parser hits it, i.e.
-         before <body> is even painted, so there's no flash.
-
-         Resolution order: saved app theme (same localStorage key /
-         JSON-encoding used by App.jsx's useLocalStorage) first, then
-         falls back to the OS-level prefers-color-scheme if the user
-         has never toggled the theme in-app. -->
-    <script>
-      (function () {
-        try {
-          var stored = null;
-          try {
-            stored = JSON.parse(localStorage.getItem("hrsuite:theme"));
-          } catch (e) {}
-
-          var isDark =
-            stored === "dark" ||
-            (stored !== "light" &&
-              window.matchMedia &&
-              window.matchMedia("(prefers-color-scheme: dark)").matches);
-
-          var bg = isDark ? "#080B12" : "#F3F4F7"; // must match --wf-paper in App.jsx
-          var statusBarColor = isDark ? "#080B12" : "#F3F4F7";
-
-          if (isDark) {
-            document.documentElement.classList.add("wf-dark");
-          }
-          document.documentElement.style.background = bg;
-
-          var meta = document.getElementById("wf-theme-color-meta");
-          if (meta) meta.setAttribute("content", statusBarColor);
-        } catch (e) {}
-      })();
-    </script>
   </head>
   <body>
     <div id="root"></div>
