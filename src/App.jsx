@@ -2972,6 +2972,13 @@ html,body{background:var(--wf-paper);}
   .wf-bottomnav{display:flex;}
   .wf-content.wf-content-bnpad{padding-bottom:86px;}
   .wf-role-staff .wf-menu-btn{display:none;}
+  /* On desktop, .wf-root's rounded corners + shadow read as a nice
+     floating card framed by the browser window. In a standalone
+     mobile PWA there is no browser window around it — the same
+     styling instead shows up as a gap of the page's white background
+     peeking through at the (rounded) edges, breaking the full-screen
+     native-app illusion. Go edge-to-edge here instead. */
+  .wf-root{border-radius:0;box-shadow:none;border:none;}
   /* iOS auto-zooms the whole page when a focused input's font-size
      is under 16px — this is what makes typing in a form feel like a
      "web page" instead of an app. Desktop keeps the denser 13px. */
