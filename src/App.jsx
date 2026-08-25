@@ -2925,7 +2925,7 @@ html,body{background:var(--wf-paper);margin:0;padding:0;overflow:hidden;overscro
 .wf-tp-item:hover{background:${T.line};}
 .wf-tp-item.selected{background:${T.gold};color:#1A1300;font-weight:700;}
 .wf-tp-sep{font-weight:700;color:${T.muted};padding-bottom:2px;}
-.wf-modal-overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(3,5,10,0.65);backdrop-filter:blur(2px);animation:wf-fade .15s ease;}
+.wf-modal-overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));background:rgba(3,5,10,0.65);backdrop-filter:blur(2px);animation:wf-fade .15s ease;}
 .wf-modal{background:${T.card};border-radius:11px;border:1px solid ${T.line};box-shadow:0 24px 64px rgba(3,5,10,0.5);width:100%;max-height:90vh;overflow-y:auto;overflow-x:hidden;animation:wf-pop .18s cubic-bezier(.2,.9,.3,1.2);}
 .wf-modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid ${T.lineSoft};position:sticky;top:0;z-index:5;background:${T.card};border-radius:11px 11px 0 0;}
 .wf-avatar{border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;flex-shrink:0;}
@@ -23295,6 +23295,7 @@ function AppInner() {
             <div
               style={{
                 padding: "18px 18px",
+                paddingTop: "calc(18px + env(safe-area-inset-top))",
                 display: "flex",
                 alignItems: "center",
                 gap: 10,
