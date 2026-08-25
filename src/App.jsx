@@ -2972,6 +2972,27 @@ html,body{background:var(--wf-paper);}
   .wf-bottomnav{display:flex;}
   .wf-content.wf-content-bnpad{padding-bottom:86px;}
   .wf-role-staff .wf-menu-btn{display:none;}
+  /* iOS auto-zooms the whole page when a focused input's font-size
+     is under 16px — this is what makes typing in a form feel like a
+     "web page" instead of an app. Desktop keeps the denser 13px. */
+  .wf-input,.wf-dp-trigger,select,textarea,.wf-login-input{font-size:16px;}
+}
+/* Removes the ~300ms delay mobile browsers add before firing a tap
+   (they wait to see if it's actually the start of a double-tap-to-
+   zoom gesture) and the gray/blue flash Android/iOS show on tap —
+   both read as "this is a website", not an app, to a user's thumb. */
+button,a,.wf-card,[role="button"],input,select,textarea{
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+/* Custom press feedback to replace what we just removed above —
+   without this, taps would feel inert since there'd be no response
+   at all until the click actually completes. */
+button:not(:disabled):active,
+a:active,
+[role="button"]:not([aria-disabled="true"]):active{
+  transform:scale(0.97);
+  transition:transform .08s ease;
 }
 `;
 function useGlobalStyle() {
