@@ -2852,7 +2852,7 @@ html,body,#root{height:100%;}
 .wf-nav-item.active::before{content:"";position:absolute;left:-10px;top:6px;bottom:6px;width:2px;border-radius:0;background:${T.gold};}
 .wf-main{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;background:${T.paper};}
 .wf-header{background:${T.headerBg};backdrop-filter:blur(8px);border-bottom:1px solid ${T.lineSoft};padding:13px 22px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;transition:background .15s ease,border-color .15s ease;}
-.wf-content{flex:1;overflow-y:auto;padding:22px;}
+.wf-content{flex:1;overflow-y:auto;padding:22px;overscroll-behavior-y:contain;}
 .wf-card{background:${T.card};border-radius:9px;border:1px solid ${T.line};box-shadow:none;transition:box-shadow .15s ease,background .15s ease,border-color .15s ease;}
 .wf-btn{display:inline-flex;align-items:center;gap:6px;font-weight:600;border-radius:7px;font-size:13px;padding:9px 15px;border:1px solid transparent;cursor:pointer;transition:background .15s ease,transform .1s ease,box-shadow .15s ease;}
 .wf-btn:active:not(:disabled){transform:scale(.97);}
@@ -5565,6 +5565,138 @@ function StatusPill({ status }) {
     </span>
   );
 }
+// Pull-to-refresh: mobile web apps don't get the browser's native pull
+// gesture, especially once installed as a home-screen PWA — so this
+// reproduces the familiar "pull down at the top of the page to reload"
+// gesture from native apps. The spinner drags down with the finger as
+// you pull, and releasing past the threshold triggers a hard reload
+// (which also picks up any waiting service-worker update). Only takes
+// over the touch gesture when the scroll container is already at the
+// very top and the finger is moving downward — normal scrolling inside
+// the page is completely unaffected otherwise.
+const PTR_THRESHOLD = 64;
+const PTR_MAX = 96;
+
+function PullToRefresh({ children, className }) {
+  const containerRef = useRef(null);
+  const startY = useRef(0);
+  const pullingRef = useRef(false);
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isPulling, setIsPulling] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const onTouchStart = (e) => {
+      if (refreshing) return;
+      if (el.scrollTop > 0) {
+        pullingRef.current = false;
+        return;
+      }
+      startY.current = e.touches[0].clientY;
+      pullingRef.current = true;
+    };
+
+    const onTouchMove = (e) => {
+      if (!pullingRef.current || refreshing) return;
+      const delta = e.touches[0].clientY - startY.current;
+      if (delta <= 0 || el.scrollTop > 0) {
+        pullingRef.current = false;
+        setIsPulling(false);
+        setPullDistance(0);
+        return;
+      }
+      e.preventDefault();
+      setIsPulling(true);
+      setPullDistance(Math.min(delta * 0.5, PTR_MAX));
+    };
+
+    const onTouchEnd = () => {
+      if (!pullingRef.current) return;
+      pullingRef.current = false;
+      setIsPulling(false);
+      setPullDistance((d) => {
+        if (d >= PTR_THRESHOLD) {
+          setRefreshing(true);
+          setTimeout(() => window.location.reload(), 400);
+          return PTR_THRESHOLD;
+        }
+        return 0;
+      });
+    };
+
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd, { passive: true });
+    el.addEventListener("touchcancel", onTouchEnd, { passive: true });
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("touchcancel", onTouchEnd);
+    };
+  }, [refreshing]);
+
+  const spinning = refreshing || pullDistance >= PTR_THRESHOLD;
+
+  return (
+    <div
+      ref={containerRef}
+      className={className}
+      style={{ position: "relative" }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "flex-end",
+          height: pullDistance,
+          overflow: "hidden",
+          transition: isPulling ? "none" : "height .2s ease",
+          pointerEvents: "none",
+          zIndex: 5,
+        }}
+      >
+        <div
+          style={{
+            width: 30,
+            height: 30,
+            marginBottom: 8,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: Math.min(pullDistance / PTR_THRESHOLD, 1),
+            transform: `rotate(${pullDistance * 3}deg)`,
+            transition: isPulling ? "none" : "transform .15s ease",
+          }}
+        >
+          <RefreshCw
+            size={20}
+            color={T.blue}
+            style={
+              spinning ? { animation: "spin 1s linear infinite" } : undefined
+            }
+          />
+        </div>
+      </div>
+      <div
+        style={{
+          transform: `translateY(${pullDistance}px)`,
+          transition: isPulling ? "none" : "transform .2s ease",
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
 function Card({ children, style, accent, ...rest }) {
   return (
     <div
@@ -23313,7 +23445,9 @@ function AppInner() {
             </div>
           </header>
 
-          <main className={`wf-content ${bottomNav ? "wf-content-bnpad" : ""}`}>
+          <PullToRefresh
+            className={`wf-content ${bottomNav ? "wf-content-bnpad" : ""}`}
+          >
             {employees.length === 0 &&
               role === "admin" &&
               page !== "employees" && (
@@ -23619,7 +23753,7 @@ function AppInner() {
                   />
                 )}
             </div>
-          </main>
+          </PullToRefresh>
 
           {bottomNav && (
             <nav
