@@ -6836,7 +6836,7 @@ const LOGIN_CSS = `
 @keyframes wf-orb-d { 0%,100% { transform:translate(0,0) scale(1); } 45% { transform:translate(-55px,-50px) scale(1.12); } }
 .wf-login-root {
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  min-height:100vh; min-height:100dvh; position:relative; overflow:hidden;
+  position:fixed; inset:0; overflow:hidden auto;
   background: linear-gradient(160deg, #050810 0%, #0A0F1A 55%, #0D1420 100%);
 }
 .wf-login-bg {
