@@ -2852,7 +2852,7 @@ html,body,#root{height:100%;}
 .wf-nav-item.active::before{content:"";position:absolute;left:-10px;top:6px;bottom:6px;width:2px;border-radius:0;background:${T.gold};}
 .wf-main{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;background:${T.paper};}
 .wf-header{background:${T.headerBg};backdrop-filter:blur(8px);border-bottom:1px solid ${T.lineSoft};padding:13px 22px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;transition:background .15s ease,border-color .15s ease;}
-.wf-content{flex:1;overflow-y:auto;padding:22px;overscroll-behavior-y:contain;}
+.wf-content{flex:1;overflow-y:auto;padding:22px;}
 .wf-card{background:${T.card};border-radius:9px;border:1px solid ${T.line};box-shadow:none;transition:box-shadow .15s ease,background .15s ease,border-color .15s ease;}
 .wf-btn{display:inline-flex;align-items:center;gap:6px;font-weight:600;border-radius:7px;font-size:13px;padding:9px 15px;border:1px solid transparent;cursor:pointer;transition:background .15s ease,transform .1s ease,box-shadow .15s ease;}
 .wf-btn:active:not(:disabled){transform:scale(.97);}
@@ -5565,138 +5565,6 @@ function StatusPill({ status }) {
     </span>
   );
 }
-// Pull-to-refresh: mobile web apps don't get the browser's native pull
-// gesture, especially once installed as a home-screen PWA — so this
-// reproduces the familiar "pull down at the top of the page to reload"
-// gesture from native apps. The spinner drags down with the finger as
-// you pull, and releasing past the threshold triggers a hard reload
-// (which also picks up any waiting service-worker update). Only takes
-// over the touch gesture when the scroll container is already at the
-// very top and the finger is moving downward — normal scrolling inside
-// the page is completely unaffected otherwise.
-const PTR_THRESHOLD = 64;
-const PTR_MAX = 96;
-
-function PullToRefresh({ children, className }) {
-  const containerRef = useRef(null);
-  const startY = useRef(0);
-  const pullingRef = useRef(false);
-  const [pullDistance, setPullDistance] = useState(0);
-  const [isPulling, setIsPulling] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
-    const onTouchStart = (e) => {
-      if (refreshing) return;
-      if (el.scrollTop > 0) {
-        pullingRef.current = false;
-        return;
-      }
-      startY.current = e.touches[0].clientY;
-      pullingRef.current = true;
-    };
-
-    const onTouchMove = (e) => {
-      if (!pullingRef.current || refreshing) return;
-      const delta = e.touches[0].clientY - startY.current;
-      if (delta <= 0 || el.scrollTop > 0) {
-        pullingRef.current = false;
-        setIsPulling(false);
-        setPullDistance(0);
-        return;
-      }
-      e.preventDefault();
-      setIsPulling(true);
-      setPullDistance(Math.min(delta * 0.5, PTR_MAX));
-    };
-
-    const onTouchEnd = () => {
-      if (!pullingRef.current) return;
-      pullingRef.current = false;
-      setIsPulling(false);
-      setPullDistance((d) => {
-        if (d >= PTR_THRESHOLD) {
-          setRefreshing(true);
-          setTimeout(() => window.location.reload(), 400);
-          return PTR_THRESHOLD;
-        }
-        return 0;
-      });
-    };
-
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchmove", onTouchMove, { passive: false });
-    el.addEventListener("touchend", onTouchEnd, { passive: true });
-    el.addEventListener("touchcancel", onTouchEnd, { passive: true });
-    return () => {
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchmove", onTouchMove);
-      el.removeEventListener("touchend", onTouchEnd);
-      el.removeEventListener("touchcancel", onTouchEnd);
-    };
-  }, [refreshing]);
-
-  const spinning = refreshing || pullDistance >= PTR_THRESHOLD;
-
-  return (
-    <div
-      ref={containerRef}
-      className={className}
-      style={{ position: "relative" }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "flex-end",
-          height: pullDistance,
-          overflow: "hidden",
-          transition: isPulling ? "none" : "height .2s ease",
-          pointerEvents: "none",
-          zIndex: 5,
-        }}
-      >
-        <div
-          style={{
-            width: 30,
-            height: 30,
-            marginBottom: 8,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            opacity: Math.min(pullDistance / PTR_THRESHOLD, 1),
-            transform: `rotate(${pullDistance * 3}deg)`,
-            transition: isPulling ? "none" : "transform .15s ease",
-          }}
-        >
-          <RefreshCw
-            size={20}
-            color={T.blue}
-            style={
-              spinning ? { animation: "spin 1s linear infinite" } : undefined
-            }
-          />
-        </div>
-      </div>
-      <div
-        style={{
-          transform: `translateY(${pullDistance}px)`,
-          transition: isPulling ? "none" : "transform .2s ease",
-        }}
-      >
-        {children}
-      </div>
-    </div>
-  );
-}
-
 function Card({ children, style, accent, ...rest }) {
   return (
     <div
@@ -6777,8 +6645,6 @@ const APP_VERSION = "1.0.0";
 const LOGIN_CSS_ID = "wf-login-style";
 const LOGIN_CSS = `
 @keyframes wf-float-up { from { opacity:0; transform:translateY(28px) scale(.96); } to { opacity:1; transform:translateY(0) scale(1); } }
-@keyframes wf-error-in { from { opacity:0; transform:translateY(-6px); max-height:0; } to { opacity:1; transform:translateY(0); max-height:60px; } }
-@keyframes wf-shake { 10%,90% { transform:translateX(-1px); } 20%,80% { transform:translateX(2px); } 30%,50%,70% { transform:translateX(-4px); } 40%,60% { transform:translateX(4px); } }
 @keyframes wf-bg-drift { 0%,100% { transform:translate(0,0) scale(1.05); } 50% { transform:translate(-20px, -14px) scale(1.08); } }
 @keyframes wf-bg-hue { 0%,100% { filter:hue-rotate(0deg); } 50% { filter:hue-rotate(12deg); } }
 @keyframes wf-pulse-ring { 0%,100% { transform:scale(1); opacity:.5; } 50% { transform:scale(1.12); opacity:.2; } }
@@ -6834,10 +6700,7 @@ const LOGIN_CSS = `
   border:1px solid rgba(255,255,255,0.08);
   box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 32px 80px rgba(0,0,0,0.55);
   animation: wf-float-up .6s cubic-bezier(.16,.9,.28,1) both;
-  transition: opacity .18s ease;
 }
-.wf-login-card.wf-shake { animation: wf-shake .38s cubic-bezier(.36,.07,.19,.97) both; }
-.wf-login-card.wf-busy { opacity:.7; }
 .wf-login-logo-ring {
   width:56px; height:56px; border-radius:12px;
   background:${T.gold};
@@ -6865,8 +6728,6 @@ const LOGIN_CSS = `
   box-shadow:0 0 0 4px rgba(240,168,59,0.14);
   transform:translateY(-1px);
 }
-.wf-login-input:disabled { opacity:.5; cursor:not-allowed; transform:none; }
-.wf-login-input.wf-input-err { border-color:#E5637A; }
 .wf-login-btn {
   width:100%; padding:13px; border:none; border-radius:9px;
   font-size:15px; font-weight:700; cursor:pointer; display:flex;
@@ -6895,8 +6756,6 @@ const LOGIN_CSS = `
   display:flex; align-items:center; gap:7px; font-size:12.5px;
   color:#F0879B; background:rgba(229,99,122,0.12); border-radius:8px;
   padding:9px 12px; margin-bottom:14px; border:1px solid rgba(229,99,122,0.25);
-  animation: wf-error-in .28s cubic-bezier(.16,.9,.28,1) both;
-  overflow:hidden;
 }
 .wf-login-demo {
   margin-top:20px; padding:11px 14px; background:rgba(255,255,255,0.04);
@@ -6973,26 +6832,29 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [shake, setShake] = useState(false);
-
-  const fail = (msg) => {
-    setError(msg);
-    setLoading(false);
-    setShake(true);
-    setTimeout(() => setShake(false), 400);
-  };
 
   const submit = async (e) => {
     e.preventDefault();
-    if (loading) return;
     setLoading(true);
     await new Promise((r) => setTimeout(r, 320));
     const emp = employees.find(
       (x) => x.code.trim().toLowerCase() === code.trim().toLowerCase(),
     );
-    if (!emp) return fail(L.errNoEmp);
-    if (emp.status !== "active") return fail(L.errInactive);
-    if ((emp.pin || "") !== pin.trim()) return fail(L.errPin);
+    if (!emp) {
+      setError(L.errNoEmp);
+      setLoading(false);
+      return;
+    }
+    if (emp.status !== "active") {
+      setError(L.errInactive);
+      setLoading(false);
+      return;
+    }
+    if ((emp.pin || "") !== pin.trim()) {
+      setError(L.errPin);
+      setLoading(false);
+      return;
+    }
     setError("");
     setLoading(false);
     onLogin(emp.id);
@@ -7004,7 +6866,7 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
       <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
         <LangToggle />
       </div>
-      <div className={`wf-login-card${shake ? " wf-shake" : ""}`}>
+      <div className="wf-login-card">
         <div
           style={{
             display: "flex",
@@ -7055,8 +6917,6 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
               }}
               placeholder={L.employeeIdPlaceholder}
               autoFocus
-              disabled={loading}
-              autoComplete="username"
             />
           </LoginField>
           <LoginField label={L.pin}>
@@ -7071,8 +6931,6 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
               type="password"
               inputMode="numeric"
               maxLength={6}
-              disabled={loading}
-              autoComplete="current-password"
             />
           </LoginField>
           {error && (
@@ -7112,25 +6970,24 @@ function AdminLoginScreen({ admins, onLogin, go }) {
   const [adminPass, setAdminPass] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [shake, setShake] = useState(false);
-
-  const fail = (msg) => {
-    setError(msg);
-    setLoading(false);
-    setShake(true);
-    setTimeout(() => setShake(false), 400);
-  };
 
   const submit = async (e) => {
     e.preventDefault();
-    if (loading) return;
     setLoading(true);
     await new Promise((r) => setTimeout(r, 320));
     const acct = admins.find(
       (a) => a.username.trim().toLowerCase() === username.trim().toLowerCase(),
     );
-    if (!acct) return fail(L.errNoAdmin);
-    if (acct.password !== adminPass) return fail(L.errPass);
+    if (!acct) {
+      setError(L.errNoAdmin);
+      setLoading(false);
+      return;
+    }
+    if (acct.password !== adminPass) {
+      setError(L.errPass);
+      setLoading(false);
+      return;
+    }
     setError("");
     setLoading(false);
     onLogin(acct.id);
@@ -7142,7 +6999,7 @@ function AdminLoginScreen({ admins, onLogin, go }) {
       <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
         <LangToggle />
       </div>
-      <div className={`wf-login-card${shake ? " wf-shake" : ""}`}>
+      <div className="wf-login-card">
         <button
           onClick={() => go("employee")}
           style={{
@@ -7157,10 +7014,7 @@ function AdminLoginScreen({ admins, onLogin, go }) {
             fontWeight: 600,
             marginBottom: 20,
             padding: 0,
-            transition: "color .15s ease",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "#EEF1F6")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "#8891A6")}
         >
           <ArrowLeft size={14} /> {L.back}
         </button>
@@ -7222,8 +7076,6 @@ function AdminLoginScreen({ admins, onLogin, go }) {
               }}
               placeholder={L.usernamePlaceholder}
               autoFocus
-              disabled={loading}
-              autoComplete="username"
             />
           </LoginField>
           <LoginField label={L.password}>
@@ -7236,8 +7088,6 @@ function AdminLoginScreen({ admins, onLogin, go }) {
               }}
               placeholder={L.passwordPlaceholder}
               type="password"
-              disabled={loading}
-              autoComplete="current-password"
             />
           </LoginField>
           {error && (
@@ -23463,9 +23313,7 @@ function AppInner() {
             </div>
           </header>
 
-          <PullToRefresh
-            className={`wf-content ${bottomNav ? "wf-content-bnpad" : ""}`}
-          >
+          <main className={`wf-content ${bottomNav ? "wf-content-bnpad" : ""}`}>
             {employees.length === 0 &&
               role === "admin" &&
               page !== "employees" && (
@@ -23771,7 +23619,7 @@ function AppInner() {
                   />
                 )}
             </div>
-          </PullToRefresh>
+          </main>
 
           {bottomNav && (
             <nav
