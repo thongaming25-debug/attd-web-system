@@ -2842,7 +2842,7 @@ html,body{background:var(--wf-paper);margin:0;padding:0;overflow:hidden;overscro
   --wf-table-head-bg:#0B0F18; --wf-divider:#171D29; --wf-danger-border:#3D1D26;
   --wf-danger-hover-bg:#20121A; --wf-header-bg:rgba(8,11,18,0.82);
 }
-.wf-root{display:flex;position:fixed;inset:0;min-height:640px;background:${T.paper};font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.text};overflow:hidden;border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,0.02),0 16px 40px -18px rgba(5,8,16,0.35);border:1px solid ${T.line};transition:background .15s ease,color .15s ease;}
+.wf-root{display:flex;position:fixed;inset:0;height:var(--app-height, 100vh);min-height:640px;background:${T.paper};font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.text};overflow:hidden;border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,0.02),0 16px 40px -18px rgba(5,8,16,0.35);border:1px solid ${T.line};transition:background .15s ease,color .15s ease;}
 .wf-sidebar{background:linear-gradient(180deg,${BRAND.ink} 0%,${BRAND.inkDark} 100%);color:#fff;width:246px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,0.06);transition:transform .25s cubic-bezier(.4,0,.2,1);}
 .wf-sidebar-inner{display:flex;flex-direction:column;height:100%;}
 .wf-logo-badge{width:32px;height:32px;border-radius:7px;background:${T.gold};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#1A1300;font-family:'JetBrains Mono',monospace;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);}
@@ -6836,7 +6836,7 @@ const LOGIN_CSS = `
 @keyframes wf-orb-d { 0%,100% { transform:translate(0,0) scale(1); } 45% { transform:translate(-55px,-50px) scale(1.12); } }
 .wf-login-root {
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  position:fixed; inset:0; overflow:hidden auto;
+  position:fixed; inset:0; height:var(--app-height, 100vh); overflow:hidden auto;
   background: linear-gradient(160deg, #050810 0%, #0A0F1A 55%, #0D1420 100%);
 }
 .wf-login-bg {
@@ -23918,6 +23918,12 @@ function useRealViewportHeight() {
     };
 
     setHeight();
+    // Also force the reflow on first mount, not only on later
+    // resize/visibility/pageshow events — a cold launch straight from the
+    // Home Screen icon can already start out pinned to a stale rect
+    // before any of those events ever fire, which is exactly the case
+    // that was slipping through before.
+    nudgeReflow();
     window.addEventListener("resize", onResize);
     window.addEventListener("orientationchange", onResize);
     window.visualViewport?.addEventListener("resize", onResize);
