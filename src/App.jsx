@@ -7649,12 +7649,27 @@ function Dashboard({
               <s.icon size={18} color={s.accent} />
             </div>
             <div
-              style={{
-                fontSize: 26,
-                fontWeight: 700,
-                fontFamily: "'JetBrains Mono',monospace",
-                color: T.ink,
-              }}
+              style={
+                typeof s.value === "number"
+                  ? {
+                      fontSize: 26,
+                      fontWeight: 700,
+                      fontFamily: "'JetBrains Mono',monospace",
+                      color: T.ink,
+                    }
+                  : {
+                      fontSize: 15,
+                      fontWeight: 700,
+                      fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                      color: T.ink,
+                      lineHeight: 1.35,
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                      wordBreak: "break-word",
+                    }
+              }
             >
               {s.value}
             </div>
