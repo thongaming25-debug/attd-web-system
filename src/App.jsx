@@ -12868,7 +12868,13 @@ function LeaveRequests({
     const bal = annualLeaveBalance(currentEmp, leaveRequests);
     const sickBal = sickLeaveBalance(currentEmp, leaveRequests);
     return (
-      <div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100%",
+        }}
+      >
         <div className="wf-grid-2" style={{ marginBottom: 16 }}>
           <Card
             accent={bal.remaining <= 0 ? T.rose : T.forest}
@@ -12960,8 +12966,15 @@ function LeaveRequests({
             <Plus size={15} /> {t.lv.addBtn}
           </Button>
         </div>
-        <Card style={{ overflowX: "auto" }}>
-          <table className="wf-table">
+        <Card
+          style={{
+            overflowX: "auto",
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <table className="wf-table" style={{ flex: 1 }}>
             <thead>
               <tr>
                 <th>{t.lv.type}</th>
