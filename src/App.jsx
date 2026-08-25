@@ -23878,23 +23878,61 @@ const PWA_ICON_URL = `data:image/svg+xml;base64,${btoa(PWA_ICON_SVG)}`;
 // the dynamic-viewport unit is either unsupported or stales after the
 // address bar animates). We measure the real viewport directly via
 // visualViewport (more reliable than window.innerHeight during toolbar
-// show/hide transitions) and publish it as a CSS var that `.wf-root`
-// prefers over the vh/dvh units once JS has run, closing any residual
-// gap between the app shell and the true bottom of the screen.
+// show/hide transitions) and publish it as a CSS var, for anything that
+// wants it.
+//
+// It also works around a separate, longstanding iOS Safari/WKWebView bug:
+// `position:fixed` elements (our `.wf-root` / `.wf-login-root` shells) can
+// end up pinned to a stale viewport rect — most often right after the
+// on-screen keyboard closes, or when a backgrounded Home Screen app is
+// restored from its cached snapshot — leaving a strip of the page's real
+// background exposed at whichever edge the stale rect no longer covers.
+// There's no direct API to ask WebKit to recompute it; the accepted
+// workaround is to force a synchronous reflow, which makes it
+// re-evaluate every fixed element against the actual current viewport.
 function useRealViewportHeight() {
   useEffect(() => {
     const setHeight = () => {
       const h = window.visualViewport?.height || window.innerHeight;
       document.documentElement.style.setProperty("--app-height", `${h}px`);
     };
+
+    let reflowTimer = null;
+    const nudgeReflow = () => {
+      clearTimeout(reflowTimer);
+      reflowTimer = setTimeout(() => {
+        const prev = document.body.style.transform;
+        document.body.style.transform = "translateZ(0)";
+        // eslint-disable-next-line no-unused-expressions
+        document.body.offsetHeight; // force a synchronous layout pass
+        document.body.style.transform = prev;
+      }, 60);
+    };
+
+    const onResize = () => {
+      setHeight();
+      nudgeReflow();
+    };
+    const onVisible = () => {
+      if (document.visibilityState === "visible") nudgeReflow();
+    };
+
     setHeight();
-    window.addEventListener("resize", setHeight);
-    window.addEventListener("orientationchange", setHeight);
-    window.visualViewport?.addEventListener("resize", setHeight);
+    window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onResize);
+    window.visualViewport?.addEventListener("resize", onResize);
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("pageshow", nudgeReflow);
+    window.addEventListener("focus", nudgeReflow);
+
     return () => {
-      window.removeEventListener("resize", setHeight);
-      window.removeEventListener("orientationchange", setHeight);
-      window.visualViewport?.removeEventListener("resize", setHeight);
+      clearTimeout(reflowTimer);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onResize);
+      window.visualViewport?.removeEventListener("resize", onResize);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("pageshow", nudgeReflow);
+      window.removeEventListener("focus", nudgeReflow);
     };
   }, []);
 }
