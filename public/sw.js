@@ -22,7 +22,7 @@
 // IMPORTANT: bump CACHE_VERSION on every deploy (or wire it to your
 // build's commit hash / package version at build time) so returning
 // visitors pick up the new build instead of a stale cached shell.
-const CACHE_VERSION = "v3";
+const CACHE_VERSION = "v4";
 const CACHE_NAME = `workforce-shell-${CACHE_VERSION}`;
 
 const OFFLINE_HTML = `<!doctype html>

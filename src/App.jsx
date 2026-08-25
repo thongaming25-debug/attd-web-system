@@ -23989,8 +23989,41 @@ function usePwaSetup() {
     });
 
     if ("serviceWorker" in navigator) {
+      // A standalone PWA (opened from the Home Screen icon) is almost
+      // never a fresh navigation — iOS/Android just resume the same
+      // in-memory page from before, so the network-first fetch in
+      // sw.js for `mode:"navigate"` never runs again and a new deploy
+      // can sit uninstalled indefinitely even though the SW itself
+      // supports it (skipWaiting + clients.claim). Browsers only ever
+      // check sw.js for changes on registration.update() or on an
+      // actual navigation — neither of which happens automatically
+      // when a backgrounded Home Screen app is simply brought back to
+      // the foreground. So we do it ourselves: every time the app
+      // becomes visible again, ask the browser to re-check sw.js, and
+      // if a new service worker takes control as a result, reload
+      // once to actually load the new JS/CSS bundle instead of just
+      // leaving it installed-but-unused in the background.
+      let reloadedForUpdate = false;
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (reloadedForUpdate) return;
+        reloadedForUpdate = true;
+        window.location.reload();
+      });
+
       navigator.serviceWorker
         .register("/sw.js")
+        .then((reg) => {
+          const checkForUpdate = () => reg.update().catch(() => {});
+          // Resuming a backgrounded/Home Screen app fires visibilitychange
+          // (most browsers) and/or pageshow with persisted:true (iOS
+          // Safari's bfcache-style resume) — listen for both so we don't
+          // miss the moment staff reopen the app after a new deploy.
+          document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") checkForUpdate();
+          });
+          window.addEventListener("pageshow", checkForUpdate);
+          window.addEventListener("focus", checkForUpdate);
+        })
         .catch((err) =>
           console.error("[pwa] service worker registration failed:", err),
         );
