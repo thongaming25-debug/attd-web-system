@@ -72,6 +72,7 @@ import {
   GraduationCap,
   Briefcase,
   ListChecks,
+  Delete,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -6948,6 +6949,35 @@ const LOGIN_CSS = `
   margin-top:32px; text-align:center; font-size:10.5px;
   letter-spacing:0.3px; color:#5B6478; opacity:0.6;
 }
+.wf-pin-dots {
+  display:flex; align-items:center; justify-content:center; gap:14px;
+  padding:6px 0 4px;
+}
+.wf-pin-dot {
+  width:14px; height:14px; border-radius:50%;
+  border:1.5px solid rgba(255,255,255,0.18);
+  background:rgba(255,255,255,0.04);
+  transition:background .15s ease, border-color .15s ease, transform .15s ease;
+}
+.wf-pin-dot.filled {
+  background:${T.gold}; border-color:${T.gold};
+  transform:scale(1.08);
+}
+.wf-keypad {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+  margin-top:18px;
+}
+.wf-keypad-btn {
+  height:54px; border-radius:12px; font-size:19px; font-weight:700;
+  color:#EEF1F6; background:rgba(255,255,255,0.045);
+  border:1px solid rgba(255,255,255,0.08); cursor:pointer;
+  font-family:'JetBrains Mono',monospace;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .15s ease, border-color .15s ease;
+}
+.wf-keypad-btn:hover { background:rgba(255,255,255,0.08); }
+.wf-keypad-btn:disabled { opacity:0.35; cursor:default; }
+.wf-keypad-btn.wf-keypad-ghost { background:none; border:none; cursor:default; }
 `;
 function LoginCredit() {
   return (
@@ -7000,6 +7030,61 @@ function LoginField({ label, children }) {
         {label}
       </div>
       {children}
+    </div>
+  );
+}
+
+// On-screen numeric keypad for entering the PIN, used instead of a real
+// text input + the OS keyboard. Two reasons: it feels more like a
+// dedicated attendance-kiosk app than a web form, and it sidesteps the
+// iOS standalone-PWA "keyboard opens, viewport miscalculates" issue
+// entirely for this field, since no native keyboard ever appears.
+const PIN_MAX_LENGTH = 6;
+function PinKeypad({ value, onChange, maxLength = PIN_MAX_LENGTH }) {
+  const press = (digit) => {
+    if (value.length >= maxLength) return;
+    onChange(value + digit);
+  };
+  const backspace = () => onChange(value.slice(0, -1));
+  return (
+    <div>
+      <div className="wf-pin-dots">
+        {Array.from({ length: maxLength }).map((_, i) => (
+          <div
+            key={i}
+            className={"wf-pin-dot" + (i < value.length ? " filled" : "")}
+          />
+        ))}
+      </div>
+      <div className="wf-keypad">
+        {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
+          <button
+            key={d}
+            type="button"
+            className="wf-keypad-btn"
+            onClick={() => press(d)}
+          >
+            {d}
+          </button>
+        ))}
+        <div className="wf-keypad-btn wf-keypad-ghost" />
+        <button
+          type="button"
+          className="wf-keypad-btn"
+          onClick={() => press("0")}
+        >
+          0
+        </button>
+        <button
+          type="button"
+          className="wf-keypad-btn"
+          onClick={backspace}
+          disabled={value.length === 0}
+          aria-label="Backspace"
+        >
+          <Delete size={19} />
+        </button>
+      </div>
     </div>
   );
 }
@@ -7102,17 +7187,12 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
             />
           </LoginField>
           <LoginField label={L.pin}>
-            <input
-              className="wf-login-input"
+            <PinKeypad
               value={pin}
-              onChange={(e) => {
-                setPin(e.target.value);
+              onChange={(v) => {
+                setPin(v);
                 setError("");
               }}
-              placeholder={L.pinPlaceholder}
-              type="password"
-              inputMode="numeric"
-              maxLength={6}
             />
           </LoginField>
           {error && (
