@@ -2842,7 +2842,7 @@ html,body{background:var(--wf-paper);margin:0;padding:0;overflow:hidden;overscro
   --wf-table-head-bg:#0B0F18; --wf-divider:#171D29; --wf-danger-border:#3D1D26;
   --wf-danger-hover-bg:#20121A; --wf-header-bg:rgba(8,11,18,0.82);
 }
-.wf-root{display:flex;height:100vh;height:100dvh;min-height:640px;max-height:100vh;max-height:100dvh;background:${T.paper};font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.text};position:relative;overflow:hidden;border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,0.02),0 16px 40px -18px rgba(5,8,16,0.35);border:1px solid ${T.line};transition:background .15s ease,color .15s ease;}
+.wf-root{display:flex;height:100vh;height:100dvh;height:var(--app-height,100dvh);min-height:640px;max-height:100vh;max-height:100dvh;max-height:var(--app-height,100dvh);background:${T.paper};font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.text};position:relative;overflow:hidden;border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,0.02),0 16px 40px -18px rgba(5,8,16,0.35);border:1px solid ${T.line};transition:background .15s ease,color .15s ease;}
 .wf-sidebar{background:linear-gradient(180deg,${BRAND.ink} 0%,${BRAND.inkDark} 100%);color:#fff;width:246px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,0.06);transition:transform .25s cubic-bezier(.4,0,.2,1);}
 .wf-sidebar-inner{display:flex;flex-direction:column;height:100%;}
 .wf-logo-badge{width:32px;height:32px;border-radius:7px;background:${T.gold};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#1A1300;font-family:'JetBrains Mono',monospace;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);}
@@ -23873,6 +23873,32 @@ const PWA_ICON_SVG =
   "</svg>";
 const PWA_ICON_URL = `data:image/svg+xml;base64,${btoa(PWA_ICON_SVG)}`;
 
+// Fallback for devices/browsers where `100dvh` doesn't reliably match the
+// true visible screen height (seen on some mobile browsers/webviews where
+// the dynamic-viewport unit is either unsupported or stales after the
+// address bar animates). We measure the real viewport directly via
+// visualViewport (more reliable than window.innerHeight during toolbar
+// show/hide transitions) and publish it as a CSS var that `.wf-root`
+// prefers over the vh/dvh units once JS has run, closing any residual
+// gap between the app shell and the true bottom of the screen.
+function useRealViewportHeight() {
+  useEffect(() => {
+    const setHeight = () => {
+      const h = window.visualViewport?.height || window.innerHeight;
+      document.documentElement.style.setProperty("--app-height", `${h}px`);
+    };
+    setHeight();
+    window.addEventListener("resize", setHeight);
+    window.addEventListener("orientationchange", setHeight);
+    window.visualViewport?.addEventListener("resize", setHeight);
+    return () => {
+      window.removeEventListener("resize", setHeight);
+      window.removeEventListener("orientationchange", setHeight);
+      window.visualViewport?.removeEventListener("resize", setHeight);
+    };
+  }, []);
+}
+
 function usePwaSetup() {
   useEffect(() => {
     const addTag = (tag, attrs) => {
@@ -23974,10 +24000,15 @@ function usePwaSetup() {
 
 export default function App() {
   usePwaSetup();
+  useRealViewportHeight();
   const [lang, setLang] = useLocalStorage("hrsuite:lang", "km");
   const t = LANG[lang] || LANG.km;
   const [theme, setTheme] = useLocalStorage("hrsuite:theme", "light");
   const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
+  useEffect(() => {
+    document.body.style.background = theme === "dark" ? "#080B12" : "#F3F4F7";
+    document.body.classList.toggle("wf-dark", theme === "dark");
+  }, [theme]);
   return (
     <LangContext.Provider value={{ lang, t, setLang }}>
       <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
