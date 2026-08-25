@@ -2938,7 +2938,7 @@ html,body{background:var(--wf-paper);margin:0;padding:0;overflow:hidden;overscro
 .wf-table tbody tr:hover{background:${T.tableHeadBg};}
 .wf-grid{display:grid;gap:16px;}
 .wf-punch-clock{font-size:34px;font-weight:700;font-family:'JetBrains Mono',monospace;color:${T.ink};font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
-.wf-menu-btn{display:none;background:none;border:none;color:${T.ink};cursor:pointer;padding:4px;}
+.wf-menu-btn,.wf-sidebar-close-btn{display:none;background:none;border:none;color:${T.ink};cursor:pointer;padding:4px;}
 .wf-overlay-scrim{display:none;}
 .wf-content::-webkit-scrollbar,.wf-sidebar nav::-webkit-scrollbar,.wf-modal::-webkit-scrollbar{width:8px;}
 .wf-content::-webkit-scrollbar-thumb,.wf-modal::-webkit-scrollbar-thumb{background:${T.mutedLight};border-radius:8px;}
@@ -2952,7 +2952,7 @@ html,body{background:var(--wf-paper);margin:0;padding:0;overflow:hidden;overscro
 .wf-page-enter{animation:wf-page-in .24s ease both;}
 .wf-nav-item,.wf-bottomnav-item{transition:background .15s ease,color .15s ease,transform .15s ease;}
 .wf-bottomnav-item:active{transform:scale(.93);}
-.wf-menu-btn,.wf-btn{transition:background .15s ease,transform .12s ease,box-shadow .15s ease,color .15s ease;}
+.wf-menu-btn,.wf-sidebar-close-btn,.wf-btn{transition:background .15s ease,transform .12s ease,box-shadow .15s ease,color .15s ease;}
 .wf-bottomnav.wf-bottomnav-hidden{display:none !important;}
 .wf-role-badge{white-space:nowrap;flex-shrink:0;}
 .wf-bottomnav{display:none;position:fixed;left:0;right:0;bottom:0;z-index:45;background:${T.headerBg};backdrop-filter:blur(10px);border-top:1px solid ${T.lineSoft};align-items:stretch;justify-content:space-around;padding:5px 2px calc(5px + env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(5,8,16,0.08);}
@@ -2965,7 +2965,7 @@ html,body{background:var(--wf-paper);margin:0;padding:0;overflow:hidden;overscro
 @media (max-width: 820px){
   .wf-sidebar{position:absolute;inset:0 auto 0 0;z-index:40;transform:translateX(-100%);height:100%;box-shadow:8px 0 24px rgba(0,0,0,0.4);}
   .wf-sidebar.open{transform:translateX(0);}
-  .wf-menu-btn{display:inline-flex;}
+  .wf-menu-btn,.wf-sidebar-close-btn{display:inline-flex;}
   .wf-overlay-scrim.open{display:block;position:absolute;inset:0;background:rgba(18,32,61,0.45);z-index:35;backdrop-filter:blur(1px);}
   .wf-header{padding:calc(12px + env(safe-area-inset-top)) 16px 12px;}
   .wf-content{padding:16px;}
@@ -23331,7 +23331,7 @@ function AppInner() {
                 {brandDisplayName}
               </span>
               <button
-                className="wf-menu-btn"
+                className="wf-sidebar-close-btn"
                 style={{ marginLeft: "auto", color: "rgba(255,255,255,0.6)" }}
                 onClick={() => setNavOpen(false)}
               >
