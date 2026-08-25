@@ -2954,7 +2954,7 @@ html,body{background:var(--wf-paper);}
 .wf-menu-btn,.wf-btn{transition:background .15s ease,transform .12s ease,box-shadow .15s ease,color .15s ease;}
 .wf-bottomnav.wf-bottomnav-hidden{display:none !important;}
 .wf-role-badge{white-space:nowrap;flex-shrink:0;}
-.wf-bottomnav{display:none;position:absolute;left:0;right:0;bottom:0;z-index:45;background:${T.headerBg};backdrop-filter:blur(10px);border-top:1px solid ${T.lineSoft};align-items:stretch;justify-content:space-around;padding:5px 2px calc(5px + env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(5,8,16,0.08);}
+.wf-bottomnav{display:none;position:fixed;left:0;right:0;bottom:0;z-index:45;background:${T.headerBg};backdrop-filter:blur(10px);border-top:1px solid ${T.lineSoft};align-items:stretch;justify-content:space-around;padding:5px 2px calc(5px + env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(5,8,16,0.08);}
 .wf-bottomnav-item{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;color:${T.muted};padding:5px 2px 4px;border-radius:9px;font-size:10px;font-weight:600;transition:color .15s ease;}
 .wf-bottomnav-item span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .wf-bottomnav-item.active{color:${T.goldText};}
