@@ -4116,61 +4116,93 @@ function ToastHost() {
   }, []);
   const dismiss = (id) => setToasts((cur) => cur.filter((x) => x.id !== id));
   if (!toasts.length) return null;
+  const accent = (type) =>
+    type === "error" ? T.rose : type === "info" ? T.blue : T.forest;
   return (
     <div
       style={{
         position: "fixed",
-        bottom: 20,
-        left: "50%",
-        transform: "translateX(-50%)",
+        top: 84,
+        right: 20,
         zIndex: 9999,
         display: "flex",
         flexDirection: "column",
-        gap: 8,
-        alignItems: "stretch",
+        gap: 10,
+        alignItems: "flex-end",
         pointerEvents: "none",
-        width: "min(92vw, 420px)",
+        width: "min(92vw, 360px)",
       }}
     >
-      {toasts.map((toast) => (
-        <div
-          key={toast.id}
-          onClick={() => dismiss(toast.id)}
-          role="status"
-          style={{
-            pointerEvents: "auto",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "flex-start",
-            gap: 10,
-            padding: "11px 14px",
-            borderRadius: 10,
-            fontSize: 13,
-            fontWeight: 500,
-            color: "#fff",
-            lineHeight: 1.45,
-            background:
-              toast.type === "error"
-                ? "#DC2626"
-                : toast.type === "info"
-                  ? "#2563EB"
-                  : "#16A34A",
-            boxShadow: "0 8px 24px rgba(0,0,0,0.22)",
-            animation: "wfToastIn 0.22s ease-out",
-          }}
-        >
-          {toast.type === "error" ? (
-            <AlertCircle size={16} style={{ flexShrink: 0, marginTop: 1 }} />
-          ) : (
-            <CheckCircle2 size={16} style={{ flexShrink: 0, marginTop: 1 }} />
-          )}
-          <span style={{ flex: 1 }}>{toast.message}</span>
-        </div>
-      ))}
+      {toasts.map((toast) => {
+        const c = accent(toast.type);
+        return (
+          <div
+            key={toast.id}
+            role="status"
+            style={{
+              pointerEvents: "auto",
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 10,
+              width: "100%",
+              padding: "12px 14px",
+              borderRadius: 12,
+              fontSize: 13,
+              fontWeight: 500,
+              color: T.text,
+              lineHeight: 1.45,
+              background: T.card,
+              border: `1px solid ${T.lineSoft}`,
+              borderLeft: `3px solid ${c}`,
+              boxShadow: "0 10px 30px rgba(0,0,0,0.14)",
+              animation: "wfToastIn 0.24s ease-out",
+            }}
+          >
+            <div
+              style={{
+                flexShrink: 0,
+                width: 22,
+                height: 22,
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: `${c}1f`,
+                color: c,
+                marginTop: 1,
+              }}
+            >
+              {toast.type === "error" ? (
+                <AlertCircle size={13} />
+              ) : (
+                <CheckCircle2 size={13} />
+              )}
+            </div>
+            <span style={{ flex: 1, paddingTop: 2 }}>{toast.message}</span>
+            <button
+              onClick={() => dismiss(toast.id)}
+              aria-label="Dismiss"
+              style={{
+                flexShrink: 0,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: T.muted,
+                padding: 2,
+                display: "flex",
+                borderRadius: 6,
+                marginTop: -1,
+              }}
+            >
+              <X size={14} />
+            </button>
+          </div>
+        );
+      })}
       <style>{`
         @keyframes wfToastIn {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateX(16px); }
+          to { opacity: 1; transform: translateX(0); }
         }
       `}</style>
     </div>
