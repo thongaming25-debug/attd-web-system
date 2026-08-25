@@ -2823,7 +2823,7 @@ const STYLE_ID = "wf-suite-style";
 const CSS = `
 *,*::before,*::after{box-sizing:border-box;}
 html,body,#root{height:100%;}
-html,body{background:var(--wf-paper);}
+html,body{background:var(--wf-paper);margin:0;padding:0;overflow:hidden;overscroll-behavior:none;}
 :root{
   --wf-ink:#10141C; --wf-ink-dark:#050810; --wf-paper:#F3F4F7; --wf-card:#FFFFFF;
   --wf-forest-soft:#E4F5EC; --wf-forest-text:#127449; --wf-gold-soft:#FCF0DC; --wf-gold-text:#9A6212;
