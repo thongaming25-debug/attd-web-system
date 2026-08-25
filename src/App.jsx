@@ -70,6 +70,8 @@ import {
   Award,
   Send,
   GraduationCap,
+  Briefcase,
+  ListChecks,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -117,6 +119,8 @@ const LANG_RAW = {
       assets: "ទ្រព្យសម្បត្តិក្រុមហ៊ុន",
       training: "ការបណ្តុះបណ្តាល & សញ្ញាបត្រ",
       docExpiry: "កិច្ចសន្យា/ឯកសារជិតផុតកំណត់",
+      recruitment: "ការជ្រើសរើសបុគ្គលិក",
+      onboarding: "ចាប់ផ្តើម/បញ្ចប់ការងារ",
       admins: "គណនីអ្នកគ្រប់គ្រង",
       myAttendance: "វត្តមានរបស់ខ្ញុំ",
       myLeave: "ច្បាប់ឈប់សម្រាករបស់ខ្ញុំ",
@@ -296,6 +300,77 @@ const LANG_RAW = {
       colStatus: "ស្ថានភាព",
       daysLeft: (n) => `${n} ថ្ងៃទៀត`,
       daysAgo: (n) => `ផុតកំណត់ ${n} ថ្ងៃមុន`,
+    },
+    recruit: {
+      title: "ការជ្រើសរើសបុគ្គលិក",
+      tabJobs: "កាលានុវត្តភាពការងារ",
+      tabCandidates: "បេក្ខជន",
+      addJobBtn: "បង្ហោះកាលានុវត្តភាព",
+      editJobTitle: "កែសម្រួលកាលានុវត្តភាព",
+      addJobTitle: "បង្ហោះកាលានុវត្តភាពថ្មី",
+      jobTitle: "តំណែងការងារ",
+      jobTitlePlaceholder: "ឧ. គណនេយ្យករ",
+      jobDept: "នាយកដ្ឋាន",
+      jobType: "ប្រភេទការងារ",
+      jobTypeFullTime: "ពេញម៉ោង",
+      jobTypePartTime: "ក្រៅម៉ោង",
+      jobTypeContract: "កិច្ចសន្យា",
+      jobTypeInternship: "កម្មសិក្សា",
+      jobStatus: "ស្ថានភាព",
+      jobStatusOpen: "កំពុងបើក",
+      jobStatusClosed: "បិទហើយ",
+      jobDesc: "ការពិពណ៌នាការងារ",
+      jobPostedDate: "ថ្ងៃបង្ហោះ",
+      jobClosingDate: "ថ្ងៃផុតកំណត់ដាក់ពាក្យ (បើមាន)",
+      noJobs: "មិនទាន់មានកាលានុវត្តភាពការងារទេ",
+      confirmDelJob: (title) => `តើអ្នកប្រាកដទេថាចង់លុប "${title}"?`,
+      candidatesFor: (n) => `បេក្ខជន ${n} នាក់`,
+      addCandidateBtn: "បន្ថែមបេក្ខជន",
+      editCandidateTitle: "កែសម្រួលបេក្ខជន",
+      addCandidateTitle: "បន្ថែមបេក្ខជនថ្មី",
+      candidateName: "ឈ្មោះបេក្ខជន",
+      candidateNamePlaceholder: "ឧ. កញ្ញា សុភា",
+      candidatePhone: "លេខទូរស័ព្ទ",
+      candidateEmail: "អ៊ីម៉ែល",
+      appliedFor: "ដាក់ពាក្យសម្រាប់តំណែង",
+      noJobSelected: "មិនទាន់ជ្រើសរើសកាលានុវត្តភាព",
+      stage: "ដំណាក់កាល",
+      stageApplied: "បានដាក់ពាក្យ",
+      stageScreening: "កំពុងពិនិត្យ",
+      stageInterview: "សម្ភាសន៍",
+      stageOffer: "ផ្តល់ជូនការងារ",
+      stageHired: "ជាប់ការងារ",
+      stageRejected: "បដិសេធ",
+      allStages: "ដំណាក់កាលទាំងអស់",
+      notes: "កំណត់ចំណាំ",
+      resume: "ប្រវត្តិរូបសង្ខេប (CV/Resume)",
+      uploadResume: "ផ្ទុក CV",
+      noResume: "មិនទាន់មានឯកសារ",
+      appliedDate: "ថ្ងៃដាក់ពាក្យ",
+      searchCandidates: "ស្វែងរកបេក្ខជន...",
+      noCandidates: "មិនទាន់មានបេក្ខជនទេ",
+      confirmDelCandidate: (name) => `តើអ្នកប្រាកដទេថាចង់លុប "${name}"?`,
+      hireHint:
+        'នៅពេលបេក្ខជនត្រូវបានជ្រើសរើស សូមបន្ថែមគាត់ដោយផ្ទាល់នៅផ្នែក "បុគ្គលិក"',
+    },
+    onboard: {
+      title: "ចាប់ផ្តើម/បញ្ចប់ការងារ",
+      subtitle:
+        "តាមដានកិច្ចការចាំបាច់ពេលបុគ្គលិកថ្មីចូលធ្វើការ ឬពេលបុគ្គលិកចាស់ឈប់ធ្វើការ",
+      selectEmployee: "ជ្រើសរើសបុគ្គលិក",
+      chooseEmployee: "-- ជ្រើសរើសបុគ្គលិក --",
+      typeOnboarding: "ចាប់ផ្តើមការងារ (Onboarding)",
+      typeOffboarding: "បញ្ចប់ការងារ (Offboarding)",
+      loadTemplate: "ផ្ទុកបញ្ជីស្តង់ដារ",
+      addTask: "បន្ថែមកិច្ចការ",
+      taskPlaceholder: "ឧ. ចេញកាតសម្គាល់បុគ្គលិក",
+      dueDate: "កាលកំណត់ (បើមាន)",
+      noTasks: "មិនទាន់មានកិច្ចការទេ",
+      noTasksHint:
+        'ចុច "ផ្ទុកបញ្ជីស្តង់ដារ" ដើម្បីចាប់ផ្តើម ឬបន្ថែមផ្ទាល់ខ្លួន',
+      progress: (done, total) => `បានបញ្ចប់ ${done}/${total}`,
+      confirmDelTask: "តើអ្នកប្រាកដទេថាចង់លុបកិច្ចការនេះ?",
+      selectEmployeeHint: "សូមជ្រើសរើសបុគ្គលិកមុនសិន",
     },
     emps: {
       addBtn: "បន្ថែមបុគ្គលិក",
@@ -975,6 +1050,8 @@ const LANG_RAW = {
       assets: "Company Assets",
       training: "Training & Certifications",
       docExpiry: "Contracts & Expiring Docs",
+      recruitment: "Recruitment",
+      onboarding: "Onboarding / Offboarding",
       admins: "Admin Accounts",
       myAttendance: "My Attendance",
       myLeave: "My Leave",
@@ -1155,6 +1232,78 @@ const LANG_RAW = {
       colStatus: "Status",
       daysLeft: (n) => `${n}d left`,
       daysAgo: (n) => `Expired ${n}d ago`,
+    },
+    recruit: {
+      title: "Recruitment",
+      tabJobs: "Job Postings",
+      tabCandidates: "Candidates",
+      addJobBtn: "Post a Job",
+      editJobTitle: "Edit Job Posting",
+      addJobTitle: "Post a New Job",
+      jobTitle: "Job Title",
+      jobTitlePlaceholder: "e.g. Accountant",
+      jobDept: "Department",
+      jobType: "Employment Type",
+      jobTypeFullTime: "Full-time",
+      jobTypePartTime: "Part-time",
+      jobTypeContract: "Contract",
+      jobTypeInternship: "Internship",
+      jobStatus: "Status",
+      jobStatusOpen: "Open",
+      jobStatusClosed: "Closed",
+      jobDesc: "Job Description",
+      jobPostedDate: "Posted Date",
+      jobClosingDate: "Closing Date (optional)",
+      noJobs: "No job postings yet",
+      confirmDelJob: (title) => `Are you sure you want to delete "${title}"?`,
+      candidatesFor: (n) => `${n} candidate(s)`,
+      addCandidateBtn: "Add Candidate",
+      editCandidateTitle: "Edit Candidate",
+      addCandidateTitle: "Add New Candidate",
+      candidateName: "Candidate Name",
+      candidateNamePlaceholder: "e.g. Sophea Kong",
+      candidatePhone: "Phone",
+      candidateEmail: "Email",
+      appliedFor: "Applied For",
+      noJobSelected: "No job posting selected",
+      stage: "Stage",
+      stageApplied: "Applied",
+      stageScreening: "Screening",
+      stageInterview: "Interview",
+      stageOffer: "Offer",
+      stageHired: "Hired",
+      stageRejected: "Rejected",
+      allStages: "All Stages",
+      notes: "Notes",
+      resume: "Resume / CV",
+      uploadResume: "Upload CV",
+      noResume: "No file yet",
+      appliedDate: "Applied Date",
+      searchCandidates: "Search candidates...",
+      noCandidates: "No candidates yet",
+      confirmDelCandidate: (name) =>
+        `Are you sure you want to delete "${name}"?`,
+      hireHint:
+        'Once a candidate is hired, add them directly under "Employees"',
+    },
+    onboard: {
+      title: "Onboarding / Offboarding",
+      subtitle:
+        "Track the tasks needed when a new employee joins, or when one leaves",
+      selectEmployee: "Select Employee",
+      chooseEmployee: "-- Select an employee --",
+      typeOnboarding: "Onboarding",
+      typeOffboarding: "Offboarding",
+      loadTemplate: "Load Default Checklist",
+      addTask: "Add Task",
+      taskPlaceholder: "e.g. Issue staff ID badge",
+      dueDate: "Due Date (optional)",
+      noTasks: "No tasks yet",
+      noTasksHint:
+        'Click "Load Default Checklist" to get started, or add your own',
+      progress: (done, total) => `${done}/${total} done`,
+      confirmDelTask: "Are you sure you want to delete this task?",
+      selectEmployeeHint: "Please select an employee first",
     },
     emps: {
       addBtn: "Add Employee",
@@ -2433,6 +2582,7 @@ const PERMISSION_MODULES = [
   "manageSettings",
   "viewAuditLog",
   "manageAssets",
+  "manageRecruitment",
 ];
 const PERMISSION_LABEL = {
   km: {
@@ -2445,6 +2595,7 @@ const PERMISSION_LABEL = {
     manageSettings: "គ្រប់គ្រងការកំណត់ក្រុមហ៊ុន",
     viewAuditLog: "មើលកំណត់ត្រាសកម្មភាព",
     manageAssets: "គ្រប់គ្រងទ្រព្យសម្បត្តិក្រុមហ៊ុន",
+    manageRecruitment: "គ្រប់គ្រងការជ្រើសរើសនិងចាប់ផ្តើមការងារ",
   },
   en: {
     manageDepartments: "Manage Departments/Shifts",
@@ -2456,6 +2607,7 @@ const PERMISSION_LABEL = {
     manageSettings: "Manage Company Settings",
     viewAuditLog: "View Audit Log",
     manageAssets: "Manage Company Assets",
+    manageRecruitment: "Manage Recruitment & Onboarding",
   },
 };
 // Fixed id under which the Employee Self-Service module toggles are saved
@@ -2531,6 +2683,7 @@ const DEFAULT_EMPLOYEE_MODULES = {
   manageAnnouncements: false,
   manageSettings: false,
   viewAuditLog: false,
+  manageRecruitment: false,
   announcements: true,
   attendance: true,
   leave: true,
@@ -2561,6 +2714,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     manageSettings: false,
     viewAuditLog: false,
     manageAssets: false,
+    manageRecruitment: false,
   },
   officer: {
     manageDepartments: false,
@@ -2572,6 +2726,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     manageSettings: false,
     viewAuditLog: false,
     manageAssets: false,
+    manageRecruitment: false,
   },
   senior: {
     manageDepartments: false,
@@ -2583,6 +2738,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     manageSettings: false,
     viewAuditLog: false,
     manageAssets: true,
+    manageRecruitment: true,
   },
   supervisor: {
     manageDepartments: false,
@@ -2594,6 +2750,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     manageSettings: false,
     viewAuditLog: false,
     manageAssets: true,
+    manageRecruitment: true,
   },
   manager: {
     manageDepartments: true,
@@ -2605,6 +2762,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     manageSettings: false,
     viewAuditLog: false,
     manageAssets: true,
+    manageRecruitment: true,
   },
   seniorManager: {
     manageDepartments: true,
@@ -2616,6 +2774,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     manageSettings: true,
     viewAuditLog: true,
     manageAssets: true,
+    manageRecruitment: true,
   },
   admin: {
     manageDepartments: true,
@@ -2627,6 +2786,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     manageSettings: true,
     viewAuditLog: true,
     manageAssets: true,
+    manageRecruitment: true,
   },
 };
 // Admin role names follow the app's km/en language toggle (like every
@@ -15898,6 +16058,1033 @@ function DocumentExpiryPage({ documents, employees }) {
 }
 
 /* ---------------------------------------------------------------
+   Recruitment — job postings + candidate pipeline. Two tabs: post
+   and manage job openings, then track applicants per posting
+   through the hiring stages (applied → screening → interview →
+   offer → hired/rejected).
+----------------------------------------------------------------*/
+const JOB_TYPES = ["full_time", "part_time", "contract", "internship"];
+function jobTypeLabel(type, t) {
+  return (
+    {
+      full_time: t.recruit.jobTypeFullTime,
+      part_time: t.recruit.jobTypePartTime,
+      contract: t.recruit.jobTypeContract,
+      internship: t.recruit.jobTypeInternship,
+    }[type] || type
+  );
+}
+const CANDIDATE_STAGES = [
+  "applied",
+  "screening",
+  "interview",
+  "offer",
+  "hired",
+  "rejected",
+];
+function stageLabel(stage, t) {
+  return (
+    {
+      applied: t.recruit.stageApplied,
+      screening: t.recruit.stageScreening,
+      interview: t.recruit.stageInterview,
+      offer: t.recruit.stageOffer,
+      hired: t.recruit.stageHired,
+      rejected: t.recruit.stageRejected,
+    }[stage] || stage
+  );
+}
+function stageColor(stage) {
+  return (
+    {
+      applied: T.blue,
+      screening: T.gold,
+      interview: T.clay,
+      offer: T.forest,
+      hired: T.forestDark,
+      rejected: T.rose,
+    }[stage] || T.muted
+  );
+}
+function StagePill({ stage, t }) {
+  const c = stageColor(stage);
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        padding: "3px 10px",
+        borderRadius: 999,
+        fontSize: 11.5,
+        fontWeight: 600,
+        color: c,
+        background: `${c}1a`,
+        border: `1px solid ${c}33`,
+        whiteSpace: "nowrap",
+      }}
+    >
+      {stageLabel(stage, t)}
+    </span>
+  );
+}
+
+function JobPostingForm({ initial, departments, onSave, onCancel }) {
+  const { t } = useLang();
+  const [f, setF] = useState(
+    initial || {
+      title: "",
+      departmentId: "",
+      employmentType: "full_time",
+      status: "open",
+      description: "",
+      postedDate: todayStr(),
+      closingDate: "",
+    },
+  );
+  const set = (k) => (e) =>
+    setF((p) => ({
+      ...p,
+      [k]: e && e.target ? e.target.value : e,
+    }));
+  return (
+    <div style={{ display: "grid", gap: 12 }}>
+      <Field label={t.recruit.jobTitle}>
+        <Input
+          value={f.title}
+          onChange={set("title")}
+          placeholder={t.recruit.jobTitlePlaceholder}
+        />
+      </Field>
+      <Field label={t.recruit.jobDept}>
+        <Select value={f.departmentId || ""} onChange={set("departmentId")}>
+          <option value="">—</option>
+          {departments.map((d) => (
+            <option key={d.id} value={d.id}>
+              {d.name}
+            </option>
+          ))}
+        </Select>
+      </Field>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <Field label={t.recruit.jobType}>
+          <Select value={f.employmentType} onChange={set("employmentType")}>
+            {JOB_TYPES.map((jt) => (
+              <option key={jt} value={jt}>
+                {jobTypeLabel(jt, t)}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field label={t.recruit.jobStatus}>
+          <Select value={f.status} onChange={set("status")}>
+            <option value="open">{t.recruit.jobStatusOpen}</option>
+            <option value="closed">{t.recruit.jobStatusClosed}</option>
+          </Select>
+        </Field>
+      </div>
+      <Field label={t.recruit.jobDesc}>
+        <textarea
+          value={f.description}
+          onChange={set("description")}
+          rows={4}
+          style={{
+            width: "100%",
+            borderRadius: 10,
+            border: `1px solid ${T.divider}`,
+            background: T.inputBg,
+            color: T.text,
+            padding: "10px 12px",
+            fontSize: 13.5,
+            fontFamily: "inherit",
+            resize: "vertical",
+          }}
+        />
+      </Field>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <Field label={t.recruit.jobPostedDate}>
+          <DatePicker value={f.postedDate} onChange={set("postedDate")} />
+        </Field>
+        <Field label={t.recruit.jobClosingDate}>
+          <DatePicker value={f.closingDate} onChange={set("closingDate")} />
+        </Field>
+      </div>
+      <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+        <Button variant="ghost" onClick={onCancel}>
+          {t.cancel}
+        </Button>
+        <Button
+          onClick={() => onSave({ ...f, id: initial?.id || uid("job") })}
+          disabled={!f.title.trim()}
+        >
+          {t.save}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function JobPostingsTab({
+  jobPostings,
+  setJobPostings,
+  candidates,
+  departments,
+  isSuperAdmin,
+  onSelectJob,
+}) {
+  const { t } = useLang();
+  const [modal, setModal] = useState(null);
+  const [confirmDel, setConfirmDel] = useState(null);
+  const deptName = (id) => departments.find((d) => d.id === id)?.name || "";
+  const candidateCount = (jobId) =>
+    candidates.filter((c) => c.jobPostingId === jobId).length;
+
+  const save = (row) => {
+    setJobPostings((prev) => {
+      const exists = prev.some((j) => j.id === row.id);
+      return exists
+        ? prev.map((j) => (j.id === row.id ? row : j))
+        : [...prev, row];
+    });
+    setModal(null);
+  };
+
+  return (
+    <div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: 14,
+        }}
+      >
+        {isSuperAdmin && (
+          <Button onClick={() => setModal({ mode: "add" })}>
+            <Plus size={15} /> {t.recruit.addJobBtn}
+          </Button>
+        )}
+      </div>
+      {jobPostings.length === 0 ? (
+        <Card style={{ padding: 24, textAlign: "center", color: T.textSoft }}>
+          {t.recruit.noJobs}
+        </Card>
+      ) : (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+            gap: 12,
+          }}
+        >
+          {jobPostings.map((j) => (
+            <Card key={j.id} style={{ padding: 16, cursor: "pointer" }}>
+              <div
+                onClick={() => onSelectJob && onSelectJob(j.id)}
+                style={{ marginBottom: 10 }}
+              >
+                <div style={{ fontWeight: 700, fontSize: 15 }}>{j.title}</div>
+                <div style={{ fontSize: 12.5, color: T.textSoft }}>
+                  {deptName(j.departmentId)} ·{" "}
+                  {jobTypeLabel(j.employmentType, t)}
+                </div>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 8,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 11.5,
+                    fontWeight: 600,
+                    padding: "3px 10px",
+                    borderRadius: 999,
+                    color: j.status === "open" ? T.forest : T.muted,
+                    background:
+                      j.status === "open" ? `${T.forest}1a` : `${T.muted}1a`,
+                  }}
+                >
+                  {j.status === "open"
+                    ? t.recruit.jobStatusOpen
+                    : t.recruit.jobStatusClosed}
+                </span>
+                <span style={{ fontSize: 12, color: T.textSoft }}>
+                  {t.recruit.candidatesFor(candidateCount(j.id))}
+                </span>
+              </div>
+              {isSuperAdmin && (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 8,
+                    marginTop: 12,
+                    paddingTop: 12,
+                    borderTop: `1px solid ${T.divider}`,
+                  }}
+                >
+                  <Button
+                    variant="ghost"
+                    onClick={() => setModal({ mode: "edit", data: j })}
+                  >
+                    <Pencil size={14} />
+                  </Button>
+                  <Button variant="ghost" onClick={() => setConfirmDel(j)}>
+                    <Trash2 size={14} color={T.rose} />
+                  </Button>
+                </div>
+              )}
+            </Card>
+          ))}
+        </div>
+      )}
+      {modal && (
+        <Modal
+          title={
+            modal.mode === "add"
+              ? t.recruit.addJobTitle
+              : t.recruit.editJobTitle
+          }
+          onClose={() => setModal(null)}
+        >
+          <JobPostingForm
+            initial={modal.data}
+            departments={departments}
+            onSave={save}
+            onCancel={() => setModal(null)}
+          />
+        </Modal>
+      )}
+      {confirmDel && (
+        <ConfirmDialog
+          text={t.recruit.confirmDelJob(confirmDel.title)}
+          onCancel={() => setConfirmDel(null)}
+          onConfirm={() => {
+            setJobPostings((prev) =>
+              prev.filter((j) => j.id !== confirmDel.id),
+            );
+            setConfirmDel(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function CandidateForm({
+  initial,
+  jobPostings,
+  defaultJobId,
+  onSave,
+  onCancel,
+}) {
+  const { t } = useLang();
+  const [f, setF] = useState(
+    initial || {
+      name: "",
+      phone: "",
+      email: "",
+      jobPostingId: defaultJobId || "",
+      stage: "applied",
+      notes: "",
+      appliedDate: todayStr(),
+      resumeFileName: "",
+      resumeMimeType: "",
+      resumeDataUrl: "",
+    },
+  );
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+  const resumeInputRef = useRef(null);
+  const set = (k) => (e) =>
+    setF((p) => ({
+      ...p,
+      [k]: e && e.target ? e.target.value : e,
+    }));
+
+  const handleFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError("");
+    if (file.size > MAX_DOC_BYTES) {
+      setError(t.doc.tooLarge);
+      if (resumeInputRef.current) resumeInputRef.current.value = "";
+      return;
+    }
+    setUploading(true);
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      setF((p) => ({
+        ...p,
+        resumeFileName: file.name,
+        resumeMimeType: file.type || "application/octet-stream",
+        resumeDataUrl: dataUrl,
+      }));
+    } finally {
+      setUploading(false);
+      if (resumeInputRef.current) resumeInputRef.current.value = "";
+    }
+  };
+
+  return (
+    <div style={{ display: "grid", gap: 12 }}>
+      <Field label={t.recruit.candidateName}>
+        <Input
+          value={f.name}
+          onChange={set("name")}
+          placeholder={t.recruit.candidateNamePlaceholder}
+        />
+      </Field>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <Field label={t.recruit.candidatePhone}>
+          <Input value={f.phone} onChange={set("phone")} />
+        </Field>
+        <Field label={t.recruit.candidateEmail}>
+          <Input value={f.email} onChange={set("email")} />
+        </Field>
+      </div>
+      <Field label={t.recruit.appliedFor}>
+        <Select value={f.jobPostingId || ""} onChange={set("jobPostingId")}>
+          <option value="">{t.recruit.noJobSelected}</option>
+          {jobPostings.map((j) => (
+            <option key={j.id} value={j.id}>
+              {j.title}
+            </option>
+          ))}
+        </Select>
+      </Field>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <Field label={t.recruit.stage}>
+          <Select value={f.stage} onChange={set("stage")}>
+            {CANDIDATE_STAGES.map((s) => (
+              <option key={s} value={s}>
+                {stageLabel(s, t)}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <Field label={t.recruit.appliedDate}>
+          <DatePicker value={f.appliedDate} onChange={set("appliedDate")} />
+        </Field>
+      </div>
+      <Field label={t.recruit.notes}>
+        <textarea
+          value={f.notes}
+          onChange={set("notes")}
+          rows={3}
+          style={{
+            width: "100%",
+            borderRadius: 10,
+            border: `1px solid ${T.divider}`,
+            background: T.inputBg,
+            color: T.text,
+            padding: "10px 12px",
+            fontSize: 13.5,
+            fontFamily: "inherit",
+            resize: "vertical",
+          }}
+        />
+      </Field>
+      <Field label={t.recruit.resume}>
+        {f.resumeDataUrl ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <DocViewDownloadLinks
+              doc={{
+                fileName: f.resumeFileName,
+                mimeType: f.resumeMimeType,
+                dataUrl: f.resumeDataUrl,
+              }}
+            />
+            <Button
+              variant="ghost"
+              onClick={() =>
+                setF((p) => ({
+                  ...p,
+                  resumeFileName: "",
+                  resumeMimeType: "",
+                  resumeDataUrl: "",
+                }))
+              }
+            >
+              <Trash2 size={14} color={T.rose} />
+            </Button>
+          </div>
+        ) : (
+          <div style={{ fontSize: 12.5, color: T.textSoft, marginBottom: 6 }}>
+            {t.recruit.noResume}
+          </div>
+        )}
+        <input
+          ref={resumeInputRef}
+          type="file"
+          accept=".pdf,.doc,.docx,image/*"
+          onChange={handleFile}
+          style={{ display: "none" }}
+        />
+        <Button
+          variant="ghost"
+          disabled={uploading}
+          onClick={() => resumeInputRef.current?.click()}
+        >
+          {uploading ? (
+            <Loader2
+              size={14}
+              style={{ animation: "spin 1s linear infinite" }}
+            />
+          ) : (
+            <Upload size={14} />
+          )}{" "}
+          {t.recruit.uploadResume}
+        </Button>
+        {error && (
+          <div style={{ fontSize: 12, color: T.rose, marginTop: 6 }}>
+            {error}
+          </div>
+        )}
+      </Field>
+      <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+        <Button variant="ghost" onClick={onCancel}>
+          {t.cancel}
+        </Button>
+        <Button
+          onClick={() => onSave({ ...f, id: initial?.id || uid("cand") })}
+          disabled={!f.name.trim()}
+        >
+          {t.save}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function CandidatesTab({
+  candidates,
+  setCandidates,
+  jobPostings,
+  isSuperAdmin,
+  selectedJobId,
+}) {
+  const { t } = useLang();
+  const [modal, setModal] = useState(null);
+  const [confirmDel, setConfirmDel] = useState(null);
+  const [query, setQuery] = useState("");
+  const [stageFilter, setStageFilter] = useState("");
+  const [jobFilter, setJobFilter] = useState(selectedJobId || "");
+
+  useEffect(() => {
+    if (selectedJobId) setJobFilter(selectedJobId);
+  }, [selectedJobId]);
+
+  const jobTitle = (id) => jobPostings.find((j) => j.id === id)?.title || "";
+
+  const filtered = useMemo(
+    () =>
+      candidates.filter(
+        (c) =>
+          (c.name + c.email + c.phone)
+            .toLowerCase()
+            .includes(query.toLowerCase()) &&
+          (!stageFilter || c.stage === stageFilter) &&
+          (!jobFilter || c.jobPostingId === jobFilter),
+      ),
+    [candidates, query, stageFilter, jobFilter],
+  );
+
+  const save = (row) => {
+    setCandidates((prev) => {
+      const exists = prev.some((c) => c.id === row.id);
+      return exists
+        ? prev.map((c) => (c.id === row.id ? row : c))
+        : [...prev, row];
+    });
+    setModal(null);
+  };
+
+  return (
+    <div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          marginBottom: 14,
+          flexWrap: "wrap",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            flexWrap: "wrap",
+            flex: 1,
+          }}
+        >
+          <div style={{ position: "relative", minWidth: 200 }}>
+            <Search
+              size={15}
+              style={{
+                position: "absolute",
+                left: 12,
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: T.muted,
+              }}
+            />
+            <Input
+              style={{ paddingLeft: 34 }}
+              placeholder={t.recruit.searchCandidates}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+          <Select
+            style={{ maxWidth: 180 }}
+            value={stageFilter}
+            onChange={(e) => setStageFilter(e.target.value)}
+          >
+            <option value="">{t.recruit.allStages}</option>
+            {CANDIDATE_STAGES.map((s) => (
+              <option key={s} value={s}>
+                {stageLabel(s, t)}
+              </option>
+            ))}
+          </Select>
+          <Select
+            style={{ maxWidth: 200 }}
+            value={jobFilter}
+            onChange={(e) => setJobFilter(e.target.value)}
+          >
+            <option value="">{t.recruit.noJobSelected}</option>
+            {jobPostings.map((j) => (
+              <option key={j.id} value={j.id}>
+                {j.title}
+              </option>
+            ))}
+          </Select>
+        </div>
+        {isSuperAdmin && (
+          <Button
+            onClick={() =>
+              setModal({ mode: "add", defaultJobId: jobFilter || "" })
+            }
+          >
+            <Plus size={15} /> {t.recruit.addCandidateBtn}
+          </Button>
+        )}
+      </div>
+      {filtered.length === 0 ? (
+        <Card style={{ padding: 24, textAlign: "center", color: T.textSoft }}>
+          {t.recruit.noCandidates}
+        </Card>
+      ) : (
+        <div style={{ display: "grid", gap: 10 }}>
+          {filtered.map((c) => (
+            <Card
+              key={c.id}
+              style={{
+                padding: 14,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                flexWrap: "wrap",
+              }}
+            >
+              <div style={{ minWidth: 180 }}>
+                <div style={{ fontWeight: 700, fontSize: 14 }}>{c.name}</div>
+                <div style={{ fontSize: 12, color: T.textSoft }}>
+                  {jobTitle(c.jobPostingId) || t.recruit.noJobSelected}
+                </div>
+              </div>
+              <div style={{ fontSize: 12.5, color: T.textSoft }}>
+                {c.phone} {c.email && `· ${c.email}`}
+              </div>
+              <StagePill stage={c.stage} t={t} />
+              {isSuperAdmin && (
+                <div style={{ display: "flex", gap: 6 }}>
+                  <Button
+                    variant="ghost"
+                    onClick={() => setModal({ mode: "edit", data: c })}
+                  >
+                    <Pencil size={14} />
+                  </Button>
+                  <Button variant="ghost" onClick={() => setConfirmDel(c)}>
+                    <Trash2 size={14} color={T.rose} />
+                  </Button>
+                </div>
+              )}
+            </Card>
+          ))}
+        </div>
+      )}
+      {t.recruit.hireHint && (
+        <div style={{ fontSize: 11.5, color: T.textSoft, marginTop: 10 }}>
+          {t.recruit.hireHint}
+        </div>
+      )}
+      {modal && (
+        <Modal
+          title={
+            modal.mode === "add"
+              ? t.recruit.addCandidateTitle
+              : t.recruit.editCandidateTitle
+          }
+          onClose={() => setModal(null)}
+        >
+          <CandidateForm
+            initial={modal.data}
+            defaultJobId={modal.defaultJobId}
+            jobPostings={jobPostings}
+            onSave={save}
+            onCancel={() => setModal(null)}
+          />
+        </Modal>
+      )}
+      {confirmDel && (
+        <ConfirmDialog
+          text={t.recruit.confirmDelCandidate(confirmDel.name)}
+          onCancel={() => setConfirmDel(null)}
+          onConfirm={() => {
+            setCandidates((prev) => prev.filter((c) => c.id !== confirmDel.id));
+            setConfirmDel(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function Recruitment({
+  jobPostings,
+  setJobPostings,
+  candidates,
+  setCandidates,
+  departments,
+  isSuperAdmin,
+}) {
+  const { t } = useLang();
+  const [tab, setTab] = useState("jobs");
+  const [selectedJobId, setSelectedJobId] = useState("");
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+        <Button
+          variant={tab === "jobs" ? "accent" : "ghost"}
+          onClick={() => setTab("jobs")}
+        >
+          {t.recruit.tabJobs}
+        </Button>
+        <Button
+          variant={tab === "candidates" ? "accent" : "ghost"}
+          onClick={() => setTab("candidates")}
+        >
+          {t.recruit.tabCandidates}
+        </Button>
+      </div>
+      {tab === "jobs" ? (
+        <JobPostingsTab
+          jobPostings={jobPostings}
+          setJobPostings={setJobPostings}
+          candidates={candidates}
+          departments={departments}
+          isSuperAdmin={isSuperAdmin}
+          onSelectJob={(id) => {
+            setSelectedJobId(id);
+            setTab("candidates");
+          }}
+        />
+      ) : (
+        <CandidatesTab
+          candidates={candidates}
+          setCandidates={setCandidates}
+          jobPostings={jobPostings}
+          isSuperAdmin={isSuperAdmin}
+          selectedJobId={selectedJobId}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   Onboarding / Offboarding — per-employee checklist for the tasks
+   needed when someone joins or leaves. Standard checklists can be
+   loaded as a starting point, then customized freely.
+----------------------------------------------------------------*/
+function onboardingTemplate(lang) {
+  return lang === "en"
+    ? [
+        "Prepare workstation & equipment",
+        "Issue staff ID badge",
+        "Create company email / accounts",
+        "Collect signed contract & ID copy",
+        "Introduce to team & manager",
+        "Explain company policies & benefits",
+        "Set up payroll & bank details",
+      ]
+    : [
+        "រៀបចំកន្លែងធ្វើការ និងឧបករណ៍",
+        "ចេញកាតសម្គាល់បុគ្គលិក",
+        "បង្កើតអ៊ីម៉ែល/គណនីក្រុមហ៊ុន",
+        "ប្រមូលកិច្ចសន្យាដែលបានចុះហត្ថលេខា + ID",
+        "ណែនាំជាមួយក្រុម និងអ្នកគ្រប់គ្រង",
+        "ពន្យល់អំពីគោលការណ៍ក្រុមហ៊ុន និងអត្ថប្រយោជន៍",
+        "រៀបចំប្រាក់ខែ និងព័ត៌មានធនាគារ",
+      ];
+}
+function offboardingTemplate(lang) {
+  return lang === "en"
+    ? [
+        "Collect company assets & ID badge",
+        "Revoke system/account access",
+        "Final payroll & unused leave settlement",
+        "Exit interview",
+        "Update team on handover",
+        "Issue employment certificate (if requested)",
+      ]
+    : [
+        "ប្រមូលទ្រព្យសម្បត្តិក្រុមហ៊ុន និងកាតសម្គាល់",
+        "ដកសិទ្ធិចូលប្រើប្រព័ន្ធ/គណនី",
+        "គណនាប្រាក់ខែចុងក្រោយ និងថ្ងៃឈប់សម្រាកនៅសល់",
+        "សម្ភាសន៍មុនចាកចេញ",
+        "ជូនដំណឹងក្រុមអំពីការប្រគល់ការងារបន្ត",
+        "ចេញលិខិតបញ្ជាក់ការងារ (ប្រសិនបើស្នើសុំ)",
+      ];
+}
+
+function OnboardingOffboarding({
+  employees,
+  onboardingTasks,
+  setOnboardingTasks,
+}) {
+  const { t, lang } = useLang();
+  const [employeeId, setEmployeeId] = useState("");
+  const [type, setType] = useState("onboarding");
+  const [newTask, setNewTask] = useState("");
+  const [newDue, setNewDue] = useState("");
+  const [confirmDel, setConfirmDel] = useState(null);
+
+  const tasks = useMemo(
+    () =>
+      onboardingTasks
+        .filter((tk) => tk.employeeId === employeeId && tk.type === type)
+        .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0)),
+    [onboardingTasks, employeeId, type],
+  );
+
+  const addTask = (title, dueDate = "") => {
+    if (!employeeId || !title.trim()) return;
+    setOnboardingTasks((prev) => [
+      ...prev,
+      {
+        id: uid("obt"),
+        employeeId,
+        type,
+        title: title.trim(),
+        done: false,
+        dueDate,
+        orderIndex: tasks.length,
+        createdAt: new Date().toISOString(),
+      },
+    ]);
+  };
+
+  const loadTemplate = () => {
+    if (!employeeId) return;
+    const items =
+      type === "onboarding"
+        ? onboardingTemplate(lang)
+        : offboardingTemplate(lang);
+    const existingTitles = new Set(tasks.map((tk) => tk.title));
+    const toAdd = items
+      .filter((title) => !existingTitles.has(title))
+      .map((title, i) => ({
+        id: uid("obt"),
+        employeeId,
+        type,
+        title,
+        done: false,
+        dueDate: "",
+        orderIndex: tasks.length + i,
+        createdAt: new Date().toISOString(),
+      }));
+    if (toAdd.length) setOnboardingTasks((prev) => [...prev, ...toAdd]);
+  };
+
+  const toggleDone = (taskId) => {
+    setOnboardingTasks((prev) =>
+      prev.map((tk) => (tk.id === taskId ? { ...tk, done: !tk.done } : tk)),
+    );
+  };
+
+  const doneCount = tasks.filter((tk) => tk.done).length;
+
+  return (
+    <div>
+      <div style={{ fontSize: 13, color: T.textSoft, marginBottom: 16 }}>
+        {t.onboard.subtitle}
+      </div>
+      <div
+        style={{
+          display: "flex",
+          gap: 12,
+          flexWrap: "wrap",
+          marginBottom: 16,
+        }}
+      >
+        <div style={{ minWidth: 220 }}>
+          <Field label={t.onboard.selectEmployee}>
+            <Select
+              value={employeeId}
+              onChange={(e) => setEmployeeId(e.target.value)}
+            >
+              <option value="">{t.onboard.chooseEmployee}</option>
+              {employees.map((e) => (
+                <option key={e.id} value={e.id}>
+                  {e.name}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        </div>
+        <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
+          <Button
+            variant={type === "onboarding" ? "accent" : "ghost"}
+            onClick={() => setType("onboarding")}
+          >
+            {t.onboard.typeOnboarding}
+          </Button>
+          <Button
+            variant={type === "offboarding" ? "accent" : "ghost"}
+            onClick={() => setType("offboarding")}
+          >
+            {t.onboard.typeOffboarding}
+          </Button>
+        </div>
+      </div>
+      {!employeeId ? (
+        <Card style={{ padding: 24, textAlign: "center", color: T.textSoft }}>
+          {t.onboard.selectEmployeeHint}
+        </Card>
+      ) : (
+        <Card style={{ padding: 16 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 14,
+            }}
+          >
+            <div style={{ fontSize: 13, color: T.textSoft }}>
+              {t.onboard.progress(doneCount, tasks.length)}
+            </div>
+            {tasks.length === 0 && (
+              <Button variant="ghost" onClick={loadTemplate}>
+                {t.onboard.loadTemplate}
+              </Button>
+            )}
+          </div>
+          {tasks.length === 0 ? (
+            <div
+              style={{
+                textAlign: "center",
+                color: T.textSoft,
+                fontSize: 13,
+                padding: "16px 0",
+              }}
+            >
+              <div>{t.onboard.noTasks}</div>
+              <div style={{ fontSize: 12, marginTop: 4 }}>
+                {t.onboard.noTasksHint}
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: "grid", gap: 8, marginBottom: 14 }}>
+              {tasks.map((tk) => (
+                <div
+                  key={tk.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: "8px 10px",
+                    borderRadius: 8,
+                    background: tk.done ? `${T.forest}0d` : "transparent",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={tk.done}
+                    onChange={() => toggleDone(tk.id)}
+                    style={{ width: 16, height: 16 }}
+                  />
+                  <div
+                    style={{
+                      flex: 1,
+                      fontSize: 13.5,
+                      textDecoration: tk.done ? "line-through" : "none",
+                      color: tk.done ? T.textSoft : T.text,
+                    }}
+                  >
+                    {tk.title}
+                  </div>
+                  {tk.dueDate && (
+                    <div style={{ fontSize: 11.5, color: T.textSoft }}>
+                      {tk.dueDate}
+                    </div>
+                  )}
+                  <Button variant="ghost" onClick={() => setConfirmDel(tk)}>
+                    <Trash2 size={13} color={T.rose} />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <Input
+              style={{ flex: 1, minWidth: 180 }}
+              placeholder={t.onboard.taskPlaceholder}
+              value={newTask}
+              onChange={(e) => setNewTask(e.target.value)}
+            />
+            <DatePicker
+              value={newDue}
+              onChange={(e) => setNewDue(e && e.target ? e.target.value : e)}
+            />
+            <Button
+              onClick={() => {
+                addTask(newTask, newDue);
+                setNewTask("");
+                setNewDue("");
+              }}
+              disabled={!newTask.trim()}
+            >
+              <Plus size={15} /> {t.onboard.addTask}
+            </Button>
+          </div>
+        </Card>
+      )}
+      {confirmDel && (
+        <ConfirmDialog
+          text={t.onboard.confirmDelTask}
+          onCancel={() => setConfirmDel(null)}
+          onConfirm={() => {
+            setOnboardingTasks((prev) =>
+              prev.filter((tk) => tk.id !== confirmDel.id),
+            );
+            setConfirmDel(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
    Admin accounts — superadmin only. Two permission levels:
    superadmin (full access, incl. deleting records and managing other
    admin accounts) and manager (day-to-day HR work, no deletes).
@@ -20562,6 +21749,18 @@ function buildNavAdmin(n) {
       permission: "manageDocuments",
     },
     {
+      id: "recruitment",
+      label: n.recruitment,
+      icon: Briefcase,
+      permission: "manageRecruitment",
+    },
+    {
+      id: "onboarding",
+      label: n.onboarding,
+      icon: ListChecks,
+      permission: "manageRecruitment",
+    },
+    {
       id: "admins",
       label: n.admins,
       icon: ShieldCheck,
@@ -20699,6 +21898,93 @@ function AppInner() {
     audit: true,
     actorRef,
   });
+  const [jobPostings, setJobPostings, jobPostingsReady] = useSupabaseArray(
+    "job_postings",
+    {
+      fromDb: (r) => ({
+        id: r.id,
+        title: r.title,
+        departmentId: r.department_id,
+        employmentType: r.employment_type,
+        status: r.status,
+        description: r.description,
+        postedDate: r.posted_date,
+        closingDate: r.closing_date || "",
+      }),
+      toDb: (r) => ({
+        id: r.id,
+        title: r.title,
+        department_id: r.departmentId || null,
+        employment_type: r.employmentType,
+        status: r.status,
+        description: r.description,
+        posted_date: r.postedDate || null,
+        closing_date: r.closingDate || null,
+      }),
+      audit: true,
+      actorRef,
+      entityLabel: (r) => r.title || "?",
+    },
+  );
+  const [candidates, setCandidates, candidatesReady] = useSupabaseArray(
+    "candidates",
+    {
+      fromDb: (r) => ({
+        id: r.id,
+        name: r.name,
+        phone: r.phone,
+        email: r.email,
+        jobPostingId: r.job_posting_id,
+        stage: r.stage,
+        notes: r.notes,
+        appliedDate: r.applied_date,
+        resumeFileName: r.resume_file_name || "",
+        resumeMimeType: r.resume_mime_type || "",
+        resumeDataUrl: r.resume_data_url || "",
+      }),
+      toDb: (r) => ({
+        id: r.id,
+        name: r.name,
+        phone: r.phone,
+        email: r.email,
+        job_posting_id: r.jobPostingId || null,
+        stage: r.stage,
+        notes: r.notes,
+        applied_date: r.appliedDate || null,
+        resume_file_name: r.resumeFileName || null,
+        resume_mime_type: r.resumeMimeType || null,
+        resume_data_url: r.resumeDataUrl || null,
+      }),
+      audit: true,
+      actorRef,
+      entityLabel: (r) => r.name || "?",
+    },
+  );
+  const [onboardingTasks, setOnboardingTasks, onboardingTasksReady] =
+    useSupabaseArray("onboarding_tasks", {
+      fromDb: (r) => ({
+        id: r.id,
+        employeeId: r.employee_id,
+        type: r.type,
+        title: r.title,
+        done: !!r.done,
+        dueDate: r.due_date || "",
+        orderIndex: r.order_index ?? 0,
+        createdAt: r.created_at,
+      }),
+      toDb: (r) => ({
+        id: r.id,
+        employee_id: r.employeeId,
+        type: r.type,
+        title: r.title,
+        done: r.done,
+        due_date: r.dueDate || null,
+        order_index: r.orderIndex ?? 0,
+      }),
+      audit: true,
+      actorRef,
+      entityLabel: (r) => r.title || "?",
+    });
   const [employees, setEmployees, eReady, employeesSaveError] =
     useSupabaseArray("employees", {
       fromDb: (r) => ({
@@ -21294,6 +22580,7 @@ function AppInner() {
         manageAnnouncements: !!r.manage_announcements,
         manageSettings: !!r.manage_settings,
         viewAuditLog: !!r.view_audit_log,
+        manageRecruitment: !!r.manage_recruitment,
         // Employee self-service module toggles — only meaningful on the
         // single row where id === EMPLOYEE_MODULES_ID, but mapped for
         // every row since the columns live on the same table. Coerced
@@ -21323,6 +22610,7 @@ function AppInner() {
         manage_announcements: r.manageAnnouncements,
         manage_settings: r.manageSettings,
         view_audit_log: r.viewAuditLog,
+        manage_recruitment: r.manageRecruitment,
         emp_announcements: r.announcements,
         emp_attendance: r.attendance,
         emp_leave: r.leave,
@@ -22091,6 +23379,27 @@ function AppInner() {
                   <DocumentExpiryPage
                     documents={documents}
                     employees={employees}
+                  />
+                )}
+              {page === "recruitment" &&
+                role === "admin" &&
+                (isSuperAdmin || can("manageRecruitment")) && (
+                  <Recruitment
+                    jobPostings={jobPostings}
+                    setJobPostings={setJobPostings}
+                    candidates={candidates}
+                    setCandidates={setCandidates}
+                    departments={departments}
+                    isSuperAdmin={isSuperAdmin || can("manageRecruitment")}
+                  />
+                )}
+              {page === "onboarding" &&
+                role === "admin" &&
+                (isSuperAdmin || can("manageRecruitment")) && (
+                  <OnboardingOffboarding
+                    employees={employees}
+                    onboardingTasks={onboardingTasks}
+                    setOnboardingTasks={setOnboardingTasks}
                   />
                 )}
               {page === "attendance" &&
