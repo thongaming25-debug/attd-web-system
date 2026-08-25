@@ -2,57 +2,10 @@
 <html lang="km">
   <head>
     <meta charset="UTF-8" />
-
-    <!-- viewport-fit=cover is what lets the app draw under the
-         notch/status bar/home-indicator area instead of stopping at
-         the safe area — must be static here, not injected by JS,
-         so iOS reads it before the first paint. -->
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
-    />
-
-    <!-- Matches the app's dark theme background. Chrome/Android use
-         this to color the system status bar / task-switcher chrome. -->
-    <meta name="theme-color" content="#0A0F1A" />
-
-    <!-- Marks the page as installable as a standalone app when added
-         to the iOS home screen (without this, tapping the icon just
-         opens a normal Safari tab with browser chrome instead of a
-         true standalone window). -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-
-    <!-- "black-translucent" lets the page draw its own background
-         under the status bar instead of iOS reserving a solid bar
-         there — combined with viewport-fit=cover above and the
-         inline background below, this removes the white gap. -->
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
-    <meta name="apple-mobile-web-app-title" content="Workforce" />
-    <!-- manifest + apple-touch-icon links are left to the JS in
-         App.jsx (usePwaSetup), which already injects them at runtime
-         with a data: URI — not what's causing the white gap. -->
-
-    <title>Workforce Suite</title>
-
-    <!-- Inline (not injected by JS) so the very first frame — before
-         the JS bundle has even downloaded, let alone parsed and run
-         — already has the correct dark background. This is what
-         actually closes the "flash of white" gap: everything App.jsx
-         sets up via JS on mount happens too late for iOS to use it
-         when deciding the initial status-bar/background chrome. -->
-    <style>
-      html,
-      body {
-        background: #dfe2e8;
-        margin: 0;
-        height: 100%;
-      }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HR Management System</title>
   </head>
-  <body>
+  <body style="margin: 0">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
