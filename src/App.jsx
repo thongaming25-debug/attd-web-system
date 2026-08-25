@@ -72,7 +72,6 @@ import {
   GraduationCap,
   Briefcase,
   ListChecks,
-  Delete,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -2824,7 +2823,6 @@ const STYLE_ID = "wf-suite-style";
 const CSS = `
 *,*::before,*::after{box-sizing:border-box;}
 html,body,#root{height:100%;}
-html,body{background:var(--wf-paper);margin:0;padding:0;overflow:hidden;overscroll-behavior:none;}
 :root{
   --wf-ink:#10141C; --wf-ink-dark:#050810; --wf-paper:#F3F4F7; --wf-card:#FFFFFF;
   --wf-forest-soft:#E4F5EC; --wf-forest-text:#127449; --wf-gold-soft:#FCF0DC; --wf-gold-text:#9A6212;
@@ -2843,7 +2841,7 @@ html,body{background:var(--wf-paper);margin:0;padding:0;overflow:hidden;overscro
   --wf-table-head-bg:#0B0F18; --wf-divider:#171D29; --wf-danger-border:#3D1D26;
   --wf-danger-hover-bg:#20121A; --wf-header-bg:rgba(8,11,18,0.82);
 }
-.wf-root{display:flex;position:fixed;inset:0;height:var(--app-height,100vh);min-height:640px;background:${T.paper};font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.text};overflow:hidden;border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,0.02),0 16px 40px -18px rgba(5,8,16,0.35);border:1px solid ${T.line};transition:background .15s ease,color .15s ease;}
+.wf-root{display:flex;height:100vh;height:100dvh;min-height:640px;max-height:100vh;max-height:100dvh;background:${T.paper};font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.text};position:relative;overflow:hidden;border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,0.02),0 16px 40px -18px rgba(5,8,16,0.35);border:1px solid ${T.line};transition:background .15s ease,color .15s ease;}
 .wf-sidebar{background:linear-gradient(180deg,${BRAND.ink} 0%,${BRAND.inkDark} 100%);color:#fff;width:246px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,0.06);transition:transform .25s cubic-bezier(.4,0,.2,1);}
 .wf-sidebar-inner{display:flex;flex-direction:column;height:100%;}
 .wf-logo-badge{width:32px;height:32px;border-radius:7px;background:${T.gold};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#1A1300;font-family:'JetBrains Mono',monospace;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);}
@@ -2853,7 +2851,7 @@ html,body{background:var(--wf-paper);margin:0;padding:0;overflow:hidden;overscro
 .wf-nav-item.active{background:rgba(240,168,59,0.09);color:#fff;font-weight:600;}
 .wf-nav-item.active::before{content:"";position:absolute;left:-10px;top:6px;bottom:6px;width:2px;border-radius:0;background:${T.gold};}
 .wf-main{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;background:${T.paper};}
-.wf-header{background:${T.headerBg};backdrop-filter:blur(8px);border-bottom:1px solid ${T.lineSoft};padding:calc(13px + env(safe-area-inset-top)) 22px 13px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;transition:background .15s ease,border-color .15s ease;}
+.wf-header{background:${T.headerBg};backdrop-filter:blur(8px);border-bottom:1px solid ${T.lineSoft};padding:13px 22px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;transition:background .15s ease,border-color .15s ease;}
 .wf-content{flex:1;overflow-y:auto;padding:22px;overscroll-behavior-y:contain;}
 .wf-card{background:${T.card};border-radius:9px;border:1px solid ${T.line};box-shadow:none;transition:box-shadow .15s ease,background .15s ease,border-color .15s ease;}
 .wf-btn{display:inline-flex;align-items:center;gap:6px;font-weight:600;border-radius:7px;font-size:13px;padding:9px 15px;border:1px solid transparent;cursor:pointer;transition:background .15s ease,transform .1s ease,box-shadow .15s ease;}
@@ -2925,8 +2923,8 @@ html,body{background:var(--wf-paper);margin:0;padding:0;overflow:hidden;overscro
 .wf-tp-item:hover{background:${T.line};}
 .wf-tp-item.selected{background:${T.gold};color:#1A1300;font-weight:700;}
 .wf-tp-sep{font-weight:700;color:${T.muted};padding-bottom:2px;}
-.wf-modal-overlay{position:fixed;inset:0;height:var(--app-height,100vh);z-index:55;display:flex;align-items:center;justify-content:center;padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));background:rgba(3,5,10,0.65);backdrop-filter:blur(2px);animation:wf-fade .15s ease;}
-.wf-modal{background:${T.card};border-radius:11px;border:1px solid ${T.line};box-shadow:0 24px 64px rgba(3,5,10,0.5);width:100%;max-height:calc(var(--app-height,100vh) * 0.9);overflow-y:auto;overflow-x:hidden;animation:wf-pop .18s cubic-bezier(.2,.9,.3,1.2);}
+.wf-modal-overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(3,5,10,0.65);backdrop-filter:blur(2px);animation:wf-fade .15s ease;}
+.wf-modal{background:${T.card};border-radius:11px;border:1px solid ${T.line};box-shadow:0 24px 64px rgba(3,5,10,0.5);width:100%;max-height:90vh;overflow-y:auto;overflow-x:hidden;animation:wf-pop .18s cubic-bezier(.2,.9,.3,1.2);}
 .wf-modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid ${T.lineSoft};position:sticky;top:0;z-index:5;background:${T.card};border-radius:11px 11px 0 0;}
 .wf-avatar{border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;flex-shrink:0;}
 .wf-badge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.02em;white-space:nowrap;}
@@ -2938,7 +2936,7 @@ html,body{background:var(--wf-paper);margin:0;padding:0;overflow:hidden;overscro
 .wf-table tbody tr:hover{background:${T.tableHeadBg};}
 .wf-grid{display:grid;gap:16px;}
 .wf-punch-clock{font-size:34px;font-weight:700;font-family:'JetBrains Mono',monospace;color:${T.ink};font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
-.wf-menu-btn,.wf-sidebar-close-btn{display:none;background:none;border:none;color:${T.ink};cursor:pointer;padding:4px;}
+.wf-menu-btn{display:none;background:none;border:none;color:${T.ink};cursor:pointer;padding:4px;}
 .wf-overlay-scrim{display:none;}
 .wf-content::-webkit-scrollbar,.wf-sidebar nav::-webkit-scrollbar,.wf-modal::-webkit-scrollbar{width:8px;}
 .wf-content::-webkit-scrollbar-thumb,.wf-modal::-webkit-scrollbar-thumb{background:${T.mutedLight};border-radius:8px;}
@@ -2952,10 +2950,10 @@ html,body{background:var(--wf-paper);margin:0;padding:0;overflow:hidden;overscro
 .wf-page-enter{animation:wf-page-in .24s ease both;}
 .wf-nav-item,.wf-bottomnav-item{transition:background .15s ease,color .15s ease,transform .15s ease;}
 .wf-bottomnav-item:active{transform:scale(.93);}
-.wf-menu-btn,.wf-sidebar-close-btn,.wf-btn{transition:background .15s ease,transform .12s ease,box-shadow .15s ease,color .15s ease;}
+.wf-menu-btn,.wf-btn{transition:background .15s ease,transform .12s ease,box-shadow .15s ease,color .15s ease;}
 .wf-bottomnav.wf-bottomnav-hidden{display:none !important;}
 .wf-role-badge{white-space:nowrap;flex-shrink:0;}
-.wf-bottomnav{display:none;position:fixed;left:0;right:0;bottom:0;z-index:45;background:${T.headerBg};backdrop-filter:blur(10px);border-top:1px solid ${T.lineSoft};align-items:stretch;justify-content:space-around;padding:5px 2px calc(5px + env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(5,8,16,0.08);}
+.wf-bottomnav{display:none;position:absolute;left:0;right:0;bottom:0;z-index:45;background:${T.headerBg};backdrop-filter:blur(10px);border-top:1px solid ${T.lineSoft};align-items:stretch;justify-content:space-around;padding:5px 2px calc(5px + env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(5,8,16,0.08);}
 .wf-bottomnav-item{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;color:${T.muted};padding:5px 2px 4px;border-radius:9px;font-size:10px;font-weight:600;transition:color .15s ease;}
 .wf-bottomnav-item span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .wf-bottomnav-item.active{color:${T.goldText};}
@@ -2965,43 +2963,14 @@ html,body{background:var(--wf-paper);margin:0;padding:0;overflow:hidden;overscro
 @media (max-width: 820px){
   .wf-sidebar{position:absolute;inset:0 auto 0 0;z-index:40;transform:translateX(-100%);height:100%;box-shadow:8px 0 24px rgba(0,0,0,0.4);}
   .wf-sidebar.open{transform:translateX(0);}
-  .wf-menu-btn,.wf-sidebar-close-btn{display:inline-flex;}
+  .wf-menu-btn{display:inline-flex;}
   .wf-overlay-scrim.open{display:block;position:absolute;inset:0;background:rgba(18,32,61,0.45);z-index:35;backdrop-filter:blur(1px);}
-  .wf-header{padding:calc(12px + env(safe-area-inset-top)) 16px 12px;}
+  .wf-header{padding:12px 16px;}
   .wf-content{padding:16px;}
   .wf-role-badge{display:none;}
   .wf-bottomnav{display:flex;}
   .wf-content.wf-content-bnpad{padding-bottom:86px;}
   .wf-role-staff .wf-menu-btn{display:none;}
-  .wf-role-staff .wf-modal-overlay{padding-bottom:calc(86px + env(safe-area-inset-bottom));}
-  /* On desktop, .wf-root's rounded corners + shadow read as a nice
-     floating card framed by the browser window. In a standalone
-     mobile PWA there is no browser window around it — the same
-     styling instead shows up as a gap of the page's white background
-     peeking through at the (rounded) edges, breaking the full-screen
-     native-app illusion. Go edge-to-edge here instead. */
-  .wf-root{border-radius:0;box-shadow:none;border:none;}
-  /* iOS auto-zooms the whole page when a focused input's font-size
-     is under 16px — this is what makes typing in a form feel like a
-     "web page" instead of an app. Desktop keeps the denser 13px. */
-  .wf-input,.wf-dp-trigger,select,textarea,.wf-login-input{font-size:16px;}
-}
-/* Removes the ~300ms delay mobile browsers add before firing a tap
-   (they wait to see if it's actually the start of a double-tap-to-
-   zoom gesture) and the gray/blue flash Android/iOS show on tap —
-   both read as "this is a website", not an app, to a user's thumb. */
-button,a,.wf-card,[role="button"],input,select,textarea{
-  touch-action:manipulation;
-  -webkit-tap-highlight-color:transparent;
-}
-/* Custom press feedback to replace what we just removed above —
-   without this, taps would feel inert since there'd be no response
-   at all until the click actually completes. */
-button:not(:disabled):active,
-a:active,
-[role="button"]:not([aria-disabled="true"]):active{
-  transform:scale(0.97);
-  transition:transform .08s ease;
 }
 `;
 function useGlobalStyle() {
@@ -5610,36 +5579,11 @@ const PTR_MAX = 96;
 
 function PullToRefresh({ children, className }) {
   const containerRef = useRef(null);
-  const wrapRef = useRef(null);
-  const contentRef = useRef(null);
-  const iconRef = useRef(null);
   const startY = useRef(0);
   const pullingRef = useRef(false);
-  const distanceRef = useRef(0);
-  const rafRef = useRef(null);
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isPulling, setIsPulling] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-
-  // Applies the current pull distance straight to the DOM via a ref,
-  // skipping React's render cycle entirely for every pixel of finger
-  // movement — a setState per touchmove event was the cause of the
-  // stutter, since it forces React to re-render the whole subtree on
-  // every event. rAF-batched direct style writes track the finger at
-  // full frame rate instead.
-  const applyDistance = (d, animated) => {
-    const wrap = wrapRef.current;
-    const content = contentRef.current;
-    const icon = iconRef.current;
-    if (!wrap || !content || !icon) return;
-    const t = animated ? "height .2s ease" : "none";
-    const t2 = animated ? "transform .2s ease" : "none";
-    wrap.style.transition = t;
-    wrap.style.height = `${d}px`;
-    content.style.transition = t2;
-    content.style.transform = `translateY(${d}px)`;
-    icon.style.transition = animated ? "transform .15s ease" : "none";
-    icon.style.opacity = Math.min(d / PTR_THRESHOLD, 1);
-    icon.style.transform = `rotate(${d * 3}deg)`;
-  };
 
   useEffect(() => {
     const el = containerRef.current;
@@ -5660,30 +5604,27 @@ function PullToRefresh({ children, className }) {
       const delta = e.touches[0].clientY - startY.current;
       if (delta <= 0 || el.scrollTop > 0) {
         pullingRef.current = false;
-        distanceRef.current = 0;
-        applyDistance(0, true);
+        setIsPulling(false);
+        setPullDistance(0);
         return;
       }
       e.preventDefault();
-      distanceRef.current = Math.min(delta * 0.5, PTR_MAX);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => {
-        applyDistance(distanceRef.current, false);
-      });
+      setIsPulling(true);
+      setPullDistance(Math.min(delta * 0.5, PTR_MAX));
     };
 
     const onTouchEnd = () => {
       if (!pullingRef.current) return;
       pullingRef.current = false;
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      if (distanceRef.current >= PTR_THRESHOLD) {
-        setRefreshing(true);
-        applyDistance(PTR_THRESHOLD, true);
-        setTimeout(() => window.location.reload(), 400);
-      } else {
-        distanceRef.current = 0;
-        applyDistance(0, true);
-      }
+      setIsPulling(false);
+      setPullDistance((d) => {
+        if (d >= PTR_THRESHOLD) {
+          setRefreshing(true);
+          setTimeout(() => window.location.reload(), 400);
+          return PTR_THRESHOLD;
+        }
+        return 0;
+      });
     };
 
     el.addEventListener("touchstart", onTouchStart, { passive: true });
@@ -5695,9 +5636,10 @@ function PullToRefresh({ children, className }) {
       el.removeEventListener("touchmove", onTouchMove);
       el.removeEventListener("touchend", onTouchEnd);
       el.removeEventListener("touchcancel", onTouchEnd);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [refreshing]);
+
+  const spinning = refreshing || pullDistance >= PTR_THRESHOLD;
 
   return (
     <div
@@ -5706,7 +5648,6 @@ function PullToRefresh({ children, className }) {
       style={{ position: "relative" }}
     >
       <div
-        ref={wrapRef}
         style={{
           position: "absolute",
           top: 0,
@@ -5715,14 +5656,14 @@ function PullToRefresh({ children, className }) {
           display: "flex",
           justifyContent: "center",
           alignItems: "flex-end",
-          height: 0,
+          height: pullDistance,
           overflow: "hidden",
+          transition: isPulling ? "none" : "height .2s ease",
           pointerEvents: "none",
           zIndex: 5,
         }}
       >
         <div
-          ref={iconRef}
           style={{
             width: 30,
             height: 30,
@@ -5730,19 +5671,26 @@ function PullToRefresh({ children, className }) {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            opacity: 0,
+            opacity: Math.min(pullDistance / PTR_THRESHOLD, 1),
+            transform: `rotate(${pullDistance * 3}deg)`,
+            transition: isPulling ? "none" : "transform .15s ease",
           }}
         >
           <RefreshCw
             size={20}
             color={T.blue}
             style={
-              refreshing ? { animation: "spin 1s linear infinite" } : undefined
+              spinning ? { animation: "spin 1s linear infinite" } : undefined
             }
           />
         </div>
       </div>
-      <div ref={contentRef} style={{ willChange: "transform" }}>
+      <div
+        style={{
+          transform: `translateY(${pullDistance}px)`,
+          transition: isPulling ? "none" : "transform .2s ease",
+        }}
+      >
         {children}
       </div>
     </div>
@@ -6829,6 +6777,8 @@ const APP_VERSION = "1.0.0";
 const LOGIN_CSS_ID = "wf-login-style";
 const LOGIN_CSS = `
 @keyframes wf-float-up { from { opacity:0; transform:translateY(28px) scale(.96); } to { opacity:1; transform:translateY(0) scale(1); } }
+@keyframes wf-error-in { from { opacity:0; transform:translateY(-6px); max-height:0; } to { opacity:1; transform:translateY(0); max-height:60px; } }
+@keyframes wf-shake { 10%,90% { transform:translateX(-1px); } 20%,80% { transform:translateX(2px); } 30%,50%,70% { transform:translateX(-4px); } 40%,60% { transform:translateX(4px); } }
 @keyframes wf-bg-drift { 0%,100% { transform:translate(0,0) scale(1.05); } 50% { transform:translate(-20px, -14px) scale(1.08); } }
 @keyframes wf-bg-hue { 0%,100% { filter:hue-rotate(0deg); } 50% { filter:hue-rotate(12deg); } }
 @keyframes wf-pulse-ring { 0%,100% { transform:scale(1); opacity:.5; } 50% { transform:scale(1.12); opacity:.2; } }
@@ -6838,7 +6788,7 @@ const LOGIN_CSS = `
 @keyframes wf-orb-d { 0%,100% { transform:translate(0,0) scale(1); } 45% { transform:translate(-55px,-50px) scale(1.12); } }
 .wf-login-root {
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  position:fixed; inset:0; height:var(--app-height,100vh); overflow:hidden auto;
+  min-height:100vh; min-height:100dvh; position:relative; overflow:hidden;
   background: linear-gradient(160deg, #050810 0%, #0A0F1A 55%, #0D1420 100%);
 }
 .wf-login-bg {
@@ -6884,7 +6834,10 @@ const LOGIN_CSS = `
   border:1px solid rgba(255,255,255,0.08);
   box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 32px 80px rgba(0,0,0,0.55);
   animation: wf-float-up .6s cubic-bezier(.16,.9,.28,1) both;
+  transition: opacity .18s ease;
 }
+.wf-login-card.wf-shake { animation: wf-shake .38s cubic-bezier(.36,.07,.19,.97) both; }
+.wf-login-card.wf-busy { opacity:.7; }
 .wf-login-logo-ring {
   width:56px; height:56px; border-radius:12px;
   background:${T.gold};
@@ -6912,6 +6865,8 @@ const LOGIN_CSS = `
   box-shadow:0 0 0 4px rgba(240,168,59,0.14);
   transform:translateY(-1px);
 }
+.wf-login-input:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+.wf-login-input.wf-input-err { border-color:#E5637A; }
 .wf-login-btn {
   width:100%; padding:13px; border:none; border-radius:9px;
   font-size:15px; font-weight:700; cursor:pointer; display:flex;
@@ -6940,6 +6895,8 @@ const LOGIN_CSS = `
   display:flex; align-items:center; gap:7px; font-size:12.5px;
   color:#F0879B; background:rgba(229,99,122,0.12); border-radius:8px;
   padding:9px 12px; margin-bottom:14px; border:1px solid rgba(229,99,122,0.25);
+  animation: wf-error-in .28s cubic-bezier(.16,.9,.28,1) both;
+  overflow:hidden;
 }
 .wf-login-demo {
   margin-top:20px; padding:11px 14px; background:rgba(255,255,255,0.04);
@@ -6950,35 +6907,6 @@ const LOGIN_CSS = `
   margin-top:32px; text-align:center; font-size:10.5px;
   letter-spacing:0.3px; color:#5B6478; opacity:0.6;
 }
-.wf-pin-dots {
-  display:flex; align-items:center; justify-content:center; gap:14px;
-  padding:6px 0 4px;
-}
-.wf-pin-dot {
-  width:14px; height:14px; border-radius:50%;
-  border:1.5px solid rgba(255,255,255,0.18);
-  background:rgba(255,255,255,0.04);
-  transition:background .15s ease, border-color .15s ease, transform .15s ease;
-}
-.wf-pin-dot.filled {
-  background:${T.gold}; border-color:${T.gold};
-  transform:scale(1.08);
-}
-.wf-keypad {
-  display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
-  margin-top:18px;
-}
-.wf-keypad-btn {
-  height:54px; border-radius:12px; font-size:19px; font-weight:700;
-  color:#EEF1F6; background:rgba(255,255,255,0.045);
-  border:1px solid rgba(255,255,255,0.08); cursor:pointer;
-  font-family:'JetBrains Mono',monospace;
-  display:flex; align-items:center; justify-content:center;
-  transition:background .15s ease, border-color .15s ease;
-}
-.wf-keypad-btn:hover { background:rgba(255,255,255,0.08); }
-.wf-keypad-btn:disabled { opacity:0.35; cursor:default; }
-.wf-keypad-btn.wf-keypad-ghost { background:none; border:none; cursor:default; }
 `;
 function LoginCredit() {
   return (
@@ -7035,61 +6963,6 @@ function LoginField({ label, children }) {
   );
 }
 
-// On-screen numeric keypad for entering the PIN, used instead of a real
-// text input + the OS keyboard. Two reasons: it feels more like a
-// dedicated attendance-kiosk app than a web form, and it sidesteps the
-// iOS standalone-PWA "keyboard opens, viewport miscalculates" issue
-// entirely for this field, since no native keyboard ever appears.
-const PIN_MAX_LENGTH = 6;
-function PinKeypad({ value, onChange, maxLength = PIN_MAX_LENGTH }) {
-  const press = (digit) => {
-    if (value.length >= maxLength) return;
-    onChange(value + digit);
-  };
-  const backspace = () => onChange(value.slice(0, -1));
-  return (
-    <div>
-      <div className="wf-pin-dots">
-        {Array.from({ length: maxLength }).map((_, i) => (
-          <div
-            key={i}
-            className={"wf-pin-dot" + (i < value.length ? " filled" : "")}
-          />
-        ))}
-      </div>
-      <div className="wf-keypad">
-        {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
-          <button
-            key={d}
-            type="button"
-            className="wf-keypad-btn"
-            onClick={() => press(d)}
-          >
-            {d}
-          </button>
-        ))}
-        <div className="wf-keypad-btn wf-keypad-ghost" />
-        <button
-          type="button"
-          className="wf-keypad-btn"
-          onClick={() => press("0")}
-        >
-          0
-        </button>
-        <button
-          type="button"
-          className="wf-keypad-btn"
-          onClick={backspace}
-          disabled={value.length === 0}
-          aria-label="Backspace"
-        >
-          <Delete size={19} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
 function EmployeeLoginScreen({ employees, onLogin, go }) {
   useLoginStyle();
   const { t } = useLang();
@@ -7100,29 +6973,26 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [shake, setShake] = useState(false);
+
+  const fail = (msg) => {
+    setError(msg);
+    setLoading(false);
+    setShake(true);
+    setTimeout(() => setShake(false), 400);
+  };
 
   const submit = async (e) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
     await new Promise((r) => setTimeout(r, 320));
     const emp = employees.find(
       (x) => x.code.trim().toLowerCase() === code.trim().toLowerCase(),
     );
-    if (!emp) {
-      setError(L.errNoEmp);
-      setLoading(false);
-      return;
-    }
-    if (emp.status !== "active") {
-      setError(L.errInactive);
-      setLoading(false);
-      return;
-    }
-    if ((emp.pin || "") !== pin.trim()) {
-      setError(L.errPin);
-      setLoading(false);
-      return;
-    }
+    if (!emp) return fail(L.errNoEmp);
+    if (emp.status !== "active") return fail(L.errInactive);
+    if ((emp.pin || "") !== pin.trim()) return fail(L.errPin);
     setError("");
     setLoading(false);
     onLogin(emp.id);
@@ -7131,17 +7001,10 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
   return (
     <div className="wf-login-root">
       <LoginBackground />
-      <div
-        style={{
-          position: "absolute",
-          top: "calc(16px + env(safe-area-inset-top))",
-          right: 16,
-          zIndex: 10,
-        }}
-      >
+      <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
         <LangToggle />
       </div>
-      <div className="wf-login-card">
+      <div className={`wf-login-card${shake ? " wf-shake" : ""}`}>
         <div
           style={{
             display: "flex",
@@ -7192,15 +7055,24 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
               }}
               placeholder={L.employeeIdPlaceholder}
               autoFocus
+              disabled={loading}
+              autoComplete="username"
             />
           </LoginField>
           <LoginField label={L.pin}>
-            <PinKeypad
+            <input
+              className="wf-login-input"
               value={pin}
-              onChange={(v) => {
-                setPin(v);
+              onChange={(e) => {
+                setPin(e.target.value);
                 setError("");
               }}
+              placeholder={L.pinPlaceholder}
+              type="password"
+              inputMode="numeric"
+              maxLength={6}
+              disabled={loading}
+              autoComplete="current-password"
             />
           </LoginField>
           {error && (
@@ -7240,24 +7112,25 @@ function AdminLoginScreen({ admins, onLogin, go }) {
   const [adminPass, setAdminPass] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [shake, setShake] = useState(false);
+
+  const fail = (msg) => {
+    setError(msg);
+    setLoading(false);
+    setShake(true);
+    setTimeout(() => setShake(false), 400);
+  };
 
   const submit = async (e) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
     await new Promise((r) => setTimeout(r, 320));
     const acct = admins.find(
       (a) => a.username.trim().toLowerCase() === username.trim().toLowerCase(),
     );
-    if (!acct) {
-      setError(L.errNoAdmin);
-      setLoading(false);
-      return;
-    }
-    if (acct.password !== adminPass) {
-      setError(L.errPass);
-      setLoading(false);
-      return;
-    }
+    if (!acct) return fail(L.errNoAdmin);
+    if (acct.password !== adminPass) return fail(L.errPass);
     setError("");
     setLoading(false);
     onLogin(acct.id);
@@ -7266,17 +7139,10 @@ function AdminLoginScreen({ admins, onLogin, go }) {
   return (
     <div className="wf-login-root">
       <LoginBackground />
-      <div
-        style={{
-          position: "absolute",
-          top: "calc(16px + env(safe-area-inset-top))",
-          right: 16,
-          zIndex: 10,
-        }}
-      >
+      <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
         <LangToggle />
       </div>
-      <div className="wf-login-card">
+      <div className={`wf-login-card${shake ? " wf-shake" : ""}`}>
         <button
           onClick={() => go("employee")}
           style={{
@@ -7291,7 +7157,10 @@ function AdminLoginScreen({ admins, onLogin, go }) {
             fontWeight: 600,
             marginBottom: 20,
             padding: 0,
+            transition: "color .15s ease",
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "#EEF1F6")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "#8891A6")}
         >
           <ArrowLeft size={14} /> {L.back}
         </button>
@@ -7353,6 +7222,8 @@ function AdminLoginScreen({ admins, onLogin, go }) {
               }}
               placeholder={L.usernamePlaceholder}
               autoFocus
+              disabled={loading}
+              autoComplete="username"
             />
           </LoginField>
           <LoginField label={L.password}>
@@ -7365,6 +7236,8 @@ function AdminLoginScreen({ admins, onLogin, go }) {
               }}
               placeholder={L.passwordPlaceholder}
               type="password"
+              disabled={loading}
+              autoComplete="current-password"
             />
           </LoginField>
           {error && (
@@ -7744,27 +7617,12 @@ function Dashboard({
               <s.icon size={18} color={s.accent} />
             </div>
             <div
-              style={
-                typeof s.value === "number"
-                  ? {
-                      fontSize: 26,
-                      fontWeight: 700,
-                      fontFamily: "'JetBrains Mono',monospace",
-                      color: T.ink,
-                    }
-                  : {
-                      fontSize: 15,
-                      fontWeight: 700,
-                      fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
-                      color: T.ink,
-                      lineHeight: 1.35,
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                      wordBreak: "break-word",
-                    }
-              }
+              style={{
+                fontSize: 26,
+                fontWeight: 700,
+                fontFamily: "'JetBrains Mono',monospace",
+                color: T.ink,
+              }}
             >
               {s.value}
             </div>
@@ -11398,14 +11256,7 @@ function KioskDisplay({ officeId, offices, branding }) {
     return (
       <div style={shellStyle}>
         <LoginBackground />
-        <div
-          style={{
-            position: "absolute",
-            top: "calc(20px + env(safe-area-inset-top))",
-            right: 20,
-            zIndex: 2,
-          }}
-        >
+        <div style={{ position: "absolute", top: 20, right: 20, zIndex: 2 }}>
           <LangToggle variant="dark" />
         </div>
         <div
@@ -11442,14 +11293,7 @@ function KioskDisplay({ officeId, offices, branding }) {
   return (
     <div style={shellStyle}>
       <LoginBackground />
-      <div
-        style={{
-          position: "absolute",
-          top: "calc(20px + env(safe-area-inset-top))",
-          right: 20,
-          zIndex: 2,
-        }}
-      >
+      <div style={{ position: "absolute", top: 20, right: 20, zIndex: 2 }}>
         <LangToggle variant="dark" />
       </div>
       <div
@@ -12868,13 +12712,7 @@ function LeaveRequests({
     const bal = annualLeaveBalance(currentEmp, leaveRequests);
     const sickBal = sickLeaveBalance(currentEmp, leaveRequests);
     return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          minHeight: "100%",
-        }}
-      >
+      <div>
         <div className="wf-grid-2" style={{ marginBottom: 16 }}>
           <Card
             accent={bal.remaining <= 0 ? T.rose : T.forest}
@@ -12966,15 +12804,8 @@ function LeaveRequests({
             <Plus size={15} /> {t.lv.addBtn}
           </Button>
         </div>
-        <Card
-          style={{
-            overflowX: "auto",
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <table className="wf-table" style={{ flex: 1 }}>
+        <Card style={{ overflowX: "auto" }}>
+          <table className="wf-table">
             <thead>
               <tr>
                 <th>{t.lv.type}</th>
@@ -23337,7 +23168,6 @@ function AppInner() {
             <div
               style={{
                 padding: "18px 18px",
-                paddingTop: "calc(18px + env(safe-area-inset-top))",
                 display: "flex",
                 alignItems: "center",
                 gap: 10,
@@ -23373,7 +23203,7 @@ function AppInner() {
                 {brandDisplayName}
               </span>
               <button
-                className="wf-sidebar-close-btn"
+                className="wf-menu-btn"
                 style={{ marginLeft: "auto", color: "rgba(255,255,255,0.6)" }}
                 onClick={() => setNavOpen(false)}
               >
@@ -23996,70 +23826,6 @@ const PWA_ICON_SVG =
   "</svg>";
 const PWA_ICON_URL = `data:image/svg+xml;base64,${btoa(PWA_ICON_SVG)}`;
 
-// Fallback for devices/browsers where `100dvh` doesn't reliably match the
-// true visible screen height (seen on some mobile browsers/webviews where
-// the dynamic-viewport unit is either unsupported or stales after the
-// address bar animates). We measure the real viewport directly via
-// visualViewport (more reliable than window.innerHeight during toolbar
-// show/hide transitions) and publish it as a CSS var, for anything that
-// wants it.
-//
-// It also works around a separate, longstanding iOS Safari/WKWebView bug:
-// `position:fixed` elements (our `.wf-root` / `.wf-login-root` shells) can
-// end up pinned to a stale viewport rect — most often right after the
-// on-screen keyboard closes, or when a backgrounded Home Screen app is
-// restored from its cached snapshot — leaving a strip of the page's real
-// background exposed at whichever edge the stale rect no longer covers.
-// There's no direct API to ask WebKit to recompute it; the accepted
-// workaround is to force a synchronous reflow, which makes it
-// re-evaluate every fixed element against the actual current viewport.
-function useRealViewportHeight() {
-  useEffect(() => {
-    const setHeight = () => {
-      const h = window.visualViewport?.height || window.innerHeight;
-      document.documentElement.style.setProperty("--app-height", `${h}px`);
-    };
-
-    let reflowTimer = null;
-    const nudgeReflow = () => {
-      clearTimeout(reflowTimer);
-      reflowTimer = setTimeout(() => {
-        const prev = document.body.style.transform;
-        document.body.style.transform = "translateZ(0)";
-        // eslint-disable-next-line no-unused-expressions
-        document.body.offsetHeight; // force a synchronous layout pass
-        document.body.style.transform = prev;
-      }, 60);
-    };
-
-    const onResize = () => {
-      setHeight();
-      nudgeReflow();
-    };
-    const onVisible = () => {
-      if (document.visibilityState === "visible") nudgeReflow();
-    };
-
-    setHeight();
-    window.addEventListener("resize", onResize);
-    window.addEventListener("orientationchange", onResize);
-    window.visualViewport?.addEventListener("resize", onResize);
-    document.addEventListener("visibilitychange", onVisible);
-    window.addEventListener("pageshow", nudgeReflow);
-    window.addEventListener("focus", nudgeReflow);
-
-    return () => {
-      clearTimeout(reflowTimer);
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("orientationchange", onResize);
-      window.visualViewport?.removeEventListener("resize", onResize);
-      document.removeEventListener("visibilitychange", onVisible);
-      window.removeEventListener("pageshow", nudgeReflow);
-      window.removeEventListener("focus", nudgeReflow);
-    };
-  }, []);
-}
-
 function usePwaSetup() {
   useEffect(() => {
     const addTag = (tag, attrs) => {
@@ -24073,25 +23839,6 @@ function usePwaSetup() {
       Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
       document.head.appendChild(el);
     };
-
-    // The default viewport tag (set in index.html) doesn't include
-    // viewport-fit=cover, so the page content stops at the safe area
-    // instead of extending under the notch/status bar — combined with
-    // apple-mobile-web-app-status-bar-style=black-translucent above,
-    // that leaves a gap where the browser/OS chrome shows through
-    // instead of the app's own background. Force it here so the app
-    // draws edge-to-edge and the safe-area insets used elsewhere
-    // (env(safe-area-inset-*)) actually have something to inset from.
-    let viewportTag = document.querySelector('meta[name="viewport"]');
-    if (!viewportTag) {
-      viewportTag = document.createElement("meta");
-      viewportTag.setAttribute("name", "viewport");
-      document.head.appendChild(viewportTag);
-    }
-    viewportTag.setAttribute(
-      "content",
-      "width=device-width, initial-scale=1, viewport-fit=cover",
-    );
 
     const manifest = {
       name: "Workforce Suite",
@@ -24150,41 +23897,8 @@ function usePwaSetup() {
     });
 
     if ("serviceWorker" in navigator) {
-      // A standalone PWA (opened from the Home Screen icon) is almost
-      // never a fresh navigation — iOS/Android just resume the same
-      // in-memory page from before, so the network-first fetch in
-      // sw.js for `mode:"navigate"` never runs again and a new deploy
-      // can sit uninstalled indefinitely even though the SW itself
-      // supports it (skipWaiting + clients.claim). Browsers only ever
-      // check sw.js for changes on registration.update() or on an
-      // actual navigation — neither of which happens automatically
-      // when a backgrounded Home Screen app is simply brought back to
-      // the foreground. So we do it ourselves: every time the app
-      // becomes visible again, ask the browser to re-check sw.js, and
-      // if a new service worker takes control as a result, reload
-      // once to actually load the new JS/CSS bundle instead of just
-      // leaving it installed-but-unused in the background.
-      let reloadedForUpdate = false;
-      navigator.serviceWorker.addEventListener("controllerchange", () => {
-        if (reloadedForUpdate) return;
-        reloadedForUpdate = true;
-        window.location.reload();
-      });
-
       navigator.serviceWorker
         .register("/sw.js")
-        .then((reg) => {
-          const checkForUpdate = () => reg.update().catch(() => {});
-          // Resuming a backgrounded/Home Screen app fires visibilitychange
-          // (most browsers) and/or pageshow with persisted:true (iOS
-          // Safari's bfcache-style resume) — listen for both so we don't
-          // miss the moment staff reopen the app after a new deploy.
-          document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === "visible") checkForUpdate();
-          });
-          window.addEventListener("pageshow", checkForUpdate);
-          window.addEventListener("focus", checkForUpdate);
-        })
         .catch((err) =>
           console.error("[pwa] service worker registration failed:", err),
         );
@@ -24194,15 +23908,10 @@ function usePwaSetup() {
 
 export default function App() {
   usePwaSetup();
-  useRealViewportHeight();
   const [lang, setLang] = useLocalStorage("hrsuite:lang", "km");
   const t = LANG[lang] || LANG.km;
   const [theme, setTheme] = useLocalStorage("hrsuite:theme", "light");
   const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
-  useEffect(() => {
-    document.body.style.background = theme === "dark" ? "#080B12" : "#F3F4F7";
-    document.body.classList.toggle("wf-dark", theme === "dark");
-  }, [theme]);
   return (
     <LangContext.Provider value={{ lang, t, setLang }}>
       <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
