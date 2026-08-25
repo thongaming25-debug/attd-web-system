@@ -2842,7 +2842,7 @@ html,body{background:var(--wf-paper);margin:0;padding:0;overflow:hidden;overscro
   --wf-table-head-bg:#0B0F18; --wf-divider:#171D29; --wf-danger-border:#3D1D26;
   --wf-danger-hover-bg:#20121A; --wf-header-bg:rgba(8,11,18,0.82);
 }
-.wf-root{display:flex;position:fixed;inset:0;height:var(--app-height, 100vh);min-height:640px;background:${T.paper};font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.text};overflow:hidden;border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,0.02),0 16px 40px -18px rgba(5,8,16,0.35);border:1px solid ${T.line};transition:background .15s ease,color .15s ease;}
+.wf-root{display:flex;position:fixed;inset:0;min-height:640px;background:${T.paper};font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.text};overflow:hidden;border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,0.02),0 16px 40px -18px rgba(5,8,16,0.35);border:1px solid ${T.line};transition:background .15s ease,color .15s ease;}
 .wf-sidebar{background:linear-gradient(180deg,${BRAND.ink} 0%,${BRAND.inkDark} 100%);color:#fff;width:246px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,0.06);transition:transform .25s cubic-bezier(.4,0,.2,1);}
 .wf-sidebar-inner{display:flex;flex-direction:column;height:100%;}
 .wf-logo-badge{width:32px;height:32px;border-radius:7px;background:${T.gold};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#1A1300;font-family:'JetBrains Mono',monospace;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);}
@@ -6836,7 +6836,7 @@ const LOGIN_CSS = `
 @keyframes wf-orb-d { 0%,100% { transform:translate(0,0) scale(1); } 45% { transform:translate(-55px,-50px) scale(1.12); } }
 .wf-login-root {
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  position:fixed; inset:0; height:var(--app-height, 100vh); overflow:hidden auto;
+  position:fixed; inset:0; overflow:hidden auto;
   background: linear-gradient(160deg, #050810 0%, #0A0F1A 55%, #0D1420 100%);
 }
 .wf-login-bg {
@@ -23917,45 +23917,13 @@ function useRealViewportHeight() {
       if (document.visibilityState === "visible") nudgeReflow();
     };
 
-    // Belt-and-suspenders for browsers that ignore the
-    // `interactive-widget=resizes-content` viewport hint above: when a
-    // focused input would be hidden behind the keyboard, WebKit can pan
-    // the whole page upward on its own (an internal visual-viewport
-    // offset, separate from a real scroll position) to keep it visible.
-    // On our `position:fixed` layout that pan can drift away from the
-    // fixed box's real top edge — cutting content off under the status
-    // bar at one end and exposing blank space at the other. Since the
-    // layout is already fixed/full-height and never needs the page
-    // itself to scroll, snapping back to (0,0) is always safe and
-    // cancels that pan. The keyboard's own show animation can re-apply
-    // the pan after our first attempt, so retry a couple of times while
-    // it settles.
-    const cancelKeyboardPan = () => {
-      window.scrollTo(0, 0);
-      setTimeout(() => window.scrollTo(0, 0), 120);
-      setTimeout(() => window.scrollTo(0, 0), 350);
-    };
-    const onFocusIn = (e) => {
-      if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || "")) {
-        cancelKeyboardPan();
-      }
-    };
-
     setHeight();
-    // Also force the reflow on first mount, not only on later
-    // resize/visibility/pageshow events — a cold launch straight from the
-    // Home Screen icon can already start out pinned to a stale rect
-    // before any of those events ever fire, which is exactly the case
-    // that was slipping through before.
-    nudgeReflow();
     window.addEventListener("resize", onResize);
     window.addEventListener("orientationchange", onResize);
     window.visualViewport?.addEventListener("resize", onResize);
     document.addEventListener("visibilitychange", onVisible);
     window.addEventListener("pageshow", nudgeReflow);
     window.addEventListener("focus", nudgeReflow);
-    document.addEventListener("focusin", onFocusIn);
-    window.visualViewport?.addEventListener("resize", cancelKeyboardPan);
 
     return () => {
       clearTimeout(reflowTimer);
@@ -23965,8 +23933,6 @@ function useRealViewportHeight() {
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("pageshow", nudgeReflow);
       window.removeEventListener("focus", nudgeReflow);
-      document.removeEventListener("focusin", onFocusIn);
-      window.visualViewport?.removeEventListener("resize", cancelKeyboardPan);
     };
   }, []);
 }
@@ -23999,20 +23965,9 @@ function usePwaSetup() {
       viewportTag.setAttribute("name", "viewport");
       document.head.appendChild(viewportTag);
     }
-    // `interactive-widget=resizes-content` (newer iOS/Android WebKit and
-    // Chromium) tells the browser to actually shrink the layout viewport
-    // when the on-screen keyboard opens, instead of leaving the layout
-    // viewport full-height and just overlaying the keyboard on top of it.
-    // Without it, WebKit's fallback for keeping a focused input visible
-    // above the keyboard is to *pan* the whole page upward internally
-    // (a visual-viewport offset, not a real scroll) — on a `position:
-    // fixed` layout like ours that pan can end up detached from the
-    // fixed box's actual top edge, which is what was cutting the input
-    // off under the status bar and leaving blank space where the app's
-    // real background no longer reaches.
     viewportTag.setAttribute(
       "content",
-      "width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content",
+      "width=device-width, initial-scale=1, viewport-fit=cover",
     );
 
     const manifest = {
