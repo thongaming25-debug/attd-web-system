@@ -7130,7 +7130,14 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
   return (
     <div className="wf-login-root">
       <LoginBackground />
-      <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
+      <div
+        style={{
+          position: "absolute",
+          top: "calc(16px + env(safe-area-inset-top))",
+          right: 16,
+          zIndex: 10,
+        }}
+      >
         <LangToggle />
       </div>
       <div className="wf-login-card">
@@ -7258,7 +7265,14 @@ function AdminLoginScreen({ admins, onLogin, go }) {
   return (
     <div className="wf-login-root">
       <LoginBackground />
-      <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
+      <div
+        style={{
+          position: "absolute",
+          top: "calc(16px + env(safe-area-inset-top))",
+          right: 16,
+          zIndex: 10,
+        }}
+      >
         <LangToggle />
       </div>
       <div className="wf-login-card">
@@ -11383,7 +11397,14 @@ function KioskDisplay({ officeId, offices, branding }) {
     return (
       <div style={shellStyle}>
         <LoginBackground />
-        <div style={{ position: "absolute", top: 20, right: 20, zIndex: 2 }}>
+        <div
+          style={{
+            position: "absolute",
+            top: "calc(20px + env(safe-area-inset-top))",
+            right: 20,
+            zIndex: 2,
+          }}
+        >
           <LangToggle variant="dark" />
         </div>
         <div
@@ -11420,7 +11441,14 @@ function KioskDisplay({ officeId, offices, branding }) {
   return (
     <div style={shellStyle}>
       <LoginBackground />
-      <div style={{ position: "absolute", top: 20, right: 20, zIndex: 2 }}>
+      <div
+        style={{
+          position: "absolute",
+          top: "calc(20px + env(safe-area-inset-top))",
+          right: 20,
+          zIndex: 2,
+        }}
+      >
         <LangToggle variant="dark" />
       </div>
       <div
