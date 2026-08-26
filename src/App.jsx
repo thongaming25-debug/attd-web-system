@@ -72,6 +72,9 @@ import {
   GraduationCap,
   Briefcase,
   ListChecks,
+  MessageCircle,
+  Mic,
+  Square,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -116,6 +119,7 @@ const LANG_RAW = {
       performance: "ការវាយតម្លៃការងារ",
       attCorrection: "សំណើកែតម្រូវវត្តមាន",
       shiftSwap: "សំណើដូរវេន",
+      messages: "សារ",
       assets: "ទ្រព្យសម្បត្តិក្រុមហ៊ុន",
       training: "ការបណ្តុះបណ្តាល & សញ្ញាបត្រ",
       docExpiry: "កិច្ចសន្យា/ឯកសារជិតផុតកំណត់",
@@ -863,6 +867,47 @@ const LANG_RAW = {
       needReason: "សូមបញ្ចូលមូលហេតុ",
       note: "ចំណាំ៖ ពេលអនុម័ត វេនរបស់បុគ្គលិកនឹងផ្លាស់ប្តូរដោយស្វ័យប្រវត្តិទៅតាមវេនដែលបានស្នើសុំភ្លាមៗ គ្មានចាំបាច់កែដោយដៃទៀតទេ។",
     },
+    chat: {
+      title: "សារ",
+      searchEmployee: "ស្វែងរកបុគ្គលិក...",
+      noConversations: "មិនទាន់មានការសន្ទនាទេ",
+      noEmployeesFound: "រកមិនឃើញបុគ្គលិកទេ",
+      selectEmployee: "ជ្រើសរើសបុគ្គលិកម្នាក់ ដើម្បីចាប់ផ្តើមសន្ទនា",
+      placeholder: "សរសេរសារ...",
+      send: "ផ្ញើ",
+      noMessages: "មិនទាន់មានសារទេ សរសេរសារដើម្បីចាប់ផ្តើមសន្ទនា",
+      adminLabel: "អ្នកគ្រប់គ្រង",
+      youLabel: "អ្នក",
+      newMessageFrom: "សារថ្មីពី",
+      newMessageFromAdmin: "សារថ្មីពីអ្នកគ្រប់គ្រង",
+      today: "ថ្ងៃនេះ",
+      attach: "ភ្ជាប់ឯកសារ",
+      removeAttachment: "លុបចេញ",
+      fileTooLarge: "ឯកសារធំពេក សូមជ្រើសរើសឯកសារតូចជាងនេះ (តិចជាង 8MB)",
+      fileReadError: "មិនអាចអានឯកសារនេះបានទេ សូមសាកល្បងម្តងទៀត",
+      recordVoice: "ថតសារជាសំឡេង",
+      recording: "កំពុងថត",
+      stopRecording: "បញ្ចប់",
+      cancelRecording: "បោះបង់ការថត",
+      micDenied:
+        "មិនអាចចូលប្រើមីក្រូហ្វូនបានទេ សូមអនុញ្ញាតសិទ្ធិប្រើមីក្រូហ្វូនសម្រាប់គេហទំព័រនេះ",
+      micUnsupported: "ឧបករណ៍ ឬកម្មវិធីរុករកនេះមិនគាំទ្រការថតសំឡេងទេ",
+      download: "ទាញយក",
+      photoAttachment: "រូបភាព",
+      edited: "បានកែសម្រួល",
+      seen: "បានឃើញ",
+      delivered: "បានផ្ញើ",
+      messageDeleted: "សារនេះត្រូវបានលុប",
+      editMessage: "កែសម្រួលសារ",
+      deleteMessage: "លុបសារ",
+      confirmDeleteMsg:
+        "តើអ្នកប្រាកដទេថាចង់លុបសារនេះ? សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ",
+      deleteConversation: "លុបការសន្ទនាទាំងមូល",
+      confirmDeleteConversation:
+        "តើអ្នកប្រាកដទេថាចង់លុបការសន្ទនាទាំងមូលជាមួយបុគ្គលិកនេះ? សារទាំងអស់នឹងបាត់ជាអចិន្ត្រៃយ៍ សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ",
+      saveEdit: "រក្សាទុក",
+      cancelEdit: "បោះបង់",
+    },
     admAcc: {
       addBtn: "បន្ថែមអ្នកគ្រប់គ្រង",
       editTitle: "កែសម្រួលអ្នកគ្រប់គ្រង",
@@ -1088,6 +1133,7 @@ const LANG_RAW = {
       performance: "Performance Reviews",
       attCorrection: "Attendance Corrections",
       shiftSwap: "Shift Swap Requests",
+      messages: "Messages",
       assets: "Company Assets",
       training: "Training & Certifications",
       docExpiry: "Contracts & Expiring Docs",
@@ -1837,6 +1883,47 @@ const LANG_RAW = {
       noRequest: "No shift swap requests yet",
       needReason: "Please enter a reason",
       note: "Note: on approval, the employee's shift is updated automatically to the requested shift — no manual edit needed afterward.",
+    },
+    chat: {
+      title: "Messages",
+      searchEmployee: "Search employee...",
+      noConversations: "No conversations yet",
+      noEmployeesFound: "No employees found",
+      selectEmployee: "Select an employee to start a conversation",
+      placeholder: "Write a message...",
+      send: "Send",
+      noMessages: "No messages yet — write one to start the conversation",
+      adminLabel: "Admin",
+      youLabel: "You",
+      newMessageFrom: "New message from",
+      newMessageFromAdmin: "New message from admin",
+      today: "Today",
+      attach: "Attach file",
+      removeAttachment: "Remove",
+      fileTooLarge: "File is too large — please choose one under 8MB",
+      fileReadError: "Couldn't read that file — please try again",
+      recordVoice: "Record a voice message",
+      recording: "Recording",
+      stopRecording: "Stop",
+      cancelRecording: "Cancel recording",
+      micDenied:
+        "Couldn't access the microphone — please allow microphone permission for this site.",
+      micUnsupported: "This device or browser doesn't support voice recording.",
+      download: "Download",
+      photoAttachment: "Photo",
+      edited: "edited",
+      seen: "Seen",
+      delivered: "Delivered",
+      messageDeleted: "This message was deleted",
+      editMessage: "Edit message",
+      deleteMessage: "Delete message",
+      confirmDeleteMsg:
+        "Are you sure you want to delete this message? This can't be undone.",
+      deleteConversation: "Delete entire conversation",
+      confirmDeleteConversation:
+        "Are you sure you want to delete this entire conversation with this employee? All messages will be permanently gone. This can't be undone.",
+      saveEdit: "Save",
+      cancelEdit: "Cancel",
     },
     admAcc: {
       addBtn: "Add Admin",
@@ -2777,6 +2864,7 @@ const DEFAULT_EMPLOYEE_MODULES = {
   documents: true,
   loginActivity: true,
   profile: true,
+  messages: true,
 };
 // Sensible starting point covering the natural HR seniority ladder — an
 // Officer can only view, each step up adds more, Admin gets everything
@@ -3024,6 +3112,7 @@ html,body,#root{height:100%;}
 .wf-content::-webkit-scrollbar-track,.wf-modal::-webkit-scrollbar-track{background:transparent;}
 .wf-sidebar nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:8px;}
 @keyframes wf-fade{from{opacity:0}to{opacity:1}}
+@keyframes wf-rec-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.75)}}
 @keyframes wf-pop{from{opacity:0;transform:scale(.96) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
 @keyframes wf-app-in{from{opacity:0;}to{opacity:1;}}
 @keyframes wf-page-in{from{opacity:0;}to{opacity:1;}}
@@ -3052,7 +3141,21 @@ html,body,#root{height:100%;}
   .wf-bottomnav{display:flex;}
   .wf-content.wf-content-bnpad{padding-bottom:86px;}
   .wf-role-staff .wf-menu-btn{display:none;}
+  .wf-chat-layout{height:calc(100vh - 190px) !important;}
+  .wf-chat-list-pane{width:100% !important;border-right:none !important;}
+  .wf-chat-layout.wf-chat-thread-open .wf-chat-list-pane{display:none;}
+  .wf-chat-layout:not(.wf-chat-thread-open) .wf-chat-thread-pane{display:none;}
+  .wf-chat-back-btn{display:inline-flex !important;}
 }
+.wf-chat-layout{display:flex;gap:0;height:calc(100vh - 230px);min-height:420px;border:1px solid ${T.lineSoft};border-radius:14px;overflow:hidden;background:${T.card};}
+.wf-chat-list-pane{width:300px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid ${T.lineSoft};overflow-y:auto;}
+.wf-chat-thread-pane{flex:1;display:flex;flex-direction:column;min-width:0;background:${T.paper};}
+.wf-chat-item{display:flex;gap:10px;width:100%;text-align:left;padding:12px 14px;background:transparent;border:none;border-bottom:1px solid ${T.lineSoft};cursor:pointer;align-items:center;}
+.wf-chat-item:hover{background:${T.paper};}
+.wf-chat-item.active{background:${T.forestSoft};}
+.wf-chat-bubble-row{padding:2px 14px;}
+.wf-chat-bubble{max-width:100%;padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.5;overflow-wrap:break-word;word-break:normal;white-space:pre-wrap;}
+.wf-chat-back-btn{display:none;background:none;border:none;cursor:pointer;color:${T.ink};padding:6px;align-items:center;}
 `;
 function useGlobalStyle() {
   useEffect(() => {
@@ -4506,6 +4609,7 @@ const REALTIME_TABLES = [
   "role_permissions",
   "assets",
   "trainings",
+  "messages",
 ];
 const realtimeHandlers = new Map(REALTIME_TABLES.map((t) => [t, new Set()]));
 let realtimeChannel = null;
@@ -6067,6 +6171,84 @@ function NotificationBell({
         </div>
       )}
     </div>
+  );
+}
+// A single icon button (no dropdown, unlike NotificationBell) that jumps
+// straight to the Messages page, badged with the unread count for
+// whoever is looking at it: an admin sees unread messages sent by any
+// employee across every thread (admins share one mailbox, same as the
+// rest of this app's admin-facing tables); an employee only ever sees
+// unread messages in their own thread.
+function ChatQuickAccess({ role, currentEmp, messages, setPage }) {
+  const { t } = useLang();
+  const unread = useMemo(() => {
+    if (role === "admin") {
+      return messages.filter(
+        (m) => m.senderRole === "employee" && !m.readByAdmin,
+      ).length;
+    }
+    if (!currentEmp) return 0;
+    return messages.filter(
+      (m) =>
+        m.employeeId === currentEmp.id &&
+        m.senderRole === "admin" &&
+        !m.readByEmployee,
+    ).length;
+  }, [role, currentEmp, messages]);
+
+  // Chimes whenever unread count rises — i.e. a new incoming message just
+  // landed for whoever is looking at this (admin or employee). Skipped on
+  // first mount so opening the app with pre-existing unread messages
+  // doesn't fire the sound, and skipped on drops (marking read).
+  const prevUnreadRef = useRef(unread);
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    if (mountedRef.current && unread > prevUnreadRef.current) {
+      playChatNotifySound();
+    }
+    prevUnreadRef.current = unread;
+    mountedRef.current = true;
+  }, [unread]);
+
+  return (
+    <button
+      onClick={() => setPage("messages")}
+      aria-label={t.chat.title}
+      style={{
+        position: "relative",
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+        color: T.ink,
+        padding: 6,
+        display: "flex",
+      }}
+    >
+      <MessageCircle size={19} />
+      {unread > 0 && (
+        <span
+          style={{
+            position: "absolute",
+            top: 1,
+            right: 1,
+            minWidth: 16,
+            height: 16,
+            borderRadius: 999,
+            background: T.rose,
+            color: "#fff",
+            fontSize: 10,
+            fontWeight: 700,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "0 3px",
+            border: `2px solid ${T.paper}`,
+          }}
+        >
+          {unread > 9 ? "9+" : unread}
+        </span>
+      )}
+    </button>
   );
 }
 function Modal({ title, onClose, children, width = 480 }) {
@@ -11101,18 +11283,14 @@ function loadJsQR() {
 // (see handleDecoded below) — built with the Web Audio API rather than
 // an audio file so it needs no extra asset/network request and still
 // works on an offline-for-a-moment kiosk tablet. Silently no-ops if
-// AudioContext is unavailable or blocked (e.g. autoplay policy); the
-// on-screen "matched" state already confirms success on its own.
-// `mode` ("in"/"out") picks which half of the preset plays, so
-// check-in and check-out stay distinguishable by ear. `preset` selects
-// the tone recipe from SOUND_PRESETS — defaults to "chime" when unset.
-function playScanBeep(mode, preset) {
+// Shared WebAudio tone player used by both the QR scan beep and the chat
+// notification sound below. Silently no-ops if AudioContext is unavailable
+// or blocked (e.g. autoplay policy) — the on-screen state already confirms
+// the event on its own, so a missing beep is never the only signal.
+function playTones(tones) {
   try {
     const Ctx = window.AudioContext || window.webkitAudioContext;
-    if (!Ctx) return;
-    const recipe = SOUND_PRESETS[preset] || SOUND_PRESETS.chime;
-    const tones = (mode === "out" ? recipe.out : recipe.in) || [];
-    if (tones.length === 0) return; // "silent" preset, or nothing to play
+    if (!Ctx || !tones || tones.length === 0) return;
     const ctx = new Ctx();
     const now = ctx.currentTime;
     tones.forEach(({ freq, start, dur, type }) => {
@@ -11128,13 +11306,29 @@ function playScanBeep(mode, preset) {
       osc.start(now + start);
       osc.stop(now + start + dur + 0.02);
     });
-    // Close the context once every tone finishes, so a scanner left open
-    // all day doesn't accumulate one AudioContext per scan.
+    // Close the context once every tone finishes, so a screen left open
+    // all day doesn't accumulate one AudioContext per event.
     const longest = Math.max(...tones.map((tn) => tn.start + tn.dur));
     setTimeout(() => ctx.close(), longest * 1000 + 250);
   } catch {
     // Ignore — see comment above.
   }
+}
+// `mode` ("in"/"out") picks which half of the preset plays, so
+// check-in and check-out stay distinguishable by ear. `preset` selects
+// the tone recipe from SOUND_PRESETS — defaults to "chime" when unset.
+function playScanBeep(mode, preset) {
+  const recipe = SOUND_PRESETS[preset] || SOUND_PRESETS.chime;
+  playTones((mode === "out" ? recipe.out : recipe.in) || []);
+}
+// Short two-note "ding" for an incoming chat message — same sound
+// whichever side receives it (admin gets a message from an employee, or
+// an employee gets one from admin), independent of the QR sound preset.
+function playChatNotifySound() {
+  playTones([
+    { freq: 784, start: 0, dur: 0.08, type: "sine" },
+    { freq: 1174.66, start: 0.09, dur: 0.16, type: "sine" },
+  ]);
 }
 
 function QrScanModal({ offices, mode, soundPreset, onMatch, onClose }) {
@@ -18213,6 +18407,1229 @@ function RolePermissionsPage({ rolePermissions, setRolePermissions }) {
   );
 }
 
+// Admin <-> Employee direct chat.
+//
+// Admin view: a searchable list of employees on the left (existing
+// conversations sorted by latest activity, or a live search to start a
+// new one) and the open thread on the right — collapses to a single
+// pane on phones via the wf-chat-thread-open class (see the @media rule
+// in CSS above), with a back button to return to the list.
+//
+// Employee view: just their own single thread with the admin team, full
+// width — there's no one else to pick, so no list pane at all.
+// Chat attachments: cap on the original upload (before any compression) so
+// a single attachment can't bloat every client's sync payload, plus the
+// target size for photo attachments sent in a thread. Larger than the tiny
+// square profile-photo avatar since these are viewed full-size in the chat.
+const MAX_CHAT_FILE_BYTES = 8 * 1024 * 1024;
+const CHAT_IMAGE_MAX_DIM = 1280;
+const CHAT_IMAGE_JPEG_QUALITY = 0.75;
+
+// Like fileToCompressedAvatarDataUrl but keeps the original aspect ratio
+// (no square crop) — a chat photo should look like what was actually sent.
+function fileToCompressedChatImageDataUrl(
+  file,
+  maxDim = CHAT_IMAGE_MAX_DIM,
+  quality = CHAT_IMAGE_JPEG_QUALITY,
+) {
+  return new Promise((resolve, reject) => {
+    const rawUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+      const w = Math.max(1, Math.round(img.width * scale));
+      const h = Math.max(1, Math.round(img.height * scale));
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(rawUrl);
+      resolve(canvas.toDataURL("image/jpeg", quality));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(rawUrl);
+      reject(new Error("image-decode-failed"));
+    };
+    img.src = rawUrl;
+  });
+}
+
+function humanFileSize(bytes) {
+  if (!bytes && bytes !== 0) return "";
+  if (bytes < 1024) return `${bytes} B`;
+  const units = ["KB", "MB", "GB"];
+  let val = bytes / 1024;
+  let i = 0;
+  while (val >= 1024 && i < units.length - 1) {
+    val /= 1024;
+    i += 1;
+  }
+  return `${val.toFixed(val < 10 ? 1 : 0)} ${units[i]}`;
+}
+
+function MessagesPage({
+  role,
+  currentAdmin,
+  currentEmp,
+  employees,
+  messages,
+  setMessages,
+}) {
+  const { t } = useLang();
+  const isAdmin = role === "admin";
+  const [selectedEmpId, setSelectedEmpId] = useState(
+    isAdmin ? null : currentEmp?.id || null,
+  );
+  const [query, setQuery] = useState("");
+  const [draft, setDraft] = useState("");
+  const scrollRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const [pendingAttachment, setPendingAttachment] = useState(null); // { dataUrl, name, type, size }
+  const [attaching, setAttaching] = useState(false);
+  const [attachError, setAttachError] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [editDraft, setEditDraft] = useState("");
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [confirmDeleteThread, setConfirmDeleteThread] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const [recordSeconds, setRecordSeconds] = useState(0);
+  const [recordError, setRecordError] = useState("");
+  const mediaRecorderRef = useRef(null);
+  const recordChunksRef = useRef([]);
+  const recordStreamRef = useRef(null);
+  const recordTimerRef = useRef(null);
+
+  const threadEmpId = isAdmin ? selectedEmpId : currentEmp?.id || null;
+
+  const threadMessages = useMemo(
+    () =>
+      messages
+        .filter((m) => m.employeeId === threadEmpId)
+        .sort((a, b) => (a.createdAt || "").localeCompare(b.createdAt || "")),
+    [messages, threadEmpId],
+  );
+
+  // Id of the viewer's own most recent (non-deleted) message in this
+  // thread — only that bubble shows a Seen/Delivered receipt, matching
+  // the usual chat-app convention instead of stamping every message.
+  const lastMineMessageId = useMemo(() => {
+    const mineRole = isAdmin ? "admin" : "employee";
+    for (let i = threadMessages.length - 1; i >= 0; i--) {
+      const m = threadMessages[i];
+      if (m.senderRole === mineRole && !m.deleted) return m.id;
+    }
+    return null;
+  }, [threadMessages, isAdmin]);
+
+  // One row per employee who has ever exchanged a message, each carrying
+  // its most recent message and how many are unread — newest activity
+  // first, same "pending things surface first" idea used elsewhere in
+  // this app (e.g. AttendanceCorrections).
+  const conversations = useMemo(() => {
+    if (!isAdmin) return [];
+    const byEmp = new Map();
+    messages.forEach((m) => {
+      const cur = byEmp.get(m.employeeId);
+      if (!cur || (m.createdAt || "") > (cur.lastMessage.createdAt || "")) {
+        byEmp.set(m.employeeId, { lastMessage: m, unread: 0 });
+      }
+    });
+    messages.forEach((m) => {
+      if (m.senderRole === "employee" && !m.readByAdmin) {
+        const cur = byEmp.get(m.employeeId);
+        if (cur) cur.unread += 1;
+      }
+    });
+    return Array.from(byEmp.entries())
+      .map(([employeeId, info]) => ({
+        employeeId,
+        employee: employees.find((e) => e.id === employeeId),
+        ...info,
+      }))
+      .filter((c) => c.employee)
+      .sort((a, b) =>
+        (b.lastMessage.createdAt || "").localeCompare(
+          a.lastMessage.createdAt || "",
+        ),
+      );
+  }, [isAdmin, messages, employees]);
+
+  // Every active employee, shown as a selectable row whether or not a
+  // conversation exists yet — employees with an existing thread keep their
+  // last-message preview and sort by recency; everyone else is listed
+  // alphabetically underneath so admin can pick anyone and message first.
+  const allChatItems = useMemo(() => {
+    if (!isAdmin) return [];
+    const q = query.trim().toLowerCase();
+    const convByEmp = new Map(conversations.map((c) => [c.employeeId, c]));
+    const items = employees
+      .filter((e) => e.status === "active")
+      .filter(
+        (e) =>
+          !q ||
+          e.name?.toLowerCase().includes(q) ||
+          e.code?.toLowerCase().includes(q),
+      )
+      .map((e) => {
+        const conv = convByEmp.get(e.id);
+        return conv
+          ? { employeeId: e.id, employee: e, ...conv, hasConversation: true }
+          : {
+              employeeId: e.id,
+              employee: e,
+              lastMessage: null,
+              unread: 0,
+              hasConversation: false,
+            };
+      });
+    return items.sort((a, b) => {
+      if (a.hasConversation && b.hasConversation) {
+        return (b.lastMessage.createdAt || "").localeCompare(
+          a.lastMessage.createdAt || "",
+        );
+      }
+      if (a.hasConversation !== b.hasConversation) {
+        return a.hasConversation ? -1 : 1;
+      }
+      return (a.employee.name || "").localeCompare(b.employee.name || "");
+    });
+  }, [isAdmin, employees, conversations, query]);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
+  }, [threadMessages.length, threadEmpId]);
+
+  // Marks the open thread's incoming messages read. Guarded on there
+  // actually being unread rows before calling setMessages, so this
+  // doesn't turn into an infinite loop re-firing on its own writes.
+  useEffect(() => {
+    if (!threadEmpId) return;
+    const unreadIncoming = messages.filter(
+      (m) =>
+        m.employeeId === threadEmpId &&
+        (isAdmin
+          ? m.senderRole === "employee" && !m.readByAdmin
+          : m.senderRole === "admin" && !m.readByEmployee),
+    );
+    if (unreadIncoming.length === 0) return;
+    const ids = new Set(unreadIncoming.map((m) => m.id));
+    setMessages(
+      messages.map((m) =>
+        ids.has(m.id)
+          ? isAdmin
+            ? { ...m, readByAdmin: true }
+            : { ...m, readByEmployee: true }
+          : m,
+      ),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [threadEmpId, messages, isAdmin]);
+
+  const send = () => {
+    const content = draft.trim();
+    if ((!content && !pendingAttachment) || !threadEmpId) return;
+    setMessages([
+      ...messages,
+      {
+        id: uid("msg"),
+        employeeId: threadEmpId,
+        senderRole: isAdmin ? "admin" : "employee",
+        senderId: isAdmin ? currentAdmin?.id || null : currentEmp?.id || null,
+        senderName: isAdmin
+          ? currentAdmin?.name || t.chat.adminLabel
+          : currentEmp?.name || "",
+        content,
+        attachmentData: pendingAttachment?.dataUrl || null,
+        attachmentName: pendingAttachment?.name || null,
+        attachmentType: pendingAttachment?.type || null,
+        readByAdmin: isAdmin,
+        readByEmployee: !isAdmin,
+        createdAt: new Date().toISOString(),
+      },
+    ]);
+    setDraft("");
+    setPendingAttachment(null);
+    setAttachError("");
+  };
+
+  const pickAttachment = () => fileInputRef.current?.click();
+
+  const onAttachmentChange = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-picking the same file next time
+    if (!file) return;
+    if (file.size > MAX_CHAT_FILE_BYTES) {
+      setAttachError(t.chat.fileTooLarge);
+      return;
+    }
+    setAttachError("");
+    setAttaching(true);
+    try {
+      const isImage = file.type.startsWith("image/");
+      const dataUrl = isImage
+        ? await fileToCompressedChatImageDataUrl(file)
+        : await fileToDataUrl(file);
+      setPendingAttachment({
+        dataUrl,
+        name: file.name,
+        type: file.type || "application/octet-stream",
+        size: file.size,
+      });
+    } catch {
+      setAttachError(t.chat.fileReadError);
+    } finally {
+      setAttaching(false);
+    }
+  };
+
+  const threadEmployee = isAdmin
+    ? employees.find((e) => e.id === threadEmpId)
+    : currentEmp;
+
+  // Voice messages reuse the exact same pendingAttachment shape as file/
+  // image attachments (dataUrl/name/type/size), so send() and the bubble
+  // renderer below don't need a separate code path — only a branch on
+  // attachmentType starting with "audio/" to show a player instead of a
+  // generic download link or image.
+  const stopRecordingTracks = () => {
+    if (recordTimerRef.current) {
+      clearInterval(recordTimerRef.current);
+      recordTimerRef.current = null;
+    }
+    recordStreamRef.current?.getTracks().forEach((tr) => tr.stop());
+    recordStreamRef.current = null;
+  };
+
+  const startRecording = async () => {
+    setRecordError("");
+    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+      setRecordError(t.chat.micUnsupported);
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+      recordStreamRef.current = stream;
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm")
+        ? "audio/webm"
+        : MediaRecorder.isTypeSupported("audio/mp4")
+          ? "audio/mp4"
+          : "";
+      const recorder = mimeType
+        ? new MediaRecorder(stream, { mimeType })
+        : new MediaRecorder(stream);
+      recordChunksRef.current = [];
+      recorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) recordChunksRef.current.push(e.data);
+      };
+      recorder.onstop = async () => {
+        stopRecordingTracks();
+        const blob = new Blob(recordChunksRef.current, {
+          type: recorder.mimeType || mimeType || "audio/webm",
+        });
+        recordChunksRef.current = [];
+        if (blob.size === 0) return; // tapped stop almost instantly
+        if (blob.size > MAX_CHAT_FILE_BYTES) {
+          setAttachError(t.chat.fileTooLarge);
+          return;
+        }
+        try {
+          const dataUrl = await fileToDataUrl(blob);
+          const ext = (blob.type || "").includes("mp4") ? "m4a" : "webm";
+          setPendingAttachment({
+            dataUrl,
+            name: `voice-${Date.now()}.${ext}`,
+            type: blob.type || "audio/webm",
+            size: blob.size,
+          });
+        } catch {
+          setAttachError(t.chat.fileReadError);
+        }
+      };
+      mediaRecorderRef.current = recorder;
+      recorder.start();
+      setRecording(true);
+      setRecordSeconds(0);
+      recordTimerRef.current = setInterval(
+        () => setRecordSeconds((s) => s + 1),
+        1000,
+      );
+    } catch {
+      setRecordError(t.chat.micDenied);
+    }
+  };
+
+  const stopRecording = () => {
+    setRecording(false);
+    mediaRecorderRef.current?.stop();
+    mediaRecorderRef.current = null;
+  };
+
+  const cancelRecording = () => {
+    setRecording(false);
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.onstop = null;
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current = null;
+    }
+    recordChunksRef.current = [];
+    stopRecordingTracks();
+  };
+
+  useEffect(() => {
+    // Stop any in-progress recording if the admin/employee navigates away
+    // from Messages entirely, so the mic doesn't stay hot in the background.
+    return () => {
+      if (mediaRecorderRef.current) {
+        mediaRecorderRef.current.onstop = null;
+        try {
+          mediaRecorderRef.current.stop();
+        } catch {
+          // already stopped
+        }
+      }
+      stopRecordingTracks();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Edit/delete is sender-only: a message is "mine to modify" only if it
+  // was actually sent by the currently logged-in identity, not just by
+  // "an admin" — admins share one mailbox per employee, so a message
+  // showing on the right (role match) may still belong to a different
+  // admin.
+  const canModify = (m) =>
+    isAdmin
+      ? m.senderRole === "admin" && m.senderId === (currentAdmin?.id || null)
+      : m.senderRole === "employee" && m.senderId === (currentEmp?.id || null);
+
+  const startEdit = (m) => {
+    setEditingId(m.id);
+    setEditDraft(m.content || "");
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditDraft("");
+  };
+
+  const saveEdit = () => {
+    const msg = messages.find((m) => m.id === editingId);
+    if (!msg) return;
+    const content = editDraft.trim();
+    if (!content && !msg.attachmentData) return; // nothing left to show
+    setMessages(
+      messages.map((m) =>
+        m.id === editingId
+          ? { ...m, content, editedAt: new Date().toISOString() }
+          : m,
+      ),
+    );
+    cancelEdit();
+  };
+
+  const deleteMessage = (id) => {
+    setMessages(
+      messages.map((m) =>
+        m.id === id
+          ? {
+              ...m,
+              content: "",
+              attachmentData: null,
+              attachmentName: null,
+              attachmentType: null,
+              deleted: true,
+            }
+          : m,
+      ),
+    );
+    setConfirmDeleteId(null);
+    if (editingId === id) cancelEdit();
+  };
+
+  // Superadmin-only: wipes the entire thread with one employee, not just
+  // one message. Unlike deleteMessage above (soft delete — content is
+  // cleared but the row stays as a "This message was deleted" tombstone),
+  // this hard-removes every row for threadEmpId, since the point is to
+  // clear the conversation out of the mailbox entirely.
+  const deleteConversation = () => {
+    if (!threadEmpId) return;
+    setMessages(messages.filter((m) => m.employeeId !== threadEmpId));
+    setConfirmDeleteThread(false);
+    setSelectedEmpId(null);
+  };
+
+  const threadPane = (
+    <>
+      <div className="wf-chat-thread-pane">
+        {threadEmpId ? (
+          <>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "12px 16px",
+                borderBottom: `1px solid ${T.lineSoft}`,
+                background: T.card,
+              }}
+            >
+              {isAdmin && (
+                <button
+                  className="wf-chat-back-btn"
+                  onClick={() => setSelectedEmpId(null)}
+                >
+                  <ArrowLeft size={18} />
+                </button>
+              )}
+              <Avatar
+                name={isAdmin ? threadEmployee?.name : t.chat.adminLabel}
+                photo={isAdmin ? threadEmployee?.photo : null}
+                size={32}
+              />
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div
+                  style={{
+                    fontWeight: 700,
+                    fontSize: 13.5,
+                    color: T.ink,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {isAdmin ? threadEmployee?.name || "?" : t.chat.adminLabel}
+                </div>
+                {isAdmin && (
+                  <div style={{ fontSize: 11, color: T.muted }}>
+                    {threadEmployee?.code}
+                  </div>
+                )}
+              </div>
+              {isAdmin && currentAdmin?.role === "superadmin" && (
+                <button
+                  type="button"
+                  onClick={() => setConfirmDeleteThread(true)}
+                  title={t.chat.deleteConversation}
+                  style={{
+                    border: "none",
+                    background: "transparent",
+                    color: T.mutedLight,
+                    cursor: "pointer",
+                    display: "flex",
+                    padding: 6,
+                    flexShrink: 0,
+                  }}
+                >
+                  <Trash2 size={16} />
+                </button>
+              )}
+            </div>
+            <div
+              ref={scrollRef}
+              style={{
+                flex: 1,
+                overflowY: "auto",
+                padding: "12px 0",
+                display: "flex",
+                flexDirection: "column",
+                gap: 6,
+              }}
+            >
+              {threadMessages.length === 0 ? (
+                <div
+                  style={{
+                    margin: "auto",
+                    color: T.muted,
+                    fontSize: 12.5,
+                    textAlign: "center",
+                    padding: "0 24px",
+                  }}
+                >
+                  {t.chat.noMessages}
+                </div>
+              ) : (
+                threadMessages.map((m) => {
+                  const mine = isAdmin
+                    ? m.senderRole === "admin"
+                    : m.senderRole === "employee";
+                  const isEditing = editingId === m.id;
+                  const modifiable = canModify(m) && !m.deleted;
+                  return (
+                    <div
+                      key={m.id}
+                      className="wf-chat-bubble-row"
+                      style={{ textAlign: mine ? "right" : "left" }}
+                    >
+                      <div
+                        style={{
+                          display: "inline-block",
+                          maxWidth: "74%",
+                          textAlign: "left",
+                        }}
+                      >
+                        {isAdmin &&
+                          m.senderRole === "admin" &&
+                          m.senderName && (
+                            <div
+                              style={{
+                                fontSize: 10,
+                                color: T.muted,
+                                marginBottom: 2,
+                                textAlign: "right",
+                              }}
+                            >
+                              {m.senderName}
+                            </div>
+                          )}
+                        {m.deleted ? (
+                          <div
+                            className="wf-chat-bubble"
+                            style={{
+                              background: "transparent",
+                              color: T.muted,
+                              border: `1px dashed ${T.lineSoft}`,
+                              fontStyle: "italic",
+                              marginLeft: mine ? "auto" : 0,
+                            }}
+                          >
+                            {t.chat.messageDeleted}
+                          </div>
+                        ) : (
+                          <>
+                            {m.attachmentData &&
+                              (m.attachmentType || "").startsWith("image/") && (
+                                <a
+                                  href={m.attachmentData}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  style={{
+                                    display: "block",
+                                    marginLeft: mine ? "auto" : 0,
+                                    marginBottom: m.content ? 6 : 0,
+                                    width: "fit-content",
+                                  }}
+                                >
+                                  <img
+                                    src={m.attachmentData}
+                                    alt={
+                                      m.attachmentName || t.chat.photoAttachment
+                                    }
+                                    style={{
+                                      maxWidth: 220,
+                                      maxHeight: 260,
+                                      borderRadius: 14,
+                                      display: "block",
+                                      cursor: "zoom-in",
+                                      objectFit: "cover",
+                                    }}
+                                  />
+                                </a>
+                              )}
+                            {m.attachmentData &&
+                              (m.attachmentType || "").startsWith("audio/") && (
+                                <audio
+                                  controls
+                                  src={m.attachmentData}
+                                  style={{
+                                    display: "block",
+                                    marginLeft: mine ? "auto" : 0,
+                                    marginBottom: m.content ? 6 : 0,
+                                    height: 36,
+                                    maxWidth: 240,
+                                  }}
+                                />
+                              )}
+                            {m.attachmentData &&
+                              !(m.attachmentType || "").startsWith("image/") &&
+                              !(m.attachmentType || "").startsWith(
+                                "audio/",
+                              ) && (
+                                <a
+                                  href={m.attachmentData}
+                                  download={m.attachmentName || "file"}
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 8,
+                                    padding: "9px 13px",
+                                    borderRadius: 14,
+                                    background: mine ? T.forest : T.card,
+                                    color: mine ? "#fff" : T.ink,
+                                    border: mine
+                                      ? "none"
+                                      : `1px solid ${T.lineSoft}`,
+                                    marginLeft: mine ? "auto" : 0,
+                                    marginBottom: m.content ? 6 : 0,
+                                    textDecoration: "none",
+                                    maxWidth: "100%",
+                                    width: "fit-content",
+                                  }}
+                                >
+                                  <FileText size={16} />
+                                  <div
+                                    style={{
+                                      minWidth: 0,
+                                      fontSize: 12.5,
+                                      fontWeight: 600,
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap",
+                                    }}
+                                  >
+                                    {m.attachmentName || t.chat.download}
+                                  </div>
+                                </a>
+                              )}
+                            {isEditing ? (
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: 6,
+                                  minWidth: 200,
+                                }}
+                              >
+                                <Input
+                                  value={editDraft}
+                                  onChange={(e) => setEditDraft(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter" && !e.shiftKey) {
+                                      e.preventDefault();
+                                      saveEdit();
+                                    } else if (e.key === "Escape") {
+                                      cancelEdit();
+                                    }
+                                  }}
+                                  autoFocus
+                                />
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "flex-end",
+                                    gap: 6,
+                                  }}
+                                >
+                                  <Button variant="ghost" onClick={cancelEdit}>
+                                    {t.chat.cancelEdit}
+                                  </Button>
+                                  <Button
+                                    variant="accent"
+                                    onClick={saveEdit}
+                                    disabled={
+                                      !editDraft.trim() && !m.attachmentData
+                                    }
+                                  >
+                                    {t.chat.saveEdit}
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              m.content && (
+                                <div
+                                  className="wf-chat-bubble"
+                                  style={{
+                                    background: mine ? T.forest : T.card,
+                                    color: mine ? "#fff" : T.ink,
+                                    border: mine
+                                      ? "none"
+                                      : `1px solid ${T.lineSoft}`,
+                                    marginLeft: mine ? "auto" : 0,
+                                  }}
+                                >
+                                  {m.content}
+                                </div>
+                              )
+                            )}
+                          </>
+                        )}
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 6,
+                            justifyContent: mine ? "flex-end" : "flex-start",
+                            marginTop: 2,
+                          }}
+                        >
+                          {mine && modifiable && !isEditing && (
+                            <>
+                              {m.content && (
+                                <button
+                                  type="button"
+                                  onClick={() => startEdit(m)}
+                                  title={t.chat.editMessage}
+                                  style={{
+                                    border: "none",
+                                    background: "transparent",
+                                    color: T.mutedLight,
+                                    cursor: "pointer",
+                                    display: "flex",
+                                    padding: 0,
+                                  }}
+                                >
+                                  <Pencil size={11} />
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => setConfirmDeleteId(m.id)}
+                                title={t.chat.deleteMessage}
+                                style={{
+                                  border: "none",
+                                  background: "transparent",
+                                  color: T.mutedLight,
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  padding: 0,
+                                }}
+                              >
+                                <Trash2 size={11} />
+                              </button>
+                            </>
+                          )}
+                          <div style={{ fontSize: 10, color: T.mutedLight }}>
+                            {m.editedAt && !m.deleted
+                              ? `${timeAgoLabel(m.createdAt)} · ${t.chat.edited}`
+                              : timeAgoLabel(m.createdAt)}
+                            {mine && m.id === lastMineMessageId && (
+                              <>
+                                {" · "}
+                                {(isAdmin ? m.readByEmployee : m.readByAdmin)
+                                  ? t.chat.seen
+                                  : t.chat.delivered}
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+            <div
+              style={{
+                borderTop: `1px solid ${T.lineSoft}`,
+                background: T.card,
+              }}
+            >
+              {(pendingAttachment || attaching) && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "8px 12px 0 12px",
+                  }}
+                >
+                  {attaching ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
+                        fontSize: 12,
+                        color: T.muted,
+                      }}
+                    >
+                      <Loader2
+                        size={14}
+                        style={{ animation: "spin 1s linear infinite" }}
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      {(pendingAttachment.type || "").startsWith("image/") ? (
+                        <img
+                          src={pendingAttachment.dataUrl}
+                          alt={pendingAttachment.name}
+                          style={{
+                            width: 44,
+                            height: 44,
+                            borderRadius: 8,
+                            objectFit: "cover",
+                            border: `1px solid ${T.lineSoft}`,
+                          }}
+                        />
+                      ) : (pendingAttachment.type || "").startsWith(
+                          "audio/",
+                        ) ? (
+                        <audio
+                          controls
+                          src={pendingAttachment.dataUrl}
+                          style={{ height: 34, maxWidth: 220 }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 6,
+                            padding: "6px 10px",
+                            borderRadius: 8,
+                            border: `1px solid ${T.lineSoft}`,
+                            fontSize: 12,
+                            color: T.ink,
+                            maxWidth: 220,
+                          }}
+                        >
+                          <FileText size={14} />
+                          <span
+                            style={{
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {pendingAttachment.name}
+                          </span>
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setPendingAttachment(null)}
+                        style={{
+                          border: "none",
+                          background: "transparent",
+                          cursor: "pointer",
+                          color: T.muted,
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                        title={t.chat.removeAttachment}
+                      >
+                        <X size={16} />
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+              {attachError && (
+                <div
+                  style={{
+                    padding: "6px 12px 0 12px",
+                    fontSize: 11.5,
+                    color: T.rose,
+                  }}
+                >
+                  {attachError}
+                </div>
+              )}
+              {recordError && (
+                <div
+                  style={{
+                    padding: "6px 12px 0 12px",
+                    fontSize: 11.5,
+                    color: T.rose,
+                  }}
+                >
+                  {recordError}
+                </div>
+              )}
+              {recording ? (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: 12,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      flex: 1,
+                      color: T.rose,
+                      fontSize: 13,
+                      fontWeight: 600,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 9,
+                        height: 9,
+                        borderRadius: 999,
+                        background: T.rose,
+                        animation: "wf-rec-pulse 1.2s ease-in-out infinite",
+                        flexShrink: 0,
+                      }}
+                    />
+                    {t.chat.recording}
+                    <span style={{ color: T.muted, fontWeight: 500 }}>
+                      {String(Math.floor(recordSeconds / 60)).padStart(2, "0")}:
+                      {String(recordSeconds % 60).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={cancelRecording}
+                    title={t.chat.cancelRecording}
+                    style={{
+                      border: `1px solid ${T.lineSoft}`,
+                      background: T.inputBg,
+                      color: T.muted,
+                      borderRadius: 10,
+                      width: 40,
+                      height: 40,
+                      flexShrink: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <X size={17} />
+                  </button>
+                  <Button variant="accent" onClick={stopRecording}>
+                    <Square size={14} /> {t.chat.stopRecording}
+                  </Button>
+                </div>
+              ) : (
+                <div style={{ display: "flex", gap: 8, padding: 12 }}>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    onChange={onAttachmentChange}
+                    style={{ display: "none" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={pickAttachment}
+                    disabled={attaching}
+                    title={t.chat.attach}
+                    style={{
+                      border: `1px solid ${T.lineSoft}`,
+                      background: T.inputBg,
+                      color: T.muted,
+                      borderRadius: 10,
+                      width: 40,
+                      flexShrink: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: attaching ? "default" : "pointer",
+                    }}
+                  >
+                    <Paperclip size={17} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={startRecording}
+                    disabled={attaching || !!pendingAttachment}
+                    title={t.chat.recordVoice}
+                    style={{
+                      border: `1px solid ${T.lineSoft}`,
+                      background: T.inputBg,
+                      color: T.muted,
+                      borderRadius: 10,
+                      width: 40,
+                      flexShrink: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor:
+                        attaching || pendingAttachment ? "default" : "pointer",
+                      opacity: pendingAttachment ? 0.5 : 1,
+                    }}
+                  >
+                    <Mic size={17} />
+                  </button>
+                  <Input
+                    value={draft}
+                    onChange={(e) => setDraft(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        send();
+                      }
+                    }}
+                    placeholder={t.chat.placeholder}
+                    style={{ flex: 1 }}
+                  />
+                  <Button
+                    variant="accent"
+                    onClick={send}
+                    disabled={!draft.trim() && !pendingAttachment}
+                  >
+                    <Send size={15} /> {t.chat.send}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          <div
+            style={{
+              margin: "auto",
+              color: T.muted,
+              fontSize: 13,
+              textAlign: "center",
+              padding: 24,
+            }}
+          >
+            {t.chat.selectEmployee}
+          </div>
+        )}
+      </div>
+      {confirmDeleteId && (
+        <ConfirmDialog
+          text={t.chat.confirmDeleteMsg}
+          onCancel={() => setConfirmDeleteId(null)}
+          onConfirm={() => deleteMessage(confirmDeleteId)}
+        />
+      )}
+      {confirmDeleteThread && (
+        <ConfirmDialog
+          text={t.chat.confirmDeleteConversation}
+          onCancel={() => setConfirmDeleteThread(false)}
+          onConfirm={deleteConversation}
+        />
+      )}
+    </>
+  );
+
+  if (!isAdmin) {
+    return (
+      <div className="wf-chat-layout wf-chat-thread-open">{threadPane}</div>
+    );
+  }
+
+  return (
+    <div
+      className={`wf-chat-layout ${selectedEmpId ? "wf-chat-thread-open" : ""}`}
+    >
+      <div className="wf-chat-list-pane">
+        <div style={{ padding: 10, borderBottom: `1px solid ${T.lineSoft}` }}>
+          <div style={{ position: "relative" }}>
+            <Search
+              size={14}
+              style={{
+                position: "absolute",
+                left: 10,
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: T.muted,
+              }}
+            />
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t.chat.searchEmployee}
+              style={{ paddingLeft: 30 }}
+            />
+          </div>
+        </div>
+        {allChatItems.length === 0 ? (
+          <div
+            style={{
+              padding: "24px 14px",
+              textAlign: "center",
+              color: T.muted,
+              fontSize: 12.5,
+            }}
+          >
+            {query.trim() ? t.chat.noEmployeesFound : t.chat.noConversations}
+          </div>
+        ) : (
+          allChatItems.map((c) => (
+            <button
+              key={c.employeeId}
+              className={`wf-chat-item ${selectedEmpId === c.employeeId ? "active" : ""}`}
+              onClick={() => setSelectedEmpId(c.employeeId)}
+            >
+              <Avatar
+                name={c.employee.name}
+                photo={c.employee.photo}
+                size={36}
+              />
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: 6,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      fontSize: 12.5,
+                      color: T.ink,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {c.employee.name}
+                  </div>
+                  {c.hasConversation && (
+                    <div
+                      style={{
+                        fontSize: 10,
+                        color: T.mutedLight,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {timeAgoLabel(c.lastMessage.createdAt)}
+                    </div>
+                  )}
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: 6,
+                    marginTop: 2,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 11.5,
+                      color: T.textSoft,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {c.hasConversation
+                      ? `${c.lastMessage.senderRole === "admin" ? `${t.chat.youLabel}: ` : ""}${c.lastMessage.content}`
+                      : c.employee.code}
+                  </div>
+                  {c.unread > 0 && (
+                    <span
+                      style={{
+                        background: T.rose,
+                        color: "#fff",
+                        fontSize: 10,
+                        fontWeight: 700,
+                        borderRadius: 999,
+                        minWidth: 16,
+                        height: 16,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        padding: "0 4px",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {c.unread > 9 ? "9+" : c.unread}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </button>
+          ))
+        )}
+      </div>
+      {threadPane}
+    </div>
+  );
+}
 function AdminAccounts({ admins, setAdmins, currentAdminId }) {
   const { t, lang } = useLang();
   const [modal, setModal] = useState(null);
@@ -22570,6 +23987,7 @@ function buildNavAdmin(n) {
     { id: "departments", label: n.departments, icon: Building2 },
     { id: "shifts", label: n.shifts, icon: Watch },
     { id: "attendance", label: n.attendance, icon: Clock },
+    { id: "messages", label: n.messages, icon: MessageCircle },
     { id: "holidays", label: n.holidays, icon: CalendarDays },
     {
       id: "leave",
@@ -22650,6 +24068,7 @@ function buildNavEmployee(n, enabledModules) {
     { id: "dashboard", label: n.dashboard, icon: LayoutDashboard },
     { id: "announcements", label: n.announcements, icon: Megaphone },
     { id: "attendance", label: n.myAttendance, icon: Clock },
+    { id: "messages", label: n.messages, icon: MessageCircle },
     { id: "leave", label: n.myLeave, icon: CalendarDays },
     { id: "ot", label: n.myOvertime, icon: Timer },
     { id: "payroll", label: n.myPayroll, icon: Wallet },
@@ -23391,6 +24810,118 @@ function AppInner() {
       },
     },
   );
+  // Admin <-> Employee direct messages. One thread per employee — admins
+  // share a single mailbox per employee (same philosophy as the shared
+  // admin notification mailbox above), so whichever admin replies, every
+  // other admin sees the same conversation and read state. Employees only
+  // ever see their own thread.
+  //
+  // Requires this table in Supabase (SQL editor):
+  //   create table messages (
+  //     id text primary key,
+  //     employee_id text not null references employees(id) on delete cascade,
+  //     sender_role text not null,       -- 'admin' | 'employee'
+  //     sender_id text,                  -- admin id or employee id of the sender
+  //     sender_name text,                -- snapshot of the sender's display name
+  //     content text not null,
+  //     attachment_data text,            -- base64 data URL of an attached photo/file, or null
+  //     attachment_name text,            -- original file name, or null
+  //     attachment_type text,            -- MIME type, or null
+  //     edited_at timestamptz,           -- set when the sender edits their own message
+  //     deleted boolean not null default false,
+  //     read_by_admin boolean not null default false,
+  //     read_by_employee boolean not null default false,
+  //     created_at timestamptz not null default now()
+  //   );
+  //   alter publication supabase_realtime add table messages;
+  // Existing installs: run
+  //   alter table messages add column attachment_data text;
+  //   alter table messages add column attachment_name text;
+  //   alter table messages add column attachment_type text;
+  //   alter table messages add column edited_at timestamptz;
+  //   alter table messages add column deleted boolean not null default false;
+  // Plus a row-level-security policy allowing admins to read/write every
+  // row, and employees to read/write only rows where employee_id matches
+  // their own id.
+  //
+  // Attachments are stored inline as base64 data URLs (same approach as
+  // employee profile photos elsewhere in this file) rather than in a
+  // Supabase Storage bucket — this keeps deployment to a single SQL
+  // migration with no bucket/policy setup required. Images are
+  // downscaled/compressed before upload (see fileToCompressedChatImageDataUrl);
+  // other file types are capped at MAX_CHAT_FILE_BYTES so a single
+  // attachment can't bloat every client's sync payload.
+  //
+  // Edit/delete is Messenger/Telegram-style and sender-only: deleting a
+  // message keeps the row (for thread continuity/ordering) but clears its
+  // content/attachment and sets deleted=true, rendered as a muted "message
+  // was deleted" placeholder rather than actually removing the row.
+  //
+  // Like attendance, chat history grows without bound, so only the last
+  // 90 days are kept live in the app — plenty for an ongoing conversation
+  // without dragging years of messages into every session.
+  const [messages, setMessages, msgReady] = useSupabaseArray("messages", {
+    dateField: "created_at",
+    daysBack: 90,
+    fromDb: (r) => ({
+      id: r.id,
+      employeeId: r.employee_id,
+      senderRole: r.sender_role,
+      senderId: r.sender_id,
+      senderName: r.sender_name,
+      content: r.content,
+      attachmentData: r.attachment_data || null,
+      attachmentName: r.attachment_name || null,
+      attachmentType: r.attachment_type || null,
+      editedAt: r.edited_at || null,
+      deleted: !!r.deleted,
+      readByAdmin: !!r.read_by_admin,
+      readByEmployee: !!r.read_by_employee,
+      createdAt: r.created_at,
+    }),
+    toDb: (r) => ({
+      id: r.id,
+      employee_id: r.employeeId,
+      sender_role: r.senderRole,
+      sender_id: r.senderId,
+      sender_name: r.senderName,
+      content: r.content,
+      attachment_data: r.attachmentData || null,
+      attachment_name: r.attachmentName || null,
+      attachment_type: r.attachmentType || null,
+      edited_at: r.editedAt || null,
+      deleted: !!r.deleted,
+      read_by_admin: !!r.readByAdmin,
+      read_by_employee: !!r.readByEmployee,
+      created_at: r.createdAt,
+    }),
+    notify: ({ type, row }) => {
+      if (type !== "create") return null;
+      const emp = employees.find((e) => e.id === row.employeeId);
+      const body =
+        row.content || (row.attachmentData ? t.chat.photoAttachment : "");
+      if (row.senderRole === "employee") {
+        return {
+          userType: "admin",
+          title: `${t.chat.newMessageFrom} ${emp?.name || row.senderName || "?"}`,
+          body,
+          page: "messages",
+          portal: "admin",
+          tag: `msg-emp-${row.employeeId}`,
+          entityId: row.employeeId,
+        };
+      }
+      return {
+        userType: "employee",
+        userId: row.employeeId,
+        title: t.chat.newMessageFromAdmin,
+        body,
+        page: "messages",
+        portal: "employee",
+        tag: `msg-admin-${row.id}`,
+      };
+    },
+  });
   const [admins, setAdmins, adminsReady, adminsSaveError] = useSupabaseArray(
     "admins",
     {
@@ -24114,6 +25645,14 @@ function AppInner() {
               )}
               <ThemeToggle variant="light" />
               <LangToggle variant="light" />
+              {(role === "admin" || moduleEnabled("messages")) && (
+                <ChatQuickAccess
+                  role={role}
+                  currentEmp={currentEmp}
+                  messages={messages}
+                  setPage={setPage}
+                />
+              )}
               <NotificationBell
                 role={role}
                 currentAdmin={currentAdmin}
@@ -24396,6 +25935,17 @@ function AppInner() {
                     setShiftSwapRequests={setShiftSwapRequests}
                     isSuperAdmin={isSuperAdmin || can("approveRequests")}
                     canApprove={isSuperAdmin || can("approveRequests")}
+                  />
+                )}
+              {page === "messages" &&
+                (role === "admin" || moduleEnabled("messages")) && (
+                  <MessagesPage
+                    role={role}
+                    currentAdmin={currentAdmin}
+                    currentEmp={currentEmp}
+                    employees={employees}
+                    messages={messages}
+                    setMessages={setMessages}
                   />
                 )}
               {page === "admins" && role === "admin" && isSuperAdmin && (
