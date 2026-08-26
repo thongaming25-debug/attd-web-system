@@ -18695,6 +18695,36 @@ const CALL_ICE_SERVERS = [
   {
     urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"],
   },
+  // STUN alone only works when both sides can reach each other directly —
+  // it fails whenever either side is behind a restrictive/symmetric NAT,
+  // which is the normal case for mobile carrier networks (4G/5G) and many
+  // corporate networks. Call then shows "Connected" (ICE/signaling found
+  // each other) but no audio ever flows, because there's no direct path
+  // and nothing to relay through. A TURN server is required as a relay
+  // fallback for those cases.
+  //
+  // ⚠️ The credentials below are Open Relay Project's free public demo
+  // TURN server — fine for testing, NOT for production (shared, rate
+  // limited, no uptime guarantee). Before going live, replace this with
+  // your own TURN server: either self-hosted (coturn is free/open-source)
+  // or a paid provider (Twilio, Metered, Xirsys, etc). See
+  // https://www.metered.ca/tools/openrelay/ for the free-tier signup that
+  // gives you your own credentials.
+  {
+    urls: "turn:openrelay.metered.ca:80",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  },
+  {
+    urls: "turn:openrelay.metered.ca:443",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  },
+  {
+    urls: "turn:openrelay.metered.ca:443?transport=tcp",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  },
 ];
 const CALL_RING_TIMEOUT_MS = 45000; // auto-cancel an unanswered call
 
