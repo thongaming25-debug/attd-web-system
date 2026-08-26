@@ -74,6 +74,9 @@ import {
   ListChecks,
   MessageCircle,
   Mic,
+  MicOff,
+  Phone,
+  PhoneOff,
   Square,
 } from "lucide-react";
 
@@ -161,6 +164,7 @@ const LANG_RAW = {
     exportExcel: "នាំចេញ Excel",
     clear: "សម្អាត",
     today: "ថ្ងៃនេះ",
+    yesterday: "ម្សិលមិញ",
     now: "ឥឡូវ",
     timeLabel: "ម៉ោង",
     selectDate: "ជ្រើសរើសកាលបរិច្ឆេទ",
@@ -907,6 +911,23 @@ const LANG_RAW = {
         "តើអ្នកប្រាកដទេថាចង់លុបការសន្ទនាទាំងមូលជាមួយបុគ្គលិកនេះ? សារទាំងអស់នឹងបាត់ជាអចិន្ត្រៃយ៍ សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ",
       saveEdit: "រក្សាទុក",
       cancelEdit: "បោះបង់",
+      call: "ហៅសំឡេង",
+      callAdmin: "ហៅអ្នកគ្រប់គ្រង",
+      callEmployee: "ហៅបុគ្គលិកនេះ",
+      calling: "កំពុងហៅ...",
+      incomingCall: "សំឡេងហៅចូល",
+      accept: "ទទួល",
+      decline: "បដិសេធ",
+      hangup: "ព្យួរទូរស័ព្ទ",
+      mute: "បិទសំឡេង",
+      unmute: "បើកសំឡេង",
+      callBusy: "ម្ខាងទៀតកំពុងជជែកខ្សែផ្សេង",
+      callDeclined: "ការហៅត្រូវបានបដិសេធ",
+      callNoAnswer: "គ្មានការឆ្លើយតប",
+      callConnectionLost: "ការតភ្ជាប់ត្រូវបានផ្តាច់",
+      callFailedToStart: "មិនអាចចាប់ផ្តើមការហៅបានទេ សូមសាកល្បងម្តងទៀត",
+      callCancelled: "ការហៅត្រូវបានបោះបង់",
+      inCall: "កំពុងហៅ",
     },
     admAcc: {
       addBtn: "បន្ថែមអ្នកគ្រប់គ្រង",
@@ -1175,6 +1196,7 @@ const LANG_RAW = {
     exportExcel: "Export Excel",
     clear: "Clear",
     today: "Today",
+    yesterday: "Yesterday",
     now: "Now",
     timeLabel: "Time",
     selectDate: "Select a date",
@@ -1924,6 +1946,23 @@ const LANG_RAW = {
         "Are you sure you want to delete this entire conversation with this employee? All messages will be permanently gone. This can't be undone.",
       saveEdit: "Save",
       cancelEdit: "Cancel",
+      call: "Voice call",
+      callAdmin: "Call admin",
+      callEmployee: "Call this employee",
+      calling: "Calling...",
+      incomingCall: "Incoming call",
+      accept: "Accept",
+      decline: "Decline",
+      hangup: "Hang up",
+      mute: "Mute",
+      unmute: "Unmute",
+      callBusy: "They're on another call",
+      callDeclined: "Call declined",
+      callNoAnswer: "No answer",
+      callConnectionLost: "Call connection lost",
+      callFailedToStart: "Couldn't start the call — please try again",
+      callCancelled: "Call cancelled",
+      inCall: "In call",
     },
     admAcc: {
       addBtn: "Add Admin",
@@ -2189,6 +2228,7 @@ const LANG_RAW = {
     exportExcel: "导出 Excel",
     clear: "清除",
     today: "今天",
+    yesterday: "昨天",
     now: "现在",
     timeLabel: "时间",
     selectDate: "选择日期",
@@ -3596,6 +3636,26 @@ function timeAgoLabel(iso) {
   if (hrs < 24) return `${hrs} ម៉ោងមុន`;
   return `${Math.round(hrs / 24)} ថ្ងៃមុន`;
 }
+// Chat date-separator label ("Today" / "Yesterday" / a localized date),
+// used to break up a message thread by day the way most chat apps do.
+// Compares calendar days (not 24h windows) so a message sent at 11:58pm
+// and one sent at 12:02am the next day fall on either side of the line.
+function chatDateSeparatorLabel(iso, lang, t) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const now = new Date();
+  const startOfDay = (date) =>
+    new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const diffDays = Math.round((startOfDay(now) - startOfDay(d)) / 86400000);
+  if (diffDays === 0) return t.today;
+  if (diffDays === 1) return t.yesterday;
+  const locale = lang === "km" ? "km-KH" : lang === "zh" ? "zh-CN" : "en-US";
+  return d.toLocaleDateString(locale, {
+    day: "numeric",
+    month: "long",
+    year: d.getFullYear() !== now.getFullYear() ? "numeric" : undefined,
+  });
+}
 // Notifications are derived live from existing data rather than stored
 // separately: admins/managers see new pending leave requests and active
 // employees who haven't clocked in today past their shift's start time;
@@ -4633,6 +4693,50 @@ function ensureRealtimeChannel() {
     console.error("[supabase] failed to open shared realtime channel:", err);
   }
   return realtimeChannel;
+}
+// ---------------------------------------------------------------
+// Voice-call signaling — a single shared Supabase Realtime *broadcast*
+// channel (separate from the postgres_changes bus above, since calls are
+// never persisted). Every signaling message carries the employeeId it
+// belongs to — same idea as messages.employee_id — so each client can
+// tell whether a given offer/answer/ICE candidate is about its own
+// thread. `broadcast: { self: false }` means a sender never receives its
+// own message back, so handlers below don't need to filter those out.
+//
+// This is intentionally a flat, unauthenticated broadcast (like the rest
+// of this app's realtime tables rely on table-level RLS rather than
+// channel-level auth) — good enough for a first version, but a
+// production deployment with many admins should look at Supabase
+// Realtime Authorization (per-channel RLS policies) so an employee's
+// browser can't technically see signaling metadata for other employees'
+// calls even though it already ignores it.
+let callSignalChannel = null;
+const callSignalHandlers = new Set();
+function ensureCallSignalChannel() {
+  if (callSignalChannel) return callSignalChannel;
+  try {
+    const channel = supabase.channel("realtime:calls", {
+      config: { broadcast: { self: false } },
+    });
+    channel.on("broadcast", { event: "signal" }, ({ payload }) => {
+      callSignalHandlers.forEach((fn) => fn(payload));
+    });
+    channel.subscribe();
+    callSignalChannel = channel;
+  } catch (err) {
+    console.error("[supabase] failed to open call signal channel:", err);
+  }
+  return callSignalChannel;
+}
+function subscribeCallSignal(handler) {
+  ensureCallSignalChannel();
+  callSignalHandlers.add(handler);
+  return () => callSignalHandlers.delete(handler);
+}
+function sendCallSignal(payload) {
+  const channel = ensureCallSignalChannel();
+  if (!channel) return;
+  channel.send({ type: "broadcast", event: "signal", payload });
 }
 // Registers `handler` for postgres_changes events on `table` and returns
 // an unsubscribe function. Tables outside REALTIME_TABLES still work —
@@ -11329,6 +11433,19 @@ function playChatNotifySound() {
     { freq: 784, start: 0, dur: 0.08, type: "sine" },
     { freq: 1174.66, start: 0.09, dur: 0.16, type: "sine" },
   ]);
+}
+// Repeating two-tone ring for an incoming/outgoing voice call — same
+// playTones() primitive as the chat "ding", just looped on an interval
+// until stopped. Returns a stop function; safe to call multiple times.
+function startRingtoneLoop() {
+  const ring = () =>
+    playTones([
+      { freq: 523.25, start: 0, dur: 0.32, type: "sine" },
+      { freq: 659.25, start: 0.36, dur: 0.32, type: "sine" },
+    ]);
+  ring();
+  const intervalId = setInterval(ring, 1600);
+  return () => clearInterval(intervalId);
 }
 
 function QrScanModal({ offices, mode, soundPreset, onMatch, onClose }) {
@@ -18468,6 +18585,641 @@ function humanFileSize(bytes) {
   return `${val.toFixed(val < 10 ? 1 : 0)} ${units[i]}`;
 }
 
+// Chrome (and other Chromium browsers) can't read correct duration
+// metadata from a MediaRecorder-produced webm blob up front — it
+// reports Infinity/NaN until the element has been scrubbed once, which
+// is why a freshly recorded voice message shows "0:00" with no total
+// time instead of "0:00 / 0:04" like a normal audio file. Seeking to a
+// huge timestamp and back to 0 on load forces the browser to walk the
+// whole file and compute the real duration, so the player shows it
+// immediately instead of only after the user drags the seek bar once.
+function fixAudioBlobDuration(e) {
+  const audio = e.currentTarget;
+  if (audio.duration !== Infinity && !Number.isNaN(audio.duration)) return;
+  const onTimeUpdate = () => {
+    audio.removeEventListener("timeupdate", onTimeUpdate);
+    audio.currentTime = 0;
+  };
+  audio.addEventListener("timeupdate", onTimeUpdate);
+  audio.currentTime = 1e101;
+}
+
+/* ---------------------------------------------------------------
+   Voice calling — WebRTC audio calls over the shared call-signal
+   broadcast channel above. One admin<->employee call at a time per
+   employee thread, mirroring the shared-mailbox model messages already
+   use: an employee "calls admin" and whichever admin is online and free
+   picks it up; an admin calls one specific employee directly.
+
+   This hook is meant to be instantiated ONCE, at the top of AppInner
+   (not inside MessagesPage), so an incoming call still rings no matter
+   which page the person currently has open — only the small
+   <CallOverlay/> UI needs to live near the app root.
+
+   Basic-version scope/known limits (see chat with the person who asked
+   for this feature): uses only free public STUN servers, no TURN — call
+   setup can fail on networks with strict NAT/firewalls (some corporate
+   WiFi, some mobile carriers). Upgrading to add a TURN server later
+   doesn't require touching this signaling logic, only ICE_SERVERS below.
+---------------------------------------------------------------- */
+const CALL_ICE_SERVERS = [
+  {
+    urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"],
+  },
+];
+const CALL_RING_TIMEOUT_MS = 45000; // auto-cancel an unanswered call
+
+function useVoiceCall({ role, currentAdmin, currentEmp, employees, t }) {
+  const isAdmin = role === "admin";
+  const selfId = isAdmin ? currentAdmin?.id || null : currentEmp?.id || null;
+  const selfName = isAdmin
+    ? currentAdmin?.name || t.chat.adminLabel
+    : currentEmp?.name || "";
+
+  // call: null | { status: 'outgoing'|'incoming'|'connected', employeeId,
+  //                peerName, muted, startedAt }
+  const [call, setCall] = useState(null);
+  const [callError, setCallError] = useState("");
+
+  const callRef = useRef(null);
+  callRef.current = call;
+  const pcRef = useRef(null);
+  const localStreamRef = useRef(null);
+  const remoteAudioRef = useRef(null);
+  const pendingCandidatesRef = useRef([]);
+  const ringTimeoutRef = useRef(null);
+  const stopRingtoneRef = useRef(null);
+
+  useEffect(() => {
+    // Hidden <audio> element the remote peer's stream plays through.
+    // Created once here (not in JSX) so playback keeps going regardless
+    // of which page/component is currently mounted.
+    const audioEl = document.createElement("audio");
+    audioEl.autoplay = true;
+    remoteAudioRef.current = audioEl;
+    return () => {
+      remoteAudioRef.current = null;
+    };
+  }, []);
+
+  const clearRingTimeout = () => {
+    if (ringTimeoutRef.current) {
+      clearTimeout(ringTimeoutRef.current);
+      ringTimeoutRef.current = null;
+    }
+  };
+  const stopRingtone = () => {
+    if (stopRingtoneRef.current) {
+      stopRingtoneRef.current();
+      stopRingtoneRef.current = null;
+    }
+  };
+  const teardownPeer = () => {
+    stopRingtone();
+    clearRingTimeout();
+    pendingCandidatesRef.current = [];
+    if (pcRef.current) {
+      pcRef.current.onicecandidate = null;
+      pcRef.current.ontrack = null;
+      pcRef.current.onconnectionstatechange = null;
+      try {
+        pcRef.current.close();
+      } catch {
+        // already closed
+      }
+      pcRef.current = null;
+    }
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach((tr) => tr.stop());
+      localStreamRef.current = null;
+    }
+    if (remoteAudioRef.current) remoteAudioRef.current.srcObject = null;
+  };
+
+  const endCall = useCallback(
+    (opts = {}) => {
+      const current = callRef.current;
+      if (current && !opts.silent) {
+        sendCallSignal({
+          kind: "hangup",
+          employeeId: current.employeeId,
+          fromRole: isAdmin ? "admin" : "employee",
+          fromId: selfId,
+        });
+      }
+      teardownPeer();
+      setCall(null);
+    },
+    [isAdmin, selfId],
+  );
+
+  const rejectCall = useCallback(() => {
+    const incoming = callRef.current;
+    if (!incoming) return;
+    sendCallSignal({
+      kind: "reject",
+      employeeId: incoming.employeeId,
+      fromRole: isAdmin ? "admin" : "employee",
+      fromId: selfId,
+    });
+    teardownPeer();
+    setCall(null);
+  }, [isAdmin, selfId]);
+
+  const createPeerConnection = (employeeId) => {
+    const pc = new RTCPeerConnection({ iceServers: CALL_ICE_SERVERS });
+    pc.onicecandidate = (e) => {
+      if (e.candidate) {
+        sendCallSignal({
+          kind: "ice",
+          employeeId,
+          fromRole: isAdmin ? "admin" : "employee",
+          fromId: selfId,
+          candidate: e.candidate.toJSON(),
+        });
+      }
+    };
+    pc.ontrack = (e) => {
+      if (remoteAudioRef.current)
+        remoteAudioRef.current.srcObject = e.streams[0];
+    };
+    pc.onconnectionstatechange = () => {
+      // "disconnected" can be a brief network blip and often recovers on
+      // its own — only treat a genuine "failed" state as the call ending.
+      if (pc.connectionState === "failed") {
+        setCallError(t.chat.callConnectionLost);
+        endCall({ silent: true });
+      }
+    };
+    pcRef.current = pc;
+    return pc;
+  };
+
+  const startLocalStream = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    localStreamRef.current = stream;
+    return stream;
+  };
+
+  const startCall = useCallback(
+    async (employeeId, peerName) => {
+      if (callRef.current || !employeeId) return;
+      setCallError("");
+      setCall({
+        status: "outgoing",
+        employeeId,
+        peerName,
+        muted: false,
+        startedAt: null,
+      });
+      try {
+        const stream = await startLocalStream();
+        const pc = createPeerConnection(employeeId);
+        stream.getTracks().forEach((tr) => pc.addTrack(tr, stream));
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        sendCallSignal({
+          kind: "offer",
+          employeeId,
+          fromRole: isAdmin ? "admin" : "employee",
+          fromId: selfId,
+          fromName: selfName,
+          sdp: offer,
+        });
+        stopRingtoneRef.current = startRingtoneLoop();
+        ringTimeoutRef.current = setTimeout(() => {
+          setCallError(t.chat.callNoAnswer);
+          endCall();
+        }, CALL_RING_TIMEOUT_MS);
+      } catch (err) {
+        setCallError(
+          err?.name === "NotAllowedError"
+            ? t.chat.micDenied
+            : t.chat.callFailedToStart,
+        );
+        teardownPeer();
+        setCall(null);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [isAdmin, selfId, selfName, endCall, t],
+  );
+
+  const acceptCall = useCallback(async () => {
+    const incoming = callRef.current;
+    if (!incoming || incoming.status !== "incoming") return;
+    stopRingtone();
+    clearRingTimeout();
+    setCallError("");
+    try {
+      const stream = await startLocalStream();
+      const pc = pcRef.current;
+      stream.getTracks().forEach((tr) => pc.addTrack(tr, stream));
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      sendCallSignal({
+        kind: "answer",
+        employeeId: incoming.employeeId,
+        fromRole: isAdmin ? "admin" : "employee",
+        fromId: selfId,
+        sdp: answer,
+      });
+      if (isAdmin) {
+        // Tell any other admin who might also be ringing that this call
+        // has already been taken, so they stop ringing too.
+        sendCallSignal({
+          kind: "answered-elsewhere",
+          employeeId: incoming.employeeId,
+          fromRole: "admin",
+          fromId: selfId,
+        });
+      }
+      setCall((c) =>
+        c ? { ...c, status: "connected", startedAt: Date.now() } : c,
+      );
+    } catch (err) {
+      setCallError(
+        err?.name === "NotAllowedError"
+          ? t.chat.micDenied
+          : t.chat.callFailedToStart,
+      );
+      sendCallSignal({
+        kind: "reject",
+        employeeId: incoming.employeeId,
+        fromRole: isAdmin ? "admin" : "employee",
+        fromId: selfId,
+      });
+      teardownPeer();
+      setCall(null);
+    }
+  }, [isAdmin, selfId, t]);
+
+  const toggleMute = useCallback(() => {
+    setCall((c) => {
+      if (!c || !localStreamRef.current) return c;
+      const next = !c.muted;
+      localStreamRef.current
+        .getAudioTracks()
+        .forEach((tr) => (tr.enabled = !next));
+      return { ...c, muted: next };
+    });
+  }, []);
+
+  // Incoming signaling — one handler processes every event on the shared
+  // channel; each branch below filters down to what's relevant.
+  useEffect(() => {
+    if (!selfId) return undefined;
+    const handler = async (msg) => {
+      if (!msg) return;
+      // Employees only ever care about their own thread; admins can see
+      // signaling for any employee (shared-mailbox model, same as chat).
+      if (!isAdmin && msg.employeeId !== selfId) return;
+
+      if (msg.kind === "offer") {
+        // Already in a call — let the caller know instead of dropping it.
+        if (callRef.current) {
+          sendCallSignal({
+            kind: "busy",
+            employeeId: msg.employeeId,
+            fromRole: isAdmin ? "admin" : "employee",
+            fromId: selfId,
+          });
+          return;
+        }
+        // An offer from "our own side" (another admin calling that same
+        // employee) isn't something we should ring for.
+        if (msg.fromRole === (isAdmin ? "admin" : "employee")) return;
+        const peerName = isAdmin
+          ? msg.fromName ||
+            employees.find((e) => e.id === msg.employeeId)?.name ||
+            "?"
+          : t.chat.adminLabel;
+        try {
+          const pc = createPeerConnection(msg.employeeId);
+          await pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+          setCall({
+            status: "incoming",
+            employeeId: msg.employeeId,
+            peerName,
+            muted: false,
+            startedAt: null,
+          });
+          stopRingtoneRef.current = startRingtoneLoop();
+          ringTimeoutRef.current = setTimeout(
+            () => rejectCall(),
+            CALL_RING_TIMEOUT_MS,
+          );
+        } catch {
+          teardownPeer();
+        }
+        return;
+      }
+
+      const current = callRef.current;
+      if (!current || current.employeeId !== msg.employeeId) return;
+
+      if (msg.kind === "answer") {
+        if (current.status !== "outgoing" || !pcRef.current) return;
+        clearRingTimeout();
+        stopRingtone();
+        try {
+          await pcRef.current.setRemoteDescription(
+            new RTCSessionDescription(msg.sdp),
+          );
+          for (const c of pendingCandidatesRef.current) {
+            await pcRef.current.addIceCandidate(c).catch(() => {});
+          }
+          pendingCandidatesRef.current = [];
+          setCall((c) =>
+            c ? { ...c, status: "connected", startedAt: Date.now() } : c,
+          );
+        } catch {
+          setCallError(t.chat.callFailedToStart);
+          endCall({ silent: true });
+        }
+        return;
+      }
+
+      if (msg.kind === "ice") {
+        const candidate = new RTCIceCandidate(msg.candidate);
+        if (pcRef.current?.remoteDescription) {
+          pcRef.current.addIceCandidate(candidate).catch(() => {});
+        } else {
+          pendingCandidatesRef.current.push(candidate);
+        }
+        return;
+      }
+
+      if (msg.kind === "reject" || msg.kind === "busy") {
+        setCallError(
+          msg.kind === "busy" ? t.chat.callBusy : t.chat.callDeclined,
+        );
+        teardownPeer();
+        setCall(null);
+        return;
+      }
+
+      if (msg.kind === "hangup") {
+        teardownPeer();
+        setCall(null);
+        return;
+      }
+
+      if (msg.kind === "answered-elsewhere") {
+        if (isAdmin && current.status === "incoming") {
+          teardownPeer();
+          setCall(null);
+        }
+        return;
+      }
+
+      if (msg.kind === "cancel") {
+        if (current.status === "incoming") {
+          setCallError(t.chat.callCancelled);
+          teardownPeer();
+          setCall(null);
+        }
+        return;
+      }
+    };
+    return subscribeCallSignal(handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selfId, isAdmin, employees]);
+
+  // If the whole app unmounts mid-call (sign-out, tab close), let the
+  // other side know instead of just going silent.
+  useEffect(() => {
+    return () => {
+      const current = callRef.current;
+      if (current) {
+        sendCallSignal({
+          kind: current.status === "incoming" ? "reject" : "cancel",
+          employeeId: current.employeeId,
+          fromRole: isAdmin ? "admin" : "employee",
+          fromId: selfId,
+        });
+      }
+      teardownPeer();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return {
+    call,
+    callError,
+    clearCallError: () => setCallError(""),
+    startCall,
+    acceptCall,
+    rejectCall,
+    endCall,
+    toggleMute,
+  };
+}
+
+// Small floating call UI — rendered once near the app root so it stays
+// visible (and the ringtone keeps playing) no matter which page the
+// person is currently looking at. Three states: incoming (ring/accept/
+// decline), outgoing (calling.../cancel), connected (timer/mute/hangup).
+function CallOverlay({
+  call,
+  callError,
+  onAccept,
+  onReject,
+  onEnd,
+  onToggleMute,
+  onDismissError,
+}) {
+  const { t } = useLang();
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    if (!call || call.status !== "connected" || !call.startedAt) return;
+    const id = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - call.startedAt) / 1000));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [call]);
+
+  useEffect(() => {
+    if (!callError) return;
+    const id = setTimeout(onDismissError, 4000);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [callError]);
+
+  if (!call && !callError) return null;
+
+  const fmtElapsed = `${String(Math.floor(elapsed / 60)).padStart(2, "0")}:${String(elapsed % 60).padStart(2, "0")}`;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: 16,
+        right: 16,
+        zIndex: 9999,
+        width: 280,
+        maxWidth: "calc(100vw - 32px)",
+        background: "#151b2b",
+        color: "#fff",
+        borderRadius: 16,
+        boxShadow: "0 12px 32px rgba(0,0,0,0.35)",
+        padding: 16,
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
+      }}
+    >
+      {call ? (
+        <>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <Avatar name={call.peerName} size={38} />
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div
+                style={{
+                  fontWeight: 700,
+                  fontSize: 13.5,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {call.peerName}
+              </div>
+              <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.65)" }}>
+                {call.status === "incoming"
+                  ? t.chat.incomingCall
+                  : call.status === "outgoing"
+                    ? t.chat.calling
+                    : fmtElapsed}
+              </div>
+            </div>
+          </div>
+          {call.status === "incoming" ? (
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                type="button"
+                onClick={onReject}
+                style={{
+                  flex: 1,
+                  border: "none",
+                  borderRadius: 10,
+                  padding: "10px 0",
+                  background: "#e5484d",
+                  color: "#fff",
+                  fontWeight: 700,
+                  fontSize: 12.5,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                }}
+              >
+                <PhoneOff size={15} /> {t.chat.decline}
+              </button>
+              <button
+                type="button"
+                onClick={onAccept}
+                style={{
+                  flex: 1,
+                  border: "none",
+                  borderRadius: 10,
+                  padding: "10px 0",
+                  background: "#1FA26B",
+                  color: "#fff",
+                  fontWeight: 700,
+                  fontSize: 12.5,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                }}
+              >
+                <Phone size={15} /> {t.chat.accept}
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: "flex", gap: 8 }}>
+              {call.status === "connected" && (
+                <button
+                  type="button"
+                  onClick={onToggleMute}
+                  title={call.muted ? t.chat.unmute : t.chat.mute}
+                  style={{
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    borderRadius: 10,
+                    width: 40,
+                    background: call.muted
+                      ? "rgba(255,255,255,0.18)"
+                      : "transparent",
+                    color: "#fff",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {call.muted ? <MicOff size={16} /> : <Mic size={16} />}
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={onEnd}
+                style={{
+                  flex: 1,
+                  border: "none",
+                  borderRadius: 10,
+                  padding: "10px 0",
+                  background: "#e5484d",
+                  color: "#fff",
+                  fontWeight: 700,
+                  fontSize: 12.5,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                }}
+              >
+                <PhoneOff size={15} /> {t.chat.hangup}
+              </button>
+            </div>
+          )}
+        </>
+      ) : (
+        <div
+          style={{
+            fontSize: 12.5,
+            color: "rgba(255,255,255,0.85)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 8,
+          }}
+        >
+          <span>{callError}</span>
+          <button
+            type="button"
+            onClick={onDismissError}
+            style={{
+              border: "none",
+              background: "transparent",
+              color: "rgba(255,255,255,0.6)",
+              cursor: "pointer",
+              display: "flex",
+              flexShrink: 0,
+            }}
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function MessagesPage({
   role,
   currentAdmin,
@@ -18475,8 +19227,10 @@ function MessagesPage({
   employees,
   messages,
   setMessages,
+  activeCall,
+  onStartCall,
 }) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const isAdmin = role === "admin";
   const [selectedEmpId, setSelectedEmpId] = useState(
     isAdmin ? null : currentEmp?.id || null,
@@ -18521,6 +19275,20 @@ function MessagesPage({
     }
     return null;
   }, [threadMessages, isAdmin]);
+
+  // Flags the first message of each calendar day so the thread can show
+  // a "Today / Yesterday / <date>" separator above it, chat-app style.
+  // threadMessages is already sorted ascending by createdAt, so a single
+  // pass comparing each message's date to the previous one is enough.
+  const threadMessagesWithDaySeparators = useMemo(() => {
+    let lastDateKey = null;
+    return threadMessages.map((m) => {
+      const dateKey = m.createdAt ? new Date(m.createdAt).toDateString() : null;
+      const showDaySeparator = dateKey !== lastDateKey;
+      lastDateKey = dateKey;
+      return { message: m, showDaySeparator };
+    });
+  }, [threadMessages]);
 
   // One row per employee who has ever exchanged a message, each carrying
   // its most recent message and how many are unread — newest activity
@@ -18908,6 +19676,31 @@ function MessagesPage({
                   </div>
                 )}
               </div>
+              {onStartCall && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    onStartCall(
+                      threadEmpId,
+                      isAdmin ? threadEmployee?.name || "?" : t.chat.adminLabel,
+                    )
+                  }
+                  disabled={!!activeCall}
+                  title={isAdmin ? t.chat.callEmployee : t.chat.callAdmin}
+                  style={{
+                    border: "none",
+                    background: "transparent",
+                    color: activeCall ? T.mutedLight : T.forest,
+                    cursor: activeCall ? "default" : "pointer",
+                    opacity: activeCall ? 0.5 : 1,
+                    display: "flex",
+                    padding: 6,
+                    flexShrink: 0,
+                  }}
+                >
+                  <Phone size={17} />
+                </button>
+              )}
               {isAdmin && currentAdmin?.role === "superadmin" && (
                 <button
                   type="button"
@@ -18951,263 +19744,309 @@ function MessagesPage({
                   {t.chat.noMessages}
                 </div>
               ) : (
-                threadMessages.map((m) => {
-                  const mine = isAdmin
-                    ? m.senderRole === "admin"
-                    : m.senderRole === "employee";
-                  const isEditing = editingId === m.id;
-                  const modifiable = canModify(m) && !m.deleted;
-                  return (
-                    <div
-                      key={m.id}
-                      className="wf-chat-bubble-row"
-                      style={{ textAlign: mine ? "right" : "left" }}
-                    >
-                      <div
-                        style={{
-                          display: "inline-block",
-                          maxWidth: "74%",
-                          textAlign: "left",
-                        }}
-                      >
-                        {isAdmin &&
-                          m.senderRole === "admin" &&
-                          m.senderName && (
-                            <div
-                              style={{
-                                fontSize: 10,
-                                color: T.muted,
-                                marginBottom: 2,
-                                textAlign: "right",
-                              }}
-                            >
-                              {m.senderName}
-                            </div>
-                          )}
-                        {m.deleted ? (
+                threadMessagesWithDaySeparators.map(
+                  ({ message: m, showDaySeparator }) => {
+                    const mine = isAdmin
+                      ? m.senderRole === "admin"
+                      : m.senderRole === "employee";
+                    const isEditing = editingId === m.id;
+                    const modifiable = canModify(m) && !m.deleted;
+                    return (
+                      <React.Fragment key={m.id}>
+                        {showDaySeparator && (
                           <div
-                            className="wf-chat-bubble"
                             style={{
-                              background: "transparent",
-                              color: T.muted,
-                              border: `1px dashed ${T.lineSoft}`,
-                              fontStyle: "italic",
-                              marginLeft: mine ? "auto" : 0,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              margin: "10px 0 4px",
                             }}
                           >
-                            {t.chat.messageDeleted}
+                            <span
+                              style={{
+                                fontSize: 10.5,
+                                fontWeight: 600,
+                                color: T.muted,
+                                background: T.inputBg,
+                                border: `1px solid ${T.lineSoft}`,
+                                borderRadius: 999,
+                                padding: "3px 12px",
+                              }}
+                            >
+                              {chatDateSeparatorLabel(m.createdAt, lang, t)}
+                            </span>
                           </div>
-                        ) : (
-                          <>
-                            {m.attachmentData &&
-                              (m.attachmentType || "").startsWith("image/") && (
-                                <a
-                                  href={m.attachmentData}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  style={{
-                                    display: "block",
-                                    marginLeft: mine ? "auto" : 0,
-                                    marginBottom: m.content ? 6 : 0,
-                                    width: "fit-content",
-                                  }}
-                                >
-                                  <img
-                                    src={m.attachmentData}
-                                    alt={
-                                      m.attachmentName || t.chat.photoAttachment
-                                    }
-                                    style={{
-                                      maxWidth: 220,
-                                      maxHeight: 260,
-                                      borderRadius: 14,
-                                      display: "block",
-                                      cursor: "zoom-in",
-                                      objectFit: "cover",
-                                    }}
-                                  />
-                                </a>
-                              )}
-                            {m.attachmentData &&
-                              (m.attachmentType || "").startsWith("audio/") && (
-                                <audio
-                                  controls
-                                  src={m.attachmentData}
-                                  style={{
-                                    display: "block",
-                                    marginLeft: mine ? "auto" : 0,
-                                    marginBottom: m.content ? 6 : 0,
-                                    height: 36,
-                                    maxWidth: 240,
-                                  }}
-                                />
-                              )}
-                            {m.attachmentData &&
-                              !(m.attachmentType || "").startsWith("image/") &&
-                              !(m.attachmentType || "").startsWith(
-                                "audio/",
-                              ) && (
-                                <a
-                                  href={m.attachmentData}
-                                  download={m.attachmentName || "file"}
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 8,
-                                    padding: "9px 13px",
-                                    borderRadius: 14,
-                                    background: mine ? T.forest : T.card,
-                                    color: mine ? "#fff" : T.ink,
-                                    border: mine
-                                      ? "none"
-                                      : `1px solid ${T.lineSoft}`,
-                                    marginLeft: mine ? "auto" : 0,
-                                    marginBottom: m.content ? 6 : 0,
-                                    textDecoration: "none",
-                                    maxWidth: "100%",
-                                    width: "fit-content",
-                                  }}
-                                >
-                                  <FileText size={16} />
-                                  <div
-                                    style={{
-                                      minWidth: 0,
-                                      fontSize: 12.5,
-                                      fontWeight: 600,
-                                      overflow: "hidden",
-                                      textOverflow: "ellipsis",
-                                      whiteSpace: "nowrap",
-                                    }}
-                                  >
-                                    {m.attachmentName || t.chat.download}
-                                  </div>
-                                </a>
-                              )}
-                            {isEditing ? (
-                              <div
-                                style={{
-                                  display: "flex",
-                                  flexDirection: "column",
-                                  gap: 6,
-                                  minWidth: 200,
-                                }}
-                              >
-                                <Input
-                                  value={editDraft}
-                                  onChange={(e) => setEditDraft(e.target.value)}
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter" && !e.shiftKey) {
-                                      e.preventDefault();
-                                      saveEdit();
-                                    } else if (e.key === "Escape") {
-                                      cancelEdit();
-                                    }
-                                  }}
-                                  autoFocus
-                                />
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "flex-end",
-                                    gap: 6,
-                                  }}
-                                >
-                                  <Button variant="ghost" onClick={cancelEdit}>
-                                    {t.chat.cancelEdit}
-                                  </Button>
-                                  <Button
-                                    variant="accent"
-                                    onClick={saveEdit}
-                                    disabled={
-                                      !editDraft.trim() && !m.attachmentData
-                                    }
-                                  >
-                                    {t.chat.saveEdit}
-                                  </Button>
-                                </div>
-                              </div>
-                            ) : (
-                              m.content && (
-                                <div
-                                  className="wf-chat-bubble"
-                                  style={{
-                                    background: mine ? T.forest : T.card,
-                                    color: mine ? "#fff" : T.ink,
-                                    border: mine
-                                      ? "none"
-                                      : `1px solid ${T.lineSoft}`,
-                                    marginLeft: mine ? "auto" : 0,
-                                  }}
-                                >
-                                  {m.content}
-                                </div>
-                              )
-                            )}
-                          </>
                         )}
                         <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 6,
-                            justifyContent: mine ? "flex-end" : "flex-start",
-                            marginTop: 2,
-                          }}
+                          className="wf-chat-bubble-row"
+                          style={{ textAlign: mine ? "right" : "left" }}
                         >
-                          {mine && modifiable && !isEditing && (
-                            <>
-                              {m.content && (
-                                <button
-                                  type="button"
-                                  onClick={() => startEdit(m)}
-                                  title={t.chat.editMessage}
+                          <div
+                            style={{
+                              display: "inline-block",
+                              maxWidth: "74%",
+                              textAlign: "left",
+                            }}
+                          >
+                            {isAdmin &&
+                              m.senderRole === "admin" &&
+                              m.senderName && (
+                                <div
                                   style={{
-                                    border: "none",
-                                    background: "transparent",
-                                    color: T.mutedLight,
-                                    cursor: "pointer",
-                                    display: "flex",
-                                    padding: 0,
+                                    fontSize: 10,
+                                    color: T.muted,
+                                    marginBottom: 2,
+                                    textAlign: "right",
                                   }}
                                 >
-                                  <Pencil size={11} />
-                                </button>
+                                  {m.senderName}
+                                </div>
                               )}
-                              <button
-                                type="button"
-                                onClick={() => setConfirmDeleteId(m.id)}
-                                title={t.chat.deleteMessage}
+                            {m.deleted ? (
+                              <div
+                                className="wf-chat-bubble"
                                 style={{
-                                  border: "none",
                                   background: "transparent",
-                                  color: T.mutedLight,
-                                  cursor: "pointer",
-                                  display: "flex",
-                                  padding: 0,
+                                  color: T.muted,
+                                  border: `1px dashed ${T.lineSoft}`,
+                                  fontStyle: "italic",
+                                  marginLeft: mine ? "auto" : 0,
                                 }}
                               >
-                                <Trash2 size={11} />
-                              </button>
-                            </>
-                          )}
-                          <div style={{ fontSize: 10, color: T.mutedLight }}>
-                            {m.editedAt && !m.deleted
-                              ? `${timeAgoLabel(m.createdAt)} · ${t.chat.edited}`
-                              : timeAgoLabel(m.createdAt)}
-                            {mine && m.id === lastMineMessageId && (
+                                {t.chat.messageDeleted}
+                              </div>
+                            ) : (
                               <>
-                                {" · "}
-                                {(isAdmin ? m.readByEmployee : m.readByAdmin)
-                                  ? t.chat.seen
-                                  : t.chat.delivered}
+                                {m.attachmentData &&
+                                  (m.attachmentType || "").startsWith(
+                                    "image/",
+                                  ) && (
+                                    <a
+                                      href={m.attachmentData}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      style={{
+                                        display: "block",
+                                        marginLeft: mine ? "auto" : 0,
+                                        marginBottom: m.content ? 6 : 0,
+                                        width: "fit-content",
+                                      }}
+                                    >
+                                      <img
+                                        src={m.attachmentData}
+                                        alt={
+                                          m.attachmentName ||
+                                          t.chat.photoAttachment
+                                        }
+                                        style={{
+                                          maxWidth: 220,
+                                          maxHeight: 260,
+                                          borderRadius: 14,
+                                          display: "block",
+                                          cursor: "zoom-in",
+                                          objectFit: "cover",
+                                        }}
+                                      />
+                                    </a>
+                                  )}
+                                {m.attachmentData &&
+                                  (m.attachmentType || "").startsWith(
+                                    "audio/",
+                                  ) && (
+                                    <audio
+                                      controls
+                                      src={m.attachmentData}
+                                      onLoadedMetadata={fixAudioBlobDuration}
+                                      style={{
+                                        display: "block",
+                                        marginLeft: mine ? "auto" : 0,
+                                        marginBottom: m.content ? 6 : 0,
+                                        height: 36,
+                                        maxWidth: 240,
+                                      }}
+                                    />
+                                  )}
+                                {m.attachmentData &&
+                                  !(m.attachmentType || "").startsWith(
+                                    "image/",
+                                  ) &&
+                                  !(m.attachmentType || "").startsWith(
+                                    "audio/",
+                                  ) && (
+                                    <a
+                                      href={m.attachmentData}
+                                      download={m.attachmentName || "file"}
+                                      style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 8,
+                                        padding: "9px 13px",
+                                        borderRadius: 14,
+                                        background: mine ? T.forest : T.card,
+                                        color: mine ? "#fff" : T.ink,
+                                        border: mine
+                                          ? "none"
+                                          : `1px solid ${T.lineSoft}`,
+                                        marginLeft: mine ? "auto" : 0,
+                                        marginBottom: m.content ? 6 : 0,
+                                        textDecoration: "none",
+                                        maxWidth: "100%",
+                                        width: "fit-content",
+                                      }}
+                                    >
+                                      <FileText size={16} />
+                                      <div
+                                        style={{
+                                          minWidth: 0,
+                                          fontSize: 12.5,
+                                          fontWeight: 600,
+                                          overflow: "hidden",
+                                          textOverflow: "ellipsis",
+                                          whiteSpace: "nowrap",
+                                        }}
+                                      >
+                                        {m.attachmentName || t.chat.download}
+                                      </div>
+                                    </a>
+                                  )}
+                                {isEditing ? (
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      flexDirection: "column",
+                                      gap: 6,
+                                      minWidth: 200,
+                                    }}
+                                  >
+                                    <Input
+                                      value={editDraft}
+                                      onChange={(e) =>
+                                        setEditDraft(e.target.value)
+                                      }
+                                      onKeyDown={(e) => {
+                                        if (e.key === "Enter" && !e.shiftKey) {
+                                          e.preventDefault();
+                                          saveEdit();
+                                        } else if (e.key === "Escape") {
+                                          cancelEdit();
+                                        }
+                                      }}
+                                      autoFocus
+                                    />
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        justifyContent: "flex-end",
+                                        gap: 6,
+                                      }}
+                                    >
+                                      <Button
+                                        variant="ghost"
+                                        onClick={cancelEdit}
+                                      >
+                                        {t.chat.cancelEdit}
+                                      </Button>
+                                      <Button
+                                        variant="accent"
+                                        onClick={saveEdit}
+                                        disabled={
+                                          !editDraft.trim() && !m.attachmentData
+                                        }
+                                      >
+                                        {t.chat.saveEdit}
+                                      </Button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  m.content && (
+                                    <div
+                                      className="wf-chat-bubble"
+                                      style={{
+                                        background: mine ? T.forest : T.card,
+                                        color: mine ? "#fff" : T.ink,
+                                        border: mine
+                                          ? "none"
+                                          : `1px solid ${T.lineSoft}`,
+                                        marginLeft: mine ? "auto" : 0,
+                                      }}
+                                    >
+                                      {m.content}
+                                    </div>
+                                  )
+                                )}
                               </>
                             )}
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 6,
+                                justifyContent: mine
+                                  ? "flex-end"
+                                  : "flex-start",
+                                marginTop: 2,
+                              }}
+                            >
+                              {mine && modifiable && !isEditing && (
+                                <>
+                                  {m.content && (
+                                    <button
+                                      type="button"
+                                      onClick={() => startEdit(m)}
+                                      title={t.chat.editMessage}
+                                      style={{
+                                        border: "none",
+                                        background: "transparent",
+                                        color: T.mutedLight,
+                                        cursor: "pointer",
+                                        display: "flex",
+                                        padding: 0,
+                                      }}
+                                    >
+                                      <Pencil size={11} />
+                                    </button>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() => setConfirmDeleteId(m.id)}
+                                    title={t.chat.deleteMessage}
+                                    style={{
+                                      border: "none",
+                                      background: "transparent",
+                                      color: T.mutedLight,
+                                      cursor: "pointer",
+                                      display: "flex",
+                                      padding: 0,
+                                    }}
+                                  >
+                                    <Trash2 size={11} />
+                                  </button>
+                                </>
+                              )}
+                              <div
+                                style={{ fontSize: 10, color: T.mutedLight }}
+                              >
+                                {m.editedAt && !m.deleted
+                                  ? `${timeAgoLabel(m.createdAt)} · ${t.chat.edited}`
+                                  : timeAgoLabel(m.createdAt)}
+                                {mine && m.id === lastMineMessageId && (
+                                  <>
+                                    {" · "}
+                                    {(
+                                      isAdmin ? m.readByEmployee : m.readByAdmin
+                                    )
+                                      ? t.chat.seen
+                                      : t.chat.delivered}
+                                  </>
+                                )}
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  );
-                })
+                      </React.Fragment>
+                    );
+                  },
+                )
               )}
             </div>
             <div
@@ -19260,6 +20099,7 @@ function MessagesPage({
                         <audio
                           controls
                           src={pendingAttachment.dataUrl}
+                          onLoadedMetadata={fixAudioBlobDuration}
                           style={{ height: 34, maxWidth: 220 }}
                         />
                       ) : (
@@ -25143,6 +25983,18 @@ function AppInner() {
   const bottomNav =
     role !== "admin" ? buildBottomNavEmployee(t.nav, employeeModules) : null;
 
+  // Instantiated once here (not inside MessagesPage) so an incoming call
+  // still rings no matter which page is currently open. selfId inside
+  // the hook is null until currentAdmin/currentEmp resolve, so it's safe
+  // to always call this even before login finishes.
+  const voiceCall = useVoiceCall({
+    role,
+    currentAdmin,
+    currentEmp,
+    employees,
+    t,
+  });
+
   // Keep actorRef in sync with whoever is signed in right now, so every
   // useSupabaseArray hook above always audits changes under the correct
   // name/id — even though the hooks themselves were created before login.
@@ -25946,6 +26798,8 @@ function AppInner() {
                     employees={employees}
                     messages={messages}
                     setMessages={setMessages}
+                    activeCall={voiceCall.call}
+                    onStartCall={voiceCall.startCall}
                   />
                 )}
               {page === "admins" && role === "admin" && isSuperAdmin && (
@@ -26030,6 +26884,15 @@ function AppInner() {
           )}
         </div>
       </div>
+      <CallOverlay
+        call={voiceCall.call}
+        callError={voiceCall.callError}
+        onAccept={voiceCall.acceptCall}
+        onReject={voiceCall.rejectCall}
+        onEnd={voiceCall.endCall}
+        onToggleMute={voiceCall.toggleMute}
+        onDismissError={voiceCall.clearCallError}
+      />
     </BrandingContext.Provider>
   );
 }
