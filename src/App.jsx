@@ -2791,6 +2791,7 @@ const PERMISSION_MODULES = [
   "viewAuditLog",
   "manageAssets",
   "manageRecruitment",
+  "canMessage",
 ];
 const PERMISSION_LABEL = {
   km: {
@@ -2804,6 +2805,7 @@ const PERMISSION_LABEL = {
     viewAuditLog: "មើលកំណត់ត្រាសកម្មភាព",
     manageAssets: "គ្រប់គ្រងទ្រព្យសម្បត្តិក្រុមហ៊ុន",
     manageRecruitment: "គ្រប់គ្រងការជ្រើសរើសនិងចាប់ផ្តើមការងារ",
+    canMessage: "សារ & ការហៅសំឡេងទៅបុគ្គលិក",
   },
   en: {
     manageDepartments: "Manage Departments/Shifts",
@@ -2816,6 +2818,7 @@ const PERMISSION_LABEL = {
     viewAuditLog: "View Audit Log",
     manageAssets: "Manage Company Assets",
     manageRecruitment: "Manage Recruitment & Onboarding",
+    canMessage: "Message & Voice-Call Employees",
   },
 };
 // Fixed id under which the Employee Self-Service module toggles are saved
@@ -2842,6 +2845,7 @@ const EMPLOYEE_MODULES = [
   "documents",
   "loginActivity",
   "profile",
+  "messages",
 ];
 const EMPLOYEE_MODULE_LABEL = {
   km: {
@@ -2857,6 +2861,7 @@ const EMPLOYEE_MODULE_LABEL = {
     documents: "ឯកសារផ្ទាល់ខ្លួន",
     loginActivity: "សកម្មភាពចូលប្រើ",
     profile: "ប្រវត្តិរូបផ្ទាល់ខ្លួន",
+    messages: "សារ & ការហៅសំឡេង",
   },
   en: {
     announcements: "Announcements",
@@ -2871,6 +2876,7 @@ const EMPLOYEE_MODULE_LABEL = {
     documents: "My Documents",
     loginActivity: "Login Activity",
     profile: "My Profile",
+    messages: "Messages & Voice Call",
   },
 };
 function employeeModuleLabel(key, lang) {
@@ -2913,6 +2919,11 @@ const DEFAULT_EMPLOYEE_MODULES = {
 // used until Superadmin has saved a custom matrix (and as a fallback for
 // any rank the matrix doesn't yet have a row for).
 const DEFAULT_ROLE_PERMISSIONS = {
+  // canMessage defaults to true on every rank (unlike the other keys
+  // above, which default to false for the lower ranks) so that shipping
+  // this permission doesn't silently take Messages/Call away from any
+  // admin who already had it — same "starts on, Superadmin opts out"
+  // philosophy as DEFAULT_EMPLOYEE_MODULES below.
   staff: {
     manageDepartments: false,
     manageEmployees: false,
@@ -2924,6 +2935,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     viewAuditLog: false,
     manageAssets: false,
     manageRecruitment: false,
+    canMessage: true,
   },
   officer: {
     manageDepartments: false,
@@ -2936,6 +2948,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     viewAuditLog: false,
     manageAssets: false,
     manageRecruitment: false,
+    canMessage: true,
   },
   senior: {
     manageDepartments: false,
@@ -2948,6 +2961,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     viewAuditLog: false,
     manageAssets: true,
     manageRecruitment: true,
+    canMessage: true,
   },
   supervisor: {
     manageDepartments: false,
@@ -2960,6 +2974,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     viewAuditLog: false,
     manageAssets: true,
     manageRecruitment: true,
+    canMessage: true,
   },
   manager: {
     manageDepartments: true,
@@ -2972,6 +2987,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     viewAuditLog: false,
     manageAssets: true,
     manageRecruitment: true,
+    canMessage: true,
   },
   seniorManager: {
     manageDepartments: true,
@@ -2984,6 +3000,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     viewAuditLog: true,
     manageAssets: true,
     manageRecruitment: true,
+    canMessage: true,
   },
   admin: {
     manageDepartments: true,
@@ -2996,6 +3013,7 @@ const DEFAULT_ROLE_PERMISSIONS = {
     viewAuditLog: true,
     manageAssets: true,
     manageRecruitment: true,
+    canMessage: true,
   },
 };
 // Admin role names follow the app's km/en language toggle (like every
@@ -8668,6 +8686,7 @@ function EmployeeForm({
       useCustomUlPolicy: false,
       customUlDeductionType: "fullDay",
       customUlDeductionValue: "",
+      messagesDisabled: false,
     },
   );
   const [newOffDate, setNewOffDate] = useState("");
@@ -9135,6 +9154,41 @@ function EmployeeForm({
           </div>
         )}
       </Field>
+      <div
+        style={{
+          border: `1px solid ${T.lineSoft}`,
+          borderRadius: 10,
+          padding: "10px 12px",
+          marginBottom: 14,
+        }}
+      >
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            cursor: "pointer",
+            fontSize: 13,
+            fontWeight: 600,
+            color: T.ink,
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={!!f.messagesDisabled}
+            onChange={(e) => setF({ ...f, messagesDisabled: e.target.checked })}
+            style={{ width: 15, height: 15, accentColor: T.forest }}
+          />
+          {lang === "en"
+            ? "Disable Messages & Voice Call for this employee"
+            : "បិទ សារ & ការហៅសំឡេង សម្រាប់បុគ្គលិកនេះ"}
+        </label>
+        <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+          {lang === "en"
+            ? "Overrides the company-wide setting for this one person only. Has no effect if Messages & Voice Call is already off for everyone in Role Permissions."
+            : "អនុវត្តតែចំពោះបុគ្គលិកនេះម្នាក់ប៉ុណ្ណោះ ដោយបដិសេធការកំណត់ទូទៅរបស់ក្រុមហ៊ុន។ ប្រសិនបើមុខងារនេះបានបិទសម្រាប់អ្នកគ្រប់គ្នារួចហើយនៅ សិទ្ធិតួនាទី វានឹងគ្មានប្រសិទ្ធភាពទេ។"}
+        </p>
+      </div>
       <div
         style={{
           display: "flex",
@@ -9749,6 +9803,7 @@ function Employees({
       customUlDeductionValue: data.useCustomUlPolicy
         ? Number(data.customUlDeductionValue) || 0
         : null,
+      messagesDisabled: !!data.messagesDisabled,
     };
     if (modal.mode === "add")
       setEmployees([...employees, { ...clean, id: uid("e") }]);
@@ -18643,12 +18698,25 @@ const CALL_ICE_SERVERS = [
 ];
 const CALL_RING_TIMEOUT_MS = 45000; // auto-cancel an unanswered call
 
-function useVoiceCall({ role, currentAdmin, currentEmp, employees, t }) {
+function useVoiceCall({
+  role,
+  currentAdmin,
+  currentEmp,
+  employees,
+  admins,
+  t,
+  canUseMessages,
+}) {
   const isAdmin = role === "admin";
   const selfId = isAdmin ? currentAdmin?.id || null : currentEmp?.id || null;
   const selfName = isAdmin
     ? currentAdmin?.name || t.chat.adminLabel
     : currentEmp?.name || "";
+  // Read inside the signal handler/startCall closures below without
+  // forcing those effects/callbacks to be rebuilt on every permission
+  // recompute — same pattern as callRef.
+  const canUseMessagesRef = useRef(canUseMessages);
+  canUseMessagesRef.current = canUseMessages;
 
   // call: null | { status: 'outgoing'|'incoming'|'connected', employeeId,
   //                peerName, muted, startedAt }
@@ -18776,13 +18844,21 @@ function useVoiceCall({ role, currentAdmin, currentEmp, employees, t }) {
   };
 
   const startCall = useCallback(
-    async (employeeId, peerName) => {
-      if (callRef.current || !employeeId) return;
+    async (employeeId, peerName, peerPhoto) => {
+      if (callRef.current || !employeeId || !canUseMessagesRef.current) return;
       setCallError("");
       setCall({
         status: "outgoing",
         employeeId,
         peerName,
+        // Admin calling a specific employee: real photo, identified.
+        // Employee calling the shared admin mailbox: no specific admin
+        // is chosen yet (whichever admin picks up), so this stays
+        // generic — matches the incoming side, where that same call
+        // only becomes "identified" once a specific admin's offer
+        // arrives with their own id/name/photo.
+        peerPhoto: isAdmin ? peerPhoto || null : null,
+        peerKind: isAdmin ? "identified" : "generic",
         muted: false,
         startedAt: null,
       });
@@ -18920,6 +18996,20 @@ function useVoiceCall({ role, currentAdmin, currentEmp, employees, t }) {
       if (!isAdmin && msg.employeeId !== selfId) return;
 
       if (msg.kind === "offer") {
+        // Permission was revoked (or never granted) for this session —
+        // decline silently rather than ringing a screen the user isn't
+        // allowed to use. Uses "busy" (not "reject") so the caller sees
+        // a generic can't-connect state instead of a misleading
+        // "declined by the person" message.
+        if (!canUseMessagesRef.current) {
+          sendCallSignal({
+            kind: "busy",
+            employeeId: msg.employeeId,
+            fromRole: isAdmin ? "admin" : "employee",
+            fromId: selfId,
+          });
+          return;
+        }
         // Already in a call — let the caller know instead of dropping it.
         if (callRef.current) {
           sendCallSignal({
@@ -18933,11 +19023,25 @@ function useVoiceCall({ role, currentAdmin, currentEmp, employees, t }) {
         // An offer from "our own side" (another admin calling that same
         // employee) isn't something we should ring for.
         if (msg.fromRole === (isAdmin ? "admin" : "employee")) return;
+        // Every signaling message already carries the real caller's id
+        // (msg.fromId) and a name snapshot (msg.fromName) — look up the
+        // live admin record too, in case their name/photo changed since
+        // the call started, but fall back to the snapshot if that admin
+        // account can't be found (e.g. deleted mid-call). Only the
+        // reverse direction (employee calling the *shared* admin
+        // mailbox, with no specific admin chosen yet) stays generic —
+        // see startCall below.
+        const callingAdmin = !isAdmin
+          ? admins.find((a) => a.id === msg.fromId)
+          : null;
         const peerName = isAdmin
           ? msg.fromName ||
             employees.find((e) => e.id === msg.employeeId)?.name ||
             "?"
-          : t.chat.adminLabel;
+          : callingAdmin?.name || msg.fromName || t.chat.adminLabel;
+        const peerPhoto = isAdmin
+          ? employees.find((e) => e.id === msg.employeeId)?.photo || null
+          : callingAdmin?.photo || null;
         try {
           const pc = createPeerConnection(msg.employeeId);
           await pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
@@ -18945,6 +19049,8 @@ function useVoiceCall({ role, currentAdmin, currentEmp, employees, t }) {
             status: "incoming",
             employeeId: msg.employeeId,
             peerName,
+            peerPhoto,
+            peerKind: "identified",
             muted: false,
             startedAt: null,
           });
@@ -19028,7 +19134,7 @@ function useVoiceCall({ role, currentAdmin, currentEmp, employees, t }) {
     };
     return subscribeCallSignal(handler);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selfId, isAdmin, employees]);
+  }, [selfId, isAdmin, employees, admins]);
 
   // If the whole app unmounts mid-call (sign-out, tab close), let the
   // other side know instead of just going silent.
@@ -19192,7 +19298,29 @@ function CallOverlay({
               />
             </>
           )}
-          <Avatar name={call.peerName} size={112} />
+          {call.peerKind === "generic" ? (
+            // Employee calling out to the shared admin mailbox: no
+            // specific admin has been chosen yet, so a generic badge
+            // is honest here — this flips to a real photo/name the
+            // moment a specific admin's offer arrives (see peerKind
+            // "identified" below).
+            <div
+              style={{
+                width: 112,
+                height: 112,
+                borderRadius: "50%",
+                background: "rgba(255,255,255,0.12)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <ShieldCheck size={48} color="#fff" />
+            </div>
+          ) : (
+            <Avatar name={call.peerName} photo={call.peerPhoto} size={112} />
+          )}
         </div>
         <div style={{ textAlign: "center" }}>
           <div style={{ fontSize: 23, fontWeight: 700 }}>{call.peerName}</div>
@@ -19736,6 +19864,7 @@ function MessagesPage({
                     onStartCall(
                       threadEmpId,
                       isAdmin ? threadEmployee?.name || "?" : t.chat.adminLabel,
+                      isAdmin ? threadEmployee?.photo : null,
                     )
                   }
                   disabled={!!activeCall}
@@ -25191,6 +25320,12 @@ function AppInner() {
         customUlDeductionType: r.custom_ul_deduction_type,
         customUlDeductionValue: r.custom_ul_deduction_value,
         dependents: r.dependents ?? 0,
+        // Per-employee override that hides Messages & Voice Call for this
+        // one person even when the company-wide toggle (role_permissions /
+        // EMPLOYEE_MODULES) has it turned on. One-directional only: this
+        // can never turn the module back ON for someone if the
+        // company-wide switch is off — both gates must pass.
+        messagesDisabled: !!r.messages_disabled,
       }),
       toDb: (r) => ({
         id: r.id,
@@ -25238,6 +25373,7 @@ function AppInner() {
           ? Number(r.customUlDeductionValue) || 0
           : null,
         dependents: Number(r.dependents) || 0,
+        messages_disabled: !!r.messagesDisabled,
       }),
       audit: true,
       actorRef,
@@ -25885,6 +26021,7 @@ function AppInner() {
         documents: r.emp_documents ?? true,
         loginActivity: r.emp_login_activity ?? true,
         profile: r.emp_profile ?? true,
+        messages: r.emp_messages ?? true,
       }),
       toDb: (r) => ({
         id: r.id,
@@ -25909,6 +26046,7 @@ function AppInner() {
         emp_documents: r.documents,
         emp_login_activity: r.loginActivity,
         emp_profile: r.profile,
+        emp_messages: r.messages,
       }),
       audit: true,
       actorRef,
@@ -26024,7 +26162,24 @@ function AppInner() {
       : sessionEmployee || null;
   const currentEmp =
     role && role !== "admin" ? employees.find((e) => e.id === role) : null;
+  // Single source of truth for "can this session use Messages/Call" —
+  // admin side checks the rank permission matrix (superadmin always
+  // passes), employee side checks the company-wide module toggle AND
+  // this employee's own messagesDisabled override. Both gates must
+  // pass — the per-employee flag can only take the module away, never
+  // grant it back when the company-wide switch is off.
+  const canUseMessages =
+    role === "admin"
+      ? isSuperAdmin || can("canMessage")
+      : moduleEnabled("messages") && !currentEmp?.messagesDisabled;
   const loggedIn = role === "admin" || !!currentEmp;
+  // Same merge feeds the side nav so the "Messages" item itself
+  // disappears for an employee whose override is on, not just the page
+  // route.
+  const employeeModulesForNav =
+    role !== "admin" && currentEmp?.messagesDisabled
+      ? { ...employeeModules, messages: false }
+      : employeeModules;
   const nav =
     role === "admin"
       ? buildNavAdmin(t.nav).filter(
@@ -26032,7 +26187,7 @@ function AppInner() {
             (!n.superadminOnly || isSuperAdmin) &&
             (!n.permission || can(n.permission)),
         )
-      : buildNavEmployee(t.nav, employeeModules);
+      : buildNavEmployee(t.nav, employeeModulesForNav);
   const bottomNav =
     role !== "admin" ? buildBottomNavEmployee(t.nav, employeeModules) : null;
 
@@ -26045,7 +26200,9 @@ function AppInner() {
     currentAdmin,
     currentEmp,
     employees,
+    admins,
     t,
+    canUseMessages,
   });
 
   // Keep actorRef in sync with whoever is signed in right now, so every
@@ -26550,7 +26707,7 @@ function AppInner() {
               )}
               <ThemeToggle variant="light" />
               <LangToggle variant="light" />
-              {(role === "admin" || moduleEnabled("messages")) && (
+              {canUseMessages && (
                 <ChatQuickAccess
                   role={role}
                   currentEmp={currentEmp}
@@ -26842,19 +26999,18 @@ function AppInner() {
                     canApprove={isSuperAdmin || can("approveRequests")}
                   />
                 )}
-              {page === "messages" &&
-                (role === "admin" || moduleEnabled("messages")) && (
-                  <MessagesPage
-                    role={role}
-                    currentAdmin={currentAdmin}
-                    currentEmp={currentEmp}
-                    employees={employees}
-                    messages={messages}
-                    setMessages={setMessages}
-                    activeCall={voiceCall.call}
-                    onStartCall={voiceCall.startCall}
-                  />
-                )}
+              {page === "messages" && canUseMessages && (
+                <MessagesPage
+                  role={role}
+                  currentAdmin={currentAdmin}
+                  currentEmp={currentEmp}
+                  employees={employees}
+                  messages={messages}
+                  setMessages={setMessages}
+                  activeCall={voiceCall.call}
+                  onStartCall={voiceCall.startCall}
+                />
+              )}
               {page === "admins" && role === "admin" && isSuperAdmin && (
                 <AdminAccounts
                   admins={admins}
