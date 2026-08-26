@@ -3196,6 +3196,20 @@ html,body,#root{height:100%;}
 .wf-chat-bubble-row{padding:2px 14px;}
 .wf-chat-bubble{max-width:100%;padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.5;overflow-wrap:break-word;word-break:normal;white-space:pre-wrap;}
 .wf-chat-back-btn{display:none;background:none;border:none;cursor:pointer;color:${T.ink};padding:6px;align-items:center;}
+.wf-callscreen{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:space-between;background:radial-gradient(circle at 50% 18%,#243158 0%,#0a0e1a 72%);color:#fff;padding:max(28px,env(safe-area-inset-top)) 24px max(32px,env(safe-area-inset-bottom));animation:wf-fade .22s ease;}
+.wf-callscreen-ring{position:absolute;top:50%;left:50%;border-radius:50%;border:2px solid rgba(255,255,255,0.25);transform:translate(-50%,-50%);animation:wf-pulse-ring 2.4s ease-out infinite;}
+.wf-callscreen-dots span{animation:wf-calldot 1.4s infinite ease-in-out;display:inline-block;}
+.wf-callscreen-dots span:nth-child(2){animation-delay:.2s;}
+.wf-callscreen-dots span:nth-child(3){animation-delay:.4s;}
+@keyframes wf-calldot{0%,80%,100%{opacity:.25;}40%{opacity:1;}}
+.wf-callbtn{display:flex;flex-direction:column;align-items:center;gap:9px;background:none;border:none;cursor:pointer;color:#fff;padding:0;}
+.wf-callbtn-circle{width:62px;height:62px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform .12s ease,background .15s ease;box-shadow:0 8px 20px rgba(0,0,0,0.3);}
+.wf-callbtn:active .wf-callbtn-circle{transform:scale(.92);}
+.wf-callbtn-circle.wf-callbtn-accept{background:#1FA26B;}
+.wf-callbtn-circle.wf-callbtn-reject{background:#e5484d;}
+.wf-callbtn-circle.wf-callbtn-secondary{background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.22);box-shadow:none;}
+.wf-callbtn-circle.wf-callbtn-secondary.wf-callbtn-active{background:#fff;color:#0a0e1a;}
+.wf-callbtn-label{font-size:12.5px;color:rgba(255,255,255,0.75);font-weight:600;}
 `;
 function useGlobalStyle() {
   useEffect(() => {
@@ -18786,6 +18800,36 @@ function useVoiceCall({ role, currentAdmin, currentEmp, employees, t }) {
           fromName: selfName,
           sdp: offer,
         });
+        // Realtime broadcast (sendCallSignal above) only reaches a peer
+        // whose tab is already open and subscribed — it does nothing if
+        // the receiver's app is closed/backgrounded. Fire a real Web
+        // Push too, same pattern as the `notify` callbacks on
+        // useSupabaseArray (messages, leave, OT, ...), so an incoming
+        // call actually rings the receiver's device even when the app
+        // isn't in the foreground. Best-effort: a push failure must
+        // never block or fail the call itself.
+        supabase.functions
+          .invoke("push_notify", {
+            body: isAdmin
+              ? {
+                  userType: "employee",
+                  userId: employeeId,
+                  title: t.chat.incomingCall,
+                  body: selfName || "",
+                  page: "messages",
+                  portal: "employee",
+                  tag: `call-${employeeId}`,
+                }
+              : {
+                  userType: "admin",
+                  title: t.chat.incomingCall,
+                  body: `${selfName || "?"} (${employeeId})`,
+                  page: "messages",
+                  portal: "admin",
+                  tag: `call-${employeeId}`,
+                },
+          })
+          .catch((err) => console.error("[push] call notify failed:", err));
         stopRingtoneRef.current = startRingtoneLoop();
         ringTimeoutRef.current = setTimeout(() => {
           setCallError(t.chat.callNoAnswer);
@@ -19051,171 +19095,180 @@ function CallOverlay({
 
   const fmtElapsed = `${String(Math.floor(elapsed / 60)).padStart(2, "0")}:${String(elapsed % 60).padStart(2, "0")}`;
 
-  return (
-    <div
-      style={{
-        position: "fixed",
-        top: 16,
-        right: 16,
-        zIndex: 9999,
-        width: 280,
-        maxWidth: "calc(100vw - 32px)",
-        background: "#151b2b",
-        color: "#fff",
-        borderRadius: 16,
-        boxShadow: "0 12px 32px rgba(0,0,0,0.35)",
-        padding: 16,
-        display: "flex",
-        flexDirection: "column",
-        gap: 10,
-      }}
-    >
-      {call ? (
-        <>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <Avatar name={call.peerName} size={38} />
-            <div style={{ minWidth: 0, flex: 1 }}>
-              <div
-                style={{
-                  fontWeight: 700,
-                  fontSize: 13.5,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {call.peerName}
-              </div>
-              <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.65)" }}>
-                {call.status === "incoming"
-                  ? t.chat.incomingCall
-                  : call.status === "outgoing"
-                    ? t.chat.calling
-                    : fmtElapsed}
-              </div>
-            </div>
-          </div>
-          {call.status === "incoming" ? (
-            <div style={{ display: "flex", gap: 8 }}>
-              <button
-                type="button"
-                onClick={onReject}
-                style={{
-                  flex: 1,
-                  border: "none",
-                  borderRadius: 10,
-                  padding: "10px 0",
-                  background: "#e5484d",
-                  color: "#fff",
-                  fontWeight: 700,
-                  fontSize: 12.5,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 6,
-                }}
-              >
-                <PhoneOff size={15} /> {t.chat.decline}
-              </button>
-              <button
-                type="button"
-                onClick={onAccept}
-                style={{
-                  flex: 1,
-                  border: "none",
-                  borderRadius: 10,
-                  padding: "10px 0",
-                  background: "#1FA26B",
-                  color: "#fff",
-                  fontWeight: 700,
-                  fontSize: 12.5,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 6,
-                }}
-              >
-                <Phone size={15} /> {t.chat.accept}
-              </button>
-            </div>
-          ) : (
-            <div style={{ display: "flex", gap: 8 }}>
-              {call.status === "connected" && (
-                <button
-                  type="button"
-                  onClick={onToggleMute}
-                  title={call.muted ? t.chat.unmute : t.chat.mute}
-                  style={{
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    borderRadius: 10,
-                    width: 40,
-                    background: call.muted
-                      ? "rgba(255,255,255,0.18)"
-                      : "transparent",
-                    color: "#fff",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {call.muted ? <MicOff size={16} /> : <Mic size={16} />}
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={onEnd}
-                style={{
-                  flex: 1,
-                  border: "none",
-                  borderRadius: 10,
-                  padding: "10px 0",
-                  background: "#e5484d",
-                  color: "#fff",
-                  fontWeight: 700,
-                  fontSize: 12.5,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 6,
-                }}
-              >
-                <PhoneOff size={15} /> {t.chat.hangup}
-              </button>
-            </div>
-          )}
-        </>
-      ) : (
-        <div
+  // A dropped/failed call with no active `call` state (no-answer timeout,
+  // mic permission denied, etc.) only needs a small dismissible toast —
+  // the full call screen below is only for a call that's actually live.
+  if (!call) {
+    return (
+      <div
+        style={{
+          position: "fixed",
+          top: "max(16px, env(safe-area-inset-top))",
+          left: "50%",
+          transform: "translateX(-50%)",
+          zIndex: 9999,
+          maxWidth: "calc(100vw - 32px)",
+          background: "#151b2b",
+          color: "#fff",
+          borderRadius: 12,
+          boxShadow: "0 12px 32px rgba(0,0,0,0.35)",
+          padding: "12px 14px",
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          fontSize: 13,
+        }}
+      >
+        <AlertCircle size={16} style={{ flexShrink: 0, color: "#ff8a80" }} />
+        <span>{callError}</span>
+        <button
+          type="button"
+          onClick={onDismissError}
           style={{
-            fontSize: 12.5,
-            color: "rgba(255,255,255,0.85)",
+            border: "none",
+            background: "transparent",
+            color: "rgba(255,255,255,0.6)",
+            cursor: "pointer",
             display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 8,
+            flexShrink: 0,
+            marginLeft: 2,
           }}
         >
-          <span>{callError}</span>
-          <button
-            type="button"
-            onClick={onDismissError}
+          <X size={14} />
+        </button>
+      </div>
+    );
+  }
+
+  const isIncoming = call.status === "incoming";
+  const isConnected = call.status === "connected";
+  const statusLabel = isIncoming
+    ? t.chat.incomingCall
+    : isConnected
+      ? fmtElapsed
+      : t.chat.calling;
+
+  return (
+    <div className="wf-callscreen">
+      <div
+        style={{
+          fontSize: 12.5,
+          fontWeight: 700,
+          color: "rgba(255,255,255,0.5)",
+          letterSpacing: 0.5,
+          textTransform: "uppercase",
+        }}
+      >
+        {t.chat.call}
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 20,
+        }}
+      >
+        <div
+          style={{
+            position: "relative",
+            width: 136,
+            height: 136,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {!isConnected && (
+            <>
+              <span
+                className="wf-callscreen-ring"
+                style={{ width: 136, height: 136 }}
+              />
+              <span
+                className="wf-callscreen-ring"
+                style={{ width: 136, height: 136, animationDelay: "0.7s" }}
+              />
+            </>
+          )}
+          <Avatar name={call.peerName} size={112} />
+        </div>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: 23, fontWeight: 700 }}>{call.peerName}</div>
+          <div
             style={{
-              border: "none",
-              background: "transparent",
-              color: "rgba(255,255,255,0.6)",
-              cursor: "pointer",
+              marginTop: 7,
+              fontSize: 14.5,
+              color: "rgba(255,255,255,0.65)",
               display: "flex",
-              flexShrink: 0,
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 3,
+              fontVariantNumeric: "tabular-nums",
+              minHeight: 18,
             }}
           >
-            <X size={14} />
-          </button>
+            {statusLabel}
+            {!isConnected && (
+              <span
+                className="wf-callscreen-dots"
+                style={{ display: "inline-flex", gap: 2 }}
+              >
+                <span>.</span>
+                <span>.</span>
+                <span>.</span>
+              </span>
+            )}
+          </div>
         </div>
-      )}
+      </div>
+
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 44 }}>
+        {isIncoming ? (
+          <>
+            <button type="button" className="wf-callbtn" onClick={onReject}>
+              <span className="wf-callbtn-circle wf-callbtn-reject">
+                <PhoneOff size={26} />
+              </span>
+              <span className="wf-callbtn-label">{t.chat.decline}</span>
+            </button>
+            <button type="button" className="wf-callbtn" onClick={onAccept}>
+              <span className="wf-callbtn-circle wf-callbtn-accept">
+                <Phone size={26} />
+              </span>
+              <span className="wf-callbtn-label">{t.chat.accept}</span>
+            </button>
+          </>
+        ) : (
+          <>
+            {isConnected && (
+              <button
+                type="button"
+                className="wf-callbtn"
+                onClick={onToggleMute}
+              >
+                <span
+                  className={`wf-callbtn-circle wf-callbtn-secondary${
+                    call.muted ? " wf-callbtn-active" : ""
+                  }`}
+                >
+                  {call.muted ? <MicOff size={22} /> : <Mic size={22} />}
+                </span>
+                <span className="wf-callbtn-label">
+                  {call.muted ? t.chat.unmute : t.chat.mute}
+                </span>
+              </button>
+            )}
+            <button type="button" className="wf-callbtn" onClick={onEnd}>
+              <span className="wf-callbtn-circle wf-callbtn-reject">
+                <PhoneOff size={26} />
+              </span>
+              <span className="wf-callbtn-label">{t.chat.hangup}</span>
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 }
