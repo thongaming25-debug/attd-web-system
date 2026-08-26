@@ -207,6 +207,17 @@ const LANG_RAW = {
       noChartData: "មិនទាន់មានទិន្នន័យគ្រប់គ្រាន់ដើម្បីបង្ហាញទេ",
       totalOt: "OT សរុប",
       hours: "ម៉ោង",
+      newHiresTrend: "និន្នាការជួលបុគ្គលិកថ្មី (៦ ខែចុងក្រោយ)",
+      newHiresTrendSub: "ចំនួនបុគ្គលិកចូលថ្មីប្រចាំខែ (គិតតាមថ្ងៃចូលធ្វើការ)",
+      absenteeism: "អត្រាអវត្តមានតាមនាយកដ្ឋាន",
+      absenteeismSub:
+        'ភាគរយកំណត់ត្រា "អវត្តមាន" ធៀបនឹងកំណត់ត្រាវត្តមានសរុបប្រចាំខែនេះ',
+      statActiveHeadcount: "បុគ្គលិកសកម្មសរុប",
+      statAvgTenure: "អាយុកាលធ្វើការជាមធ្យម",
+      statInactiveRate: "អត្រាអសកម្មបច្ចុប្បន្ន",
+      statInactiveRateNote:
+        "ចំណាំ៖ នេះជាភាគរយស្ថិតិបច្ចុប្បន្ន មិនមែនអត្រាចេញ-ចូលក្នុងកំឡុងពេលជាក់លាក់ទេ (ប្រព័ន្ធមិនទាន់កត់ត្រាកាលបរិច្ឆេទចាកចេញ)",
+      tenureFormat: (y, m) => (y > 0 ? `${y} ឆ្នាំ ${m} ខែ` : `${m} ខែ`),
     },
     depts: {
       addBtn: "បន្ថែមនាយកដ្ឋាន",
@@ -411,6 +422,36 @@ const LANG_RAW = {
       searchPlaceholder: "ស្វែងរកបុគ្គលិក...",
       allBranches: "គ្រប់សាខា",
       confirmDelWithName: (name) => `តើអ្នកពិតជាចង់លុប "${name}" មែនទេ?`,
+      importBtn: "នាំចូល",
+      importTitle: "នាំចូលបុគ្គលិកជាបាច់",
+      importDesc:
+        "ទាញយកគំរូឯកសារខាងក្រោម បំពេញព័ត៌មានបុគ្គលិក រួចផ្ទុកឡើងវិញ។ ជួរឈរ៖ ឈ្មោះ, លេខសម្គាល់, នាយកដ្ឋាន, តួនាទី, វេន, លេខទូរស័ព្ទ, អ៊ីម៉ែល, ប្រាក់ខែ, ថ្ងៃចូលធ្វើការ, សាខា, ស្ថានភាព។ (នាយកដ្ឋាន/វេន/សាខា ត្រូវសរសេរឲ្យត្រូវនឹងឈ្មោះដែលមានស្រាប់ក្នុងប្រព័ន្ធ)",
+      downloadTemplate: "ទាញយកគំរូ (Excel)",
+      chooseFile: "ជ្រើសរើសឯកសារ (.xlsx / .csv)",
+      changeFile: "ជ្រើសរើសឯកសារផ្សេង",
+      parsing: "កំពុងអានឯកសារ...",
+      previewTitle: "ត្រួតពិនិត្យទិន្នន័យមុននាំចូល",
+      colRow: "ជួរ",
+      colStatus: "ស្ថានភាព",
+      rowValid: "ត្រឹមត្រូវ",
+      rowError: "មានបញ្ហា",
+      summaryText: (total, valid, errors) =>
+        `សរុប ${total} ជួរ — ត្រឹមត្រូវ ${valid} ជួរ, មានបញ្ហា ${errors} ជួរ`,
+      confirmImportBtn: (n) => `នាំចូល ${n} នាក់`,
+      importSuccessToast: (n) => `បាននាំចូលបុគ្គលិកចំនួន ${n} នាក់ដោយជោគជ័យ`,
+      noValidRows:
+        "គ្មានជួរណាត្រឹមត្រូវសម្រាប់នាំចូលទេ សូមកែឯកសារ ហើយផ្ទុកម្តងទៀត",
+      emptyFile: "ឯកសារនេះគ្មានទិន្នន័យទេ",
+      backToUpload: "ត្រឡប់ក្រោយ",
+      errMissingName: "ខ្វះឈ្មោះ",
+      errMissingCode: "ខ្វះលេខសម្គាល់",
+      errDuplicateCode: (code) => `លេខសម្គាល់ "${code}" ត្រូវបានប្រើរួចហើយ`,
+      errDeptNotFound: (v) => `រកមិនឃើញនាយកដ្ឋាន "${v}" ទេ`,
+      errShiftNotFound: (v) => `រកមិនឃើញវេន "${v}" ទេ`,
+      errOfficeNotFound: (v) => `រកមិនឃើញសាខា "${v}" ទេ`,
+      errInvalidSalary: "ប្រាក់ខែមិនត្រឹមត្រូវ",
+      importFontNote:
+        "ចំណាំ៖ ប្រសិនបើឈ្មោះនាយកដ្ឋាន/វេន បង្ហាញជាប្រអប់ ឬបន្ទាត់នៅក្នុង Excel នោះគ្រាន់តែជាបញ្ហាពុម្ពអក្សរប៉ុណ្ណោះ (ពុម្ពអក្សរលំនាំដើមរបស់ Excel មិនអាចបង្ហាញអក្សរខ្មែរបានទេ)។ ទិន្នន័យខាងក្នុងនៅតែត្រឹមត្រូវ អាចវាយសរសេរជាន់លើ ឬកែសម្រួលធម្មតា ហើយនៅតែនាំចូលចូលប្រព័ន្ធបានធម្មតា។ ដើម្បីឲ្យបង្ហាញច្បាស់ សូមជ្រើសរើសជួរឈរនោះ ហើយប្តូរពុម្ពអក្សរទៅ Khmer OS ឬ Khmer Sangam MN។",
     },
     sh: {
       addBtn: "បន្ថែមវេន",
@@ -1137,6 +1178,17 @@ const LANG_RAW = {
       noChartData: "Not enough data to show yet",
       totalOt: "Total OT",
       hours: "hrs",
+      newHiresTrend: "New Hires (last 6 months)",
+      newHiresTrendSub: "New employees added per month, based on join date",
+      absenteeism: "Absenteeism Rate by Department",
+      absenteeismSub:
+        'Share of "absent" records vs. total attendance records this month',
+      statActiveHeadcount: "Total Active Headcount",
+      statAvgTenure: "Average Tenure",
+      statInactiveRate: "Current Inactive Rate",
+      statInactiveRateNote:
+        "Note: this is a current snapshot, not a turnover rate over a period — the system doesn't yet track an exit date.",
+      tenureFormat: (y, m) => (y > 0 ? `${y}y ${m}m` : `${m}m`),
     },
     depts: {
       addBtn: "Add Department",
@@ -1345,6 +1397,35 @@ const LANG_RAW = {
       allBranches: "All Branches",
       confirmDelWithName: (name) =>
         `Are you sure you want to delete "${name}"?`,
+      importBtn: "Import",
+      importTitle: "Bulk Import Employees",
+      importDesc:
+        "Download the template below, fill in employee details, then upload it. Columns: Name, Employee ID, Department, Role, Shift, Phone, Email, Salary, Join Date, Branch, Status. (Department/Shift/Branch must match names already set up in the system)",
+      downloadTemplate: "Download Template (Excel)",
+      chooseFile: "Choose File (.xlsx / .csv)",
+      changeFile: "Choose a Different File",
+      parsing: "Reading file...",
+      previewTitle: "Review Data Before Importing",
+      colRow: "Row",
+      colStatus: "Status",
+      rowValid: "Valid",
+      rowError: "Error",
+      summaryText: (total, valid, errors) =>
+        `${total} rows total — ${valid} valid, ${errors} with errors`,
+      confirmImportBtn: (n) => `Import ${n} Employees`,
+      importSuccessToast: (n) => `Successfully imported ${n} employees`,
+      noValidRows: "No valid rows to import. Please fix the file and re-upload",
+      emptyFile: "This file has no data",
+      backToUpload: "Back",
+      errMissingName: "Missing name",
+      errMissingCode: "Missing employee ID",
+      errDuplicateCode: (code) => `Employee ID "${code}" is already in use`,
+      errDeptNotFound: (v) => `Department "${v}" not found`,
+      errShiftNotFound: (v) => `Shift "${v}" not found`,
+      errOfficeNotFound: (v) => `Branch "${v}" not found`,
+      errInvalidSalary: "Invalid salary",
+      importFontNote:
+        "Note: if department/shift names show as boxes or blank marks in Excel, that's just a font display issue — Excel's default font doesn't include Khmer glyphs. The underlying data is still correct, and you can type/edit over it normally; it will still import fine. To display it properly, select that column and change its font to Khmer OS or Khmer Sangam MN.",
     },
     sh: {
       addBtn: "Add Shift",
@@ -7962,6 +8043,56 @@ function AnalyticsPage({
   const hasOtData = overtimeRequests.some((r) => r.status === "approved");
   const totalOtThisTrend = otTrend.reduce((s, d) => s + d.value, 0);
 
+  // New hires per month, based on join date, across all employees
+  // (active or not) — a hire event is a historical fact regardless of
+  // the employee's current status.
+  const newHiresTrend = months.map((mkm) => {
+    const count = employees.filter(
+      (e) => e.joined && e.joined.startsWith(mkm),
+    ).length;
+    return { label: shortMonthLabel(mkm, lang), value: count };
+  });
+  const hasHiresData = employees.some((e) => e.joined);
+
+  // Absenteeism rate by department for the current month: share of
+  // that department's attendance records this month marked "absent".
+  const absenteeismByDept = departments
+    .map((d) => {
+      const deptEmpIds = new Set(
+        employees.filter((e) => e.deptId === d.id).map((e) => e.id),
+      );
+      const recs = attendance.filter(
+        (a) => deptEmpIds.has(a.employeeId) && a.date && a.date.startsWith(mk),
+      );
+      const absent = recs.filter((a) => a.status === "absent").length;
+      const rate = recs.length ? Math.round((absent / recs.length) * 100) : 0;
+      return { label: d.name, value: rate, recCount: recs.length };
+    })
+    .filter((d) => d.recCount > 0)
+    .sort((a, b) => b.value - a.value);
+  const hasAbsenceData = absenteeismByDept.length > 0;
+
+  // Snapshot workforce stats: active headcount, average tenure of
+  // active employees, and the current inactive share. The inactive
+  // share is a point-in-time snapshot, not a turnover rate over a
+  // period — the app tracks a status flag, not an exit date.
+  const avgTenureDays = activeEmployees.length
+    ? activeEmployees.reduce((sum, e) => {
+        if (!e.joined) return sum;
+        const days = Math.max(
+          0,
+          (Date.now() - new Date(e.joined + "T00:00:00").getTime()) / 86400000,
+        );
+        return sum + days;
+      }, 0) / activeEmployees.length
+    : 0;
+  const tenureYears = Math.floor(avgTenureDays / 365);
+  const tenureMonths = Math.floor((avgTenureDays % 365) / 30);
+  const inactiveCount = employees.filter((e) => e.status === "inactive").length;
+  const inactiveRate = employees.length
+    ? Math.round((inactiveCount / employees.length) * 100)
+    : 0;
+
   return (
     <div>
       <Card
@@ -7988,6 +8119,135 @@ function AnalyticsPage({
           {t.analytics.subtitle}
         </p>
       </Card>
+
+      <div
+        className="wf-grid"
+        style={{
+          gridTemplateColumns: "repeat(auto-fit, minmax(190px,1fr))",
+          marginBottom: 16,
+        }}
+      >
+        <Card accent={T.forest} style={{ padding: 16 }}>
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 10,
+              background: T.forest + "1A",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: 12,
+            }}
+          >
+            <Users size={18} color={T.forest} />
+          </div>
+          <div
+            style={{
+              fontSize: 26,
+              fontWeight: 700,
+              fontFamily: "'JetBrains Mono',monospace",
+              color: T.ink,
+            }}
+          >
+            {activeEmployees.length}
+          </div>
+          <div
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              color: T.textSoft,
+              marginTop: 2,
+            }}
+          >
+            {t.analytics.statActiveHeadcount}
+          </div>
+        </Card>
+
+        <Card accent={T.blue} style={{ padding: 16 }}>
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 10,
+              background: T.blue + "1A",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: 12,
+            }}
+          >
+            <CalendarClock size={18} color={T.blue} />
+          </div>
+          <div
+            style={{
+              fontSize: 26,
+              fontWeight: 700,
+              fontFamily: "'JetBrains Mono',monospace",
+              color: T.ink,
+            }}
+          >
+            {t.analytics.tenureFormat(tenureYears, tenureMonths)}
+          </div>
+          <div
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              color: T.textSoft,
+              marginTop: 2,
+            }}
+          >
+            {t.analytics.statAvgTenure}
+          </div>
+        </Card>
+
+        <Card accent={T.rose} style={{ padding: 16 }}>
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 10,
+              background: T.rose + "1A",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: 12,
+            }}
+          >
+            <AlertCircle size={18} color={T.rose} />
+          </div>
+          <div
+            style={{
+              fontSize: 26,
+              fontWeight: 700,
+              fontFamily: "'JetBrains Mono',monospace",
+              color: T.ink,
+            }}
+          >
+            {inactiveRate}%
+          </div>
+          <div
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              color: T.textSoft,
+              marginTop: 2,
+            }}
+          >
+            {t.analytics.statInactiveRate}
+          </div>
+          <div
+            style={{
+              fontSize: 10.5,
+              color: T.muted,
+              marginTop: 4,
+              lineHeight: 1.5,
+            }}
+          >
+            {t.analytics.statInactiveRateNote}
+          </div>
+        </Card>
+      </div>
 
       <div
         className="wf-grid"
@@ -8021,6 +8281,19 @@ function AnalyticsPage({
             formatValue={(v) => `${v}h`}
           />
         </ChartCard>
+
+        <ChartCard
+          title={t.analytics.newHiresTrend}
+          subtitle={t.analytics.newHiresTrendSub}
+          noData={!hasHiresData}
+          noDataLabel={t.analytics.noChartData}
+        >
+          <MiniBarChart
+            data={newHiresTrend}
+            color={T.blue}
+            formatValue={(v) => `${v}`}
+          />
+        </ChartCard>
       </div>
 
       <ChartCard
@@ -8035,6 +8308,21 @@ function AnalyticsPage({
           formatValue={fmtMoney}
         />
       </ChartCard>
+
+      <div style={{ marginTop: 16 }}>
+        <ChartCard
+          title={t.analytics.absenteeism}
+          subtitle={t.analytics.absenteeismSub}
+          noData={!hasAbsenceData}
+          noDataLabel={t.analytics.noChartData}
+        >
+          <HorizontalBarChart
+            data={absenteeismByDept}
+            color={T.rose}
+            formatValue={(v) => `${v}%`}
+          />
+        </ChartCard>
+      </div>
     </div>
   );
 }
@@ -8572,6 +8860,523 @@ function EmployeeForm({
   );
 }
 
+/* ---------------------------------------------------------------
+   Bulk employee import (Excel/CSV) — parses a spreadsheet the admin
+   uploads, validates each row against existing departments/shifts/
+   offices and existing employee codes, and lets the admin confirm
+   before writing anything. Reuses ExcelJS (already a dependency for
+   payroll export) for .xlsx, and a small hand-rolled parser for
+   .csv so no extra package is required.
+----------------------------------------------------------------*/
+const IMPORT_TEMPLATE_HEADERS = [
+  "Name",
+  "Employee ID",
+  "Department",
+  "Role",
+  "Shift",
+  "Phone",
+  "Email",
+  "Salary",
+  "Join Date (YYYY-MM-DD)",
+  "Branch",
+  "Status (active/inactive)",
+];
+
+// Ships the template as a real .xlsx (rather than plain CSV) so we can
+// set an explicit font on the sample row. Excel's default Calibri has
+// no Khmer glyphs, so a department/shift name in Khmer script renders
+// as empty boxes/underscores in a plain CSV opened in Excel — the
+// underlying text is still correct and still imports fine, but it's
+// unreadable while editing. A Khmer-capable font fixes the display;
+// it doesn't change what data actually gets written or parsed.
+async function downloadImportTemplate(departments, shifts) {
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "Workforce Suite";
+  wb.created = new Date();
+  const ws = wb.addWorksheet("Employees");
+
+  const headerRow = ws.addRow(IMPORT_TEMPLATE_HEADERS);
+  headerRow.eachCell((cell) => {
+    cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF12203D" },
+    };
+    cell.alignment = { horizontal: "center", vertical: "middle" };
+  });
+
+  const sampleRow = ws.addRow([
+    "John Doe",
+    "EMP-101",
+    departments[0]?.name || "HR",
+    "Staff",
+    shifts[0] ? shiftLabel(shifts[0]) : "Morning Shift",
+    "012 345 678",
+    "john@company.com",
+    600,
+    todayStr(),
+    "",
+    "active",
+  ]);
+  // "Khmer OS" is the most commonly pre-installed Khmer font on
+  // Cambodian business machines; falls back harmlessly (Excel just
+  // keeps whatever it was already using) if it isn't present.
+  sampleRow.font = { name: "Khmer OS Battambang", size: 11 };
+
+  ws.columns = IMPORT_TEMPLATE_HEADERS.map((h) => ({
+    width: Math.max(16, h.length + 4),
+  }));
+
+  const buffer = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "employee-import-template.xlsx";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Minimal RFC-4180-ish CSV parser: handles quoted fields, escaped
+// quotes ("") inside quotes, and both \n and \r\n line endings.
+function parseCsvText(text) {
+  const clean = text.replace(/^\uFEFF/, "");
+  const rows = [];
+  let row = [];
+  let field = "";
+  let inQuotes = false;
+  for (let i = 0; i < clean.length; i++) {
+    const c = clean[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (clean[i + 1] === '"') {
+          field += '"';
+          i++;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        field += c;
+      }
+    } else if (c === '"') {
+      inQuotes = true;
+    } else if (c === ",") {
+      row.push(field);
+      field = "";
+    } else if (c === "\n" || c === "\r") {
+      if (c === "\r" && clean[i + 1] === "\n") i++;
+      row.push(field);
+      if (!(row.length === 1 && row[0] === "")) rows.push(row);
+      row = [];
+      field = "";
+    } else {
+      field += c;
+    }
+  }
+  if (field !== "" || row.length) {
+    row.push(field);
+    if (!(row.length === 1 && row[0] === "")) rows.push(row);
+  }
+  return rows;
+}
+
+async function parseImportFile(file) {
+  if (/\.csv$/i.test(file.name)) {
+    const text = await file.text();
+    return parseCsvText(text);
+  }
+  const buf = await file.arrayBuffer();
+  const wb = new ExcelJS.Workbook();
+  await wb.xlsx.load(buf);
+  const ws = wb.worksheets[0];
+  const rows = [];
+  ws?.eachRow((wsRow) => {
+    const values = wsRow.values.slice(1); // ExcelJS rows are 1-indexed
+    const cells = values.map((v) => {
+      if (v === null || v === undefined) return "";
+      if (typeof v === "object" && v.text !== undefined) return v.text;
+      if (typeof v === "object" && v.result !== undefined) return v.result;
+      return String(v);
+    });
+    rows.push(cells);
+  });
+  return rows;
+}
+
+// Turns raw parsed rows (first row = headers, ignored — column order
+// is assumed to match IMPORT_TEMPLATE_HEADERS) into validated
+// employee objects, matching Department/Shift/Branch by name
+// (case-insensitive) and flagging anything that can't be resolved
+// or that collides with an existing/earlier-in-file employee code.
+function validateImportRows(
+  rows,
+  { departments, shifts, offices, employees, t },
+) {
+  const dataRows = rows
+    .slice(1)
+    .filter((r) => r.some((c) => String(c ?? "").trim() !== ""));
+  const existingCodes = new Set(
+    employees.map((e) =>
+      String(e.code || "")
+        .trim()
+        .toLowerCase(),
+    ),
+  );
+  const seenCodesInFile = new Set();
+  const findByName = (list, name) =>
+    list.find(
+      (x) =>
+        x.name.trim().toLowerCase() ===
+        String(name || "")
+          .trim()
+          .toLowerCase(),
+    );
+
+  return dataRows.map((r, idx) => {
+    const [
+      name,
+      code,
+      deptName,
+      role,
+      shiftName,
+      phone,
+      email,
+      salaryRaw,
+      joined,
+      officeName,
+      statusRaw,
+    ] = r.map((c) => (c ?? "").toString().trim());
+
+    const errors = [];
+    if (!name) errors.push(t.emps.errMissingName);
+    if (!code) errors.push(t.emps.errMissingCode);
+    const codeKey = code.toLowerCase();
+    if (code && (existingCodes.has(codeKey) || seenCodesInFile.has(codeKey))) {
+      errors.push(t.emps.errDuplicateCode(code));
+    }
+
+    const dept = deptName ? findByName(departments, deptName) : departments[0];
+    if (deptName && !dept) errors.push(t.emps.errDeptNotFound(deptName));
+
+    const shift = shiftName ? findByName(shifts, shiftName) : shifts[0];
+    if (shiftName && !shift) errors.push(t.emps.errShiftNotFound(shiftName));
+
+    let office = null;
+    if (officeName) {
+      office = findByName(offices || [], officeName);
+      if (!office) errors.push(t.emps.errOfficeNotFound(officeName));
+    }
+
+    const salary = Number(salaryRaw);
+    if (salaryRaw && (!Number.isFinite(salary) || salary < 0)) {
+      errors.push(t.emps.errInvalidSalary);
+    }
+
+    const statusNorm = statusRaw.toLowerCase();
+    const status = statusNorm === "inactive" ? "inactive" : "active";
+
+    if (code && errors.length === 0) seenCodesInFile.add(codeKey);
+
+    const employee =
+      errors.length === 0
+        ? {
+            id: uid("e"),
+            code,
+            pin: randomPin(),
+            name,
+            deptId: dept?.id || "",
+            shiftId: shift?.id || "",
+            officeId: office?.id || "",
+            weeklyOff: [],
+            customDaysOff: [],
+            annualLeaveDays: DEFAULT_ANNUAL_LEAVE_DAYS,
+            sickLeaveDays: DEFAULT_SICK_LEAVE_DAYS,
+            role,
+            email,
+            phone,
+            salary: salaryRaw ? salary : 0,
+            dependents: 0,
+            status,
+            joined: joined || todayStr(),
+            useCustomRate: false,
+            customTaxRate: null,
+            customInsuranceRate: null,
+            useCustomLatePolicy: false,
+            customLateGraceCount: null,
+            customLateDeductionType: null,
+            customLateDeductionValue: null,
+            useCustomUlPolicy: false,
+            customUlDeductionType: null,
+            customUlDeductionValue: null,
+          }
+        : null;
+
+    return { rowNumber: idx + 2, raw: { name, code }, errors, employee };
+  });
+}
+
+function ImportEmployeesModal({
+  departments,
+  shifts,
+  offices,
+  employees,
+  onImport,
+  onClose,
+}) {
+  const { t } = useLang();
+  const fileRef = useRef(null);
+  const [fileName, setFileName] = useState("");
+  const [parsing, setParsing] = useState(false);
+  const [results, setResults] = useState(null); // array from validateImportRows
+  const [parseError, setParseError] = useState("");
+
+  const handleFile = async (file) => {
+    if (!file) return;
+    setFileName(file.name);
+    setParsing(true);
+    setParseError("");
+    setResults(null);
+    try {
+      const rows = await parseImportFile(file);
+      if (!rows.length) {
+        setParseError(t.emps.emptyFile);
+      } else {
+        setResults(
+          validateImportRows(rows, {
+            departments,
+            shifts,
+            offices,
+            employees,
+            t,
+          }),
+        );
+      }
+    } catch (err) {
+      setParseError(err?.message || String(err));
+    } finally {
+      setParsing(false);
+    }
+  };
+
+  const validRows = (results || []).filter((r) => r.errors.length === 0);
+  const errorRows = (results || []).filter((r) => r.errors.length > 0);
+
+  return (
+    <Modal title={t.emps.importTitle} onClose={onClose} width={680}>
+      <p
+        style={{
+          fontSize: 12.5,
+          color: T.textSoft,
+          marginBottom: 14,
+          lineHeight: 1.6,
+        }}
+      >
+        {t.emps.importDesc}
+      </p>
+      <p
+        style={{
+          fontSize: 11.5,
+          color: T.muted,
+          marginBottom: 14,
+          lineHeight: 1.6,
+          background: T.tableHeadBg,
+          borderRadius: 8,
+          padding: "8px 10px",
+        }}
+      >
+        ℹ️ {t.emps.importFontNote}
+      </p>
+      <div
+        style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}
+      >
+        <Button
+          variant="ghost"
+          type="button"
+          onClick={() =>
+            downloadImportTemplate(departments, shifts).catch((err) =>
+              pushToast(err?.message || String(err), "error"),
+            )
+          }
+        >
+          <FileSpreadsheet size={15} /> {t.emps.downloadTemplate}
+        </Button>
+        <Button
+          variant="accent"
+          type="button"
+          onClick={() => fileRef.current?.click()}
+        >
+          <Upload size={15} />{" "}
+          {fileName ? t.emps.changeFile : t.emps.chooseFile}
+        </Button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept=".xlsx,.xls,.csv"
+          style={{ display: "none" }}
+          onChange={(e) => handleFile(e.target.files?.[0])}
+        />
+      </div>
+
+      {fileName && (
+        <div style={{ fontSize: 12, color: T.muted, marginBottom: 10 }}>
+          📄 {fileName}
+        </div>
+      )}
+      {parsing && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            color: T.muted,
+            fontSize: 13,
+          }}
+        >
+          <Loader2 size={15} style={{ animation: "spin 1s linear infinite" }} />{" "}
+          {t.emps.parsing}
+        </div>
+      )}
+      {parseError && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            color: T.rose,
+            fontSize: 13,
+            marginBottom: 10,
+          }}
+        >
+          <AlertCircle size={15} /> {parseError}
+        </div>
+      )}
+
+      {results && (
+        <div>
+          <div
+            style={{
+              fontSize: 12.5,
+              fontWeight: 600,
+              color: errorRows.length ? T.rose : T.forestText,
+              marginBottom: 10,
+            }}
+          >
+            {t.emps.summaryText(
+              results.length,
+              validRows.length,
+              errorRows.length,
+            )}
+          </div>
+          <div
+            style={{
+              maxHeight: 260,
+              overflowY: "auto",
+              border: `1px solid ${T.lineSoft}`,
+              borderRadius: 10,
+              marginBottom: 16,
+            }}
+          >
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                fontSize: 12,
+              }}
+            >
+              <thead>
+                <tr style={{ background: T.tableHeadBg }}>
+                  <th style={{ textAlign: "left", padding: "8px 10px" }}>
+                    {t.emps.colRow}
+                  </th>
+                  <th style={{ textAlign: "left", padding: "8px 10px" }}>
+                    {t.emps.name}
+                  </th>
+                  <th style={{ textAlign: "left", padding: "8px 10px" }}>
+                    {t.emps.code}
+                  </th>
+                  <th style={{ textAlign: "left", padding: "8px 10px" }}>
+                    {t.emps.colStatus}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {results.map((r) => (
+                  <tr
+                    key={r.rowNumber}
+                    style={{ borderTop: `1px solid ${T.lineSoft}` }}
+                  >
+                    <td style={{ padding: "6px 10px", color: T.muted }}>
+                      {r.rowNumber}
+                    </td>
+                    <td style={{ padding: "6px 10px" }}>{r.raw.name || "—"}</td>
+                    <td
+                      style={{
+                        padding: "6px 10px",
+                        fontFamily: "'JetBrains Mono',monospace",
+                      }}
+                    >
+                      {r.raw.code || "—"}
+                    </td>
+                    <td style={{ padding: "6px 10px" }}>
+                      {r.errors.length === 0 ? (
+                        <span
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 5,
+                            color: T.forestText,
+                          }}
+                        >
+                          <CheckCircle2 size={13} /> {t.emps.rowValid}
+                        </span>
+                      ) : (
+                        <span
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 5,
+                            color: T.rose,
+                          }}
+                        >
+                          <AlertCircle size={13} /> {r.errors.join(" · ")}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+        <Button variant="ghost" type="button" onClick={onClose}>
+          {t.cancel}
+        </Button>
+        {results && (
+          <Button
+            variant="accent"
+            type="button"
+            disabled={validRows.length === 0}
+            onClick={() => onImport(validRows.map((r) => r.employee))}
+          >
+            <Upload size={15} />{" "}
+            {validRows.length === 0
+              ? t.emps.noValidRows
+              : t.emps.confirmImportBtn(validRows.length)}
+          </Button>
+        )}
+      </div>
+    </Modal>
+  );
+}
+
 function Employees({
   employees,
   departments,
@@ -8592,6 +9397,7 @@ function Employees({
   const [query, setQuery] = useState("");
   const [branchFilter, setBranchFilter] = useState("");
   const [badgePopupBlocked, setBadgePopupBlocked] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const filtered = useMemo(
     () =>
       employees.filter(
@@ -8734,6 +9540,9 @@ function Employees({
           }
         >
           <Download size={15} /> {t.exportCsv}
+        </Button>
+        <Button variant="ghost" onClick={() => setImportOpen(true)}>
+          <Upload size={15} /> {t.emps.importBtn}
         </Button>
         <Button variant="accent" onClick={() => setModal({ mode: "add" })}>
           <Plus size={15} /> {t.emps.addBtn}
@@ -8960,6 +9769,23 @@ function Employees({
           title={t.popupBlockedTitle}
           message={t.popupBlockedBadge}
           onClose={() => setBadgePopupBlocked(false)}
+        />
+      )}
+      {importOpen && (
+        <ImportEmployeesModal
+          departments={departments}
+          shifts={shifts}
+          offices={offices}
+          employees={employees}
+          onClose={() => setImportOpen(false)}
+          onImport={(newEmployees) => {
+            setEmployees([...employees, ...newEmployees]);
+            pushToast(
+              t.emps.importSuccessToast(newEmployees.length),
+              "success",
+            );
+            setImportOpen(false);
+          }}
         />
       )}
     </div>
