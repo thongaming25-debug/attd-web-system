@@ -19564,7 +19564,20 @@ function useVoiceCall({
   };
 
   const startLocalStream = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    // Explicit audio-processing constraints instead of bare `audio: true`.
+    // Without these, some browsers/devices (notably Android WebViews used
+    // by installed PWAs) don't reliably turn on echo cancellation, which
+    // is exactly what produces the "stuck / doubled / talking over itself"
+    // sound during a call: the callee's own speaker output gets picked
+    // back up by their mic and re-sent, so each side hears a delayed
+    // copy of its own voice layered on top of the other person's.
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+      },
+    });
     localStreamRef.current = stream;
     return stream;
   };
