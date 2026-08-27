@@ -1029,6 +1029,7 @@ const LANG_RAW = {
       telegramCatShiftswap: "សំណើដូរវេន",
       telegramCatPayroll: "ប្រាក់ខែបានបើកចប់",
       telegramCatLate: "បុគ្គលិកមកយឺត",
+      telegramCatChat: "សារជជែក (Chat)",
       telegramTestBtn: "ផ្ញើសារសាកល្បង",
       telegramTestSending: "កំពុងផ្ញើ...",
       telegramTestSuccess:
@@ -2067,6 +2068,7 @@ const LANG_RAW = {
       telegramCatShiftswap: "Shift swap requests",
       telegramCatPayroll: "Payroll completed",
       telegramCatLate: "Employee checked in late",
+      telegramCatChat: "Chat messages",
       telegramTestBtn: "Send test message",
       telegramTestSending: "Sending...",
       telegramTestSuccess: "Test message sent! Check your Telegram group",
@@ -5093,8 +5095,14 @@ function useSupabaseArray(
         // (using `category`, which matches `body.page`: "leave"/"ot"/
         // "attcorr"/"shiftswap"), so this call is safe to fire even when
         // Telegram isn't configured at all — it just no-ops server-side.
+        // `body.skipTelegram` is an escape hatch for notify() callbacks
+        // (e.g. new chat messages) that want push notifications to keep
+        // working but need to opt OUT of Telegram specifically based on
+        // a toggle the edge function doesn't know about — checked here
+        // on the client rather than trusting the server side to filter
+        // a category it may not recognize.
         const sendTelegram = (body) => {
-          if (!body || body.userType !== "admin") return;
+          if (!body || body.userType !== "admin" || body.skipTelegram) return;
           supabase.functions
             .invoke("telegram_notify", {
               body: {
@@ -5547,6 +5555,7 @@ const DEFAULT_TELEGRAM_SETTINGS = {
   notifyShiftswap: true,
   notifyPayroll: true,
   notifyLate: true,
+  notifyChat: true,
 };
 function useTelegramSettings() {
   const [value, setValueState] = useState(DEFAULT_TELEGRAM_SETTINGS);
@@ -5579,6 +5588,7 @@ function useTelegramSettings() {
           notifyShiftswap: data.notify_shiftswap ?? true,
           notifyPayroll: data.notify_payroll ?? true,
           notifyLate: data.notify_late ?? true,
+          notifyChat: data.notify_chat ?? true,
         });
       } else {
         setValueState(DEFAULT_TELEGRAM_SETTINGS);
@@ -5605,6 +5615,7 @@ function useTelegramSettings() {
           notify_shiftswap: !!next.notifyShiftswap,
           notify_payroll: !!next.notifyPayroll,
           notify_late: !!next.notifyLate,
+          notify_chat: !!next.notifyChat,
         });
         if (error) {
           console.error(
@@ -21555,6 +21566,7 @@ function TelegramSettingsCard() {
     { key: "notifyShiftswap", label: t.settings.telegramCatShiftswap },
     { key: "notifyPayroll", label: t.settings.telegramCatPayroll },
     { key: "notifyLate", label: t.settings.telegramCatLate },
+    { key: "notifyChat", label: t.settings.telegramCatChat },
   ];
 
   return (
@@ -26022,6 +26034,12 @@ function AppInner() {
   // Like attendance, chat history grows without bound, so only the last
   // 90 days are kept live in the app — plenty for an ongoing conversation
   // without dragging years of messages into every session.
+  // Read-only peek at the Telegram policy so the chat notify() callback
+  // below can opt individual messages out of Telegram forwarding (see
+  // `skipTelegram` in the generic sendTelegram helper) without owning
+  // the settings row — TelegramSettingsCard still has its own
+  // read/write instance of this hook for the actual Settings screen.
+  const [telegramPolicy] = useTelegramSettings();
   const [messages, setMessages, msgReady] = useSupabaseArray("messages", {
     dateField: "created_at",
     daysBack: 90,
@@ -26071,6 +26089,7 @@ function AppInner() {
           portal: "admin",
           tag: `msg-emp-${row.employeeId}`,
           entityId: row.employeeId,
+          skipTelegram: !telegramPolicy.notifyChat,
         };
       }
       return {
