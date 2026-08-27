@@ -11456,33 +11456,91 @@ function loadJsQR() {
 // (see handleDecoded below) — built with the Web Audio API rather than
 // an audio file so it needs no extra asset/network request and still
 // works on an offline-for-a-moment kiosk tablet. Silently no-ops if
-// Shared WebAudio tone player used by both the QR scan beep and the chat
-// notification sound below. Silently no-ops if AudioContext is unavailable
-// or blocked (e.g. autoplay policy) — the on-screen state already confirms
-// the event on its own, so a missing beep is never the only signal.
+// A brand-new AudioContext always starts life "suspended" under every
+// browser's autoplay policy, and only resumes once there has been real
+// user activation (a click/tap/keydown) on the page. That's harmless for
+// the QR scan beep and the chat "ding" — both fire as a direct result of
+// something the user just did (scanning, opening Messages) — but it's
+// exactly what breaks the *incoming call* ringtone: that one has to play
+// the instant a Realtime broadcast/push arrives, with no click anywhere
+// near it, so a context created fresh at that moment can stay silently
+// suspended and the callee never hears it ring even though the on-screen
+// "incoming call" state is correct.
+//
+// Fix: keep ONE AudioContext for the whole app's lifetime instead of a
+// new one per sound, created lazily on first use, and explicitly
+// `.resume()` it before every single playTones() call (resume() is a
+// no-op if it's already running). A context that has already been
+// resumed once via a real user gesture stays unlocked for the rest of
+// the page's life, so as long as the person has tapped/clicked
+// *anywhere* on the page since it loaded — which they always will have,
+// just by logging in — later resume() calls made from a push/broadcast
+// handler succeed even with no gesture directly attached to them.
+let sharedAudioCtx = null;
+function getAudioCtx() {
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  if (!Ctx) return null;
+  if (!sharedAudioCtx || sharedAudioCtx.state === "closed") {
+    sharedAudioCtx = new Ctx();
+  }
+  return sharedAudioCtx;
+}
+// Proactively unlock the shared context on the very first interaction
+// with the page (well before any call can come in), so a later
+// resume() from an unattended event — like an incoming-call ring — has
+// the best chance of actually being allowed to play. Best-effort only:
+// if this never fires (e.g. the push notification opens a brand-new,
+// still-untouched tab), playTones()'s own resume() call below is still
+// attempted and simply may not produce sound on that first cold open,
+// per browser policy — nothing else here depends on it succeeding.
+if (typeof document !== "undefined") {
+  const unlockAudio = () => {
+    const ctx = getAudioCtx();
+    if (ctx && ctx.state === "suspended") ctx.resume().catch(() => {});
+    document.removeEventListener("pointerdown", unlockAudio);
+    document.removeEventListener("keydown", unlockAudio);
+  };
+  document.addEventListener("pointerdown", unlockAudio, { passive: true });
+  document.addEventListener("keydown", unlockAudio);
+}
+// Shared WebAudio tone player used by the QR scan beep, the chat
+// notification sound, and the call ringtone below. Silently no-ops if
+// AudioContext is unavailable or blocked (e.g. autoplay policy) — the
+// on-screen state already confirms the event on its own, so a missing
+// beep is never the only signal.
 function playTones(tones) {
   try {
-    const Ctx = window.AudioContext || window.webkitAudioContext;
-    if (!Ctx || !tones || tones.length === 0) return;
-    const ctx = new Ctx();
-    const now = ctx.currentTime;
-    tones.forEach(({ freq, start, dur, type }) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = type || "sine";
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0, now + start);
-      gain.gain.linearRampToValueAtTime(0.35, now + start + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + start + dur);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now + start);
-      osc.stop(now + start + dur + 0.02);
-    });
-    // Close the context once every tone finishes, so a screen left open
-    // all day doesn't accumulate one AudioContext per event.
-    const longest = Math.max(...tones.map((tn) => tn.start + tn.dur));
-    setTimeout(() => ctx.close(), longest * 1000 + 250);
+    const ctx = getAudioCtx();
+    if (!ctx || !tones || tones.length === 0) return;
+    const schedule = () => {
+      const now = ctx.currentTime;
+      tones.forEach(({ freq, start, dur, type }) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type || "sine";
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0, now + start);
+        gain.gain.linearRampToValueAtTime(0.35, now + start + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + start + dur);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + start);
+        osc.stop(now + start + dur + 0.02);
+      });
+    };
+    // Always attempt resume() first — required for a context that's
+    // still suspended, and a harmless no-op otherwise. This is what
+    // actually plays the ringtone for an incoming call that arrived
+    // with no user gesture attached to it, as long as the page had
+    // *any* earlier interaction (see unlockAudio above).
+    if (ctx.state === "suspended") {
+      ctx
+        .resume()
+        .then(schedule)
+        .catch(() => {});
+    } else {
+      schedule();
+    }
   } catch {
     // Ignore — see comment above.
   }
@@ -18760,6 +18818,7 @@ function useVoiceCall({
   const remoteAudioRef = useRef(null);
   const pendingCandidatesRef = useRef([]);
   const ringTimeoutRef = useRef(null);
+  const offerRetryRef = useRef(null);
   const stopRingtoneRef = useRef(null);
 
   useEffect(() => {
@@ -18780,6 +18839,12 @@ function useVoiceCall({
       ringTimeoutRef.current = null;
     }
   };
+  const clearOfferRetry = () => {
+    if (offerRetryRef.current) {
+      clearInterval(offerRetryRef.current);
+      offerRetryRef.current = null;
+    }
+  };
   const stopRingtone = () => {
     if (stopRingtoneRef.current) {
       stopRingtoneRef.current();
@@ -18789,6 +18854,7 @@ function useVoiceCall({
   const teardownPeer = () => {
     stopRingtone();
     clearRingTimeout();
+    clearOfferRetry();
     pendingCandidatesRef.current = [];
     if (pcRef.current) {
       pcRef.current.onicecandidate = null;
@@ -18898,14 +18964,31 @@ function useVoiceCall({
         stream.getTracks().forEach((tr) => pc.addTrack(tr, stream));
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
-        sendCallSignal({
-          kind: "offer",
-          employeeId,
-          fromRole: isAdmin ? "admin" : "employee",
-          fromId: selfId,
-          fromName: selfName,
-          sdp: offer,
-        });
+        const broadcastOffer = () =>
+          sendCallSignal({
+            kind: "offer",
+            employeeId,
+            fromRole: isAdmin ? "admin" : "employee",
+            fromId: selfId,
+            fromName: selfName,
+            sdp: offer,
+          });
+        broadcastOffer();
+        // A single broadcast only reaches a receiver whose tab is already
+        // open, foregrounded, and subscribed at that exact instant —
+        // mobile browsers commonly suspend a backgrounded tab's websocket,
+        // so the very first offer is easy to miss entirely (nothing
+        // buffers/replays a Realtime broadcast). Re-send the identical
+        // offer every few seconds for as long as we're still ringing, so
+        // a receiver whose connection comes back mid-ring (e.g. they
+        // switch back to this app, or the socket auto-reconnects) still
+        // catches a later copy instead of the call just silently not
+        // arriving. The receiving side (see the "offer" branch in the
+        // signal handler below) treats a repeat offer for a call it's
+        // already ringing on as a no-op refresh, not a new/duplicate call.
+        offerRetryRef.current = setInterval(() => {
+          if (callRef.current?.status === "outgoing") broadcastOffer();
+        }, 3000);
         // Realtime broadcast (sendCallSignal above) only reaches a peer
         // whose tab is already open and subscribed — it does nothing if
         // the receiver's app is closed/backgrounded. Fire a real Web
@@ -19040,8 +19123,26 @@ function useVoiceCall({
           });
           return;
         }
-        // Already in a call — let the caller know instead of dropping it.
+        // Already ringing/connected. If this is the *same* caller
+        // re-sending the same offer (our retry loop above), just refresh
+        // the ring timeout rather than rejecting our own retried call as
+        // "busy" — that would cancel a call we're actively ringing for.
+        // Anything else (a different caller, or already answered/on a
+        // different call) really is busy.
         if (callRef.current) {
+          if (
+            callRef.current.status === "incoming" &&
+            callRef.current.employeeId === msg.employeeId &&
+            callRef.current.fromId === msg.fromId &&
+            msg.fromRole !== (isAdmin ? "admin" : "employee")
+          ) {
+            clearRingTimeout();
+            ringTimeoutRef.current = setTimeout(
+              () => rejectCall(),
+              CALL_RING_TIMEOUT_MS,
+            );
+            return;
+          }
           sendCallSignal({
             kind: "busy",
             employeeId: msg.employeeId,
@@ -19078,6 +19179,7 @@ function useVoiceCall({
           setCall({
             status: "incoming",
             employeeId: msg.employeeId,
+            fromId: msg.fromId,
             peerName,
             peerPhoto,
             peerKind: "identified",
@@ -19101,6 +19203,7 @@ function useVoiceCall({
       if (msg.kind === "answer") {
         if (current.status !== "outgoing" || !pcRef.current) return;
         clearRingTimeout();
+        clearOfferRetry();
         stopRingtone();
         try {
           await pcRef.current.setRemoteDescription(
