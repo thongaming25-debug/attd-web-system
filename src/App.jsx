@@ -7673,20 +7673,73 @@ function officeKioskUrl(officeId) {
 // poster page. Deliberately does NOT print the buddy-punching warning —
 // that's shown to the admin in the modal before they click Print, but has
 // no reason to appear on the poster employees actually see and scan.
-function printOfficeQrPage(office, title) {
+function printOfficeQrPage(office, title, scanHint, branding) {
   const payload = officeStaticQrPayload(office);
-  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(payload)}`;
-  const win = window.open("", "_blank", "width=500,height=680");
+  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=560x560&data=${encodeURIComponent(payload)}`;
+  const brandName = branding?.name?.trim() || "";
+  const logoHtml = branding?.logo
+    ? `<img class="logo" src="${branding.logo}" alt="" />`
+    : brandName
+      ? `<div class="logo logo-fallback">${escapeHtml(getInitials(brandName))}</div>`
+      : "";
+  const win = window.open("", "_blank", "width=560,height=760");
   if (!win) return; // popup blocked — nothing more we can do here
   win.document.write(`<!DOCTYPE html><html><head><title>${escapeHtml(
     title,
-  )}</title><style>
-    body{font-family:'Sora',sans-serif;text-align:center;padding:32px 20px;}
-    h1{font-size:20px;margin-bottom:24px;}
-    img{width:340px;height:340px;}
+  )}</title><meta charset="utf-8" /><style>
+    @page{size:A5;margin:0;}
+    *{box-sizing:border-box;}
+    html,body{margin:0;padding:0;}
+    body{
+      font-family:'Noto Sans Khmer','Sora',sans-serif;
+      width:148mm;min-height:210mm;
+      display:flex;flex-direction:column;align-items:center;
+      background:#fff;color:#0A0F1A;
+    }
+    .band{
+      width:100%;background:#0A0F1A;color:#fff;
+      padding:22px 20px 20px;text-align:center;
+    }
+    .logo{
+      width:44px;height:44px;border-radius:12px;object-fit:cover;
+      margin:0 auto 10px;display:block;
+    }
+    .logo-fallback{
+      background:#1FA26B;color:#fff;font-weight:700;font-size:16px;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Sora',sans-serif;
+    }
+    .brand{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;
+      color:#8A93A8;margin-bottom:6px;font-weight:600;}
+    .office{font-size:22px;font-weight:700;margin:0;}
+    .card{
+      margin:34px auto 0;padding:20px;background:#fff;
+      border:2px solid #1FA26B;border-radius:22px;
+    }
+    img.qr{width:300px;height:300px;display:block;}
+    .hint{
+      margin-top:26px;font-size:16px;font-weight:600;
+      color:#0A0F1A;text-align:center;padding:0 30px;
+    }
+    .badge{
+      margin-top:10px;display:flex;align-items:center;gap:6px;
+      color:#1FA26B;font-size:12.5px;font-weight:600;
+    }
+    .dot{width:7px;height:7px;border-radius:50%;background:#1FA26B;}
+    .footer{margin-top:auto;padding:18px 0 26px;font-size:10.5px;
+      color:#A9B4C7;letter-spacing:0.5px;}
   </style></head><body>
-    <h1>${escapeHtml(title)}</h1>
-    <img src="${qrSrc}" alt="QR" onload="window.print()" />
+    <div class="band">
+      ${logoHtml}
+      ${brandName ? `<div class="brand">${escapeHtml(brandName)}</div>` : ""}
+      <p class="office">${escapeHtml(office.name)}</p>
+    </div>
+    <div class="card">
+      <img class="qr" src="${qrSrc}" alt="QR" onload="window.print()" />
+    </div>
+    <p class="hint">${escapeHtml(scanHint)}</p>
+    <div class="badge"><span class="dot"></span>Check-in / Check-out</div>
+    <div class="footer">${escapeHtml(brandName || title)}</div>
   </body></html>`);
   win.document.close();
 }
@@ -12686,6 +12739,7 @@ function KioskDisplay({ officeId, offices, branding }) {
 
 function OfficeLocationSettings({ offices, setOffices }) {
   const { t } = useLang();
+  const { branding } = useBranding();
   const [open, setOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(null); // null | "add" | <office being edited>
   const [confirmDel, setConfirmDel] = useState(null);
@@ -12971,6 +13025,8 @@ function OfficeLocationSettings({ offices, setOffices }) {
                   printOfficeQrPage(
                     printOffice,
                     t.att.printQrTitle(printOffice.name),
+                    t.att.kioskScanHint,
+                    branding,
                   )
                 }
               >
