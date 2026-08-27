@@ -78,6 +78,7 @@ import {
   Phone,
   PhoneOff,
   Square,
+  Printer,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -549,6 +550,13 @@ const LANG_RAW = {
       openKioskBtn: "បើកអេក្រង់បង្ហាញ QR",
       kioskScanHint: "ស្កេនកូដដើម្បីចូល ឬ ចេញការងារ",
       kioskRefreshHint: "កូដនេះប្តូរដោយស្វ័យប្រវត្តិរៀងរាល់ ២០ វិនាទី",
+      printQrBtn: "បោះពុម្ព QR (Static)",
+      printQrTitle: (name) => `QR សម្រាប់បោះពុម្ព · ${name}`,
+      printQrDesc:
+        "កូដនេះមិនផ្លាស់ប្តូរទេ អាចបោះពុម្ពដាក់ជាផ្ទាំងនៅច្រកចូលសាខាបាន សម្រាប់ឲ្យបុគ្គលិកស្កេន check-in/check-out ដោយប្រើទូរស័ព្ទផ្ទាល់ខ្លួន",
+      printQrWarning:
+        "⚠️ ដោយសារកូដនេះមិនផ្លាស់ប្តូរ បើនរណាម្នាក់ថតទុករូបនេះ គេអាចយកទៅប្រើ check-in/check-out ជំនួសមិត្តភ័ក្តិបាន (buddy-punching)។ ប្រើ QR ដែលប្តូរដោយស្វ័យប្រវត្តិ (លើប៊ូតុង QR Code) បើចង់សុវត្ថិភាពជាងនេះ",
+      printBtn: "បោះពុម្ព",
       kioskNotFoundTitle: "រកមិនឃើញសាខានេះទេ",
       kioskNotFoundDesc: "តំណនេះមិនត្រឹមត្រូវទេ ឬសាខានេះត្រូវបានលុបហើយ",
     },
@@ -1585,6 +1593,13 @@ const LANG_RAW = {
         "Display this screen at the branch entrance (e.g. on a tablet or monitor) so employees can scan to check in/out. Don't print it as a static poster — this QR stops working once it rotates.",
       officeQrRefreshHint:
         "This QR refreshes automatically every 20 seconds for security — don't save a screenshot to reuse later.",
+      printQrBtn: "Print QR (Static)",
+      printQrTitle: (name) => `Printable QR · ${name}`,
+      printQrDesc:
+        "This code never changes, so you can print it and post it at the branch entrance for employees to scan check-in/check-out with their own phone.",
+      printQrWarning:
+        "⚠️ Because this code never changes, a photo of it could be used to check someone else in/out (buddy-punching). Use the rotating QR (the QR Code button) instead if that's a concern.",
+      printBtn: "Print",
       openKioskBtn: "Open Kiosk Display",
       kioskScanHint: "Scan the code to check in or check out",
       kioskRefreshHint: "This code refreshes automatically every 20 seconds",
@@ -2347,6 +2362,13 @@ const LANG_RAW = {
         "将此屏幕显示在分店入口（例如平板电脑/固定屏幕上），供员工扫描打卡上下班。请勿打印张贴，因为该 QR 刷新后将失效",
       officeQrRefreshHint:
         "为了安全，此 QR 每 20 秒会自动更换 — 请勿截图留存以后使用",
+      printQrBtn: "打印 QR（固定）",
+      printQrTitle: (name) => `可打印 QR · ${name}`,
+      printQrDesc:
+        "此 QR 永久不变，可以打印张贴在分店入口，让员工用自己的手机扫描打卡上/下班",
+      printQrWarning:
+        "⚠️ 由于此 QR 永久不变，若被人拍照留存，可能被用来替他人打卡（代打卡）。如需更高安全性，请改用会自动更换的 QR Code 按钮",
+      printBtn: "打印",
       openKioskBtn: "打开 QR 展示屏幕",
       kioskScanHint: "扫描此码以打卡上/下班",
       kioskRefreshHint: "此码每 20 秒会自动更换",
@@ -3996,6 +4018,10 @@ function officeQrPayload(office, windowMs = QR_ROTATE_MS) {
 // period so a QR that rotated a split-second before the scan finished
 // still works.
 function evaluateOfficeQrPayload(offices, text, windowMs = QR_ROTATE_MS) {
+  // A printed static QR never expires, so it short-circuits straight to
+  // "ok" without any time-window check — see officeStaticQrPayload above.
+  const staticMatch = verifyOfficeStaticQrPayload(offices, text);
+  if (staticMatch) return { status: "ok", office: staticMatch };
   if (typeof text !== "string" || !text.startsWith(OFFICE_QR_PREFIX))
     return { status: "invalid" };
   const parts = text.slice(OFFICE_QR_PREFIX.length).split(":");
@@ -4016,6 +4042,29 @@ function evaluateOfficeQrPayload(offices, text, windowMs = QR_ROTATE_MS) {
 function verifyOfficeQrPayload(offices, text, windowMs = QR_ROTATE_MS) {
   const result = evaluateOfficeQrPayload(offices, text, windowMs);
   return result.status === "ok" ? result.office : null;
+}
+// Printable, non-rotating QR for a branch — same idea as the rotating QR
+// above but deliberately WITHOUT the time-window token, since a printed
+// poster can't refresh itself every 20s. Trade-off is explicit and
+// surfaced to the admin in the print modal: a photo of a printed QR
+// works forever, so this reopens the "screenshot it and check someone
+// else in/out" gap the rotating QR closes. Uses its own secret
+// (`staticQrSecret`) rather than reusing `qrSecret`, so printing a
+// poster can't be used to derive/guess the rotating token's secret.
+const OFFICE_STATIC_QR_PREFIX = "WFOFFICE-STATIC:";
+function officeStaticQrPayload(office) {
+  return `${OFFICE_STATIC_QR_PREFIX}${office.id}:${office.staticQrSecret || ""}`;
+}
+function verifyOfficeStaticQrPayload(offices, text) {
+  if (typeof text !== "string" || !text.startsWith(OFFICE_STATIC_QR_PREFIX))
+    return null;
+  const parts = text.slice(OFFICE_STATIC_QR_PREFIX.length).split(":");
+  if (parts.length !== 2) return null;
+  const [officeId, secret] = parts;
+  if (!officeId || !secret) return null;
+  const office = (offices || []).find((o) => o.id === officeId);
+  if (!office || !office.staticQrSecret) return null;
+  return office.staticQrSecret === secret ? office : null;
 }
 // Promise wrapper around the browser geolocation API.
 function getCurrentPosition(options) {
@@ -7614,6 +7663,32 @@ function employeePortalUrl() {
 function officeKioskUrl(officeId) {
   const { origin, pathname } = window.location;
   return `${origin}${pathname}#/kiosk/${officeId}`;
+}
+// Opens a small same-origin popup with just the branch name + a large QR
+// image, then calls window.print() once the image has actually loaded
+// (rather than immediately, which could print a blank box on a slow
+// connection). Kept as a plain popup instead of trying to print the
+// admin's whole dashboard layout via CSS @media print, since that layout
+// (sidebar, header, cards) isn't designed to be pared down to a single
+// poster page. Deliberately does NOT print the buddy-punching warning —
+// that's shown to the admin in the modal before they click Print, but has
+// no reason to appear on the poster employees actually see and scan.
+function printOfficeQrPage(office, title) {
+  const payload = officeStaticQrPayload(office);
+  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(payload)}`;
+  const win = window.open("", "_blank", "width=500,height=680");
+  if (!win) return; // popup blocked — nothing more we can do here
+  win.document.write(`<!DOCTYPE html><html><head><title>${escapeHtml(
+    title,
+  )}</title><style>
+    body{font-family:'Sora',sans-serif;text-align:center;padding:32px 20px;}
+    h1{font-size:20px;margin-bottom:24px;}
+    img{width:340px;height:340px;}
+  </style></head><body>
+    <h1>${escapeHtml(title)}</h1>
+    <img src="${qrSrc}" alt="QR" onload="window.print()" />
+  </body></html>`);
+  win.document.close();
 }
 // Generic QR display modal. Pass `url` for the existing employee-portal
 // link use case (kept for backwards compatibility), or `data` for any
@@ -12616,6 +12691,7 @@ function OfficeLocationSettings({ offices, setOffices }) {
   const [confirmDel, setConfirmDel] = useState(null);
   const [qrOffice, setQrOffice] = useState(null); // office currently shown in the QR modal
   const [qrTick, setQrTick] = useState(0); // bumped on an interval to force the QR to re-render as it rotates
+  const [printOffice, setPrintOffice] = useState(null); // office currently shown in the printable static-QR modal
 
   const saveOffice = (data) => {
     if (formOpen === "add") {
@@ -12656,6 +12732,21 @@ function OfficeLocationSettings({ offices, setOffices }) {
   const openKiosk = (office) => {
     const ready = ensureQrSecret(office);
     window.open(officeKioskUrl(ready.id), "_blank");
+  };
+
+  // Same lazy-generation idea as ensureQrSecret, but for the separate
+  // non-rotating secret used by the printable static QR (see
+  // officeStaticQrPayload) — kept as its own field so printing a poster
+  // never exposes/derives the rotating-QR secret.
+  const ensureStaticQrSecret = (office) => {
+    if (office.staticQrSecret) return office;
+    const withSecret = { ...office, staticQrSecret: uid("sqs") };
+    setOffices(offices.map((o) => (o.id === office.id ? withSecret : o)));
+    return withSecret;
+  };
+
+  const openPrintQr = (office) => {
+    setPrintOffice(ensureStaticQrSecret(office));
   };
 
   // While the QR modal is open, force a re-render every QR_ROTATE_MS so
@@ -12764,6 +12855,18 @@ function OfficeLocationSettings({ offices, setOffices }) {
                   <Monitor size={14} />
                 </button>
                 <button
+                  onClick={() => openPrintQr(o)}
+                  title={t.att.printQrBtn}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: T.muted,
+                  }}
+                >
+                  <Printer size={14} />
+                </button>
+                <button
                   onClick={() => setFormOpen(o)}
                   style={{
                     background: "none",
@@ -12841,6 +12944,39 @@ function OfficeLocationSettings({ offices, setOffices }) {
             >
               {t.att.officeQrRefreshHint}
             </p>
+          }
+        />
+      )}
+      {printOffice && (
+        <QrModal
+          data={officeStaticQrPayload(printOffice)}
+          title={t.att.printQrTitle(printOffice.name)}
+          desc={t.att.printQrDesc}
+          onClose={() => setPrintOffice(null)}
+          footer={
+            <>
+              <p
+                style={{
+                  fontSize: 11,
+                  color: T.rose,
+                  textAlign: "center",
+                  margin: 0,
+                }}
+              >
+                {t.att.printQrWarning}
+              </p>
+              <Button
+                size="sm"
+                onClick={() =>
+                  printOfficeQrPage(
+                    printOffice,
+                    t.att.printQrTitle(printOffice.name),
+                  )
+                }
+              >
+                <Printer size={13} /> {t.att.printBtn}
+              </Button>
+            </>
           }
         />
       )}
@@ -26259,6 +26395,7 @@ function AppInner() {
       lng: Number(r.lng),
       radius: Number(r.radius),
       qrSecret: r.qr_secret || "",
+      staticQrSecret: r.static_qr_secret || "",
     }),
     toDb: (r) => ({
       id: r.id,
@@ -26267,6 +26404,7 @@ function AppInner() {
       lng: r.lng,
       radius: r.radius,
       qr_secret: r.qrSecret || null,
+      static_qr_secret: r.staticQrSecret || null,
     }),
     orderBy: "name",
     audit: true,
