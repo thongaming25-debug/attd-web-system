@@ -422,6 +422,9 @@ const LANG_RAW = {
       branchNotSet: "មិនទាន់កំណត់",
       annualLeaveDaysLabel: "ថ្ងៃច្បាប់ប្រចាំឆ្នាំ (ថ្ងៃ/ឆ្នាំ)",
       sickLeaveDaysLabel: "ថ្ងៃច្បាប់ឈឺ (ថ្ងៃ/ឆ្នាំ)",
+      leaveCarryOverLabel: "ថ្ងៃលើកមកពីឆ្នាំមុន (Carry-over)",
+      leaveCarryOverHint:
+        'ថ្ងៃច្បាប់ប្រចាំឆ្នាំដែលនៅសល់ពីឆ្នាំមុន ត្រូវបានបូកបន្ថែមទៅលើថ្ងៃដែលកើនឡើងជារៀងរាល់ខែ (1.5 ថ្ងៃ/ខែ សម្រាប់កូតា 18ថ្ងៃ)។ Admin អាចកែលេខនេះដោយផ្ទាល់ ឬប្រើប៊ូតុង "លើកសល់ទៅឆ្នាំក្រោយ" ក្នុងទំព័រច្បាប់ឈប់សម្រាក។',
       dependentsLabel: "ចំនួនអាស្រ័យ (កូន/ប្តី-ប្រពន្ធ)",
       dependentsHint:
         "ប្រើសម្រាប់គណនាការកាត់ពន្ធលើប្រាក់បៀវត្សរ៍ (១៥០,០០០ រៀល/នាក់) នៅពេលបើកមុខងារគណនាតាមច្បាប់កម្ពុជា",
@@ -598,6 +601,24 @@ const LANG_RAW = {
       modalTitle: "ស្នើសុំច្បាប់ឈប់សម្រាក",
       fromShort: "ចាប់ពី",
       toShort: "ដល់",
+      accrualNote:
+        "ថ្ងៃច្បាប់ប្រចាំឆ្នាំកើនឡើងជារៀងរាល់ខែ (1.5 ថ្ងៃ/ខែ សម្រាប់កូតា 18ថ្ងៃ) — មិនមែនទទួលបានពេញលេញតាំងពីដើមឆ្នាំទេ",
+      accruedOfAnnualQuota: (accrued, annualQuota) =>
+        `បានប្រមូលផ្តុំ ${accrued} ក្នុងចំណោមកូតា ${annualQuota} ថ្ងៃ/ឆ្នាំ`,
+      carriedOverNote: (n) => `+${n} ថ្ងៃលើកមកពីឆ្នាំមុន`,
+      rolloverTitle: "ដំណើរការចុងឆ្នាំ",
+      rolloverDesc: (fromYear, toYear) =>
+        `លើកយកសមតុល្យច្បាប់ប្រចាំឆ្នាំដែលនៅសល់ក្នុងឆ្នាំ ${fromYear} ទៅជា carry-over សម្រាប់ឆ្នាំ ${toYear} របស់និយោជិកសកម្មទាំងអស់`,
+      rolloverBtn: (fromYear) => `លើកសល់ឆ្នាំ ${fromYear} ទៅឆ្នាំក្រោយ`,
+      rolloverConfirm: (fromYear, toYear) =>
+        `តើអ្នកប្រាកដទេថាចង់លើកយកសមតុល្យច្បាប់ប្រចាំឆ្នាំដែលនៅសល់ក្នុងឆ្នាំ ${fromYear} ទៅជា carry-over សម្រាប់ឆ្នាំ ${toYear}? សកម្មភាពនេះនឹងសរសេរជាន់លើ carry-over បច្ចុប្បន្នរបស់និយោជិកទាំងអស់។`,
+      rolloverDone: (count) =>
+        `បានធ្វើបច្ចុប្បន្នភាព carry-over សម្រាប់និយោជិក ${count} នាក់`,
+      resetCarryOverBtn: "កំណត់ carry-over ទាំងអស់ទៅសូន្យ",
+      resetCarryOverConfirm:
+        "តើអ្នកប្រាកដទេថាចង់កំណត់ថ្ងៃ carry-over របស់និយោជិកទាំងអស់ត្រឡប់ទៅសូន្យវិញ? សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។",
+      resetCarryOverDone: (count) =>
+        `បានកំណត់ carry-over ទៅសូន្យសម្រាប់និយោជិក ${count} នាក់`,
     },
     ot: {
       addBtn: "សុំ OT ថ្មី",
@@ -1466,6 +1487,9 @@ const LANG_RAW = {
       branchNotSet: "Not set",
       annualLeaveDaysLabel: "Annual Leave Days (per year)",
       sickLeaveDaysLabel: "Sick Leave Days (per year)",
+      leaveCarryOverLabel: "Carried-over Days (from last year)",
+      leaveCarryOverHint:
+        'Unused annual leave rolled in from a prior year, added on top of the days that accrue monthly (1.5 days/month for an 18-day quota). Admins can edit this directly, or use the "Roll over to next year" button on the Leave Requests page.',
       dependentsLabel: "Dependents (children / spouse)",
       dependentsHint:
         "Used to calculate the Tax on Salary dependent deduction (150,000 KHR each) when the Cambodia auto-calculation mode is enabled",
@@ -1644,6 +1668,23 @@ const LANG_RAW = {
       fromShort: "From",
       toShort: "To",
       remainingDays: (n) => `${n} days remaining`,
+      accrualNote:
+        "Annual leave accrues monthly (1.5 days/month for an 18-day quota) — it isn't granted in full at the start of the year",
+      accruedOfAnnualQuota: (accrued, annualQuota) =>
+        `Accrued ${accrued} of ${annualQuota} days/year quota`,
+      carriedOverNote: (n) => `+${n} carried over from last year`,
+      rolloverTitle: "Year-End Processing",
+      rolloverDesc: (fromYear, toYear) =>
+        `Roll each active employee's remaining ${fromYear} annual leave balance into their ${toYear} carry-over`,
+      rolloverBtn: (fromYear) => `Roll over ${fromYear} to next year`,
+      rolloverConfirm: (fromYear, toYear) =>
+        `Roll every active employee's remaining ${fromYear} annual leave balance into their ${toYear} carry-over? This overwrites everyone's current carry-over value.`,
+      rolloverDone: (count) => `Carry-over updated for ${count} employee(s)`,
+      resetCarryOverBtn: "Reset all carry-over to 0",
+      resetCarryOverConfirm:
+        "Reset every employee's carry-over days back to 0? This can't be undone.",
+      resetCarryOverDone: (count) =>
+        `Carry-over reset to 0 for ${count} employee(s)`,
     },
     ot: {
       addBtn: "New OT Request",
@@ -3592,12 +3633,64 @@ function usedAnnualLeaveDays(employeeId, leaveRequests, year) {
 function usedSickLeaveDays(employeeId, leaveRequests, year) {
   return usedLeaveDaysByType(employeeId, leaveRequests, "sick", year);
 }
+// Annual leave accrues monthly (quota/12 per month, e.g. 1.5 days/month on
+// the 18-day default) rather than being granted in full on Jan 1. This
+// returns how many of `year`'s 12 months the employee has already "earned"
+// accrual for, based on their hire date (`emp.joined`, "YYYY-MM-DD"):
+// - Year before they were hired: 0 months.
+// - Year they were hired: counts from their hire month through Dec (or
+//   through the current month, if that year is still in progress).
+// - A later, already-completed year: all 12 months.
+// - The current year: counts through the current month only — days don't
+//   accrue for months that haven't happened yet.
+// - A future year: 0 months.
+// No hire date on file: treat as fully accrued (12 months) so older data
+// without a `joined` value still behaves like the old flat-quota system.
+function accruedMonthsInYear(joinedStr, year) {
+  if (!joinedStr) return 12;
+  const hire = new Date(joinedStr + "T00:00:00");
+  if (Number.isNaN(hire.getTime())) return 12;
+  const hireYear = hire.getFullYear();
+  const hireMonth = hire.getMonth(); // 0-11
+  const now = new Date();
+  const curYear = now.getFullYear();
+  if (year < hireYear || year > curYear) return 0;
+  const startMonth = year === hireYear ? hireMonth : 0;
+  const endMonth = year === curYear ? now.getMonth() : 11;
+  return Math.max(0, Math.min(12, endMonth - startMonth + 1));
+}
+// Annual leave balance for `year` (defaults to the current year):
+// - accrued: days earned so far this year via monthly accrual.
+// - carryOver: unused days manually rolled in from a prior year (set via
+//   the admin "roll over" action, or reset to 0 — see LeaveRequests admin
+//   view). Only applied for the current year; past/future years show 0
+//   here since carry-over is a snapshot taken once at rollover time, not
+//   something recomputed per year.
+// - quota: accrued + carryOver — the total days available this year,
+//   kept under this name so existing "used X of Y" displays keep working.
 function annualLeaveBalance(emp, leaveRequests, year) {
-  const quota = Number.isFinite(emp?.annualLeaveDays)
+  const y = year || new Date().getFullYear();
+  const annualQuota = Number.isFinite(emp?.annualLeaveDays)
     ? emp.annualLeaveDays
     : DEFAULT_ANNUAL_LEAVE_DAYS;
-  const used = usedAnnualLeaveDays(emp?.id, leaveRequests, year);
-  return { quota, used, remaining: quota - used };
+  const monthsAccrued = accruedMonthsInYear(emp?.joined, y);
+  const accrued =
+    Math.round(((annualQuota / 12) * monthsAccrued + Number.EPSILON) * 10) / 10;
+  const carryOver =
+    y === new Date().getFullYear() && Number.isFinite(emp?.leaveCarryOver)
+      ? emp.leaveCarryOver
+      : 0;
+  const quota = Math.round((accrued + carryOver) * 10) / 10;
+  const used = usedAnnualLeaveDays(emp?.id, leaveRequests, y);
+  return {
+    quota,
+    accrued,
+    carryOver,
+    monthsAccrued,
+    annualQuota,
+    used,
+    remaining: quota - used,
+  };
 }
 function sickLeaveBalance(emp, leaveRequests, year) {
   const quota = Number.isFinite(emp?.sickLeaveDays)
@@ -8874,6 +8967,7 @@ function EmployeeForm({
       customDaysOff: [],
       annualLeaveDays: DEFAULT_ANNUAL_LEAVE_DAYS,
       sickLeaveDays: DEFAULT_SICK_LEAVE_DAYS,
+      leaveCarryOver: 0,
       role: "",
       email: "",
       phone: "",
@@ -9283,6 +9377,26 @@ function EmployeeForm({
           placeholder={String(DEFAULT_SICK_LEAVE_DAYS)}
         />
       </Field>
+      <Field label={t.emps.leaveCarryOverLabel}>
+        <Input
+          type="number"
+          step="0.1"
+          min={0}
+          value={f.leaveCarryOver ?? 0}
+          onChange={set("leaveCarryOver")}
+          placeholder="0"
+        />
+        <p
+          style={{
+            fontSize: 12,
+            color: T.muted,
+            marginTop: 4,
+            marginBottom: 0,
+          }}
+        >
+          {t.emps.leaveCarryOverHint}
+        </p>
+      </Field>
       <Field label={t.emps.weeklyOffLabel}>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {WEEKDAY_LABELS.map((label, dow) => {
@@ -9655,6 +9769,7 @@ function validateImportRows(
             customDaysOff: [],
             annualLeaveDays: DEFAULT_ANNUAL_LEAVE_DAYS,
             sickLeaveDays: DEFAULT_SICK_LEAVE_DAYS,
+            leaveCarryOver: 0,
             role,
             email,
             phone,
@@ -13982,6 +14097,7 @@ function LeaveRequests({
   currentAdmin,
   currentEmp,
   employees,
+  setEmployees,
   admins,
   leaveRequests,
   setLeaveRequests,
@@ -13994,7 +14110,42 @@ function LeaveRequests({
   const [modal, setModal] = useState(false);
   const [rejectFor, setRejectFor] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
+  const [confirmRollover, setConfirmRollover] = useState(false);
+  const [confirmResetCarry, setConfirmResetCarry] = useState(false);
   const empOf = (id) => employees.find((e) => e.id === id);
+
+  // Year-end rollover: takes each active employee's remaining annual
+  // leave balance for `fromYear` and stores it as their carry-over for
+  // `fromYear + 1`. Overwrites any existing carry-over value — running it
+  // twice for the same year doesn't stack. Inactive employees are left
+  // untouched.
+  const rolloverYear = new Date().getFullYear() - 1;
+  const runRollover = () => {
+    let count = 0;
+    setEmployees(
+      employees.map((e) => {
+        if (e.status !== "active") return e;
+        const bal = annualLeaveBalance(e, leaveRequests, rolloverYear);
+        const carry = Math.max(0, bal.remaining);
+        count++;
+        return { ...e, leaveCarryOver: carry };
+      }),
+    );
+    setConfirmRollover(false);
+    pushToast(t.lv.rolloverDone(count));
+  };
+  const runResetCarryOver = () => {
+    let count = 0;
+    setEmployees(
+      employees.map((e) => {
+        if (!e.leaveCarryOver) return e;
+        count++;
+        return { ...e, leaveCarryOver: 0 };
+      }),
+    );
+    setConfirmResetCarry(false);
+    pushToast(t.lv.resetCarryOverDone(count));
+  };
 
   // Approving a request marks every day in its range as leave in
   // attendance. Annual/sick/other leave is marked "leave" (paid, no
@@ -14126,7 +14277,17 @@ function LeaveRequests({
                 {t.lv.annualLeaveYear(new Date().getFullYear())}
               </div>
               <div style={{ fontSize: 13, color: T.textSoft }}>
+                {t.lv.accruedOfAnnualQuota(bal.accrued, bal.annualQuota)}
+                {bal.carryOver > 0 &&
+                  ` · ${t.lv.carriedOverNote(bal.carryOver)}`}
+              </div>
+              <div style={{ fontSize: 12.5, color: T.textSoft, marginTop: 2 }}>
                 {t.lv.usedOfQuota(bal.used, bal.quota)}
+              </div>
+              <div
+                style={{ fontSize: 10.5, color: T.mutedLight, marginTop: 2 }}
+              >
+                {t.lv.accrualNote}
               </div>
             </div>
             <div
@@ -14263,6 +14424,41 @@ function LeaveRequests({
   });
   return (
     <div>
+      {isSuperAdmin && (
+        <Card style={{ padding: "14px 18px", marginBottom: 16 }}>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: ".04em",
+              color: T.muted,
+              marginBottom: 2,
+            }}
+          >
+            {t.lv.rolloverTitle}
+          </div>
+          <div style={{ fontSize: 12.5, color: T.textSoft, marginBottom: 10 }}>
+            {t.lv.rolloverDesc(rolloverYear, rolloverYear + 1)}
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <Button
+              size="sm"
+              variant="accent"
+              onClick={() => setConfirmRollover(true)}
+            >
+              <Repeat size={14} /> {t.lv.rolloverBtn(rolloverYear)}
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setConfirmResetCarry(true)}
+            >
+              <RefreshCw size={14} /> {t.lv.resetCarryOverBtn}
+            </Button>
+          </div>
+        </Card>
+      )}
       <Card style={{ overflowX: "auto" }}>
         <table className="wf-table">
           <thead>
@@ -14420,6 +14616,20 @@ function LeaveRequests({
             );
             setConfirmDel(null);
           }}
+        />
+      )}
+      {confirmRollover && (
+        <ConfirmDialog
+          text={t.lv.rolloverConfirm(rolloverYear, rolloverYear + 1)}
+          onCancel={() => setConfirmRollover(false)}
+          onConfirm={runRollover}
+        />
+      )}
+      {confirmResetCarry && (
+        <ConfirmDialog
+          text={t.lv.resetCarryOverConfirm}
+          onCancel={() => setConfirmResetCarry(false)}
+          onConfirm={runResetCarryOver}
         />
       )}
     </div>
@@ -25772,6 +25982,14 @@ function AppInner() {
         customDaysOff: r.custom_days_off || [],
         annualLeaveDays: r.annual_leave_days ?? DEFAULT_ANNUAL_LEAVE_DAYS,
         sickLeaveDays: r.sick_leave_days ?? DEFAULT_SICK_LEAVE_DAYS,
+        // Unused annual leave days manually rolled in from a prior year via
+        // the "roll over" admin action (see LeaveRequests). Only ever
+        // written by that action or a direct edit in the employee form —
+        // never recomputed automatically, so it stays put until an admin
+        // rolls over again or resets it to 0.
+        leaveCarryOver: Number.isFinite(r.leave_carry_over)
+          ? r.leave_carry_over
+          : 0,
         role: r.role,
         email: r.email,
         phone: r.phone,
@@ -25820,6 +26038,9 @@ function AppInner() {
         sick_leave_days: Number.isFinite(r.sickLeaveDays)
           ? r.sickLeaveDays
           : DEFAULT_SICK_LEAVE_DAYS,
+        leave_carry_over: Number.isFinite(Number(r.leaveCarryOver))
+          ? Number(r.leaveCarryOver)
+          : 0,
         role: r.role,
         email: r.email,
         phone: r.phone,
@@ -27409,6 +27630,7 @@ function AppInner() {
                     currentAdmin={currentAdmin}
                     currentEmp={currentEmp}
                     employees={employees}
+                    setEmployees={setEmployees}
                     admins={admins}
                     leaveRequests={leaveRequests}
                     setLeaveRequests={setLeaveRequests}
