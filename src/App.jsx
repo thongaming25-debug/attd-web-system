@@ -606,6 +606,16 @@ const LANG_RAW = {
       accruedOfAnnualQuota: (accrued, annualQuota) =>
         `បានប្រមូលផ្តុំ ${accrued} ក្នុងចំណោមកូតា ${annualQuota} ថ្ងៃ/ឆ្នាំ`,
       carriedOverNote: (n) => `+${n} ថ្ងៃលើកមកពីឆ្នាំមុន`,
+      accrualPolicyTitle: "គោលការណ៍ថ្ងៃច្បាប់ប្រចាំឆ្នាំ",
+      accrualPolicyDesc:
+        "កំណត់របៀបដែលថ្ងៃច្បាប់ប្រចាំឆ្នាំរបស់ក្រុមហ៊ុនទទួលបាន — កំណត់នេះអនុវត្តលើនិយោជិកទាំងអស់",
+      accrualModeLabel: "របៀបផ្តល់ថ្ងៃច្បាប់ប្រចាំឆ្នាំ",
+      accrualModeMonthly: "កើនឡើងជារៀងរាល់ខែ (តាមច្បាប់ការងារកម្ពុជា)",
+      accrualModeFlat: "ផ្តល់ពេញលេញភ្លាមតាំងពីដើមឆ្នាំ (បែបចាស់)",
+      accrualModeMonthlyHint:
+        "និយោជិកនឹងទទួលបានថ្ងៃច្បាប់បន្តិចម្តងៗ (1.5 ថ្ងៃ/ខែ សម្រាប់កូតា 18ថ្ងៃ) — ស្របតាមច្បាប់ការងារកម្ពុជា",
+      accrualModeFlatHint:
+        "និយោជិកនឹងទទួលបានថ្ងៃច្បាប់ពេញលេញតាំងពីដើមឆ្នាំ (ឬពីថ្ងៃចូលធ្វើការ សម្រាប់អ្នកចូលកណ្តាលឆ្នាំ) ដូចប្រព័ន្ធពីមុន",
       rolloverTitle: "ដំណើរការចុងឆ្នាំ",
       rolloverDesc: (fromYear, toYear) =>
         `លើកយកសមតុល្យច្បាប់ប្រចាំឆ្នាំដែលនៅសល់ក្នុងឆ្នាំ ${fromYear} ទៅជា carry-over សម្រាប់ឆ្នាំ ${toYear} របស់និយោជិកសកម្មទាំងអស់`,
@@ -1673,6 +1683,16 @@ const LANG_RAW = {
       accruedOfAnnualQuota: (accrued, annualQuota) =>
         `Accrued ${accrued} of ${annualQuota} days/year quota`,
       carriedOverNote: (n) => `+${n} carried over from last year`,
+      accrualPolicyTitle: "Annual Leave Accrual Policy",
+      accrualPolicyDesc:
+        "Sets how annual leave becomes available company-wide — applies to every employee",
+      accrualModeLabel: "Annual leave grant method",
+      accrualModeMonthly: "Accrues monthly (Cambodian Labor Law standard)",
+      accrualModeFlat: "Granted in full at the start of the year (legacy)",
+      accrualModeMonthlyHint:
+        "Employees earn leave gradually (1.5 days/month for an 18-day quota) — matches Cambodian Labor Law",
+      accrualModeFlatHint:
+        "Employees get the full annual quota from day one of the year (or from their hire date, for a same-year hire) — same as the old system",
       rolloverTitle: "Year-End Processing",
       rolloverDesc: (fromYear, toYear) =>
         `Roll each active employee's remaining ${fromYear} annual leave balance into their ${toYear} carry-over`,
@@ -3606,6 +3626,11 @@ function isDayOff(emp, dateStr) {
 }
 const DEFAULT_ANNUAL_LEAVE_DAYS = 18;
 const DEFAULT_SICK_LEAVE_DAYS = 7;
+// Company-wide switch (leave_policy, single settings row, id = 1) for how
+// annual leave becomes available over the year — see annualLeaveBalance
+// below for what each mode means. Falls back to "monthly" (the Cambodian
+// Labor Law standard) until an admin explicitly saves a different value.
+const DEFAULT_LEAVE_POLICY = { annualLeaveAccrualMode: "monthly" };
 // Number of *approved* leave days of a given `type` ("annual" | "sick")
 // an employee has used within `year` (defaults to the current year).
 // Counts every calendar day in each approved request's range that falls
@@ -3659,8 +3684,17 @@ function accruedMonthsInYear(joinedStr, year) {
   const endMonth = year === curYear ? now.getMonth() : 11;
   return Math.max(0, Math.min(12, endMonth - startMonth + 1));
 }
-// Annual leave balance for `year` (defaults to the current year):
-// - accrued: days earned so far this year via monthly accrual.
+// Annual leave balance for `year` (defaults to the current year).
+// `accrualMode` controls how the yearly quota becomes available:
+// - "monthly" (default): accrues gradually — quota/12 per month, based on
+//   the employee's hire date (see accruedMonthsInYear above). This is the
+//   Cambodian Labor Law standard (1.5 days/month for an 18-day quota).
+// - "flat": the old behavior — the full annual quota is available from
+//   day one of the year (or from hire date, for a same-year hire), same
+//   as before this accrual feature existed. Use this if company policy
+//   changes back to granting leave in full up front.
+// Fields returned:
+// - accrued: days earned so far this year under the active accrual mode.
 // - carryOver: unused days manually rolled in from a prior year (set via
 //   the admin "roll over" action, or reset to 0 — see LeaveRequests admin
 //   view). Only applied for the current year; past/future years show 0
@@ -3668,12 +3702,13 @@ function accruedMonthsInYear(joinedStr, year) {
 //   something recomputed per year.
 // - quota: accrued + carryOver — the total days available this year,
 //   kept under this name so existing "used X of Y" displays keep working.
-function annualLeaveBalance(emp, leaveRequests, year) {
+function annualLeaveBalance(emp, leaveRequests, year, accrualMode) {
   const y = year || new Date().getFullYear();
   const annualQuota = Number.isFinite(emp?.annualLeaveDays)
     ? emp.annualLeaveDays
     : DEFAULT_ANNUAL_LEAVE_DAYS;
-  const monthsAccrued = accruedMonthsInYear(emp?.joined, y);
+  const monthsAccrued =
+    accrualMode === "flat" ? 12 : accruedMonthsInYear(emp?.joined, y);
   const accrued =
     Math.round(((annualQuota / 12) * monthsAccrued + Number.EPSILON) * 10) / 10;
   const carryOver =
@@ -5505,6 +5540,66 @@ function useOtPolicy() {
         });
         if (error) {
           console.error("[supabase] save failed on ot_policy:", error.message);
+          pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
+        } else {
+          pushToast(t.settings.saved, "success");
+        }
+      })();
+    },
+    [t],
+  );
+
+  return [value, setValue, ready];
+}
+
+// leave_policy is a single settings row (id = 1), same shape as
+// DEFAULT_LEAVE_POLICY. Falls back to the defaults until an admin saves one.
+function useLeavePolicy() {
+  const [value, setValueState] = useState(DEFAULT_LEAVE_POLICY);
+  const [ready, setReady] = useState(false);
+  const { t } = useLang();
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("leave_policy")
+        .select("*")
+        .eq("id", 1)
+        .maybeSingle();
+      if (cancelled) return;
+      if (error) {
+        console.error("[supabase] failed to load leave_policy:", error.message);
+        setValueState(DEFAULT_LEAVE_POLICY);
+      } else if (data) {
+        setValueState({
+          annualLeaveAccrualMode:
+            data.annual_leave_accrual_mode ??
+            DEFAULT_LEAVE_POLICY.annualLeaveAccrualMode,
+        });
+      } else {
+        setValueState(DEFAULT_LEAVE_POLICY);
+      }
+      setReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const setValue = useCallback(
+    (next) => {
+      setValueState(next);
+      (async () => {
+        const { error } = await supabase.from("leave_policy").upsert({
+          id: 1,
+          annual_leave_accrual_mode: next.annualLeaveAccrualMode,
+        });
+        if (error) {
+          console.error(
+            "[supabase] save failed on leave_policy:",
+            error.message,
+          );
           pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
         } else {
           pushToast(t.settings.saved, "success");
@@ -14105,6 +14200,8 @@ function LeaveRequests({
   setAttendance,
   isSuperAdmin,
   canApprove,
+  leavePolicy,
+  setLeavePolicy,
 }) {
   const { t, lang } = useLang();
   const [modal, setModal] = useState(false);
@@ -14113,6 +14210,7 @@ function LeaveRequests({
   const [confirmRollover, setConfirmRollover] = useState(false);
   const [confirmResetCarry, setConfirmResetCarry] = useState(false);
   const empOf = (id) => employees.find((e) => e.id === id);
+  const accrualMode = leavePolicy?.annualLeaveAccrualMode || "monthly";
 
   // Year-end rollover: takes each active employee's remaining annual
   // leave balance for `fromYear` and stores it as their carry-over for
@@ -14125,7 +14223,12 @@ function LeaveRequests({
     setEmployees(
       employees.map((e) => {
         if (e.status !== "active") return e;
-        const bal = annualLeaveBalance(e, leaveRequests, rolloverYear);
+        const bal = annualLeaveBalance(
+          e,
+          leaveRequests,
+          rolloverYear,
+          accrualMode,
+        );
         const carry = Math.max(0, bal.remaining);
         count++;
         return { ...e, leaveCarryOver: carry };
@@ -14247,7 +14350,12 @@ function LeaveRequests({
     const mine = leaveRequests
       .filter((r) => r.employeeId === currentEmp.id)
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-    const bal = annualLeaveBalance(currentEmp, leaveRequests);
+    const bal = annualLeaveBalance(
+      currentEmp,
+      leaveRequests,
+      null,
+      accrualMode,
+    );
     const sickBal = sickLeaveBalance(currentEmp, leaveRequests);
     return (
       <div>
@@ -14436,6 +14544,44 @@ function LeaveRequests({
               marginBottom: 2,
             }}
           >
+            {t.lv.accrualPolicyTitle}
+          </div>
+          <div style={{ fontSize: 12.5, color: T.textSoft, marginBottom: 10 }}>
+            {t.lv.accrualPolicyDesc}
+          </div>
+          <Field label={t.lv.accrualModeLabel}>
+            <Select
+              value={accrualMode}
+              onChange={(e) =>
+                setLeavePolicy({
+                  ...(leavePolicy || DEFAULT_LEAVE_POLICY),
+                  annualLeaveAccrualMode: e.target.value,
+                })
+              }
+            >
+              <option value="monthly">{t.lv.accrualModeMonthly}</option>
+              <option value="flat">{t.lv.accrualModeFlat}</option>
+            </Select>
+          </Field>
+          <p style={{ fontSize: 11.5, color: T.muted, marginTop: -6 }}>
+            {accrualMode === "flat"
+              ? t.lv.accrualModeFlatHint
+              : t.lv.accrualModeMonthlyHint}
+          </p>
+        </Card>
+      )}
+      {isSuperAdmin && (
+        <Card style={{ padding: "14px 18px", marginBottom: 16 }}>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: ".04em",
+              color: T.muted,
+              marginBottom: 2,
+            }}
+          >
             {t.lv.rolloverTitle}
           </div>
           <div style={{ fontSize: 12.5, color: T.textSoft, marginBottom: 10 }}>
@@ -14527,7 +14673,12 @@ function LeaveRequests({
                     {r.type === "annual" && emp && (
                       <div style={{ fontSize: 10.5, color: T.muted }}>
                         {t.lv.remainingDays(
-                          annualLeaveBalance(emp, leaveRequests).remaining,
+                          annualLeaveBalance(
+                            emp,
+                            leaveRequests,
+                            null,
+                            accrualMode,
+                          ).remaining,
                         )}
                       </div>
                     )}
@@ -26690,6 +26841,7 @@ function AppInner() {
   const [otPolicy, setOtPolicy, otPolicyReady] = useOtPolicy();
   const [payrollPolicy, setPayrollPolicy, payrollPolicyReady] =
     usePayrollPolicy();
+  const [leavePolicy, setLeavePolicy, leavePolicyReady] = useLeavePolicy();
   const [soundPolicy, setSoundPolicy, soundPolicyReady] = useSoundPolicy();
   // Superadmin-editable permission matrix: one row per rank (Officer,
   // Senior, Supervisor, Manager, Senior Manager, Admin), each holding
@@ -27638,6 +27790,8 @@ function AppInner() {
                     setAttendance={setAttendance}
                     isSuperAdmin={isSuperAdmin || can("approveRequests")}
                     canApprove={isSuperAdmin || can("approveRequests")}
+                    leavePolicy={leavePolicy}
+                    setLeavePolicy={setLeavePolicy}
                   />
                 )}
               {page === "ot" && (role === "admin" || moduleEnabled("ot")) && (
