@@ -26287,12 +26287,29 @@ function AppInner() {
     (key) => canDo(currentAdmin, rolePermissionsMap, key),
     [currentAdmin, rolePermissionsMap],
   );
+  // The kiosk portal (see the `if (portal === "kiosk")` early-return
+  // below) is a public, unauthenticated tablet display — it must never
+  // pick up an authenticated identity. Without this guard, `role` fell
+  // through to `sessionEmployee`, which is `useLocalStorage`-backed and
+  // therefore shared by every tab in that browser: if the same device
+  // was ever used to log in as a particular employee (e.g. testing the
+  // employee portal before mounting the kiosk tablet), the leftover
+  // localStorage value made this "passive QR display" tab silently
+  // resolve to that employee's identity too. Hooks still run
+  // unconditionally above the early-return, so useVoiceCall (and the
+  // Messages/notification wiring) would then actually subscribe and
+  // ring for that employee's calls on the kiosk tablet — a ghost
+  // duplicate of the ring the real recipient already gets on their own
+  // device. Forcing role to null here means selfId inside useVoiceCall
+  // resolves to null and its subscribing effect never fires for kiosk.
   const role =
-    portal === "admin"
-      ? currentAdmin
-        ? "admin"
-        : null
-      : sessionEmployee || null;
+    portal === "kiosk"
+      ? null
+      : portal === "admin"
+        ? currentAdmin
+          ? "admin"
+          : null
+        : sessionEmployee || null;
   const currentEmp =
     role && role !== "admin" ? employees.find((e) => e.id === role) : null;
   // Single source of truth for "can this session use Messages/Call" —
