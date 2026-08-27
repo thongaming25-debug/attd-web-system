@@ -884,6 +884,8 @@ const LANG_RAW = {
       youLabel: "អ្នក",
       newMessageFrom: "សារថ្មីពី",
       newMessageFromAdmin: "សារថ្មីពីអ្នកគ្រប់គ្រង",
+      onlineLabel: "កំពុងអនឡាញ",
+      lastSeenLabel: "ឃើញចុងក្រោយ",
       today: "ថ្ងៃនេះ",
       attach: "ភ្ជាប់ឯកសារ",
       removeAttachment: "លុបចេញ",
@@ -1920,6 +1922,8 @@ const LANG_RAW = {
       youLabel: "You",
       newMessageFrom: "New message from",
       newMessageFromAdmin: "New message from admin",
+      onlineLabel: "Online",
+      lastSeenLabel: "Last seen",
       today: "Today",
       attach: "Attach file",
       removeAttachment: "Remove",
@@ -5633,12 +5637,74 @@ function useTelegramSettings() {
 
   return [value, setValue, ready];
 }
-// Public VAPID key for Web Push (base64url, generated once for this
-// deployment via `npx web-push generate-vapid-keys`). Push subscribe UI
-// hides itself entirely when this is blank, so leaving it empty is safe.
-// The matching PRIVATE key never goes in client code — it lives only in
-// the server-side function that actually sends push messages (see
-// push_subscriptions table + Edge Function, deployed separately).
+// Online/last-seen status (Messages chat header) — approximated from a
+// periodic heartbeat rather than a dedicated Presence channel, so it
+// reuses the realtime sync every table already has instead of adding a
+// second live-connection type: this session writes its own `last_active`
+// timestamp every HEARTBEAT_INTERVAL_MS while the tab is visible, and
+// every other open tab already receives that column change instantly via
+// the existing employees/admins realtime subscription. "Online" is then
+// just "was last_active within the last couple of heartbeats" — cheap to
+// compute, self-healing (a closed tab simply stops refreshing it and
+// naturally ages out), and needs no explicit join/leave/disconnect
+// handling for a laptop lid closing, wifi dropping, etc.
+const HEARTBEAT_INTERVAL_MS = 45000;
+const ONLINE_THRESHOLD_MS = HEARTBEAT_INTERVAL_MS * 2 + 15000; // ~105s grace
+function useLastActiveHeartbeat(table, selfId) {
+  useEffect(() => {
+    if (!selfId) return undefined;
+    let cancelled = false;
+    const beat = () => {
+      if (cancelled || document.visibilityState !== "visible") return;
+      supabase
+        .from(table)
+        .update({ last_active: new Date().toISOString() })
+        .eq("id", selfId)
+        .then(({ error }) => {
+          if (error)
+            console.error(
+              `[presence] heartbeat failed for ${table}:`,
+              error.message,
+            );
+        });
+    };
+    beat(); // immediately on login/mount, not just after the first interval
+    const intervalId = setInterval(beat, HEARTBEAT_INTERVAL_MS);
+    // Also beat the instant the tab regains focus, so switching back to
+    // an idle tab flips it to "Online" right away instead of waiting up
+    // to HEARTBEAT_INTERVAL_MS for the next scheduled tick.
+    const onVisible = () => {
+      if (document.visibilityState === "visible") beat();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      cancelled = true;
+      clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [table, selfId]);
+}
+// True if `iso` (a last_active timestamp) is recent enough to count as
+// "Online" right now. `nowMs` is passed in (rather than read internally)
+// so callers re-derive this from a ticking clock and get a live-updating
+// label instead of one frozen at render time.
+function isRecentlyActive(iso, nowMs) {
+  if (!iso) return false;
+  return nowMs - new Date(iso).getTime() < ONLINE_THRESHOLD_MS;
+}
+// Re-renders whatever calls this every `intervalMs`, purely so
+// isRecentlyActive()/timeAgoLabel() output (both functions of "now") stay
+// fresh on screen even when no new data has arrived — e.g. a chat header
+// stuck on "Online" needs *something* to prompt it to re-check and flip
+// to "Last seen 1 minute ago" once the other side's heartbeats stop.
+function useNowTick(intervalMs) {
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick((n) => n + 1), intervalMs);
+    return () => clearInterval(id);
+  }, [intervalMs]);
+}
+
 const PUSH_VAPID_PUBLIC_KEY =
   "BEUW05cxGKpj15XXpvr-2EmtTAoXll3zWKBHj8S7Lj-18APot7YlEjNI4MsxbbJLLkDS4TPyWiBYE80DSToaFis";
 function urlBase64ToUint8Array(base64String) {
@@ -19550,6 +19616,7 @@ function MessagesPage({
   currentAdmin,
   currentEmp,
   employees,
+  admins,
   messages,
   setMessages,
   activeCall,
@@ -19780,6 +19847,23 @@ function MessagesPage({
     ? employees.find((e) => e.id === threadEmpId)
     : currentEmp;
 
+  // Online/last-seen for the chat header. Admin side looks at the one
+  // selected employee's own last_active; employee side looks at the
+  // *shared* admin mailbox — "Online" if any admin is currently active,
+  // "Last seen" from whichever admin was most recently active, matching
+  // the shared-inbox model used everywhere else in Messages/calls.
+  useNowTick(15000);
+  const peerActiveIso = isAdmin
+    ? threadEmployee?.lastActive || null
+    : admins.reduce(
+        (latest, a) =>
+          !a.last_active || (latest && latest > a.last_active)
+            ? latest
+            : a.last_active,
+        null,
+      );
+  const peerOnline = isRecentlyActive(peerActiveIso, Date.now());
+
   // Voice messages reuse the exact same pendingAttachment shape as file/
   // image attachments (dataUrl/name/type/size), so send() and the bubble
   // renderer below don't need a separate code path — only a branch on
@@ -19977,11 +20061,28 @@ function MessagesPage({
                   <ArrowLeft size={18} />
                 </button>
               )}
-              <Avatar
-                name={isAdmin ? threadEmployee?.name : t.chat.adminLabel}
-                photo={isAdmin ? threadEmployee?.photo : null}
-                size={32}
-              />
+              <div style={{ position: "relative", flexShrink: 0 }}>
+                <Avatar
+                  name={isAdmin ? threadEmployee?.name : t.chat.adminLabel}
+                  photo={isAdmin ? threadEmployee?.photo : null}
+                  size={32}
+                />
+                {peerOnline && (
+                  <span
+                    title={t.chat.onlineLabel}
+                    style={{
+                      position: "absolute",
+                      bottom: -1,
+                      right: -1,
+                      width: 9,
+                      height: 9,
+                      borderRadius: "50%",
+                      background: "#22c55e",
+                      border: `2px solid ${T.card}`,
+                    }}
+                  />
+                )}
+              </div>
               <div style={{ minWidth: 0, flex: 1 }}>
                 <div
                   style={{
@@ -19995,11 +20096,26 @@ function MessagesPage({
                 >
                   {isAdmin ? threadEmployee?.name || "?" : t.chat.adminLabel}
                 </div>
-                {isAdmin && (
-                  <div style={{ fontSize: 11, color: T.muted }}>
-                    {threadEmployee?.code}
-                  </div>
-                )}
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: peerOnline ? "#22c55e" : T.muted,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {[
+                    isAdmin ? threadEmployee?.code : null,
+                    peerOnline
+                      ? t.chat.onlineLabel
+                      : peerActiveIso
+                        ? `${t.chat.lastSeenLabel} ${timeAgoLabel(peerActiveIso)}`
+                        : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </div>
               </div>
               {onStartCall && (
                 <button
@@ -20708,11 +20824,28 @@ function MessagesPage({
               className={`wf-chat-item ${selectedEmpId === c.employeeId ? "active" : ""}`}
               onClick={() => setSelectedEmpId(c.employeeId)}
             >
-              <Avatar
-                name={c.employee.name}
-                photo={c.employee.photo}
-                size={36}
-              />
+              <div style={{ position: "relative", flexShrink: 0 }}>
+                <Avatar
+                  name={c.employee.name}
+                  photo={c.employee.photo}
+                  size={36}
+                />
+                {isRecentlyActive(c.employee.lastActive, Date.now()) && (
+                  <span
+                    title={t.chat.onlineLabel}
+                    style={{
+                      position: "absolute",
+                      bottom: -1,
+                      right: -1,
+                      width: 9,
+                      height: 9,
+                      borderRadius: "50%",
+                      background: "#22c55e",
+                      border: `2px solid ${T.card}`,
+                    }}
+                  />
+                )}
+              </div>
               <div style={{ minWidth: 0, flex: 1 }}>
                 <div
                   style={{
@@ -25471,6 +25604,13 @@ function AppInner() {
         // can never turn the module back ON for someone if the
         // company-wide switch is off — both gates must pass.
         messagesDisabled: !!r.messages_disabled,
+        // Written by useLastActiveHeartbeat, not by the employee edit
+        // form — deliberately left OUT of toDb below so saving an
+        // unrelated field (name, salary, etc.) never clobbers it back
+        // to null; only the heartbeat's own direct .update() touches
+        // this column, and its result flows back in here via the
+        // normal employees realtime subscription like any other change.
+        lastActive: r.last_active || null,
       }),
       toDb: (r) => ({
         id: r.id,
@@ -26374,6 +26514,17 @@ function AppInner() {
     canUseMessages,
   });
 
+  // Online/last-seen (see useLastActiveHeartbeat above) — keeps this
+  // session's own `last_active` fresh in the admins/employees table
+  // while it's logged in, so every other open tab's chat header can
+  // show "Online" for this person. No-ops until role resolves (also
+  // stays a no-op for the kiosk portal, since role is forced null there
+  // — see the kiosk guard above).
+  useLastActiveHeartbeat(
+    role === "admin" ? "admins" : "employees",
+    role === "admin" ? currentAdmin?.id : currentEmp?.id,
+  );
+
   // Keep actorRef in sync with whoever is signed in right now, so every
   // useSupabaseArray hook above always audits changes under the correct
   // name/id — even though the hooks themselves were created before login.
@@ -27174,6 +27325,7 @@ function AppInner() {
                   currentAdmin={currentAdmin}
                   currentEmp={currentEmp}
                   employees={employees}
+                  admins={admins}
                   messages={messages}
                   setMessages={setMessages}
                   activeCall={voiceCall.call}
