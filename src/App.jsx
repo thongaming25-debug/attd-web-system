@@ -3262,9 +3262,9 @@ html,body,#root{height:100%;}
 @keyframes wf-rec-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.75)}}
 @keyframes wf-pop{from{opacity:0;transform:scale(.96) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
 @keyframes wf-app-in{from{opacity:0;}to{opacity:1;}}
-@keyframes wf-page-in{from{opacity:0;}to{opacity:1;}}
+@keyframes wf-page-in{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 .wf-app-enter{animation:wf-app-in .38s ease both;}
-.wf-page-enter{animation:wf-page-in .24s ease both;}
+.wf-page-enter{animation:wf-page-in .32s cubic-bezier(0.22,1,0.36,1) both;}
 .wf-nav-item,.wf-bottomnav-item{transition:background .15s ease,color .15s ease,transform .15s ease;}
 .wf-bottomnav-item:active{transform:scale(.93);}
 .wf-menu-btn,.wf-btn{transition:background .15s ease,transform .12s ease,box-shadow .15s ease,color .15s ease;}
@@ -26992,6 +26992,15 @@ function AppInner() {
   // (e.g. a bare #/employee link) — otherwise refreshing always restores
   // whatever page was open, for both the admin and staff portals.
   const page = routedPage || "dashboard";
+  // wf-content is one persistent scroll container shared by every page
+  // (pages themselves aren't remounted-with-scroll-reset by the browser),
+  // so without this, switching from a long scrolled-down list straight to
+  // a short page lands you mid-page instead of at the top — jarring on
+  // mobile where screen switches are expected to always start at the top.
+  const contentRef = useRef(null);
+  useEffect(() => {
+    contentRef.current?.scrollTo({ top: 0 });
+  }, [page]);
 
   // A tap on a Web Push notification (see sw.js "notificationclick") posts
   // this message to any already-open tab instead of doing a hard
@@ -27664,7 +27673,10 @@ function AppInner() {
             </div>
           </header>
 
-          <main className={`wf-content ${bottomNav ? "wf-content-bnpad" : ""}`}>
+          <main
+            ref={contentRef}
+            className={`wf-content ${bottomNav ? "wf-content-bnpad" : ""}`}
+          >
             {employees.length === 0 &&
               role === "admin" &&
               page !== "employees" && (
