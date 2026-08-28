@@ -3184,7 +3184,7 @@ html,body,#root{height:100%;}
 .wf-btn-danger:hover:not(:disabled){background:${T.dangerHoverBg};}
 .wf-btn-danger-solid{background:${T.rose};color:#fff;}
 .wf-btn-danger-solid:hover:not(:disabled){background:${T.roseDark};}
-.wf-input{width:100%;padding:9px 12px;border-radius:7px;border:1px solid ${T.inputBorder};font-size:13px;background:${T.inputBg};color:${T.text};outline:none;font-family:inherit;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
+.wf-input{width:100%;padding:9px 12px;border-radius:7px;border:1px solid ${T.inputBorder};font-size:16px;background:${T.inputBg};color:${T.text};outline:none;font-family:inherit;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
 .wf-input:focus{border-color:${T.gold};box-shadow:0 0 0 3px rgba(240,168,59,0.16);}
 .wf-field-label{display:block;font-size:11px;font-weight:700;color:${T.fieldLabel};margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;}
 .wf-dp-wrap{position:relative;display:inline-block;width:100%;}
@@ -8063,11 +8063,14 @@ function Dashboard({
   employees,
   departments,
   attendance,
+  setAttendance,
   payrollPaid,
   role,
   currentEmp,
   shifts,
   offices,
+  soundPreset,
+  showSelfPunch,
 }) {
   const { t, lang } = useLang();
   const today = todayStr();
@@ -8238,6 +8241,23 @@ function Dashboard({
           })}
         </p>
       </Card>
+
+      {/* Punch button lives here (not only on the Attendance page) so the
+         single action employees do twice a day — clock in/out — is one
+         tap from the home screen instead of two (open app → Dashboard →
+         tap "Attendance" tab → then find the button). Admin never sees
+         this; `showSelfPunch` also lets a company that disabled the
+         "attendance" module hide it here too. */}
+      {role !== "admin" && currentEmp && showSelfPunch && (
+        <SelfPunch
+          emp={currentEmp}
+          shift={myShift}
+          attendance={attendance}
+          setAttendance={setAttendance}
+          offices={offices}
+          soundPreset={soundPreset}
+        />
+      )}
 
       <div
         className="wf-grid"
@@ -27670,11 +27690,14 @@ function AppInner() {
                   employees={employees}
                   departments={departments}
                   attendance={attendance}
+                  setAttendance={setAttendance}
                   payrollPaid={payrollPaid}
                   role={role}
                   currentEmp={currentEmp}
                   shifts={shifts}
                   offices={offices}
+                  soundPreset={soundPolicy.preset}
+                  showSelfPunch={moduleEnabled("attendance")}
                 />
               )}
               {page === "analytics" && role === "admin" && (
