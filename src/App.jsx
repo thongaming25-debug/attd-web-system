@@ -79,6 +79,7 @@ import {
   PhoneOff,
   Square,
   Printer,
+  Ban,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -985,6 +986,18 @@ const LANG_RAW = {
       confirmDelWithName: (name) => `តើអ្នកពិតជាចង់លុបគណនី "${name}" មែនទេ?`,
       fullName: "ឈ្មោះពេញ",
       fullNamePlaceholder: "ឧ. សុខ សម្បត្តិ",
+      status: "ស្ថានភាព",
+      active: "សកម្ម",
+      inactive: "អសកម្ម",
+      disableBtn: "ផ្អាកគណនី",
+      enableBtn: "បើកគណនីឡើងវិញ",
+      cannotDisableSelf: "មិនអាចផ្អាកគណនីខ្លួនឯងបានទេ",
+      cannotDisableLastSuperadmin:
+        "ត្រូវមានអ្នកគ្រប់គ្រងជាន់ខ្ពស់សកម្មយ៉ាងតិចម្នាក់",
+      confirmDisableWithName: (name) =>
+        `ផ្អាកគណនី "${name}"? អ្នកនេះនឹងមិនអាចចូលប្រព័ន្ធបានទេ រហូតដល់អ្នកបើកឡើងវិញ។`,
+      confirmEnableWithName: (name) =>
+        `បើកគណនី "${name}" ឡើងវិញ? អ្នកនេះនឹងអាចចូលប្រព័ន្ធបានវិញ។`,
     },
     profile: {
       title: "ប្រវត្តិរូបរបស់ខ្ញុំ",
@@ -2061,6 +2074,17 @@ const LANG_RAW = {
         `Are you sure you want to delete account "${name}"?`,
       fullName: "Full Name",
       fullNamePlaceholder: "e.g. John Doe",
+      status: "Status",
+      active: "Active",
+      inactive: "Inactive",
+      disableBtn: "Disable",
+      enableBtn: "Re-enable",
+      cannotDisableSelf: "You can't disable your own account",
+      cannotDisableLastSuperadmin: "At least one active superadmin is required",
+      confirmDisableWithName: (name) =>
+        `Disable account "${name}"? They won't be able to log in until you re-enable it.`,
+      confirmEnableWithName: (name) =>
+        `Re-enable account "${name}"? They'll be able to log in again.`,
     },
     profile: {
       title: "My Profile",
@@ -7336,10 +7360,24 @@ function TimePicker({ value, onChange, placeholder, style, disabled }) {
   );
 }
 
-function ConfirmDialog({ text, onCancel, onConfirm }) {
+// title/confirmLabel/icon/variant default to the original delete-only
+// look, so every other call site in the app (real deletes) renders
+// exactly as before. Pass overrides for non-delete confirmations (e.g.
+// disable/enable) so the header and button actually describe the
+// action being confirmed instead of always saying "Delete".
+function ConfirmDialog({
+  text,
+  onCancel,
+  onConfirm,
+  title,
+  confirmLabel,
+  icon,
+  variant = "danger-solid",
+}) {
   const { t } = useLang();
+  const ConfirmIcon = icon || Trash2;
   return (
-    <Modal title={t.confirmDelete} onClose={onCancel} width={380}>
+    <Modal title={title || t.confirmDelete} onClose={onCancel} width={380}>
       <p style={{ fontSize: 14, color: T.textSoft, marginBottom: 20 }}>
         {text}
       </p>
@@ -7347,8 +7385,8 @@ function ConfirmDialog({ text, onCancel, onConfirm }) {
         <Button variant="ghost" onClick={onCancel}>
           {t.cancel}
         </Button>
-        <Button variant="danger-solid" onClick={onConfirm}>
-          <Trash2 size={14} /> {t.delete}
+        <Button variant={variant} onClick={onConfirm}>
+          <ConfirmIcon size={14} /> {confirmLabel || t.delete}
         </Button>
       </div>
     </Modal>
@@ -7697,6 +7735,11 @@ function AdminLoginScreen({ admins, onLogin, go }) {
     );
     if (!acct) {
       setError(L.errNoAdmin);
+      setLoading(false);
+      return;
+    }
+    if (acct.status === "inactive") {
+      setError(L.errInactive);
       setLoading(false);
       return;
     }
@@ -19042,7 +19085,13 @@ function OnboardingOffboarding({
 function AdminAccountForm({ initial, onSave, onCancel }) {
   const { t, lang } = useLang();
   const [f, setF] = useState(
-    initial || { username: "", password: "", name: "", role: "manager" },
+    initial || {
+      username: "",
+      password: "",
+      name: "",
+      role: "manager",
+      status: "active",
+    },
   );
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   return (
@@ -21519,9 +21568,13 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
   const { t, lang } = useLang();
   const [modal, setModal] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
+  const [confirmToggle, setConfirmToggle] = useState(null);
   const [error, setError] = useState("");
 
   const superadminCount = admins.filter((a) => a.role === "superadmin").length;
+  const activeSuperadminCount = admins.filter(
+    (a) => a.role === "superadmin" && a.status !== "inactive",
+  ).length;
 
   const save = (data) => {
     const dupe = admins.find(
@@ -21544,6 +21597,29 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
     if (a.id === currentAdminId) return; // can't delete yourself
     if (a.role === "superadmin" && superadminCount <= 1) return; // keep at least one
     setConfirmDel(a);
+  };
+
+  const toggleStatusBlocked = (a) => {
+    if (a.id === currentAdminId) return t.admAcc.cannotDisableSelf; // can't disable yourself
+    const isActive = a.status !== "inactive";
+    // only block when *disabling* would leave zero active superadmins
+    if (isActive && a.role === "superadmin" && activeSuperadminCount <= 1) {
+      return t.admAcc.cannotDisableLastSuperadmin;
+    }
+    return null;
+  };
+
+  const askToggleStatus = (a) => {
+    if (toggleStatusBlocked(a)) return;
+    setConfirmToggle(a);
+  };
+
+  const toggleStatus = (a) => {
+    const nextStatus = a.status === "inactive" ? "active" : "inactive";
+    setAdmins(
+      admins.map((x) => (x.id === a.id ? { ...x, status: nextStatus } : x)),
+    );
+    setConfirmToggle(null);
   };
 
   return (
@@ -21572,6 +21648,7 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
               <th>{t.emps.name}</th>
               <th>{t.admAcc.username}</th>
               <th>{t.admAcc.roleLabel}</th>
+              <th>{t.admAcc.status}</th>
               <th></th>
             </tr>
           </thead>
@@ -21580,6 +21657,8 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
               const isSelf = a.id === currentAdminId;
               const isLastSuperadmin =
                 a.role === "superadmin" && superadminCount <= 1;
+              const isActive = a.status !== "inactive";
+              const toggleBlockedReason = toggleStatusBlocked(a);
               return (
                 <tr key={a.id}>
                   <td>
@@ -21621,6 +21700,21 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
                       {adminRoleLabel(a.role, lang)}
                     </span>
                   </td>
+                  <td>
+                    <span
+                      className="wf-badge"
+                      style={
+                        isActive
+                          ? { background: T.forestSoft, color: T.forestText }
+                          : {
+                              background: "rgba(148,163,184,0.18)",
+                              color: T.muted,
+                            }
+                      }
+                    >
+                      {isActive ? t.admAcc.active : t.admAcc.inactive}
+                    </span>
+                  </td>
                   <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                     <div style={{ display: "inline-flex", gap: 10 }}>
                       <button
@@ -21636,6 +21730,30 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
                         }}
                       >
                         <Pencil size={14} />
+                      </button>
+                      <button
+                        onClick={() => askToggleStatus(a)}
+                        disabled={!!toggleBlockedReason}
+                        title={toggleBlockedReason || undefined}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: toggleBlockedReason
+                            ? "not-allowed"
+                            : "pointer",
+                          color: toggleBlockedReason
+                            ? T.mutedLight
+                            : isActive
+                              ? T.rose
+                              : T.forestText,
+                          opacity: toggleBlockedReason ? 0.4 : 1,
+                        }}
+                      >
+                        {isActive ? (
+                          <Lock size={14} />
+                        ) : (
+                          <ShieldCheck size={14} />
+                        )}
                       </button>
                       <button
                         onClick={() => askDelete(a)}
@@ -21696,6 +21814,31 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
             setAdmins(admins.filter((a) => a.id !== confirmDel.id));
             setConfirmDel(null);
           }}
+        />
+      )}
+      {confirmToggle && (
+        <ConfirmDialog
+          title={
+            confirmToggle.status === "inactive"
+              ? t.admAcc.enableBtn
+              : t.admAcc.disableBtn
+          }
+          text={
+            confirmToggle.status === "inactive"
+              ? t.admAcc.confirmEnableWithName(confirmToggle.name)
+              : t.admAcc.confirmDisableWithName(confirmToggle.name)
+          }
+          confirmLabel={
+            confirmToggle.status === "inactive"
+              ? t.admAcc.enableBtn
+              : t.admAcc.disableBtn
+          }
+          icon={confirmToggle.status === "inactive" ? ShieldCheck : Ban}
+          variant={
+            confirmToggle.status === "inactive" ? "accent" : "danger-solid"
+          }
+          onCancel={() => setConfirmToggle(null)}
+          onConfirm={() => toggleStatus(confirmToggle)}
         />
       )}
     </div>
@@ -27196,6 +27339,45 @@ function AppInner() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loggedIn, activeSessionId, role, currentAdmin, currentEmp]);
+
+  // Force-signs THIS device out the moment a superadmin disables the
+  // signed-in admin/employee's own account — not just future login
+  // attempts. Disabling an account only ever blocked the *next* login
+  // (see AdminLoginScreen/EmployeeLoginScreen's status check); it never
+  // touched an already-open session, so a disabled user stayed logged
+  // in until they closed the tab themselves. currentAdmin/currentEmp
+  // already update live from the shared realtime subscription, so this
+  // reacts immediately (no polling needed) once the status flip
+  // actually reaches the database.
+  useEffect(() => {
+    if (!loggedIn) return;
+    const disabled =
+      role === "admin"
+        ? currentAdmin?.status === "inactive"
+        : !!currentEmp && currentEmp.status !== "active";
+    if (!disabled) return;
+    const actor =
+      role === "admin"
+        ? { type: "admin", id: currentAdmin?.id, name: currentAdmin?.name }
+        : { type: "employee", id: currentEmp?.id, name: currentEmp?.name };
+    writeAuditLog({
+      actor,
+      action: "logout",
+      table: role === "admin" ? "admins" : "employees",
+      entityId: actor.id,
+      label: actor.name,
+    });
+    writeLoginActivity({
+      actor,
+      action: "logout",
+      sessionId: activeSessionId,
+    });
+    setActiveSessionId(null);
+    if (role === "admin") setSessionAdmin(null);
+    else setSessionEmployee(null);
+    setRevokedNotice(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loggedIn, role, currentAdmin?.status, currentEmp?.status]);
 
   useEffect(() => {
     if (loggedIn && !nav.find((n) => n.id === page)) setPage("dashboard");
