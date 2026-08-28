@@ -1175,14 +1175,14 @@ const LANG_RAW = {
     appName: "Workforce Suite",
     login: {
       employeeId: "Employee ID",
-      employeeIdPlaceholder: "EMP-001",
+      employeeIdPlaceholder: "YOUR-ID",
       pin: "PIN Code",
       pinPlaceholder: "••••",
       submit: "Sign In",
       adminSubmit: "Sign In as Admin",
       username: "Username",
-      usernamePlaceholder: "admin",
-      password: "Admin Password",
+      usernamePlaceholder: "Your Username",
+      password: "Password",
       passwordPlaceholder: "••••••••",
       adminTitle: "Admin Login",
       employeePortal: "Employee Portal",
@@ -7407,6 +7407,8 @@ const LOGIN_CSS = `
 @keyframes wf-orb-b { 0%,100% { transform:translate(0,0) scale(1); } 50% { transform:translate(-70px,60px) scale(1.2); } }
 @keyframes wf-orb-c { 0%,100% { transform:translate(0,0) scale(1); } 40% { transform:translate(70px,50px) scale(.88); } 75% { transform:translate(-50px,-30px) scale(1.1); } }
 @keyframes wf-orb-d { 0%,100% { transform:translate(0,0) scale(1); } 45% { transform:translate(-55px,-50px) scale(1.12); } }
+@keyframes wf-shimmer { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
+@keyframes wf-credit-in { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
 .wf-login-root {
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   min-height:100vh; min-height:100dvh; position:relative; overflow:hidden;
@@ -7419,6 +7421,14 @@ const LOGIN_CSS = `
               radial-gradient(ellipse 50% 40% at 60% 10%, rgba(31,162,107,0.08) 0%, transparent 60%);
   animation: wf-bg-drift 14s ease-in-out infinite, wf-bg-hue 22s ease-in-out infinite;
   will-change: transform, filter;
+}
+.wf-login-bg::after {
+  content:''; position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size:42px 42px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 0%, transparent 75%);
 }
 .wf-login-orbs { position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
 .wf-login-orb {
@@ -7448,30 +7458,38 @@ const LOGIN_CSS = `
 .wf-login-card {
   position:relative; z-index:2;
   width:100%; max-width:420px; margin:16px;
-  padding:36px 32px 28px;
-  background:rgba(14,18,27,0.86);
-  backdrop-filter:blur(24px);
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 32px 80px rgba(0,0,0,0.55);
+  padding:38px 32px 30px;
+  background:linear-gradient(180deg, rgba(20,25,37,0.92), rgba(12,16,25,0.88));
+  backdrop-filter:blur(28px);
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,0.09);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 0 0 1px rgba(0,0,0,0.2),
+              0 36px 90px rgba(0,0,0,0.6), 0 8px 24px rgba(240,168,59,0.06);
   animation: wf-float-up .6s cubic-bezier(.16,.9,.28,1) both;
+  overflow:hidden;
+}
+.wf-login-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, transparent, ${T.gold}, rgba(91,141,239,0.9), transparent);
+  background-size:200% 100%;
+  animation: wf-shimmer 6s linear infinite;
 }
 .wf-login-logo-ring {
-  width:56px; height:56px; border-radius:12px;
-  background:${T.gold};
+  width:58px; height:58px; border-radius:14px;
+  background:linear-gradient(150deg, ${T.gold}, #d98f22);
   display:flex; align-items:center; justify-content:center;
   font-weight:800; font-size:18px; color:#1A1300;
   font-family:'JetBrains Mono',monospace;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.3), 0 8px 22px rgba(240,168,59,0.35);
   position:relative;
 }
 .wf-login-logo-ring::before {
-  content:''; position:absolute; inset:-8px; border-radius:18px;
-  border:1px solid rgba(240,168,59,0.3);
+  content:''; position:absolute; inset:-9px; border-radius:20px;
+  border:1px solid rgba(240,168,59,0.35);
   animation: wf-pulse-ring 3s ease-in-out infinite;
 }
 .wf-login-input {
-  width:100%; padding:12px 14px; border-radius:8px;
+  width:100%; padding:13px 14px; border-radius:10px;
   border:1.5px solid rgba(255,255,255,0.1); font-size:14px;
   background:rgba(255,255,255,0.04); color:#EEF1F6; outline:none;
   font-family:inherit; transition:border-color .25s ease, box-shadow .25s ease, background .25s ease, transform .15s ease;
@@ -7484,7 +7502,7 @@ const LOGIN_CSS = `
   transform:translateY(-1px);
 }
 .wf-login-btn {
-  width:100%; padding:13px; border:none; border-radius:9px;
+  width:100%; padding:14px; border:none; border-radius:11px;
   font-size:15px; font-weight:700; cursor:pointer; display:flex;
   align-items:center; justify-content:center; gap:8px;
   font-family:inherit; transition:transform .2s cubic-bezier(.2,.9,.3,1), box-shadow .2s ease, filter .2s ease;
@@ -7493,18 +7511,18 @@ const LOGIN_CSS = `
 .wf-login-btn:hover:not(:disabled) { transform:translateY(-1px); }
 .wf-login-btn:active:not(:disabled) { transform:scale(.97) translateY(0); }
 .wf-login-btn-emp {
-  background:${T.gold};
+  background:linear-gradient(135deg, #ffcf76, ${T.gold} 55%, #dd9a2e);
   color:#1A1300;
-  box-shadow:0 4px 16px rgba(240,168,59,0.3);
+  box-shadow:0 6px 20px rgba(240,168,59,0.35);
 }
-.wf-login-btn-emp:hover { box-shadow:0 6px 24px rgba(240,168,59,0.4); filter:brightness(1.05); }
+.wf-login-btn-emp:hover { box-shadow:0 8px 28px rgba(240,168,59,0.45); filter:brightness(1.05); }
 .wf-login-btn-adm {
-  background:rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.07);
   color:#fff;
-  border:1px solid rgba(255,255,255,0.14);
+  border:1px solid rgba(255,255,255,0.16);
   box-shadow:none;
 }
-.wf-login-btn-adm:hover { background:rgba(255,255,255,0.1); }
+.wf-login-btn-adm:hover { background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.24); }
 .wf-login-divider { display:flex; align-items:center; gap:10px; margin:18px 0; }
 .wf-login-divider::before,.wf-login-divider::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.1); }
 .wf-login-error {
@@ -7518,14 +7536,37 @@ const LOGIN_CSS = `
   line-height:1.7; border:1px solid rgba(255,255,255,0.07);
 }
 .wf-login-credit {
-  margin-top:32px; text-align:center; font-size:10.5px;
-  letter-spacing:0.3px; color:#5B6478; opacity:0.6;
+  margin-top:26px; display:inline-flex; align-items:center; gap:8px;
+  text-align:center; font-size:11.5px; font-weight:600;
+  letter-spacing:0.2px; color:#AEB6C9;
+  padding:8px 18px; border-radius:999px;
+  background:rgba(255,255,255,0.055);
+  border:1px solid rgba(255,255,255,0.11);
+  backdrop-filter:blur(10px);
+  box-shadow:0 4px 14px rgba(0,0,0,0.25);
+  animation: wf-credit-in .6s ease .15s both;
 }
+.wf-login-credit .wf-login-credit-ver {
+  color:${T.gold}; font-weight:700; font-family:'JetBrains Mono',monospace; font-size:11px;
+}
+.wf-login-credit .wf-login-credit-dot {
+  width:3px; height:3px; border-radius:50%; background:#5B6478; flex-shrink:0;
+}
+.wf-login-credit .wf-login-credit-name {
+  color:#EEF1F6; font-weight:700;
+}
+.wf-login-credit-wrap { margin-top:6px; display:flex; justify-content:center; }
 `;
 function LoginCredit() {
   return (
-    <div className="wf-login-credit">
-      v{APP_VERSION} &middot; Developed by Ou SoThon
+    <div className="wf-login-credit-wrap">
+      <div className="wf-login-credit">
+        <span className="wf-login-credit-ver">v{APP_VERSION}</span>
+        <span className="wf-login-credit-dot" />
+        <span>
+          Developed by <span className="wf-login-credit-name">Ou SoThon</span>
+        </span>
+      </div>
     </div>
   );
 }
@@ -7788,14 +7829,18 @@ function AdminLoginScreen({ admins, onLogin, go }) {
         >
           <div
             style={{
-              width: 56,
-              height: 56,
-              borderRadius: 12,
-              background: branding.logo ? "#fff" : T.blue,
+              width: 58,
+              height: 58,
+              borderRadius: 14,
+              background: branding.logo
+                ? "#fff"
+                : `linear-gradient(150deg, ${T.blue}, #3a5fc4)`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.25)",
+              boxShadow: branding.logo
+                ? "inset 0 0 0 1px rgba(255,255,255,0.25)"
+                : "inset 0 0 0 1px rgba(255,255,255,0.3), 0 8px 22px rgba(91,141,239,0.35)",
               overflow: "hidden",
               border: branding.logo ? `1px solid ${T.line}` : "none",
             }}
