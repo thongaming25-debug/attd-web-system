@@ -7407,12 +7407,71 @@ const LOGIN_CSS = `
 @keyframes wf-orb-b { 0%,100% { transform:translate(0,0) scale(1); } 50% { transform:translate(-70px,60px) scale(1.2); } }
 @keyframes wf-orb-c { 0%,100% { transform:translate(0,0) scale(1); } 40% { transform:translate(70px,50px) scale(.88); } 75% { transform:translate(-50px,-30px) scale(1.1); } }
 @keyframes wf-orb-d { 0%,100% { transform:translate(0,0) scale(1); } 45% { transform:translate(-55px,-50px) scale(1.12); } }
-@keyframes wf-shimmer { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
 @keyframes wf-credit-in { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+@keyframes wf-border-spin { to { transform: rotate(1turn); } }
 .wf-login-root {
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   min-height:100vh; min-height:100dvh; position:relative; overflow:hidden;
-  background: linear-gradient(160deg, #050810 0%, #0A0F1A 55%, #0D1420 100%);
+  background: var(--wfl-bg);
+  transition: background .3s ease;
+  /* dark (default) theme tokens */
+  --wfl-bg: linear-gradient(160deg, #050810 0%, #0A0F1A 55%, #0D1420 100%);
+  --wfl-grid-line: rgba(255,255,255,0.035);
+  --wfl-orb-opacity: .4;
+  --wfl-card-bg: linear-gradient(180deg, rgba(20,25,37,0.92), rgba(12,16,25,0.88));
+  --wfl-card-border: rgba(255,255,255,0.09);
+  --wfl-card-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 0 0 1px rgba(0,0,0,0.2), 0 36px 90px rgba(0,0,0,0.6), 0 8px 24px rgba(240,168,59,0.06);
+  --wfl-border-a: ${T.gold};
+  --wfl-border-b: rgba(91,141,239,0.9);
+  --wfl-text: #EEF1F6;
+  --wfl-text-soft: #8891A6;
+  --wfl-text-softer: #8A93A8;
+  --wfl-input-bg: rgba(255,255,255,0.04);
+  --wfl-input-bg-focus: rgba(255,255,255,0.06);
+  --wfl-input-border: rgba(255,255,255,0.1);
+  --wfl-input-placeholder: #5B6478;
+  --wfl-divider: rgba(255,255,255,0.1);
+  --wfl-demo-bg: rgba(255,255,255,0.04);
+  --wfl-demo-border: rgba(255,255,255,0.07);
+  --wfl-demo-text: #8891A6;
+  --wfl-credit-bg: rgba(255,255,255,0.055);
+  --wfl-credit-border: rgba(255,255,255,0.11);
+  --wfl-credit-text: #AEB6C9;
+  --wfl-credit-name: #EEF1F6;
+  --wfl-btn-adm-bg: rgba(255,255,255,0.07);
+  --wfl-btn-adm-border: rgba(255,255,255,0.16);
+  --wfl-btn-adm-hover-bg: rgba(255,255,255,0.12);
+  --wfl-btn-adm-hover-border: rgba(255,255,255,0.24);
+}
+.wf-login-root.wf-login-light {
+  /* light theme tokens */
+  --wfl-bg: linear-gradient(160deg, #eef1f8 0%, #f6f8fb 55%, #eef2f7 100%);
+  --wfl-grid-line: rgba(15,20,35,0.05);
+  --wfl-orb-opacity: .22;
+  --wfl-card-bg: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.82));
+  --wfl-card-border: rgba(15,20,35,0.08);
+  --wfl-card-shadow: 0 1px 0 rgba(255,255,255,0.7) inset, 0 0 0 1px rgba(15,20,35,0.03), 0 30px 70px rgba(20,25,45,0.12), 0 8px 20px rgba(240,168,59,0.10);
+  --wfl-border-a: ${T.gold};
+  --wfl-border-b: #5B8DEF;
+  --wfl-text: #12151F;
+  --wfl-text-soft: #5B6274;
+  --wfl-text-softer: #6B7284;
+  --wfl-input-bg: rgba(15,20,35,0.035);
+  --wfl-input-bg-focus: rgba(15,20,35,0.05);
+  --wfl-input-border: rgba(15,20,35,0.12);
+  --wfl-input-placeholder: #9AA1B2;
+  --wfl-divider: rgba(15,20,35,0.1);
+  --wfl-demo-bg: rgba(15,20,35,0.035);
+  --wfl-demo-border: rgba(15,20,35,0.08);
+  --wfl-demo-text: #5B6274;
+  --wfl-credit-bg: rgba(15,20,35,0.045);
+  --wfl-credit-border: rgba(15,20,35,0.09);
+  --wfl-credit-text: #5B6274;
+  --wfl-credit-name: #12151F;
+  --wfl-btn-adm-bg: rgba(15,20,35,0.05);
+  --wfl-btn-adm-border: rgba(15,20,35,0.14);
+  --wfl-btn-adm-hover-bg: rgba(15,20,35,0.08);
+  --wfl-btn-adm-hover-border: rgba(15,20,35,0.2);
 }
 .wf-login-bg {
   position:absolute; inset:-40px; z-index:0; pointer-events:none;
@@ -7425,14 +7484,14 @@ const LOGIN_CSS = `
 .wf-login-bg::after {
   content:''; position:absolute; inset:0;
   background-image:
-    linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+    linear-gradient(var(--wfl-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--wfl-grid-line) 1px, transparent 1px);
   background-size:42px 42px;
   mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 0%, transparent 75%);
 }
 .wf-login-orbs { position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
 .wf-login-orb {
-  position:absolute; border-radius:50%; filter:blur(50px); opacity:.4;
+  position:absolute; border-radius:50%; filter:blur(50px); opacity:var(--wfl-orb-opacity);
   will-change: transform;
 }
 .wf-login-orb-1 {
@@ -7455,24 +7514,31 @@ const LOGIN_CSS = `
   background:radial-gradient(circle,rgba(229,99,122,0.3),transparent 70%);
   animation: wf-orb-d 15s ease-in-out infinite;
 }
-.wf-login-card {
+.wf-login-card-glow {
   position:relative; z-index:2;
   width:100%; max-width:420px; margin:16px;
+  border-radius:22px;
+  padding:2px;
+  overflow:hidden;
+  animation: wf-float-up .6s cubic-bezier(.16,.9,.28,1) both;
+}
+.wf-login-card-glow::before {
+  content:'';
+  position:absolute;
+  inset:-50%;
+  background: conic-gradient(from 0deg, transparent 0%, var(--wfl-border-a) 10%, var(--wfl-border-b) 28%, transparent 46%, transparent 100%);
+  animation: wf-border-spin 5s linear infinite;
+}
+.wf-login-card {
+  position:relative; z-index:1;
+  width:100%;
   padding:38px 32px 30px;
-  background:linear-gradient(180deg, rgba(20,25,37,0.92), rgba(12,16,25,0.88));
+  background:var(--wfl-card-bg);
   backdrop-filter:blur(28px);
   border-radius:20px;
-  border:1px solid rgba(255,255,255,0.09);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 0 0 1px rgba(0,0,0,0.2),
-              0 36px 90px rgba(0,0,0,0.6), 0 8px 24px rgba(240,168,59,0.06);
-  animation: wf-float-up .6s cubic-bezier(.16,.9,.28,1) both;
+  border:1px solid var(--wfl-card-border);
+  box-shadow: var(--wfl-card-shadow);
   overflow:hidden;
-}
-.wf-login-card::before {
-  content:''; position:absolute; top:0; left:0; right:0; height:3px;
-  background:linear-gradient(90deg, transparent, ${T.gold}, rgba(91,141,239,0.9), transparent);
-  background-size:200% 100%;
-  animation: wf-shimmer 6s linear infinite;
 }
 .wf-login-logo-ring {
   width:58px; height:58px; border-radius:14px;
@@ -7490,14 +7556,14 @@ const LOGIN_CSS = `
 }
 .wf-login-input {
   width:100%; padding:13px 14px; border-radius:10px;
-  border:1.5px solid rgba(255,255,255,0.1); font-size:14px;
-  background:rgba(255,255,255,0.04); color:#EEF1F6; outline:none;
+  border:1.5px solid var(--wfl-input-border); font-size:14px;
+  background:var(--wfl-input-bg); color:var(--wfl-text); outline:none;
   font-family:inherit; transition:border-color .25s ease, box-shadow .25s ease, background .25s ease, transform .15s ease;
   box-sizing:border-box;
 }
-.wf-login-input::placeholder { color:#5B6478; }
+.wf-login-input::placeholder { color:var(--wfl-input-placeholder); }
 .wf-login-input:focus {
-  border-color:${T.gold}; background:rgba(255,255,255,0.06);
+  border-color:${T.gold}; background:var(--wfl-input-bg-focus);
   box-shadow:0 0 0 4px rgba(240,168,59,0.14);
   transform:translateY(-1px);
 }
@@ -7517,31 +7583,31 @@ const LOGIN_CSS = `
 }
 .wf-login-btn-emp:hover { box-shadow:0 8px 28px rgba(240,168,59,0.45); filter:brightness(1.05); }
 .wf-login-btn-adm {
-  background:rgba(255,255,255,0.07);
-  color:#fff;
-  border:1px solid rgba(255,255,255,0.16);
+  background:var(--wfl-btn-adm-bg);
+  color:var(--wfl-text);
+  border:1px solid var(--wfl-btn-adm-border);
   box-shadow:none;
 }
-.wf-login-btn-adm:hover { background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.24); }
+.wf-login-btn-adm:hover { background:var(--wfl-btn-adm-hover-bg); border-color:var(--wfl-btn-adm-hover-border); }
 .wf-login-divider { display:flex; align-items:center; gap:10px; margin:18px 0; }
-.wf-login-divider::before,.wf-login-divider::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.1); }
+.wf-login-divider::before,.wf-login-divider::after { content:''; flex:1; height:1px; background:var(--wfl-divider); }
 .wf-login-error {
   display:flex; align-items:center; gap:7px; font-size:12.5px;
   color:#F0879B; background:rgba(229,99,122,0.12); border-radius:8px;
   padding:9px 12px; margin-bottom:14px; border:1px solid rgba(229,99,122,0.25);
 }
 .wf-login-demo {
-  margin-top:20px; padding:11px 14px; background:rgba(255,255,255,0.04);
-  border-radius:8px; font-size:11px; color:#8891A6;
-  line-height:1.7; border:1px solid rgba(255,255,255,0.07);
+  margin-top:20px; padding:11px 14px; background:var(--wfl-demo-bg);
+  border-radius:8px; font-size:11px; color:var(--wfl-demo-text);
+  line-height:1.7; border:1px solid var(--wfl-demo-border);
 }
 .wf-login-credit {
   margin-top:26px; display:inline-flex; align-items:center; gap:8px;
   text-align:center; font-size:11.5px; font-weight:600;
-  letter-spacing:0.2px; color:#AEB6C9;
+  letter-spacing:0.2px; color:var(--wfl-credit-text);
   padding:8px 18px; border-radius:999px;
-  background:rgba(255,255,255,0.055);
-  border:1px solid rgba(255,255,255,0.11);
+  background:var(--wfl-credit-bg);
+  border:1px solid var(--wfl-credit-border);
   backdrop-filter:blur(10px);
   box-shadow:0 4px 14px rgba(0,0,0,0.25);
   animation: wf-credit-in .6s ease .15s both;
@@ -7550,10 +7616,10 @@ const LOGIN_CSS = `
   color:${T.gold}; font-weight:700; font-family:'JetBrains Mono',monospace; font-size:11px;
 }
 .wf-login-credit .wf-login-credit-dot {
-  width:3px; height:3px; border-radius:50%; background:#5B6478; flex-shrink:0;
+  width:3px; height:3px; border-radius:50%; background:var(--wfl-text-soft); flex-shrink:0;
 }
 .wf-login-credit .wf-login-credit-name {
-  color:#EEF1F6; font-weight:700;
+  color:var(--wfl-credit-name); font-weight:700;
 }
 .wf-login-credit-wrap { margin-top:6px; display:flex; justify-content:center; }
 `;
@@ -7605,7 +7671,7 @@ function LoginField({ label, children }) {
         style={{
           fontSize: 11.5,
           fontWeight: 700,
-          color: "#8A93A8",
+          color: "var(--wfl-text-softer)",
           marginBottom: 7,
           textTransform: "uppercase",
           letterSpacing: ".04em",
@@ -7622,6 +7688,8 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
   useLoginStyle();
   const { t } = useLang();
   const { branding } = useBranding();
+  const { theme } = useTheme();
+  const isLight = theme === "light";
   const displayName = branding.name?.trim() || t.appName;
   const L = t.login;
   const [code, setCode] = useState("");
@@ -7657,99 +7725,117 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
   };
 
   return (
-    <div className="wf-login-root">
+    <div className={`wf-login-root ${isLight ? "wf-login-light" : ""}`}>
       <LoginBackground />
-      <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
-        <LangToggle />
+      <div
+        style={{
+          position: "absolute",
+          top: 16,
+          right: 16,
+          zIndex: 10,
+          display: "flex",
+          gap: 8,
+        }}
+      >
+        <ThemeToggle variant={isLight ? "light" : "dark"} />
+        <LangToggle variant={isLight ? "light" : "dark"} />
       </div>
-      <div className="wf-login-card">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            marginBottom: 28,
-          }}
-        >
-          <div className="wf-login-logo-ring">
-            {branding.logo ? (
-              <img
-                src={branding.logo}
-                alt={displayName}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  borderRadius: "inherit",
-                }}
-              />
-            ) : (
-              getInitials(displayName)
-            )}
-          </div>
+      <div className="wf-login-card-glow">
+        <div className="wf-login-card">
           <div
             style={{
-              marginTop: 14,
-              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
-              fontWeight: 700,
-              fontSize: 20,
-              color: "#EEF1F6",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              marginBottom: 28,
             }}
           >
-            {displayName}
-          </div>
-          <div style={{ fontSize: 13, color: "#8891A6", marginTop: 4 }}>
-            {L.employeePortal}
-          </div>
-        </div>
-        <form onSubmit={submit}>
-          <LoginField label={L.employeeId}>
-            <input
-              className="wf-login-input"
-              value={code}
-              onChange={(e) => {
-                setCode(e.target.value);
-                setError("");
-              }}
-              placeholder={L.employeeIdPlaceholder}
-              autoFocus
-            />
-          </LoginField>
-          <LoginField label={L.pin}>
-            <input
-              className="wf-login-input"
-              value={pin}
-              onChange={(e) => {
-                setPin(e.target.value);
-                setError("");
-              }}
-              placeholder={L.pinPlaceholder}
-              type="password"
-              inputMode="numeric"
-              maxLength={6}
-            />
-          </LoginField>
-          {error && (
-            <div className="wf-login-error">
-              <AlertCircle size={14} /> {error}
+            <div className="wf-login-logo-ring">
+              {branding.logo ? (
+                <img
+                  src={branding.logo}
+                  alt={displayName}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    borderRadius: "inherit",
+                  }}
+                />
+              ) : (
+                getInitials(displayName)
+              )}
             </div>
-          )}
-          <button
-            type="submit"
-            className="wf-login-btn wf-login-btn-emp"
-            disabled={loading}
-          >
-            {loading ? (
-              <Loader2
-                size={16}
-                style={{ animation: "spin 1s linear infinite" }}
+            <div
+              style={{
+                marginTop: 14,
+                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                fontWeight: 700,
+                fontSize: 20,
+                color: "var(--wfl-text)",
+              }}
+            >
+              {displayName}
+            </div>
+            <div
+              style={{
+                fontSize: 13,
+                color: "var(--wfl-text-soft)",
+                marginTop: 4,
+              }}
+            >
+              {L.employeePortal}
+            </div>
+          </div>
+          <form onSubmit={submit}>
+            <LoginField label={L.employeeId}>
+              <input
+                className="wf-login-input"
+                value={code}
+                onChange={(e) => {
+                  setCode(e.target.value);
+                  setError("");
+                }}
+                placeholder={L.employeeIdPlaceholder}
+                autoFocus
               />
-            ) : (
-              <LogIn size={16} />
+            </LoginField>
+            <LoginField label={L.pin}>
+              <input
+                className="wf-login-input"
+                value={pin}
+                onChange={(e) => {
+                  setPin(e.target.value);
+                  setError("");
+                }}
+                placeholder={L.pinPlaceholder}
+                type="password"
+                inputMode="numeric"
+                maxLength={6}
+              />
+            </LoginField>
+            {error && (
+              <div className="wf-login-error">
+                <AlertCircle size={14} /> {error}
+              </div>
             )}
-            {loading ? "..." : L.submit}
-          </button>
-        </form>
+            <button
+              type="submit"
+              className="wf-login-btn wf-login-btn-emp"
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader2
+                  size={16}
+                  style={{ animation: "spin 1s linear infinite" }}
+                />
+              ) : (
+                <LogIn size={16} />
+              )}
+              {loading ? "..." : L.submit}
+            </button>
+          </form>
+        </div>
       </div>
       <LoginCredit />
     </div>
@@ -7760,6 +7846,8 @@ function AdminLoginScreen({ admins, onLogin, go }) {
   useLoginStyle();
   const { t } = useLang();
   const { branding } = useBranding();
+  const { theme } = useTheme();
+  const isLight = theme === "light";
   const displayName = branding.name?.trim() || t.appName;
   const L = t.login;
   const [username, setUsername] = useState("");
@@ -7795,127 +7883,145 @@ function AdminLoginScreen({ admins, onLogin, go }) {
   };
 
   return (
-    <div className="wf-login-root">
+    <div className={`wf-login-root ${isLight ? "wf-login-light" : ""}`}>
       <LoginBackground />
-      <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
-        <LangToggle />
+      <div
+        style={{
+          position: "absolute",
+          top: 16,
+          right: 16,
+          zIndex: 10,
+          display: "flex",
+          gap: 8,
+        }}
+      >
+        <ThemeToggle variant={isLight ? "light" : "dark"} />
+        <LangToggle variant={isLight ? "light" : "dark"} />
       </div>
-      <div className="wf-login-card">
-        <button
-          onClick={() => go("employee")}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            color: "#8891A6",
-            fontSize: 12.5,
-            fontWeight: 600,
-            marginBottom: 20,
-            padding: 0,
-          }}
-        >
-          <ArrowLeft size={14} /> {L.back}
-        </button>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            marginBottom: 28,
-          }}
-        >
-          <div
+      <div className="wf-login-card-glow">
+        <div className="wf-login-card">
+          <button
+            onClick={() => go("employee")}
             style={{
-              width: 58,
-              height: 58,
-              borderRadius: 14,
-              background: branding.logo
-                ? "#fff"
-                : `linear-gradient(150deg, ${T.blue}, #3a5fc4)`,
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              boxShadow: branding.logo
-                ? "inset 0 0 0 1px rgba(255,255,255,0.25)"
-                : "inset 0 0 0 1px rgba(255,255,255,0.3), 0 8px 22px rgba(91,141,239,0.35)",
-              overflow: "hidden",
-              border: branding.logo ? `1px solid ${T.line}` : "none",
+              gap: 6,
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "var(--wfl-text-soft)",
+              fontSize: 12.5,
+              fontWeight: 600,
+              marginBottom: 20,
+              padding: 0,
             }}
           >
-            {branding.logo ? (
-              <img
-                src={branding.logo}
-                alt={displayName}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-            ) : (
-              <ShieldCheck size={26} color="#fff" />
-            )}
-          </div>
+            <ArrowLeft size={14} /> {L.back}
+          </button>
           <div
             style={{
-              marginTop: 14,
-              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
-              fontWeight: 700,
-              fontSize: 20,
-              color: "#EEF1F6",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              marginBottom: 28,
             }}
           >
-            {L.adminTitle}
-          </div>
-          <div style={{ fontSize: 13, color: "#8891A6", marginTop: 4 }}>
-            {displayName}
-          </div>
-        </div>
-        <form onSubmit={submit}>
-          <LoginField label={L.username}>
-            <input
-              className="wf-login-input"
-              value={username}
-              onChange={(e) => {
-                setUsername(e.target.value);
-                setError("");
+            <div
+              style={{
+                width: 58,
+                height: 58,
+                borderRadius: 14,
+                background: branding.logo
+                  ? "#fff"
+                  : `linear-gradient(150deg, ${T.blue}, #3a5fc4)`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: branding.logo
+                  ? "inset 0 0 0 1px rgba(255,255,255,0.25)"
+                  : "inset 0 0 0 1px rgba(255,255,255,0.3), 0 8px 22px rgba(91,141,239,0.35)",
+                overflow: "hidden",
+                border: branding.logo ? `1px solid ${T.line}` : "none",
               }}
-              placeholder={L.usernamePlaceholder}
-              autoFocus
-            />
-          </LoginField>
-          <LoginField label={L.password}>
-            <input
-              className="wf-login-input"
-              value={adminPass}
-              onChange={(e) => {
-                setAdminPass(e.target.value);
-                setError("");
-              }}
-              placeholder={L.passwordPlaceholder}
-              type="password"
-            />
-          </LoginField>
-          {error && (
-            <div className="wf-login-error">
-              <AlertCircle size={14} /> {error}
+            >
+              {branding.logo ? (
+                <img
+                  src={branding.logo}
+                  alt={displayName}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              ) : (
+                <ShieldCheck size={26} color="#fff" />
+              )}
             </div>
-          )}
-          <button
-            type="submit"
-            className="wf-login-btn wf-login-btn-adm"
-            disabled={loading}
-          >
-            {loading ? (
-              <Loader2
-                size={16}
-                style={{ animation: "spin 1s linear infinite" }}
+            <div
+              style={{
+                marginTop: 14,
+                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                fontWeight: 700,
+                fontSize: 20,
+                color: "var(--wfl-text)",
+              }}
+            >
+              {L.adminTitle}
+            </div>
+            <div
+              style={{
+                fontSize: 13,
+                color: "var(--wfl-text-soft)",
+                marginTop: 4,
+              }}
+            >
+              {displayName}
+            </div>
+          </div>
+          <form onSubmit={submit}>
+            <LoginField label={L.username}>
+              <input
+                className="wf-login-input"
+                value={username}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  setError("");
+                }}
+                placeholder={L.usernamePlaceholder}
+                autoFocus
               />
-            ) : (
-              <ShieldCheck size={16} />
+            </LoginField>
+            <LoginField label={L.password}>
+              <input
+                className="wf-login-input"
+                value={adminPass}
+                onChange={(e) => {
+                  setAdminPass(e.target.value);
+                  setError("");
+                }}
+                placeholder={L.passwordPlaceholder}
+                type="password"
+              />
+            </LoginField>
+            {error && (
+              <div className="wf-login-error">
+                <AlertCircle size={14} /> {error}
+              </div>
             )}
-            {loading ? "..." : L.adminSubmit}
-          </button>
-        </form>
+            <button
+              type="submit"
+              className="wf-login-btn wf-login-btn-adm"
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader2
+                  size={16}
+                  style={{ animation: "spin 1s linear infinite" }}
+                />
+              ) : (
+                <ShieldCheck size={16} />
+              )}
+              {loading ? "..." : L.adminSubmit}
+            </button>
+          </form>
+        </div>
       </div>
       <LoginCredit />
     </div>
