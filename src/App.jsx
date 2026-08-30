@@ -27201,6 +27201,18 @@ function buildNavEmployee(n, enabledModules) {
 // consumer apps (Grab, ABA...) so staff get one-tap access to the things
 // they touch daily. Less-frequent pages stay reachable via "More", which
 // opens the existing full side menu rather than duplicating it.
+// Same compact tab-bar pattern as the employee view, but for admins: the
+// 4 pages an admin checks most often, with everything else reachable via
+// the "Apps" grid page — so admin mobile gets the identical clean layout
+// instead of the old hamburger + slide-in drawer.
+function buildBottomNavAdmin(n) {
+  return [
+    { id: "dashboard", label: n.dashboard, icon: LayoutDashboard },
+    { id: "employees", label: n.employees, icon: Users },
+    { id: "attendance", label: n.attendance, icon: Clock },
+    { id: "payroll", label: n.payroll, icon: Wallet },
+  ];
+}
 function buildBottomNavEmployee(n, enabledModules) {
   const enabled = enabledModules || DEFAULT_EMPLOYEE_MODULES;
   return [
@@ -28364,7 +28376,9 @@ function AppInner() {
         )
       : buildNavEmployee(t.nav, employeeModulesForNav);
   const bottomNav =
-    role !== "admin" ? buildBottomNavEmployee(t.nav, employeeModules) : null;
+    role === "admin"
+      ? buildBottomNavAdmin(t.nav)
+      : buildBottomNavEmployee(t.nav, employeeModules);
 
   // Instantiated once here (not inside MessagesPage) so an incoming call
   // still rings no matter which page is currently open. selfId inside
