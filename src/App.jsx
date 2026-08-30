@@ -80,6 +80,7 @@ import {
   Square,
   Printer,
   Ban,
+  LayoutGrid,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -112,10 +113,12 @@ const LANG_RAW = {
     },
     nav: {
       dashboard: "ផ្ទាំងគ្រប់គ្រង",
+      apps: "កម្មវិធី",
       announcements: "សេចក្តីប្រកាស",
       employees: "បុគ្គលិក",
       departments: "នាយកដ្ឋាន",
       shifts: "វេនការងារ",
+      roster: "កាលវិភាគវេន",
       attendance: "វត្តមាន",
       holidays: "ថ្ងៃឈប់សម្រាកជាតិ",
       leave: "ច្បាប់ឈប់សម្រាក",
@@ -140,6 +143,7 @@ const LANG_RAW = {
       myDocuments: "ឯកសាររបស់ខ្ញុំ",
       myAttCorrection: "ស្នើសុំកែតម្រូវវត្តមាន",
       myShiftSwap: "ស្នើសុំដូរវេន",
+      myRoster: "កាលវិភាគវេនរបស់ខ្ញុំ",
       myProfile: "ប្រវត្តិរូបរបស់ខ្ញុំ",
       settings: "ការកំណត់",
       audits: "កំណត់ត្រាសកម្មភាព",
@@ -482,6 +486,38 @@ const LANG_RAW = {
       overnightTag: "(ឆ្លងអធ្រាត្រ)",
       confirmDelWithCount: (name, n) =>
         `តើអ្នកពិតជាចង់លុបវេន "${name}" មែនទេ? (មានបុគ្គលិក ${n} នាក់កំពុងប្រើវេននេះ)`,
+    },
+    roster: {
+      title: "កាលវិភាគវេន",
+      subtitle: "កំណត់ថាបុគ្គលិកណាធ្វើវេនណានៅថ្ងៃណា",
+      addBtn: "កំណត់កាលវិភាគ",
+      dayDetailAdd: "បន្ថែមទៅថ្ងៃនេះ",
+      noneOnDay: "មិនទាន់មានកំណត់កាលវិភាគសម្រាប់ថ្ងៃនេះទេ",
+      shiftLabel: "វេន",
+      selectShift: "ជ្រើសរើសវេន",
+      employeesLabel: "បុគ្គលិក",
+      searchEmp: "ស្វែងរកបុគ្គលិក...",
+      noEmpSelected: "សូមជ្រើសរើសបុគ្គលិកយ៉ាងហោចណាស់ម្នាក់",
+      dateModeLabel: "រយៈពេល",
+      dateModeSingle: "ថ្ងៃតែមួយ",
+      dateModeRange: "ចន្លោះកាលបរិច្ឆេទ",
+      startDate: "ថ្ងៃចាប់ផ្តើម",
+      endDate: "ថ្ងៃបញ្ចប់",
+      repeatOnLabel: "ធ្វើម្តងទៀតលើថ្ងៃ",
+      noteLabel: "កំណត់ចំណាំ (មិនចាំបាច់)",
+      notePlaceholder: "ឧ. ជំនួសបុគ្គលិកឈប់សម្រាក",
+      overwriteHint:
+        "ⓘ ប្រសិនបើបុគ្គលិកណាម្នាក់មានវេនរួចហើយនៅថ្ងៃណាមួយ វានឹងត្រូវបានជំនួសដោយវេនថ្មីនេះ",
+      removeAssignment: "លុបចេញពីកាលវិភាគ",
+      confirmRemove: (name, date) =>
+        `តើអ្នកពិតជាចង់លុប "${name}" ចេញពីកាលវិភាគថ្ងៃទី ${date} មែនទេ?`,
+      assignedCountLabel: (n) => `${n} នាក់`,
+      today: "ថ្ងៃនេះ",
+      thisMonth: "ខែនេះ",
+      myUpcoming: "កាលវិភាគខាងមុខរបស់ខ្ញុំ",
+      noUpcoming: "មិនទាន់មានកាលវិភាគកំណត់ទុកសម្រាប់ថ្ងៃខាងមុខទេ",
+      savedToast: "បានរក្សាទុកកាលវិភាគ",
+      viewAll: "មើលទាំងអស់",
     },
     att: {
       checkIn: "ចូលធ្វើការ",
@@ -1197,10 +1233,12 @@ const LANG_RAW = {
     },
     nav: {
       dashboard: "Dashboard",
+      apps: "Apps",
       announcements: "Announcements",
       employees: "Employees",
       departments: "Departments",
       shifts: "Shifts",
+      roster: "Shift Roster",
       attendance: "Attendance",
       holidays: "Public Holidays",
       leave: "Leave Requests",
@@ -1225,6 +1263,7 @@ const LANG_RAW = {
       myDocuments: "My Documents",
       myAttCorrection: "Attendance Correction",
       myShiftSwap: "Shift Swap Request",
+      myRoster: "My Shift Roster",
       myProfile: "My Profile",
       settings: "Settings",
       audits: "Audit Log",
@@ -1570,6 +1609,38 @@ const LANG_RAW = {
       overnightTag: "(overnight)",
       confirmDelWithCount: (name, n) =>
         `Are you sure you want to delete "${name}"? (${n} staff use this shift)`,
+    },
+    roster: {
+      title: "Shift Roster",
+      subtitle: "Assign which employee works which shift, on which date",
+      addBtn: "Schedule Shifts",
+      dayDetailAdd: "Add to this day",
+      noneOnDay: "No one is scheduled for this day yet",
+      shiftLabel: "Shift",
+      selectShift: "Select a shift",
+      employeesLabel: "Employees",
+      searchEmp: "Search employees...",
+      noEmpSelected: "Select at least one employee",
+      dateModeLabel: "Duration",
+      dateModeSingle: "Single day",
+      dateModeRange: "Date range",
+      startDate: "Start Date",
+      endDate: "End Date",
+      repeatOnLabel: "Repeat on",
+      noteLabel: "Note (optional)",
+      notePlaceholder: "e.g. Covering for staff on leave",
+      overwriteHint:
+        "ⓘ If an employee already has a shift on a given day, it will be replaced by this new one",
+      removeAssignment: "Remove from roster",
+      confirmRemove: (name, date) =>
+        `Remove "${name}" from the roster on ${date}?`,
+      assignedCountLabel: (n) => `${n} assigned`,
+      today: "Today",
+      thisMonth: "This Month",
+      myUpcoming: "My Upcoming Schedule",
+      noUpcoming: "No upcoming schedule set yet",
+      savedToast: "Roster saved",
+      viewAll: "View all",
     },
     att: {
       checkIn: "Check In",
@@ -2287,6 +2358,7 @@ const LANG_RAW = {
     },
     nav: {
       dashboard: "仪表板",
+      apps: "应用",
       announcements: "公告",
       employees: "员工",
       departments: "部门",
@@ -2955,6 +3027,7 @@ const EMPLOYEE_MODULES = [
   "training",
   "attcorr",
   "shiftswap",
+  "roster",
   "documents",
   "loginActivity",
   "profile",
@@ -2971,6 +3044,7 @@ const EMPLOYEE_MODULE_LABEL = {
     training: "ការបណ្តុះបណ្តាល & សញ្ញាបត្រ",
     attcorr: "សំណើកែតម្រូវវត្តមាន",
     shiftswap: "សំណើដូរវេន",
+    roster: "កាលវិភាគវេនរបស់ខ្ញុំ",
     documents: "ឯកសារផ្ទាល់ខ្លួន",
     loginActivity: "សកម្មភាពចូលប្រើ",
     profile: "ប្រវត្តិរូបផ្ទាល់ខ្លួន",
@@ -2986,6 +3060,7 @@ const EMPLOYEE_MODULE_LABEL = {
     training: "My Training & Certifications",
     attcorr: "Attendance Correction",
     shiftswap: "Shift Swap Request",
+    roster: "My Shift Roster",
     documents: "My Documents",
     loginActivity: "Login Activity",
     profile: "My Profile",
@@ -3020,6 +3095,7 @@ const DEFAULT_EMPLOYEE_MODULES = {
   training: true,
   attcorr: true,
   shiftswap: true,
+  roster: true,
   documents: true,
   loginActivity: true,
   profile: true,
@@ -3186,10 +3262,12 @@ html,body,#root{height:100%;}
 .wf-sidebar-inner{display:flex;flex-direction:column;height:100%;}
 .wf-logo-badge{width:32px;height:32px;border-radius:7px;background:${T.gold};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#1A1300;font-family:'JetBrains Mono',monospace;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);}
 .wf-nav-eyebrow{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#4C5670;padding:4px 14px 8px;}
+.wf-sidebar-nav{flex:1;min-height:0;overflow-y:auto;padding:14px 10px;display:flex;flex-direction:column;gap:3px;}
 .wf-nav-item{position:relative;width:100%;display:flex;align-items:center;gap:11px;padding:9px 14px;border-radius:7px;font-size:13.5px;font-weight:500;background:transparent;color:#8891A6;border:none;cursor:pointer;text-align:left;transition:background .15s ease,color .15s ease;}
 .wf-nav-item:hover{background:rgba(255,255,255,0.045);color:#fff;}
 .wf-nav-item.active{background:rgba(240,168,59,0.09);color:#fff;font-weight:600;}
 .wf-nav-item.active::before{content:"";position:absolute;left:-10px;top:6px;bottom:6px;width:2px;border-radius:0;background:${T.gold};}
+.wf-nav-icon-wrap{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;flex-shrink:0;}
 .wf-main{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;background:${T.paper};}
 .wf-header{background:${T.headerBg};backdrop-filter:blur(8px);border-bottom:1px solid ${T.lineSoft};padding:13px 22px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;transition:background .15s ease,border-color .15s ease;}
 .wf-content{flex:1;overflow-y:auto;padding:22px;}
@@ -3275,6 +3353,13 @@ html,body,#root{height:100%;}
 .wf-table tbody tr{transition:background .12s ease;}
 .wf-table tbody tr:hover{background:${T.tableHeadBg};}
 .wf-grid{display:grid;gap:16px;}
+.wf-dash-stats{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));}
+.wf-apps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.wf-apps-tile{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:9px;background:${T.card};border:1px solid ${T.line};border-radius:16px;padding:18px 6px;cursor:pointer;text-align:center;transition:transform .12s ease,box-shadow .15s ease,border-color .15s ease;}
+.wf-apps-tile:hover{border-color:${T.gold};box-shadow:0 4px 14px rgba(5,8,16,0.06);}
+.wf-apps-tile:active{transform:scale(.96);}
+.wf-apps-tile-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.wf-apps-tile-label{font-size:12px;font-weight:600;color:${T.ink};line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .wf-punch-clock{font-size:34px;font-weight:700;font-family:'JetBrains Mono',monospace;color:${T.ink};font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
 .wf-menu-btn{display:none;background:none;border:none;color:${T.ink};cursor:pointer;padding:4px;}
 .wf-overlay-scrim{display:none;}
@@ -3317,6 +3402,22 @@ html,body,#root{height:100%;}
   .wf-chat-layout.wf-chat-thread-open .wf-chat-list-pane{display:none;}
   .wf-chat-layout:not(.wf-chat-thread-open) .wf-chat-thread-pane{display:none;}
   .wf-chat-back-btn{display:inline-flex !important;}
+  /* "More" menu becomes a tidy icon grid (like a phone home-screen /
+     app launcher) instead of a plain stacked list once the sidebar is
+     a full-height slide-in drawer. */
+  .wf-sidebar-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 8px;padding:18px 14px 14px;align-content:start;}
+  .wf-sidebar-nav .wf-nav-eyebrow{grid-column:1/-1;padding:0 2px 6px;}
+  .wf-sidebar-nav .wf-nav-item{flex-direction:column;gap:7px;padding:10px 2px;border-radius:14px;text-align:center;font-size:10.5px;line-height:1.25;}
+  .wf-sidebar-nav .wf-nav-item.active::before{content:none;}
+  .wf-sidebar-nav .wf-nav-item.active{background:rgba(255,255,255,0.07);}
+  .wf-sidebar-nav .wf-nav-icon-wrap{width:46px;height:46px;border-radius:14px;}
+  .wf-sidebar-nav .wf-nav-label{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  /* Dashboard "my dept / shift / status / payroll" stat cards: force a
+     tight 2-column grid on phones instead of auto-fit(190px), which
+     collapses to a single stacked column on narrow screens and reads
+     as messy/unorganized. */
+  .wf-dash-stats{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .wf-dash-stats .wf-card{padding:13px !important;}
 }
 .wf-chat-layout{display:flex;gap:0;height:calc(100vh - 230px);min-height:420px;border:1px solid ${T.lineSoft};border-radius:14px;overflow:hidden;background:${T.card};}
 .wf-chat-list-pane{width:300px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid ${T.lineSoft};overflow-y:auto;}
@@ -3341,6 +3442,21 @@ html,body,#root{height:100%;}
 .wf-callbtn-circle.wf-callbtn-secondary{background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.22);box-shadow:none;}
 .wf-callbtn-circle.wf-callbtn-secondary.wf-callbtn-active{background:#fff;color:#0a0e1a;}
 .wf-callbtn-label{font-size:12.5px;color:rgba(255,255,255,0.75);font-weight:600;}
+.wf-roster-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.wf-roster-dow{font-size:11px;font-weight:700;color:${T.muted};text-align:center;padding:4px 0;text-transform:uppercase;}
+.wf-roster-cell{position:relative;min-height:88px;border:1px solid ${T.lineSoft};border-radius:10px;padding:6px;cursor:pointer;background:${T.card};display:flex;flex-direction:column;gap:4px;transition:background .12s ease,border-color .12s ease;}
+.wf-roster-cell:hover{background:${T.paper};border-color:${T.line};}
+.wf-roster-cell.outside{opacity:.4;}
+.wf-roster-cell.today{border-color:${T.gold};}
+.wf-roster-daynum{font-size:12px;font-weight:700;color:${T.ink};}
+.wf-roster-pill{font-size:10.5px;font-weight:600;padding:2px 6px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wf-roster-more{font-size:10px;color:${T.muted};font-weight:600;}
+@media (max-width:640px){
+  .wf-roster-grid{gap:4px;}
+  .wf-roster-cell{min-height:64px;padding:4px;}
+  .wf-roster-dow{font-size:9.5px;}
+  .wf-roster-pill{font-size:9px;padding:1px 4px;}
+}
 `;
 function useGlobalStyle() {
   useEffect(() => {
@@ -4902,6 +5018,7 @@ const REALTIME_TABLES = [
   "holidays",
   "attendance_corrections",
   "shift_swap_requests",
+  "shift_roster",
   "admins",
   "offices",
   "payroll_paid",
@@ -8453,13 +8570,7 @@ function Dashboard({
         />
       )}
 
-      <div
-        className="wf-grid"
-        style={{
-          gridTemplateColumns: "repeat(auto-fit, minmax(190px,1fr))",
-          marginBottom: 22,
-        }}
-      >
+      <div className="wf-dash-stats" style={{ marginBottom: 22 }}>
         {stats.map((s) => (
           <Card key={s.label} accent={s.accent} style={{ padding: 16 }}>
             <div
@@ -12047,6 +12158,767 @@ function Shifts({ shifts, setShifts, employees, isSuperAdmin }) {
             setConfirmDel(null);
           }}
         />
+      )}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   Roster (shift scheduling calendar) — lets admins assign which
+   employee works which shift on which specific date, on top of the
+   shift *types* managed above. Stored as one row per (employee, date)
+   in `shift_roster`; a new save for the same employee+date overwrites
+   the previous one rather than duplicating (one shift per person per
+   day). Employees see a read-only month view of just their own rows.
+----------------------------------------------------------------*/
+// One bulk "assign" action can fan out into many rows: every selected
+// employee × every date in range that matches the checked weekdays.
+// Returns the array of {id, employeeId, shiftId, date, note} rows to
+// upsert — reusing an existing row's id when one already exists for
+// that employee+date (so it's an overwrite, not a duplicate).
+function buildRosterRows({ existing, employeeIds, shiftId, dates, note }) {
+  return employeeIds.flatMap((employeeId) =>
+    dates.map((date) => {
+      const prior = existing.find(
+        (r) => r.employeeId === employeeId && r.date === date,
+      );
+      return {
+        id: prior ? prior.id : uid("ros"),
+        employeeId,
+        shiftId,
+        date,
+        note: note || "",
+      };
+    }),
+  );
+}
+
+function RosterAssignForm({
+  initialDate,
+  employees,
+  departments,
+  shifts,
+  shiftRoster,
+  onSave,
+  onCancel,
+}) {
+  const { t, lang } = useLang();
+  const [shiftId, setShiftId] = useState(shifts[0]?.id || "");
+  const [dateMode, setDateMode] = useState("single");
+  const [startDate, setStartDate] = useState(initialDate || todayStr());
+  const [endDate, setEndDate] = useState(initialDate || todayStr());
+  const [repeatDays, setRepeatDays] = useState([0, 1, 2, 3, 4, 5, 6]);
+  const [deptFilter, setDeptFilter] = useState("");
+  const [search, setSearch] = useState("");
+  const [selectedEmp, setSelectedEmp] = useState([]);
+  const [note, setNote] = useState("");
+
+  const activeEmployees = employees.filter((e) => e.status === "active");
+  const filteredEmp = activeEmployees.filter((e) => {
+    if (deptFilter && e.deptId !== deptFilter) return false;
+    if (search && !e.name.toLowerCase().includes(search.toLowerCase()))
+      return false;
+    return true;
+  });
+  const toggleEmp = (id) =>
+    setSelectedEmp((cur) =>
+      cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id],
+    );
+  const toggleDow = (dow) =>
+    setRepeatDays((cur) =>
+      cur.includes(dow) ? cur.filter((d) => d !== dow) : [...cur, dow],
+    );
+
+  const dates =
+    dateMode === "single"
+      ? startDate
+        ? [startDate]
+        : []
+      : dateRange(startDate, endDate).filter((d) => {
+          const [y, m, dd] = d.split("-").map(Number);
+          return repeatDays.includes(new Date(y, m - 1, dd).getDay());
+        });
+
+  const invalid = !shiftId || dates.length === 0 || selectedEmp.length === 0;
+
+  const save = () => {
+    const rows = buildRosterRows({
+      existing: shiftRoster,
+      employeeIds: selectedEmp,
+      shiftId,
+      dates,
+      note: note.trim(),
+    });
+    onSave(rows);
+  };
+
+  return (
+    <div>
+      <Field label={t.roster.shiftLabel}>
+        <Select value={shiftId} onChange={(e) => setShiftId(e.target.value)}>
+          <option value="" disabled>
+            {t.roster.selectShift}
+          </option>
+          {shifts.map((s) => (
+            <option key={s.id} value={s.id}>
+              {shiftLabel(s)}
+            </option>
+          ))}
+        </Select>
+      </Field>
+      <Field label={t.roster.dateModeLabel}>
+        <div style={{ display: "flex", gap: 8 }}>
+          {["single", "range"].map((m) => (
+            <button
+              type="button"
+              key={m}
+              onClick={() => setDateMode(m)}
+              style={{
+                flex: 1,
+                padding: "8px 10px",
+                borderRadius: 9,
+                border: `1px solid ${dateMode === m ? T.forest : T.line}`,
+                background: dateMode === m ? T.forestSoft : T.inputBg,
+                color: dateMode === m ? T.forestText : T.text,
+                fontWeight: 600,
+                fontSize: 12.5,
+                cursor: "pointer",
+              }}
+            >
+              {m === "single"
+                ? t.roster.dateModeSingle
+                : t.roster.dateModeRange}
+            </button>
+          ))}
+        </div>
+      </Field>
+      {dateMode === "single" ? (
+        <Field label={t.selectDate}>
+          <DatePicker
+            value={startDate}
+            onChange={(e) => {
+              setStartDate(e.target.value);
+              setEndDate(e.target.value);
+            }}
+          />
+        </Field>
+      ) : (
+        <>
+          <div className="wf-grid-2">
+            <Field label={t.roster.startDate}>
+              <DatePicker
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </Field>
+            <Field label={t.roster.endDate}>
+              <DatePicker
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </Field>
+          </div>
+          <Field label={t.roster.repeatOnLabel}>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {WEEKDAY_LABELS.map((label, dow) => {
+                const active = repeatDays.includes(dow);
+                return (
+                  <button
+                    type="button"
+                    key={dow}
+                    onClick={() => toggleDow(dow)}
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 9,
+                      border: `1px solid ${active ? T.forest : T.line}`,
+                      background: active ? T.forest : T.inputBg,
+                      color: active ? "#fff" : T.text,
+                      fontWeight: 700,
+                      fontSize: 12,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </Field>
+        </>
+      )}
+      <Field label={t.roster.employeesLabel}>
+        <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+          <Input
+            placeholder={t.roster.searchEmp}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ flex: 1 }}
+          />
+          <Select
+            value={deptFilter}
+            onChange={(e) => setDeptFilter(e.target.value)}
+            style={{ maxWidth: 160 }}
+          >
+            <option value="">
+              {lang === "en" ? "All Depts" : "គ្រប់នាយកដ្ឋាន"}
+            </option>
+            {departments.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.name}
+              </option>
+            ))}
+          </Select>
+        </div>
+        <div
+          style={{
+            maxHeight: 220,
+            overflowY: "auto",
+            border: `1px solid ${T.lineSoft}`,
+            borderRadius: 10,
+          }}
+        >
+          {filteredEmp.length === 0 && (
+            <div style={{ padding: 14, fontSize: 12.5, color: T.muted }}>
+              {t.noResults}
+            </div>
+          )}
+          {filteredEmp.map((e) => {
+            const checked = selectedEmp.includes(e.id);
+            return (
+              <label
+                key={e.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "8px 10px",
+                  borderBottom: `1px solid ${T.lineSoft}`,
+                  cursor: "pointer",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => toggleEmp(e.id)}
+                  style={{ width: 16, height: 16, cursor: "pointer" }}
+                />
+                <Avatar name={e.name} size={28} photo={e.photo} />
+                <span style={{ fontSize: 12.5, color: T.ink, fontWeight: 600 }}>
+                  {e.name}
+                </span>
+              </label>
+            );
+          })}
+        </div>
+        {selectedEmp.length > 0 && (
+          <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+            {t.roster.assignedCountLabel(selectedEmp.length)}
+          </p>
+        )}
+      </Field>
+      <Field label={t.roster.noteLabel}>
+        <Input
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder={t.roster.notePlaceholder}
+        />
+      </Field>
+      <p
+        style={{
+          fontSize: 11.5,
+          color: T.muted,
+          marginTop: -6,
+          marginBottom: 14,
+        }}
+      >
+        {t.roster.overwriteHint}
+      </p>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          marginTop: 16,
+          paddingTop: 14,
+          borderTop: `1px solid ${T.lineSoft}`,
+        }}
+      >
+        <Button variant="ghost" onClick={onCancel}>
+          {t.cancel}
+        </Button>
+        <Button variant="accent" onClick={save} disabled={invalid}>
+          {t.save}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// Detail popup for one day: lists everyone already assigned that day
+// (grouped visually by shift via the colored dot), lets an admin remove
+// a single assignment, and offers a shortcut into RosterAssignForm
+// pre-filled to that date for adding more people.
+function RosterDayModal({
+  date,
+  employees,
+  shifts,
+  shiftRoster,
+  onAdd,
+  onRemove,
+  onClose,
+}) {
+  const { t } = useLang();
+  const rows = shiftRoster
+    .filter((r) => r.date === date)
+    .map((r) => ({
+      row: r,
+      emp: employees.find((e) => e.id === r.employeeId),
+      shift: shifts.find((s) => s.id === r.shiftId),
+    }))
+    .filter((x) => x.emp)
+    .sort((a, b) => (a.emp.name || "").localeCompare(b.emp.name || ""));
+  const [confirmRemove, setConfirmRemove] = useState(null);
+
+  return (
+    <Modal title={fmtDateDisplay(date) || date} onClose={onClose} width={460}>
+      {rows.length === 0 && (
+        <p style={{ fontSize: 13, color: T.muted, marginBottom: 16 }}>
+          {t.roster.noneOnDay}
+        </p>
+      )}
+      {rows.length > 0 && (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+            marginBottom: 16,
+          }}
+        >
+          {rows.map(({ row, emp, shift }) => (
+            <div
+              key={row.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 10,
+                padding: "9px 10px",
+                border: `1px solid ${T.lineSoft}`,
+                borderRadius: 10,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  minWidth: 0,
+                }}
+              >
+                <Avatar name={emp.name} size={30} photo={emp.photo} />
+                <div style={{ minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 12.5,
+                      fontWeight: 600,
+                      color: T.ink,
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {emp.name}
+                  </div>
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 5 }}
+                  >
+                    <span
+                      style={{
+                        width: 7,
+                        height: 7,
+                        borderRadius: "50%",
+                        background: shift ? colorFor(shift.name) : T.mutedLight,
+                        display: "inline-block",
+                      }}
+                    />
+                    <span style={{ fontSize: 11, color: T.muted }}>
+                      {shift ? shiftLabel(shift) : "—"}
+                    </span>
+                  </div>
+                  {row.note && (
+                    <div
+                      style={{
+                        fontSize: 10.5,
+                        color: T.mutedLight,
+                        marginTop: 2,
+                      }}
+                    >
+                      {row.note}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={() => setConfirmRemove({ row, emp })}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: T.mutedLight,
+                  flexShrink: 0,
+                }}
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      <Button
+        variant="accent"
+        onClick={() => onAdd(date)}
+        style={{ width: "100%", justifyContent: "center" }}
+      >
+        <Plus size={15} /> {t.roster.dayDetailAdd}
+      </Button>
+      {confirmRemove && (
+        <ConfirmDialog
+          text={t.roster.confirmRemove(confirmRemove.emp.name, date)}
+          onCancel={() => setConfirmRemove(null)}
+          onConfirm={() => {
+            onRemove(confirmRemove.row.id);
+            setConfirmRemove(null);
+          }}
+        />
+      )}
+    </Modal>
+  );
+}
+
+function Roster({
+  role,
+  currentEmp,
+  employees,
+  departments,
+  shifts,
+  shiftRoster,
+  setShiftRoster,
+  isSuperAdmin,
+}) {
+  const { t, lang } = useLang();
+  const [cursor, setCursor] = useState(() => new Date());
+  const [dayModal, setDayModal] = useState(null); // date string
+  const [assignModal, setAssignModal] = useState(null); // { date? } or {} for bulk
+  const today = todayStr();
+
+  const year = cursor.getFullYear();
+  const month = cursor.getMonth();
+  const cells = buildCalendarCells(year, month);
+  const title = monthTitleFor(year, month);
+
+  const shiftOf = (id) => shifts.find((s) => s.id === id);
+  const rosterByDate = useMemo(() => {
+    const map = {};
+    shiftRoster.forEach((r) => {
+      if (!map[r.date]) map[r.date] = [];
+      map[r.date].push(r);
+    });
+    return map;
+  }, [shiftRoster]);
+
+  const saveRows = (rows) => {
+    const nextIds = new Set(rows.map((r) => r.id));
+    const withoutOverwritten = shiftRoster.filter((r) => !nextIds.has(r.id));
+    setShiftRoster([...withoutOverwritten, ...rows]);
+    pushToast(t.roster.savedToast);
+    setAssignModal(null);
+    setDayModal(null);
+  };
+
+  const removeRow = (id) => {
+    setShiftRoster(shiftRoster.filter((r) => r.id !== id));
+  };
+
+  // Employee (read-only) view: their own upcoming schedule, plus the
+  // same month calendar but only showing their own rows.
+  if (role !== "admin" && currentEmp) {
+    const myRows = shiftRoster
+      .filter((r) => r.employeeId === currentEmp.id)
+      .sort((a, b) => a.date.localeCompare(b.date));
+    const myUpcoming = myRows.filter((r) => r.date >= today).slice(0, 8);
+    return (
+      <div>
+        <Card style={{ padding: 16, marginBottom: 16 }}>
+          <h3
+            style={{
+              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+              fontWeight: 600,
+              color: T.ink,
+              marginBottom: 12,
+              fontSize: 14,
+            }}
+          >
+            {t.roster.myUpcoming}
+          </h3>
+          {myUpcoming.length === 0 && (
+            <p style={{ fontSize: 13, color: T.muted }}>
+              {t.roster.noUpcoming}
+            </p>
+          )}
+          {myUpcoming.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {myUpcoming.map((r) => {
+                const shift = shiftOf(r.shiftId);
+                return (
+                  <div
+                    key={r.id}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "9px 12px",
+                      border: `1px solid ${T.lineSoft}`,
+                      borderRadius: 10,
+                    }}
+                  >
+                    <span
+                      style={{ fontSize: 12.5, fontWeight: 600, color: T.ink }}
+                    >
+                      {r.date === today
+                        ? t.roster.today
+                        : fmtDateDisplay(r.date)}
+                    </span>
+                    <span
+                      className="wf-badge"
+                      style={{
+                        background: shift ? T.forestSoft : "#EEE",
+                        color: shift ? T.forestText : "#555",
+                      }}
+                    >
+                      {shift ? shiftLabel(shift) : "—"}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </Card>
+        <Card style={{ padding: 16 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 12,
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setCursor(new Date(year, month - 1, 1))}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: T.ink,
+              }}
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <span style={{ fontSize: 13.5, fontWeight: 700, color: T.ink }}>
+              {title}
+            </span>
+            <button
+              type="button"
+              onClick={() => setCursor(new Date(year, month + 1, 1))}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: T.ink,
+              }}
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+          <div className="wf-roster-grid">
+            {DP_DOW.map((w, i) => (
+              <div className="wf-roster-dow" key={i}>
+                {w}
+              </div>
+            ))}
+            {cells.map((c, i) => {
+              const ymd = fmtYMD(c.date);
+              const mine = myRows.find((r) => r.date === ymd);
+              const shift = mine ? shiftOf(mine.shiftId) : null;
+              return (
+                <div
+                  key={i}
+                  className={`wf-roster-cell${c.outside ? " outside" : ""}${ymd === today ? " today" : ""}`}
+                  style={{ cursor: "default" }}
+                >
+                  <span className="wf-roster-daynum">{c.day}</span>
+                  {shift && (
+                    <span
+                      className="wf-roster-pill"
+                      style={{ background: T.forestSoft, color: T.forestText }}
+                    >
+                      {shift.name}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  // Admin view: full month grid with click-to-manage per day.
+  return (
+    <div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16,
+          flexWrap: "wrap",
+          gap: 10,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <button
+            type="button"
+            onClick={() => setCursor(new Date(year, month - 1, 1))}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: T.ink,
+            }}
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <span
+            style={{
+              fontSize: 15,
+              fontWeight: 700,
+              color: T.ink,
+              minWidth: 130,
+              textAlign: "center",
+            }}
+          >
+            {title}
+          </span>
+          <button
+            type="button"
+            onClick={() => setCursor(new Date(year, month + 1, 1))}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: T.ink,
+            }}
+          >
+            <ChevronRight size={20} />
+          </button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setCursor(new Date())}
+          >
+            {t.roster.today}
+          </Button>
+        </div>
+        {isSuperAdmin && (
+          <Button variant="accent" onClick={() => setAssignModal({})}>
+            <Plus size={15} /> {t.roster.addBtn}
+          </Button>
+        )}
+      </div>
+      <Card style={{ padding: 16 }}>
+        <div className="wf-roster-grid">
+          {DP_DOW.map((w, i) => (
+            <div className="wf-roster-dow" key={i}>
+              {w}
+            </div>
+          ))}
+          {cells.map((c, i) => {
+            const ymd = fmtYMD(c.date);
+            const dayRows = rosterByDate[ymd] || [];
+            const byShift = {};
+            dayRows.forEach((r) => {
+              if (!byShift[r.shiftId]) byShift[r.shiftId] = 0;
+              byShift[r.shiftId]++;
+            });
+            const shiftIds = Object.keys(byShift);
+            const MAX_SHOWN = 3;
+            return (
+              <div
+                key={i}
+                className={`wf-roster-cell${c.outside ? " outside" : ""}${ymd === today ? " today" : ""}`}
+                onClick={() => setDayModal(ymd)}
+              >
+                <span className="wf-roster-daynum">{c.day}</span>
+                {shiftIds.slice(0, MAX_SHOWN).map((sid) => {
+                  const shift = shiftOf(sid);
+                  return (
+                    <span
+                      key={sid}
+                      className="wf-roster-pill"
+                      style={{
+                        background: colorFor(shift?.name || sid) + "22",
+                        color: colorFor(shift?.name || sid),
+                      }}
+                    >
+                      {shift ? shift.name : "?"} · {byShift[sid]}
+                    </span>
+                  );
+                })}
+                {shiftIds.length > MAX_SHOWN && (
+                  <span className="wf-roster-more">
+                    +{shiftIds.length - MAX_SHOWN}{" "}
+                    {lang === "en" ? "more" : "ទៀត"}
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+      {dayModal && (
+        <RosterDayModal
+          date={dayModal}
+          employees={employees}
+          shifts={shifts}
+          shiftRoster={shiftRoster}
+          onAdd={(date) => {
+            setDayModal(null);
+            setAssignModal({ date });
+          }}
+          onRemove={removeRow}
+          onClose={() => setDayModal(null)}
+        />
+      )}
+      {assignModal && (
+        <Modal
+          title={t.roster.addBtn}
+          onClose={() => setAssignModal(null)}
+          width={520}
+        >
+          <RosterAssignForm
+            initialDate={assignModal.date}
+            employees={employees}
+            departments={departments}
+            shifts={shifts}
+            shiftRoster={shiftRoster}
+            onSave={saveRows}
+            onCancel={() => setAssignModal(null)}
+          />
+        </Modal>
       )}
     </div>
   );
@@ -26158,14 +27030,63 @@ function Payroll({
 /* ---------------------------------------------------------------
    App shell
 ----------------------------------------------------------------*/
+// A dedicated full-page grid of every module the bottom tab bar doesn't
+// have room for — replaces the old "More" slide-in drawer for the
+// employee/staff mobile view so it reads as its own page (like a phone
+// app-launcher) instead of an overlay panel.
+function MoreAppsPage({ nav, setPage }) {
+  const { t } = useLang();
+  const items = nav.filter((n) => n.id !== "dashboard");
+  return (
+    <div>
+      <h2
+        style={{
+          fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+          fontSize: 19,
+          fontWeight: 700,
+          color: T.ink,
+          marginBottom: 16,
+        }}
+      >
+        {t.nav.apps}
+      </h2>
+      <div className="wf-apps-grid">
+        {items.map((n) => {
+          const accent = n.accent || T.blue;
+          return (
+            <button
+              key={n.id}
+              className="wf-apps-tile"
+              onClick={() => setPage(n.id)}
+            >
+              <span
+                className="wf-apps-tile-icon"
+                style={{ background: accent + "1F", color: accent }}
+              >
+                <n.icon size={22} />
+              </span>
+              <span className="wf-apps-tile-label">{n.label}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 function buildNavAdmin(n) {
-  return [
+  return withNavAccents([
     { id: "dashboard", label: n.dashboard, icon: LayoutDashboard },
     { id: "analytics", label: n.analytics, icon: BarChart3 },
     { id: "announcements", label: n.announcements, icon: Megaphone },
     { id: "employees", label: n.employees, icon: Users },
     { id: "departments", label: n.departments, icon: Building2 },
     { id: "shifts", label: n.shifts, icon: Watch },
+    {
+      id: "roster",
+      label: n.roster,
+      icon: CalendarClock,
+      permission: "manageDepartments",
+    },
     { id: "attendance", label: n.attendance, icon: Clock },
     { id: "messages", label: n.messages, icon: MessageCircle },
     { id: "holidays", label: n.holidays, icon: CalendarDays },
@@ -26240,26 +27161,39 @@ function buildNavAdmin(n) {
     },
     { id: "loginActivity", label: n.loginActivity, icon: Smartphone },
     { id: "settings", label: n.settings, icon: Settings2 },
-  ];
+  ]);
+}
+// Cycles each nav item through the existing brand PALETTE so every module
+// gets a distinct icon color — turns the mobile "More" grid into a set of
+// recognizable colored tiles (like a phone app-launcher) instead of a wall
+// of same-color icons.
+function withNavAccents(items) {
+  return items.map((item, i) => ({
+    ...item,
+    accent: PALETTE[i % PALETTE.length],
+  }));
 }
 function buildNavEmployee(n, enabledModules) {
   const enabled = enabledModules || DEFAULT_EMPLOYEE_MODULES;
-  return [
-    { id: "dashboard", label: n.dashboard, icon: LayoutDashboard },
-    { id: "announcements", label: n.announcements, icon: Megaphone },
-    { id: "attendance", label: n.myAttendance, icon: Clock },
-    { id: "messages", label: n.messages, icon: MessageCircle },
-    { id: "leave", label: n.myLeave, icon: CalendarDays },
-    { id: "ot", label: n.myOvertime, icon: Timer },
-    { id: "payroll", label: n.myPayroll, icon: Wallet },
-    { id: "review", label: n.myPerformance, icon: Star },
-    { id: "training", label: n.myTraining, icon: GraduationCap },
-    { id: "attcorr", label: n.myAttCorrection, icon: CalendarClock },
-    { id: "shiftswap", label: n.myShiftSwap, icon: Repeat },
-    { id: "documents", label: n.myDocuments, icon: FileText },
-    { id: "loginActivity", label: n.loginActivity, icon: Smartphone },
-    { id: "profile", label: n.myProfile, icon: UserCircle2 },
-  ].filter((item) => item.id === "dashboard" || enabled[item.id] !== false);
+  return withNavAccents(
+    [
+      { id: "dashboard", label: n.dashboard, icon: LayoutDashboard },
+      { id: "announcements", label: n.announcements, icon: Megaphone },
+      { id: "attendance", label: n.myAttendance, icon: Clock },
+      { id: "messages", label: n.messages, icon: MessageCircle },
+      { id: "leave", label: n.myLeave, icon: CalendarDays },
+      { id: "ot", label: n.myOvertime, icon: Timer },
+      { id: "payroll", label: n.myPayroll, icon: Wallet },
+      { id: "review", label: n.myPerformance, icon: Star },
+      { id: "training", label: n.myTraining, icon: GraduationCap },
+      { id: "attcorr", label: n.myAttCorrection, icon: CalendarClock },
+      { id: "shiftswap", label: n.myShiftSwap, icon: Repeat },
+      { id: "roster", label: n.myRoster, icon: CalendarClock },
+      { id: "documents", label: n.myDocuments, icon: FileText },
+      { id: "loginActivity", label: n.loginActivity, icon: Smartphone },
+      { id: "profile", label: n.myProfile, icon: UserCircle2 },
+    ].filter((item) => item.id === "dashboard" || enabled[item.id] !== false),
+  );
 }
 
 // Compact 5-item tab bar shown on phones for the employee/staff role,
@@ -26559,6 +27493,33 @@ function AppInner() {
     audit: true,
     actorRef,
   });
+  // One row per (employee, date) — which shift that employee is scheduled
+  // to work on that specific day, on top of the shift *types* above. Not
+  // date-windowed like attendance: unlike punches, the roster is small
+  // (one row per scheduled day, not one per check-in/out) and admins need
+  // to browse both past and future months freely.
+  const [shiftRoster, setShiftRoster, rosterReady] = useSupabaseArray(
+    "shift_roster",
+    {
+      fromDb: (r) => ({
+        id: r.id,
+        employeeId: r.employee_id,
+        shiftId: r.shift_id,
+        date: r.date,
+        note: r.note || "",
+      }),
+      toDb: (r) => ({
+        id: r.id,
+        employee_id: r.employeeId,
+        shift_id: r.shiftId,
+        date: r.date,
+        note: r.note || null,
+      }),
+      audit: true,
+      actorRef,
+      entityLabel: (r) => `${r.date || "?"} · ${r.employeeId || "?"}`,
+    },
+  );
   const [attendance, setAttendance, aReady] = useSupabaseArray("attendance", {
     // Attendance grows without bound (every check-in/out, forever), so we
     // only keep a rolling 6-month window live in the app — enough for the
@@ -27204,6 +28165,7 @@ function AppInner() {
         training: r.emp_training ?? true,
         attcorr: r.emp_attcorr ?? true,
         shiftswap: r.emp_shiftswap ?? true,
+        roster: r.emp_roster ?? true,
         documents: r.emp_documents ?? true,
         loginActivity: r.emp_login_activity ?? true,
         profile: r.emp_profile ?? true,
@@ -27229,6 +28191,7 @@ function AppInner() {
         emp_training: r.training,
         emp_attcorr: r.attcorr,
         emp_shiftswap: r.shiftswap,
+        emp_roster: r.roster,
         emp_documents: r.documents,
         emp_login_activity: r.loginActivity,
         emp_profile: r.profile,
@@ -27745,32 +28708,31 @@ function AppInner() {
                 <X size={18} />
               </button>
             </div>
-            <nav
-              style={{
-                flex: 1,
-                minHeight: 0,
-                overflowY: "auto",
-                padding: "14px 10px",
-                display: "flex",
-                flexDirection: "column",
-                gap: 3,
-              }}
-            >
+            <nav className="wf-sidebar-nav">
               <div className="wf-nav-eyebrow">
                 {lang === "km" ? "ម៉ឺនុយ" : "Menu"}
               </div>
-              {nav.map((n) => (
-                <button
-                  key={n.id}
-                  className={`wf-nav-item ${page === n.id ? "active" : ""}`}
-                  onClick={() => {
-                    setPage(n.id);
-                    setNavOpen(false);
-                  }}
-                >
-                  <n.icon size={17} /> {n.label}
-                </button>
-              ))}
+              {nav.map((n) => {
+                const accent = n.accent || T.blue;
+                return (
+                  <button
+                    key={n.id}
+                    className={`wf-nav-item ${page === n.id ? "active" : ""}`}
+                    onClick={() => {
+                      setPage(n.id);
+                      setNavOpen(false);
+                    }}
+                  >
+                    <span
+                      className="wf-nav-icon-wrap"
+                      style={{ background: accent + "26", color: accent }}
+                    >
+                      <n.icon size={17} />
+                    </span>
+                    <span className="wf-nav-label">{n.label}</span>
+                  </button>
+                );
+              })}
             </nav>
             <div
               style={{
@@ -28030,6 +28992,9 @@ function AppInner() {
                 </div>
               )}
             <div key={page} className="wf-page-enter">
+              {page === "moreApps" && (
+                <MoreAppsPage nav={nav} setPage={setPage} />
+              )}
               {page === "dashboard" && (
                 <Dashboard
                   employees={employees}
@@ -28094,6 +29059,19 @@ function AppInner() {
                   isSuperAdmin={isSuperAdmin || can("manageDepartments")}
                 />
               )}
+              {page === "roster" &&
+                (role === "admin" || moduleEnabled("roster")) && (
+                  <Roster
+                    role={role}
+                    currentEmp={currentEmp}
+                    employees={employees}
+                    departments={departments}
+                    shifts={shifts}
+                    shiftRoster={shiftRoster}
+                    setShiftRoster={setShiftRoster}
+                    isSuperAdmin={isSuperAdmin || can("manageDepartments")}
+                  />
+                )}
               {page === "assets" &&
                 role === "admin" &&
                 (isSuperAdmin || can("manageAssets")) && (
@@ -28353,13 +29331,13 @@ function AppInner() {
                 </button>
               ))}
               <button
-                className={`wf-bottomnav-item ${navOpen ? "active" : ""}`}
-                onClick={() => setNavOpen(true)}
+                className={`wf-bottomnav-item ${page === "moreApps" ? "active" : ""}`}
+                onClick={() => setPage("moreApps")}
               >
                 <span className="wf-bnav-icon-wrap">
-                  <Menu size={19} />
+                  <LayoutGrid size={19} />
                 </span>
-                <span>{lang === "km" ? "ផ្សេងទៀត" : "More"}</span>
+                <span>{t.nav.apps}</span>
               </button>
             </nav>
           )}
