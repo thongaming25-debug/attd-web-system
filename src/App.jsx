@@ -3354,6 +3354,10 @@ html,body,#root{height:100%;}
 .wf-table tbody tr:hover{background:${T.tableHeadBg};}
 .wf-grid{display:grid;gap:16px;}
 .wf-dash-stats{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));}
+.wf-skel-shell{display:flex;min-height:100vh;min-height:100dvh;background:${T.paper};}
+.wf-skel-side{width:220px;flex-shrink:0;padding:18px;display:flex;flex-direction:column;gap:10px;border-right:1px solid ${T.lineSoft};}
+.wf-skel-main{flex:1;min-width:0;padding:22px;}
+.wf-skel-bottombar{display:none;}
 .wf-apps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
 .wf-apps-tile{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:9px;background:${T.card};border:1px solid ${T.line};border-radius:16px;padding:18px 6px;cursor:pointer;text-align:center;transition:transform .12s ease,box-shadow .15s ease,border-color .15s ease;}
 .wf-apps-tile:hover{border-color:${T.gold};box-shadow:0 4px 14px rgba(5,8,16,0.06);}
@@ -3418,6 +3422,17 @@ html,body,#root{height:100%;}
      as messy/unorganized. */
   .wf-dash-stats{grid-template-columns:repeat(2,1fr);gap:10px;}
   .wf-dash-stats .wf-card{padding:13px !important;}
+  /* Loading skeleton: the desktop shape (fixed 220px sidebar rail +
+     content column) squeezed the sidebar into a sliver and left the
+     rest of a phone screen blank/empty instead of filling it — on
+     phones, drop the sidebar column entirely and stack full-width
+     blocks instead, plus a bottom-tab-bar placeholder so the shape
+     actually matches what mobile is about to load into. */
+  .wf-skel-side{display:none;}
+  .wf-skel-shell{flex-direction:column;}
+  .wf-skel-main{padding:16px;padding-bottom:70px;width:100%;}
+  .wf-skel-bottombar{display:flex;position:fixed;left:0;right:0;bottom:0;gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:${T.headerBg};border-top:1px solid ${T.lineSoft};}
+  .wf-skel-bottombar > div{flex:1;height:34px;border-radius:9px;}
 }
 .wf-chat-layout{display:flex;gap:0;height:calc(100vh - 230px);min-height:420px;border:1px solid ${T.lineSoft};border-radius:14px;overflow:hidden;background:${T.card};}
 .wf-chat-list-pane{width:300px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid ${T.lineSoft};overflow-y:auto;}
@@ -28308,6 +28323,23 @@ function AppInner() {
     brandingReady &&
     sAdminReady &&
     sEmpReady;
+  // If any one of the ~15 tables/settings above never resolves (a bad
+  // network request that hangs instead of erroring, a stalled realtime
+  // handshake, etc.) `ready` stays false forever and the skeleton below
+  // would otherwise sit there indefinitely with no way to tell "still
+  // loading" apart from "actually stuck". After a few seconds, swap the
+  // skeleton for an explicit "this is taking a while" message with a
+  // manual reload button instead of leaving the person staring at an
+  // animation that may never finish.
+  const [slowLoad, setSlowLoad] = useState(false);
+  useEffect(() => {
+    if (ready) {
+      setSlowLoad(false);
+      return;
+    }
+    const timer = setTimeout(() => setSlowLoad(true), 8000);
+    return () => clearTimeout(timer);
+  }, [ready]);
   // Each portal only ever reads its own session — the admin URL never
   // shows an employee who is signed in elsewhere, and vice versa.
   // sessionAdmin now stores an admin account id (not a fixed "admin"
@@ -28513,6 +28545,51 @@ function AppInner() {
   }, [role]);
 
   if (!ready) {
+    // If loading is taking unusually long (see the slowLoad timer above),
+    // stop animating the skeleton forever and tell the person plainly
+    // instead — an indefinite shimmer looks identical whether the app is
+    // "about to finish" or "actually stuck", which is exactly what was
+    // confusing on refresh.
+    if (slowLoad) {
+      return (
+        <div
+          style={{
+            minHeight: "100vh",
+            minHeight: "100dvh",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 14,
+            background: T.paper,
+            padding: 24,
+            textAlign: "center",
+          }}
+        >
+          <Loader2
+            size={28}
+            color={T.muted}
+            style={{ animation: "spin 1s linear infinite" }}
+          />
+          <div style={{ fontSize: 15, fontWeight: 600, color: T.ink }}>
+            {lang === "km"
+              ? "ការផ្ទុកកំពុងចំណាយពេលយូរជាងធម្មតា"
+              : "This is taking longer than usual"}
+          </div>
+          <div style={{ fontSize: 13, color: T.muted, maxWidth: 320 }}>
+            {lang === "km"
+              ? "សូមពិនិត្យមើលការតភ្ជាប់អ៊ីនធឺណិត រួចសាកល្បង Reload ម្តងទៀត"
+              : "Check your internet connection, then try reloading."}
+          </div>
+          <button
+            className="wf-btn wf-btn-primary"
+            onClick={() => window.location.reload()}
+          >
+            {lang === "km" ? "Reload" : "Reload"}
+          </button>
+        </div>
+      );
+    }
     // Shape-of-the-app skeleton (sidebar rail + topbar + card grid)
     // instead of a bare spinner on a blank page — it gives the person
     // something to look at that already resembles where they're headed,
@@ -28526,25 +28603,8 @@ function AppInner() {
       borderRadius: 8,
     };
     return (
-      <div
-        style={{
-          minHeight: 500,
-          display: "flex",
-          background: T.paper,
-          borderRadius: 12,
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            width: 220,
-            padding: 18,
-            display: "flex",
-            flexDirection: "column",
-            gap: 10,
-            borderRight: `1px solid ${T.lineSoft}`,
-          }}
-        >
+      <div className="wf-skel-shell">
+        <div className="wf-skel-side">
           <div
             style={{ ...shimmer, height: 28, width: "70%", marginBottom: 14 }}
           />
@@ -28555,7 +28615,7 @@ function AppInner() {
             />
           ))}
         </div>
-        <div style={{ flex: 1, padding: 22 }}>
+        <div className="wf-skel-main">
           <div
             style={{ ...shimmer, height: 22, width: 200, marginBottom: 20 }}
           />
@@ -28572,6 +28632,11 @@ function AppInner() {
             ))}
           </div>
           <div style={{ ...shimmer, height: 220 }} />
+        </div>
+        <div className="wf-skel-bottombar">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} style={shimmer} />
+          ))}
         </div>
         <style>
           {
