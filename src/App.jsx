@@ -27049,7 +27049,7 @@ function Payroll({
 // have room for — replaces the old "More" slide-in drawer for the
 // employee/staff mobile view so it reads as its own page (like a phone
 // app-launcher) instead of an overlay panel.
-function MoreAppsPage({ nav, setPage }) {
+function MoreAppsPage({ nav, setPage, onLogout }) {
   const { t } = useLang();
   const items = nav.filter((n) => n.id !== "dashboard");
   return (
@@ -27085,6 +27085,33 @@ function MoreAppsPage({ nav, setPage }) {
           );
         })}
       </div>
+      {/* Mobile phones drop the desktop hamburger + slide-in sidebar
+          (see buildBottomNavAdmin/Employee above), so Sign Out — which
+          lives in that sidebar on desktop — has no other home on phones.
+          Surface it here so it's still reachable on mobile. */}
+      {onLogout && (
+        <button
+          onClick={onLogout}
+          style={{
+            marginTop: 22,
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            padding: "12px 16px",
+            borderRadius: 12,
+            border: `1px solid ${T.dangerBorder}`,
+            background: "transparent",
+            color: T.rose,
+            fontSize: 13.5,
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
+        >
+          <LogOut size={16} /> {t.logout}
+        </button>
+      )}
     </div>
   );
 }
@@ -28729,6 +28756,51 @@ function AppInner() {
     );
   }
 
+  // Shared by the desktop sidebar's Sign Out button and the mobile
+  // "Apps" page's Sign Out tile — kept in one place so both stay in
+  // sync with the audit-log/login-activity bookkeeping.
+  const handleLogout = () => {
+    if (role === "admin") {
+      writeAuditLog({
+        actor: {
+          type: "admin",
+          id: currentAdmin?.id,
+          name: currentAdmin?.name,
+        },
+        action: "logout",
+        table: "admins",
+        entityId: currentAdmin?.id,
+        label: currentAdmin?.name,
+      });
+      writeLoginActivity({
+        actor: {
+          type: "admin",
+          id: currentAdmin?.id,
+          name: currentAdmin?.name,
+        },
+        action: "logout",
+        sessionId: activeSessionId,
+      });
+      setActiveSessionId(null);
+      setSessionAdmin(null);
+    } else {
+      writeAuditLog({
+        actor: { type: "employee", id: currentEmp?.id, name: currentEmp?.name },
+        action: "logout",
+        table: "employees",
+        entityId: currentEmp?.id,
+        label: currentEmp?.name,
+      });
+      writeLoginActivity({
+        actor: { type: "employee", id: currentEmp?.id, name: currentEmp?.name },
+        action: "logout",
+        sessionId: activeSessionId,
+      });
+      setActiveSessionId(null);
+      setSessionEmployee(null);
+    }
+  };
+
   return (
     <BrandingContext.Provider value={{ branding, setBranding }}>
       <div
@@ -28871,55 +28943,7 @@ function AppInner() {
               <button
                 className="wf-nav-item"
                 style={{ color: "#E3B7BE" }}
-                onClick={() => {
-                  if (role === "admin") {
-                    writeAuditLog({
-                      actor: {
-                        type: "admin",
-                        id: currentAdmin?.id,
-                        name: currentAdmin?.name,
-                      },
-                      action: "logout",
-                      table: "admins",
-                      entityId: currentAdmin?.id,
-                      label: currentAdmin?.name,
-                    });
-                    writeLoginActivity({
-                      actor: {
-                        type: "admin",
-                        id: currentAdmin?.id,
-                        name: currentAdmin?.name,
-                      },
-                      action: "logout",
-                      sessionId: activeSessionId,
-                    });
-                    setActiveSessionId(null);
-                    setSessionAdmin(null);
-                  } else {
-                    writeAuditLog({
-                      actor: {
-                        type: "employee",
-                        id: currentEmp?.id,
-                        name: currentEmp?.name,
-                      },
-                      action: "logout",
-                      table: "employees",
-                      entityId: currentEmp?.id,
-                      label: currentEmp?.name,
-                    });
-                    writeLoginActivity({
-                      actor: {
-                        type: "employee",
-                        id: currentEmp?.id,
-                        name: currentEmp?.name,
-                      },
-                      action: "logout",
-                      sessionId: activeSessionId,
-                    });
-                    setActiveSessionId(null);
-                    setSessionEmployee(null);
-                  }
-                }}
+                onClick={handleLogout}
               >
                 <LogOut size={17} /> {t.logout}
               </button>
@@ -29072,7 +29096,11 @@ function AppInner() {
               )}
             <div key={page} className="wf-page-enter">
               {page === "moreApps" && (
-                <MoreAppsPage nav={nav} setPage={setPage} />
+                <MoreAppsPage
+                  nav={nav}
+                  setPage={setPage}
+                  onLogout={handleLogout}
+                />
               )}
               {page === "dashboard" && (
                 <Dashboard
