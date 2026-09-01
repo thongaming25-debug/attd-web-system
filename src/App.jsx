@@ -82,6 +82,7 @@ import {
   Ban,
   LayoutGrid,
   Filter,
+  DollarSign,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -418,6 +419,9 @@ const LANG_RAW = {
       confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបបុគ្គលិកនេះ?",
       noEmp: "មិនទាន់មានបុគ្គលិកទេ",
       printBadge: "បោះពុម្ពកាតសម្គាល់",
+      idBadgeShort: "កាតសម្គាល់",
+      documentsShort: "ឯកសារ",
+      certificateShort: "វិញ្ញាបនបត្រ",
       namePlaceholder: "ឧ. លោក សុវណ្ណ ដារា",
       codePlaceholder: "EMP-004",
       rolePlaceholder: "ឧ. Accountant",
@@ -735,6 +739,14 @@ const LANG_RAW = {
       taxLabel: "ពន្ធលើប្រាក់ខែ",
       insuranceLabel: "ធានារ៉ាប់រង",
       policyTitle: "គោលការណ៍កាត់ប្រាក់ខែ",
+      policyBannerDesc:
+        "ការកាត់ប្រាក់ត្រូវបានអនុវត្តទៅតាមគោលការណ៍ក្រុមហ៊ុន និងស្ថានភាពបុគ្គលិក",
+      viewPolicyLink: "មើលគោលការណ៍",
+      totalEmployeesStat: "បុគ្គលិកសរុប",
+      totalNetPayStat: "ប្រាក់ខែសុទ្ធសរុប",
+      totalBaseSalaryStat: "ប្រាក់ខែមូលដ្ឋានសរុប",
+      totalDeductionsStat: "ការកាត់ប្រាក់សរុប",
+      deductions: "ការកាត់ប្រាក់",
       policyDesc:
         "កំណត់អត្រាភាគរយពន្ធលើប្រាក់ខែ និងធានារ៉ាប់រង ព្រមទាំងកម្រិតប្រាក់ខែអប្បបរមា។ ការកាត់ប្រាក់នេះនឹងអនុវត្តលើបុគ្គលិកដែលមានប្រាក់ខែមូលដ្ឋានស្មើ ឬលើសពីកម្រិតកំណត់នេះប៉ុណ្ណោះ។",
       taxRateLabel: "អត្រាពន្ធលើប្រាក់ខែ (%)",
@@ -1557,6 +1569,9 @@ const LANG_RAW = {
       confirmDel: "Are you sure you want to delete this employee?",
       noEmp: "No employees yet",
       printBadge: "Print ID Badge",
+      idBadgeShort: "ID Badge",
+      documentsShort: "Documents",
+      certificateShort: "Certificate",
       namePlaceholder: "e.g. John Doe",
       codePlaceholder: "EMP-004",
       rolePlaceholder: "e.g. Accountant",
@@ -1875,6 +1890,14 @@ const LANG_RAW = {
       taxLabel: "Income Tax",
       insuranceLabel: "Insurance",
       policyTitle: "Payroll Deduction Policy",
+      policyBannerDesc:
+        "Deductions are applied based on company policies and employee status.",
+      viewPolicyLink: "View Policy",
+      totalEmployeesStat: "Total Employees",
+      totalNetPayStat: "Total Net Pay",
+      totalBaseSalaryStat: "Total Base Salary",
+      totalDeductionsStat: "Total Deductions",
+      deductions: "Deductions",
       policyDesc:
         "Set the tax and insurance percentage rates, and the minimum base salary at which they start applying. Employees whose base salary is below the threshold are not deducted.",
       taxRateLabel: "Tax Rate (%)",
@@ -3354,8 +3377,13 @@ html,body,#root{height:100%;}
 .wf-btn-sm{padding:6px 10px;font-size:12px;}
 .wf-btn-primary{background:${T.gold};color:#1A1300;box-shadow:0 1px 2px rgba(240,168,59,0.25);}
 .wf-btn-primary:hover:not(:disabled){background:#D89430;}
-.wf-btn-accent{background:${T.forest};color:#fff;box-shadow:0 1px 2px rgba(31,162,107,0.22);}
-.wf-btn-accent:hover:not(:disabled){background:${T.forestDark};}
+.wf-btn-accent{position:relative;overflow:hidden;background:linear-gradient(135deg,#4F6EF7,#8B5CF6);color:#fff;box-shadow:0 3px 12px rgba(124,92,240,0.35);}
+.wf-btn-accent:hover:not(:disabled){box-shadow:0 5px 18px rgba(124,92,240,0.48);filter:brightness(1.06);}
+.wf-btn-accent::after{content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;background:linear-gradient(115deg,transparent,rgba(255,255,255,0.4),transparent);transform:skewX(-20deg);animation:wf-btn-shine 3.4s ease-in-out infinite;pointer-events:none;}
+.wf-btn-premium{position:relative;overflow:hidden;background:linear-gradient(135deg,#4F6EF7,#8B5CF6);color:#fff;box-shadow:0 3px 12px rgba(124,92,240,0.35);}
+.wf-btn-premium:hover:not(:disabled){box-shadow:0 5px 18px rgba(124,92,240,0.48);filter:brightness(1.06);}
+.wf-btn-premium::after{content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;background:linear-gradient(115deg,transparent,rgba(255,255,255,0.4),transparent);transform:skewX(-20deg);animation:wf-btn-shine 3.4s ease-in-out infinite;pointer-events:none;}
+@keyframes wf-btn-shine{0%{left:-60%;}38%{left:130%;}100%{left:130%;}}
 .wf-btn-ghost{background:transparent;color:${T.ink};border-color:${T.line};}
 .wf-btn-ghost:hover:not(:disabled){background:${T.tableHeadBg};}
 .wf-btn-danger{background:transparent;color:${T.rose};border-color:${T.dangerBorder};}
@@ -3430,6 +3458,8 @@ html,body,#root{height:100%;}
 .wf-table tbody tr{transition:background .12s ease;}
 .wf-table tbody tr:hover{background:${T.tableHeadBg};}
 .wf-grid{display:grid;gap:16px;}
+.wf-emp-linkbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:11.5px;font-weight:600;color:${T.textSoft};padding:6px 4px;border-radius:6px;transition:background .15s ease,color .15s ease;white-space:nowrap;}
+.wf-emp-linkbtn:hover{background:${T.tableHeadBg};color:${T.ink};}
 .wf-dash-stats{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));}
 .wf-skel-shell{display:flex;min-height:100vh;min-height:100dvh;background:${T.paper};}
 .wf-skel-side{width:220px;flex-shrink:0;padding:18px;display:flex;flex-direction:column;gap:10px;border-right:1px solid ${T.lineSoft};}
@@ -6493,6 +6523,7 @@ function Button({ children, variant = "primary", size, style, ...props }) {
   const cls = {
     primary: "wf-btn-primary",
     accent: "wf-btn-accent",
+    premium: "wf-btn-premium",
     ghost: "wf-btn-ghost",
     danger: "wf-btn-danger",
     "danger-solid": "wf-btn-danger-solid",
@@ -10970,44 +11001,51 @@ function Employees({
                 </Button>
               )}
             </div>
-            <Button
-              size="sm"
-              variant="ghost"
-              style={{ width: "100%", justifyContent: "center", marginTop: 8 }}
-              onClick={() =>
-                printEmployeeBadge({
-                  t,
-                  brandName: branding?.name?.trim() || t.appName,
-                  brandLogo: branding?.logo || null,
-                  emp: e,
-                  deptLabel: deptName(e.deptId),
-                  roleLabel: e.role,
-                  shiftText: shiftLabel(shiftOf(e.shiftId)),
-                  officeText: officeName(e.officeId),
-                  statusLabel:
-                    e.status === "active" ? t.emps.active : t.emps.inactive,
-                  onPopupBlocked: () => setBadgePopupBlocked(true),
-                })
-              }
+            <div
+              className="wf-emp-linkrow"
+              style={{
+                display: "flex",
+                marginTop: 8,
+                paddingTop: 8,
+                borderTop: `1px solid ${T.divider}`,
+              }}
             >
-              <BadgeCheck size={13} /> {t.emps.printBadge}
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              style={{ width: "100%", justifyContent: "center", marginTop: 8 }}
-              onClick={() => setDocsFor(e)}
-            >
-              <FileText size={13} /> {t.doc.title}
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              style={{ width: "100%", justifyContent: "center", marginTop: 8 }}
-              onClick={() => setCertFor(e)}
-            >
-              <Award size={13} /> {t.cert.btn}
-            </Button>
+              <button
+                type="button"
+                className="wf-emp-linkbtn"
+                onClick={() =>
+                  printEmployeeBadge({
+                    t,
+                    brandName: branding?.name?.trim() || t.appName,
+                    brandLogo: branding?.logo || null,
+                    emp: e,
+                    deptLabel: deptName(e.deptId),
+                    roleLabel: e.role,
+                    shiftText: shiftLabel(shiftOf(e.shiftId)),
+                    officeText: officeName(e.officeId),
+                    statusLabel:
+                      e.status === "active" ? t.emps.active : t.emps.inactive,
+                    onPopupBlocked: () => setBadgePopupBlocked(true),
+                  })
+                }
+              >
+                <BadgeCheck size={12} /> {t.emps.idBadgeShort}
+              </button>
+              <button
+                type="button"
+                className="wf-emp-linkbtn"
+                onClick={() => setDocsFor(e)}
+              >
+                <FileText size={12} /> {t.emps.documentsShort}
+              </button>
+              <button
+                type="button"
+                className="wf-emp-linkbtn"
+                onClick={() => setCertFor(e)}
+              >
+                <Award size={12} /> {t.emps.certificateShort}
+              </button>
+            </div>
           </Card>
         ))}
         {filtered.length === 0 && (
@@ -14410,134 +14448,192 @@ function OfficeLocationSettings({ offices, setOffices }) {
       <div
         style={{
           display: "flex",
-          alignItems: "center",
+          alignItems: "flex-start",
           justifyContent: "space-between",
           gap: 12,
           cursor: "pointer",
         }}
         onClick={() => setOpen(!open)}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <MapPin size={16} color={T.forest} />
-          <span style={{ fontWeight: 600, fontSize: 13.5, color: T.ink }}>
-            {t.att.officeGeofenceTitle}
-          </span>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+          <div
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 12,
+              background: "#EEEAFB",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <MapPin size={19} color="#7C6AE8" />
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 14.5, color: T.ink }}>
+              {t.att.officeGeofenceTitle}
+            </div>
+            <p
+              style={{
+                fontSize: 12,
+                color: T.muted,
+                marginTop: 3,
+                maxWidth: 520,
+                lineHeight: 1.5,
+              }}
+            >
+              {t.att.officeGeofenceDesc}
+            </p>
+          </div>
         </div>
-        <span
-          style={{
-            fontSize: 11.5,
-            color: offices.length ? T.textSoft : T.mutedLight,
-          }}
-        >
-          {offices.length > 0
-            ? t.att.officeCountLabel(offices.length)
-            : t.att.officeNotSet}
-        </span>
-      </div>
-      {open && (
         <div
           style={{
-            marginTop: 16,
-            paddingTop: 16,
-            borderTop: `1px solid ${T.lineSoft}`,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            flexShrink: 0,
           }}
         >
-          <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
-            {t.att.officeGeofenceDesc}
-          </p>
+          <span
+            style={{
+              fontSize: 11.5,
+              fontWeight: 600,
+              padding: "4px 11px",
+              borderRadius: 999,
+              background: offices.length ? "#EEEAFB" : T.tableHeadBg,
+              color: offices.length ? "#6D5BD0" : T.mutedLight,
+            }}
+          >
+            {offices.length > 0
+              ? t.att.officeCountLabel(offices.length)
+              : t.att.officeNotSet}
+          </span>
+          <ChevronRight
+            size={16}
+            color={T.mutedLight}
+            style={{
+              transform: open ? "rotate(90deg)" : "rotate(0deg)",
+              transition: "transform 0.15s ease",
+              marginTop: 2,
+            }}
+          />
+        </div>
+      </div>
+      {open && (
+        <div style={{ marginTop: 16 }}>
           {offices.length === 0 && (
             <p style={{ fontSize: 12, color: T.mutedLight, marginBottom: 12 }}>
               {t.att.officeNoneYet}
             </p>
           )}
-          {offices.map((o) => (
-            <div
-              key={o.id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 8,
-                padding: "9px 0",
-                borderBottom: `1px solid ${T.lineSoft}`,
-              }}
-            >
-              <div>
-                <div style={{ fontWeight: 600, fontSize: 13, color: T.ink }}>
-                  {o.name}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {offices.map((o) => (
+              <div
+                key={o.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 8,
+                  padding: "13px 14px",
+                  borderRadius: 12,
+                  border: `1px solid ${T.lineSoft}`,
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: "50%",
+                      background: T.forest,
+                      flexShrink: 0,
+                    }}
+                  />
+                  <div>
+                    <div
+                      style={{ fontWeight: 600, fontSize: 13.5, color: T.ink }}
+                    >
+                      {o.name}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: T.muted,
+                        fontFamily: "'JetBrains Mono',monospace",
+                        marginTop: 2,
+                      }}
+                    >
+                      {o.lat.toFixed(4)}, {o.lng.toFixed(4)} · {o.radius}m
+                    </div>
+                  </div>
                 </div>
-                <div
-                  style={{
-                    fontSize: 11,
-                    color: T.muted,
-                    fontFamily: "'JetBrains Mono',monospace",
-                  }}
-                >
-                  {o.lat.toFixed(4)}, {o.lng.toFixed(4)} · {o.radius}m
+                <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+                  <button
+                    onClick={() => openQr(o)}
+                    title={t.att.officeQrBtn}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: T.mutedLight,
+                    }}
+                  >
+                    <QrCode size={15} />
+                  </button>
+                  <button
+                    onClick={() => openKiosk(o)}
+                    title={t.att.openKioskBtn}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: T.mutedLight,
+                    }}
+                  >
+                    <Monitor size={15} />
+                  </button>
+                  <button
+                    onClick={() => openPrintQr(o)}
+                    title={t.att.printQrBtn}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: T.mutedLight,
+                    }}
+                  >
+                    <Printer size={15} />
+                  </button>
+                  <button
+                    onClick={() => setFormOpen(o)}
+                    title={t.edit}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: T.mutedLight,
+                    }}
+                  >
+                    <Pencil size={15} />
+                  </button>
+                  <button
+                    onClick={() => setConfirmDel(o)}
+                    title={t.delete}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: T.rose,
+                    }}
+                  >
+                    <Trash2 size={15} />
+                  </button>
                 </div>
               </div>
-              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                <button
-                  onClick={() => openQr(o)}
-                  title={t.att.officeQrBtn}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    color: T.muted,
-                  }}
-                >
-                  <QrCode size={14} />
-                </button>
-                <button
-                  onClick={() => openKiosk(o)}
-                  title={t.att.openKioskBtn}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    color: T.muted,
-                  }}
-                >
-                  <Monitor size={14} />
-                </button>
-                <button
-                  onClick={() => openPrintQr(o)}
-                  title={t.att.printQrBtn}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    color: T.muted,
-                  }}
-                >
-                  <Printer size={14} />
-                </button>
-                <button
-                  onClick={() => setFormOpen(o)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    color: T.muted,
-                  }}
-                >
-                  <Pencil size={14} />
-                </button>
-                <button
-                  onClick={() => setConfirmDel(o)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    color: T.rose,
-                  }}
-                >
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
           <div style={{ marginTop: 12 }}>
             <Button
               variant="ghost"
@@ -15184,7 +15280,7 @@ function Attendance({
             <Download size={15} /> {t.exportCsv}
           </Button>
           <Button
-            variant="accent"
+            variant="premium"
             onClick={() => {
               setEditRecord(null);
               setModal(true);
@@ -16903,7 +16999,14 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
   };
   const isKhmerMode = f.taxMode === "khmerProgressive";
   return (
-    <Card style={{ padding: 16, marginBottom: 16 }}>
+    <Card
+      style={{
+        padding: open ? 16 : 0,
+        marginBottom: 16,
+        background: open ? T.card : T.forestSoft,
+        overflow: "hidden",
+      }}
+    >
       <div
         style={{
           display: "flex",
@@ -16911,34 +17014,89 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
           justifyContent: "space-between",
           gap: 12,
           cursor: "pointer",
+          padding: open ? 0 : "14px 18px",
         }}
         onClick={() => setOpen(!open)}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <Receipt size={16} color={T.forest} />
-          <span style={{ fontWeight: 600, fontSize: 13.5, color: T.ink }}>
-            {t.pay.policyTitle}
-          </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          {!open && (
+            <div
+              style={{
+                width: 34,
+                height: 34,
+                borderRadius: 9,
+                background: T.card,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <Receipt size={16} color={T.forestText} />
+            </div>
+          )}
+          {open && <Receipt size={16} color={T.forest} />}
+          <div>
+            <span
+              style={{
+                fontWeight: 700,
+                fontSize: 13.5,
+                color: open ? T.ink : T.forestText,
+              }}
+            >
+              {t.pay.policyTitle}
+            </span>
+            {!open && (
+              <div
+                style={{
+                  fontSize: 12,
+                  color: T.forestText,
+                  opacity: 0.85,
+                  marginTop: 1,
+                }}
+              >
+                {t.pay.policyBannerDesc}
+              </div>
+            )}
+          </div>
         </div>
-        <span
-          style={{
-            fontSize: 11.5,
-            color: T.textSoft,
-            fontFamily: "'JetBrains Mono',monospace",
-          }}
-        >
-          {payrollPolicy.taxMode === "khmerProgressive"
-            ? t.pay.taxModeKhmer
-            : `${payrollPolicy.taxRate}% / ${payrollPolicy.insuranceRate}%`}
-          {payrollPolicy.taxMode !== "khmerProgressive" &&
-          Number(payrollPolicy.minSalaryThreshold) > 0
-            ? ` · ≥ ${fmtMoney(payrollPolicy.minSalaryThreshold)}`
-            : ""}
-          {Number(payrollPolicy.lateDeductionValue) > 0
-            ? ` · ${t.pay.lateBadgeShort(Number(payrollPolicy.lateGraceCount) || 0)}`
-            : ""}
-          {` · ${t.pay.ulBadgeShort(payrollPolicy.ulDeductionType || "fullDay")}`}
-        </span>
+        {!open && (
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 3,
+              fontSize: 12.5,
+              fontWeight: 700,
+              color: T.blue,
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+            }}
+          >
+            {t.pay.viewPolicyLink} <ChevronRight size={14} />
+          </span>
+        )}
+        {open && (
+          <span
+            style={{
+              fontSize: 11.5,
+              color: T.textSoft,
+              fontFamily: "'JetBrains Mono',monospace",
+            }}
+          >
+            {payrollPolicy.taxMode === "khmerProgressive"
+              ? t.pay.taxModeKhmer
+              : `${payrollPolicy.taxRate}% / ${payrollPolicy.insuranceRate}%`}
+            {payrollPolicy.taxMode !== "khmerProgressive" &&
+            Number(payrollPolicy.minSalaryThreshold) > 0
+              ? ` · ≥ ${fmtMoney(payrollPolicy.minSalaryThreshold)}`
+              : ""}
+            {Number(payrollPolicy.lateDeductionValue) > 0
+              ? ` · ${t.pay.lateBadgeShort(Number(payrollPolicy.lateGraceCount) || 0)}`
+              : ""}
+            {` · ${t.pay.ulBadgeShort(payrollPolicy.ulDeductionType || "fullDay")}`}
+          </span>
+        )}
       </div>
       {open && (
         <div
@@ -27387,6 +27545,25 @@ function Payroll({
       ).net,
     0,
   );
+  const totalBaseSalary = list.reduce((sum, e) => sum + (e.salary || 0), 0);
+  const totalDeductions = list.reduce((sum, e) => {
+    const p = computePayroll(
+      e,
+      attendance,
+      mk,
+      overtimeRequests,
+      otPolicy,
+      payrollPolicy,
+    );
+    return (
+      sum +
+      p.absenceDeduction +
+      p.unpaidLeaveDeduction +
+      p.tax +
+      p.insurance +
+      p.lateDeduction
+    );
+  }, 0);
 
   return (
     <div>
@@ -27553,38 +27730,146 @@ function Payroll({
       )}
       {role === "admin" && (
         <Card
-          accent={T.gold}
           style={{
-            padding: 16,
+            padding: 0,
             marginBottom: 16,
             display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            alignItems: "stretch",
+            flexWrap: "wrap",
+            overflow: "hidden",
+            borderLeft: `4px solid ${T.blue}`,
           }}
         >
-          <div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 14,
+              padding: "18px 22px",
+            }}
+          >
             <div
               style={{
-                fontSize: 11,
-                color: T.muted,
-                textTransform: "uppercase",
-                fontWeight: 700,
+                width: 46,
+                height: 46,
+                borderRadius: 999,
+                background: `color-mix(in srgb, ${T.blue} 16%, transparent)`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
               }}
             >
-              {t.pay.totalPaid} · {monthLabel(mk)}
+              <Wallet size={20} color={T.blue} />
             </div>
-            <div
-              style={{
-                fontSize: 24,
-                fontWeight: 700,
-                color: T.ink,
-                fontFamily: "'JetBrains Mono',monospace",
-              }}
-            >
-              {fmtMoney(totalNet)}
+            <div>
+              <div
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: ".04em",
+                  color: T.muted,
+                }}
+              >
+                {t.pay.totalPaid} - {monthLabel(mk)}
+              </div>
+              <div
+                style={{
+                  fontSize: 22,
+                  fontWeight: 700,
+                  color: T.ink,
+                  fontFamily: "'JetBrains Mono',monospace",
+                  marginTop: 2,
+                }}
+              >
+                {fmtMoney(totalNet)}
+              </div>
             </div>
           </div>
-          <BadgeCheck size={28} color={T.gold} />
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              flex: 1,
+            }}
+          >
+            {[
+              {
+                label: t.pay.totalEmployeesStat,
+                value: list.length,
+                icon: Users,
+                color: "#8B5CF6",
+              },
+              {
+                label: t.pay.totalNetPayStat,
+                value: fmtMoney(totalNet),
+                icon: DollarSign,
+                color: T.forest,
+              },
+              {
+                label: t.pay.totalBaseSalaryStat,
+                value: fmtMoney(totalBaseSalary),
+                icon: BarChart3,
+                color: T.blue,
+              },
+              {
+                label: t.pay.totalDeductionsStat,
+                value: fmtMoney(totalDeductions),
+                icon: FileText,
+                color: T.rose,
+              },
+            ].map((s) => (
+              <div
+                key={s.label}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "18px 20px",
+                  flex: "1 1 180px",
+                  borderLeft: `1px solid ${T.lineSoft}`,
+                }}
+              >
+                <div
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 10,
+                    background: `color-mix(in srgb, ${s.color} 14%, transparent)`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <s.icon size={16} color={s.color} />
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 15,
+                      fontWeight: 700,
+                      color: T.ink,
+                      fontFamily: "'JetBrains Mono',monospace",
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {s.value}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: T.textSoft,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {s.label}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </Card>
       )}
       <Card style={{ overflowX: "auto" }}>
@@ -27593,6 +27878,7 @@ function Payroll({
             <tr>
               <th>{t.employee}</th>
               <th>{t.pay.baseSalary}</th>
+              <th>{t.pay.deductions}</th>
               <th>{t.pay.netSalary}</th>
               <th>{t.status}</th>
               <th></th>
@@ -27610,6 +27896,11 @@ function Payroll({
                 usesCustomRate,
                 usesCustomLatePolicy,
                 usesCustomUlPolicy,
+                tax,
+                insurance,
+                lateDeduction,
+                absenceDeduction,
+                unpaidLeaveDeduction,
               } = computePayroll(
                 e,
                 attendance,
@@ -27618,6 +27909,12 @@ function Payroll({
                 otPolicy,
                 payrollPolicy,
               );
+              const deductionsTotal =
+                tax +
+                insurance +
+                lateDeduction +
+                absenceDeduction +
+                unpaidLeaveDeduction;
               return (
                 <tr key={e.id}>
                   <td>
@@ -27713,6 +28010,14 @@ function Payroll({
                   </td>
                   <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
                     {fmtMoney(e.salary)}
+                  </td>
+                  <td
+                    style={{
+                      fontFamily: "'JetBrains Mono',monospace",
+                      color: deductionsTotal > 0 ? T.rose : T.textSoft,
+                    }}
+                  >
+                    {fmtMoney(deductionsTotal)}
                   </td>
                   <td
                     style={{
