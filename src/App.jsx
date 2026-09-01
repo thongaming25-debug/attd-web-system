@@ -544,6 +544,9 @@ const LANG_RAW = {
         "មិនអាចទាញយកទីតាំង GPS បានទេ សូមបើក Location សម្រាប់កម្មវិធីនេះ",
       gpsRequiredHint: (n) =>
         `ត្រូវការទីតាំង GPS នៅជិតសាខាមួយក្នុងចំណោម ${n} សាខា`,
+      locatingNow: "កំពុងកំណត់ទីតាំង...",
+      locVerifiedOnPunch: "នឹងផ្ទៀងផ្ទាត់ពេលចុះឈ្មោះ",
+      locationLabel: "ទីតាំង",
       noData: "គ្មានទិន្នន័យ",
       manualEntry: "កត់ត្រាដោយដៃ",
       dayOffNote:
@@ -1666,6 +1669,9 @@ const LANG_RAW = {
       gpsFailed:
         "Couldn't get your GPS location. Please enable Location for this app.",
       gpsRequiredHint: (n) => `GPS location required near one of ${n} branches`,
+      locatingNow: "Locating...",
+      locVerifiedOnPunch: "Verified when you check in/out",
+      locationLabel: "Location",
       noData: "No data",
       manualEntry: "Manual Entry",
       dayOffNote:
@@ -2479,6 +2485,9 @@ const LANG_RAW = {
         `⚠️ 您正在分店"${name}"打卡，但您被分配在其他分店工作`,
       gpsFailed: "无法获取 GPS 位置，请为此应用开启定位服务",
       gpsRequiredHint: (n) => `需要在 ${n} 个分店之一的 GPS 范围内`,
+      locatingNow: "正在定位...",
+      locVerifiedOnPunch: "打卡时将验证位置",
+      locationLabel: "位置",
       noData: "没有数据",
       manualEntry: "手动登记",
       dayOffNote: "🛌 今天是您的休息日 — 如果您来上班仍可以打卡",
@@ -2910,6 +2919,25 @@ const T = {
   dangerHoverBg: "var(--wf-danger-hover-bg)",
   headerBg: "var(--wf-header-bg)",
 };
+// Pastel palette for the employee-facing dashboard cards only (see
+// Dashboard below) — fixed hex values rather than CSS vars because
+// these tints are a deliberate design choice distinct from the rest
+// of the app's theme-driven palette, with separate light/dark stops
+// picked by hand rather than derived automatically.
+const EMP_PASTEL = {
+  light: {
+    blue: { bg: "#DCE6FB", text: "#1E3A8A", icon: "#93B4F0" },
+    gold: { bg: "#FBEDD3", text: "#7A4A0B", icon: "#F0C878" },
+    forest: { bg: "#DCF2E3", text: "#166534", icon: "#7FCB9A" },
+    rose: { bg: "#FBDFE3", text: "#9F1D33", icon: "#F0A0AC" },
+  },
+  dark: {
+    blue: { bg: "#1C2B4D", text: "#B9CDF7", icon: "#3E5C9E" },
+    gold: { bg: "#3B2E12", text: "#F0C878", icon: "#7A5D24" },
+    forest: { bg: "#123222", text: "#7FCB9A", icon: "#245A3C" },
+    rose: { bg: "#3A1620", text: "#F0A0AC", icon: "#6E2A38" },
+  },
+};
 const PALETTE = [
   "#1FA26B",
   "#F0A83B",
@@ -3272,6 +3300,25 @@ html,body,#root{height:100%;}
 .wf-header{background:${T.headerBg};backdrop-filter:blur(8px);border-bottom:1px solid ${T.lineSoft};padding:13px 22px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;transition:background .15s ease,border-color .15s ease;}
 .wf-content{flex:1;overflow-y:auto;padding:22px;}
 .wf-card{background:${T.card};border-radius:9px;border:1px solid ${T.line};box-shadow:none;transition:box-shadow .15s ease,background .15s ease,border-color .15s ease;}
+.wf-stat-solid{position:relative;overflow:hidden;border-radius:10px;padding:18px;cursor:default;transition:transform .18s cubic-bezier(.4,0,.2,1),box-shadow .18s cubic-bezier(.4,0,.2,1);}
+.wf-stat-solid:hover{transform:translateY(-3px);box-shadow:0 10px 22px -10px rgba(5,8,16,0.35);}
+.wf-stat-solid-icon{position:absolute;right:10px;bottom:8px;opacity:.22;transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .25s ease;}
+.wf-stat-solid:hover .wf-stat-solid-icon{transform:scale(1.12) rotate(-4deg);opacity:.3;}
+.wf-stat-solid-value{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;position:relative;line-height:1;}
+.wf-stat-solid-label{font-size:13px;font-weight:600;margin-top:6px;position:relative;}
+@media (prefers-reduced-motion:reduce){.wf-stat-solid,.wf-stat-solid-icon{transition:none;}}
+.wf-stat-pastel{position:relative;overflow:hidden;border-radius:14px;padding:20px 18px;min-height:132px;cursor:default;font-family:'Poppins','Noto Sans Khmer',sans-serif;transition:transform .18s cubic-bezier(.4,0,.2,1),box-shadow .18s cubic-bezier(.4,0,.2,1);}
+.wf-stat-pastel:hover{transform:translateY(-3px);box-shadow:0 10px 22px -12px rgba(5,8,16,0.25);}
+.wf-stat-pastel-clickable{cursor:pointer;}
+.wf-stat-pastel-clickable:focus-visible{outline:2px solid ${T.gold};outline-offset:2px;}
+.wf-stat-pastel-icon{position:absolute;right:10px;bottom:8px;opacity:.55;transition:transform .35s cubic-bezier(.4,0,.2,1);}
+.wf-stat-pastel:hover .wf-stat-pastel-icon{transform:scale(1.1) rotate(-4deg);}
+.wf-stat-pastel-chevron{position:absolute;top:14px;right:14px;width:24px;height:24px;border-radius:999px;background:rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;transition:transform .18s cubic-bezier(.4,0,.2,1);}
+.wf-stat-pastel-clickable:hover .wf-stat-pastel-chevron{transform:translateX(2px);}
+.wf-stat-pastel-title{font-size:19px;font-weight:700;position:relative;line-height:1.28;padding-right:24px;}
+.wf-stat-pastel-label{font-size:12.5px;font-weight:500;margin-top:5px;position:relative;}
+.wf-stat-pastel-sub{font-size:11.5px;font-weight:500;margin-top:2px;position:relative;opacity:.75;}
+@media (prefers-reduced-motion:reduce){.wf-stat-pastel,.wf-stat-pastel-icon,.wf-stat-pastel-chevron{transition:none;}}
 .wf-btn{display:inline-flex;align-items:center;gap:6px;font-weight:600;border-radius:7px;font-size:13px;padding:9px 15px;border:1px solid transparent;cursor:pointer;transition:background .15s ease,transform .1s ease,box-shadow .15s ease;}
 .wf-btn:active:not(:disabled){transform:scale(.97);}
 .wf-btn:disabled{opacity:.5;cursor:not-allowed;}
@@ -3364,7 +3411,7 @@ html,body,#root{height:100%;}
 .wf-apps-tile:active{transform:scale(.96);}
 .wf-apps-tile-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .wf-apps-tile-label{font-size:12px;font-weight:600;color:${T.ink};line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.wf-punch-clock{font-size:34px;font-weight:700;font-family:'JetBrains Mono',monospace;color:${T.ink};font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
+.wf-punch-clock{font-size:34px;font-weight:700;font-family:'Poppins','Noto Sans Khmer',sans-serif;color:${T.ink};font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
 .wf-menu-btn{display:none;background:none;border:none;color:${T.ink};cursor:pointer;padding:4px;}
 .wf-overlay-scrim{display:none;}
 .wf-content::-webkit-scrollbar,.wf-sidebar nav::-webkit-scrollbar,.wf-modal::-webkit-scrollbar{width:8px;}
@@ -3422,6 +3469,8 @@ html,body,#root{height:100%;}
      as messy/unorganized. */
   .wf-dash-stats{grid-template-columns:repeat(2,1fr);gap:10px;}
   .wf-dash-stats .wf-card{padding:13px !important;}
+  .wf-dash-stats .wf-stat-solid{padding:13px !important;}
+  .wf-dash-stats .wf-stat-solid-value{font-size:23px !important;}
   /* Loading skeleton: the desktop shape (fixed 220px sidebar rail +
      content column) squeezed the sidebar into a sliver and left the
      rest of a phone screen blank/empty instead of filling it — on
@@ -3486,7 +3535,7 @@ function useGlobalStyle() {
       link.id = "wf-fonts";
       link.rel = "stylesheet";
       link.href =
-        "https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Khmer:wght@400;500;600;700&display=swap";
+        "https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Khmer:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap";
       document.head.appendChild(link);
     }
   }, []);
@@ -8397,8 +8446,11 @@ function Dashboard({
   offices,
   soundPreset,
   showSelfPunch,
+  setPage,
+  moduleEnabled,
 }) {
   const { t, lang } = useLang();
+  const { theme } = useTheme();
   const today = todayStr();
   // "Working now" = checked in today, not checked out yet, and not on
   // leave/absent. Driven straight off the `attendance` array, which is
@@ -8497,6 +8549,7 @@ function Dashboard({
             sub: "",
             icon: Building2,
             accent: T.blue,
+            linkTo: "profile",
           },
           {
             label: t.dash.myShift,
@@ -8504,6 +8557,7 @@ function Dashboard({
             sub: myShift ? `${myShift.start}–${myShift.end}` : "",
             icon: Clock,
             accent: T.gold,
+            linkTo: "roster",
           },
           {
             label: t.dash.todayStatus,
@@ -8511,6 +8565,7 @@ function Dashboard({
             sub: "",
             icon: CheckCircle2,
             accent: T.forest,
+            linkTo: "attendance",
           },
           {
             label: t.dash.payrollStatus,
@@ -8520,6 +8575,7 @@ function Dashboard({
             sub: t.dash.thisMonth,
             icon: Wallet,
             accent: T.rose,
+            linkTo: "payroll",
           },
         ];
   const recent = [...attendance]
@@ -8543,9 +8599,12 @@ function Dashboard({
         <p style={{ color: "#A9B4C7", fontSize: 13 }}>{t.dash.welcome}</p>
         <h2
           style={{
-            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontFamily:
+              role === "admin"
+                ? "'Sora','Noto Sans Khmer',sans-serif"
+                : "'Poppins','Noto Sans Khmer',sans-serif",
             fontSize: 24,
-            fontWeight: 600,
+            fontWeight: role === "admin" ? 600 : 700,
             marginTop: 2,
           }}
         >
@@ -8556,7 +8615,10 @@ function Dashboard({
             color: "#A9B4C7",
             fontSize: 12,
             marginTop: 6,
-            fontFamily: "'JetBrains Mono',monospace",
+            fontFamily:
+              role === "admin"
+                ? "'JetBrains Mono',monospace"
+                : "'Poppins','Noto Sans Khmer',sans-serif",
           }}
         >
           {new Date().toLocaleDateString(lang === "en" ? "en-US" : "km-KH", {
@@ -8586,47 +8648,117 @@ function Dashboard({
       )}
 
       <div className="wf-dash-stats" style={{ marginBottom: 22 }}>
-        {stats.map((s) => (
-          <Card key={s.label} accent={s.accent} style={{ padding: 16 }}>
+        {stats.map((s) => {
+          if (role !== "admin") {
+            // Employee dashboard uses a softer pastel card style,
+            // distinct from the admin's solid-color cards.
+            const accentKey =
+              s.accent === T.forest
+                ? "forest"
+                : s.accent === T.blue
+                  ? "blue"
+                  : s.accent === T.gold
+                    ? "gold"
+                    : "rose";
+            const pastel =
+              EMP_PASTEL[theme === "dark" ? "dark" : "light"][accentKey];
+            const canLink =
+              s.linkTo &&
+              typeof setPage === "function" &&
+              (typeof moduleEnabled !== "function" ||
+                moduleEnabled(s.linkTo) !== false);
+            const clickProps = canLink
+              ? {
+                  role: "button",
+                  tabIndex: 0,
+                  onClick: () => setPage(s.linkTo),
+                  onKeyDown: (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setPage(s.linkTo);
+                    }
+                  },
+                }
+              : {};
+            return (
+              <div
+                key={s.label}
+                className={`wf-stat-pastel ${canLink ? "wf-stat-pastel-clickable" : ""}`}
+                style={{ background: pastel.bg }}
+                {...clickProps}
+              >
+                {canLink && (
+                  <span className="wf-stat-pastel-chevron">
+                    <ChevronRight size={13} color={pastel.text} />
+                  </span>
+                )}
+                <s.icon
+                  className="wf-stat-pastel-icon"
+                  size={46}
+                  color={pastel.icon}
+                  strokeWidth={1.6}
+                />
+                <div
+                  className="wf-stat-pastel-title"
+                  style={{ color: pastel.text }}
+                >
+                  {s.value}
+                </div>
+                <div
+                  className="wf-stat-pastel-label"
+                  style={{ color: pastel.text, opacity: 0.85 }}
+                >
+                  {s.label}
+                </div>
+                {s.sub && (
+                  <div
+                    className="wf-stat-pastel-sub"
+                    style={{ color: pastel.text }}
+                  >
+                    {s.sub}
+                  </div>
+                )}
+              </div>
+            );
+          }
+          // Gold reads best with dark text on top of it; every other
+          // accent in the palette is dark enough for white text.
+          const onColor = s.accent === T.gold ? "#1A1300" : "#fff";
+          const subColor =
+            s.accent === T.gold ? "rgba(26,19,0,0.72)" : "rgba(255,255,255,0.82)";
+          return (
             <div
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 10,
-                background: s.accent + "1A",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: 12,
-              }}
+              key={s.label}
+              className="wf-stat-solid"
+              style={{ background: s.accent }}
             >
-              <s.icon size={18} color={s.accent} />
+              <s.icon
+                className="wf-stat-solid-icon"
+                size={58}
+                color={onColor}
+                strokeWidth={1.5}
+              />
+              <div className="wf-stat-solid-value" style={{ color: onColor }}>
+                {s.value}
+              </div>
+              <div className="wf-stat-solid-label" style={{ color: onColor }}>
+                {s.label}
+              </div>
+              {s.sub && (
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: subColor,
+                    marginTop: 2,
+                    position: "relative",
+                  }}
+                >
+                  {s.sub}
+                </div>
+              )}
             </div>
-            <div
-              style={{
-                fontSize: 26,
-                fontWeight: 700,
-                fontFamily: "'JetBrains Mono',monospace",
-                color: T.ink,
-              }}
-            >
-              {s.value}
-            </div>
-            <div
-              style={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: T.textSoft,
-                marginTop: 2,
-              }}
-            >
-              {s.label}
-            </div>
-            <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>
-              {s.sub}
-            </div>
-          </Card>
-        ))}
+          );
+        })}
       </div>
 
       {role === "admin" && offices && offices.length > 0 && (
@@ -13482,26 +13614,44 @@ function SelfPunch({
             background: T.paper,
             padding: "4px 10px",
             borderRadius: 999,
-            marginBottom: 16,
+            marginBottom: hasOffices ? 14 : 16,
           }}
         >
           <Watch size={12} /> {shiftLabel(shift)}
         </div>
       )}
-      {!shift && <div style={{ marginBottom: 16 }} />}
+      {!shift && <div style={{ marginBottom: hasOffices ? 10 : 16 }} />}
       {hasOffices && (
         <div
           style={{
             display: "flex",
-            alignItems: "center",
+            alignItems: "flex-start",
             justifyContent: "center",
-            gap: 5,
-            fontSize: 11,
-            color: T.muted,
-            marginBottom: 12,
+            gap: 22,
+            padding: "12px 0",
+            marginBottom: 16,
+            borderTop: `1px solid ${T.lineSoft}`,
+            borderBottom: `1px solid ${T.lineSoft}`,
           }}
         >
-          <MapPin size={12} /> {t.att.gpsRequiredHint(offices.length)}
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 6 }}>
+            <MapPin size={14} color={T.muted} style={{ marginTop: 1 }} />
+            <div style={{ textAlign: "left" }}>
+              <div style={{ fontSize: 12, color: T.textSoft }}>
+                {t.att.gpsRequiredHint(offices.length)}
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: locBusy ? T.muted : T.forestText,
+                  fontWeight: 600,
+                  marginTop: 1,
+                }}
+              >
+                {locBusy ? t.att.locatingNow : t.att.locVerifiedOnPunch}
+              </div>
+            </div>
+          </div>
         </div>
       )}
       {todayIsDayOff && (
@@ -13567,7 +13717,14 @@ function SelfPunch({
             variant="accent"
             onClick={() => punchIn()}
             disabled={locBusy}
-            style={{ padding: "12px 26px", fontSize: 15 }}
+            style={{
+              width: "100%",
+              maxWidth: 340,
+              justifyContent: "center",
+              padding: "13px 26px",
+              fontSize: 15,
+              borderRadius: 11,
+            }}
           >
             {locBusy ? (
               <Loader2
@@ -13598,31 +13755,87 @@ function SelfPunch({
       )}
       {rec && !rec.checkOut && (
         <div>
-          <p
+          <div
             style={{
-              fontSize: 13,
-              color: T.textSoft,
-              marginBottom: 12,
-              fontFamily: "'JetBrains Mono',monospace",
+              display: "flex",
+              marginBottom: 18,
+              maxWidth: 340,
+              marginLeft: "auto",
+              marginRight: "auto",
             }}
           >
-            {t.att.checkIn} {rec.checkIn} · <StatusPill status={rec.status} />
+            <div style={{ flex: 1 }}>
+              <div
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 700,
+                  letterSpacing: ".05em",
+                  color: T.muted,
+                  textTransform: "uppercase",
+                }}
+              >
+                {t.att.checkIn}
+              </div>
+              <div
+                style={{
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: T.ink,
+                  fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
+                  marginTop: 3,
+                }}
+              >
+                {rec.checkIn}
+              </div>
+            </div>
+            <div
+              style={{
+                flex: 1,
+                borderLeft: `1px solid ${T.lineSoft}`,
+                borderRight: `1px solid ${T.lineSoft}`,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 700,
+                  letterSpacing: ".05em",
+                  color: T.muted,
+                  textTransform: "uppercase",
+                }}
+              >
+                {t.status}
+              </div>
+              <div style={{ marginTop: 4 }}>
+                <StatusPill status={rec.status} />
+              </div>
+            </div>
             {rec.checkInLoc?.officeName && (
-              <>
-                {" "}
-                ·{" "}
-                <span
+              <div style={{ flex: 1 }}>
+                <div
                   style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 3,
+                    fontSize: 10.5,
+                    fontWeight: 700,
+                    letterSpacing: ".05em",
+                    color: T.muted,
+                    textTransform: "uppercase",
                   }}
                 >
-                  <MapPin size={11} /> {rec.checkInLoc.officeName}
-                </span>
-              </>
+                  {t.att.locationLabel}
+                </div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: T.ink,
+                    marginTop: 3,
+                  }}
+                >
+                  {rec.checkInLoc.officeName}
+                </div>
+              </div>
             )}
-          </p>
+          </div>
           <div
             style={{
               display: "flex",
@@ -13635,7 +13848,14 @@ function SelfPunch({
               variant="danger-solid"
               onClick={() => punchOut()}
               disabled={locBusy}
-              style={{ padding: "12px 26px", fontSize: 15 }}
+              style={{
+                width: "100%",
+                maxWidth: 340,
+                justifyContent: "center",
+                padding: "13px 26px",
+                fontSize: 15,
+                borderRadius: 11,
+              }}
             >
               {locBusy ? (
                 <Loader2
@@ -13670,7 +13890,7 @@ function SelfPunch({
           style={{
             fontSize: 13,
             color: T.textSoft,
-            fontFamily: "'JetBrains Mono',monospace",
+            fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
           }}
         >
           <CheckCircle2
@@ -28956,7 +29176,7 @@ function AppInner() {
             <button className="wf-menu-btn" onClick={() => setNavOpen(true)}>
               <Menu size={20} />
             </button>
-            <div>
+            <div style={{ minWidth: 0, flex: 1, overflow: "hidden" }}>
               <div
                 style={{
                   fontFamily: "'JetBrains Mono',monospace",
@@ -28966,6 +29186,9 @@ function AppInner() {
                   textTransform: "uppercase",
                   color: T.muted,
                   marginBottom: 2,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {brandDisplayName}
@@ -28977,6 +29200,9 @@ function AppInner() {
                   color: T.ink,
                   fontSize: 16,
                   letterSpacing: "-.01em",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {nav.find((n) => n.id === page)?.label}
@@ -28985,6 +29211,7 @@ function AppInner() {
             <div
               style={{
                 marginLeft: "auto",
+                flexShrink: 0,
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
@@ -29115,6 +29342,8 @@ function AppInner() {
                   offices={offices}
                   soundPreset={soundPolicy.preset}
                   showSelfPunch={moduleEnabled("attendance")}
+                  setPage={setPage}
+                  moduleEnabled={moduleEnabled}
                 />
               )}
               {page === "analytics" && role === "admin" && (
