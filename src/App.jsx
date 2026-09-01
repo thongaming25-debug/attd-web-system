@@ -81,6 +81,7 @@ import {
   Printer,
   Ban,
   LayoutGrid,
+  Filter,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -667,8 +668,22 @@ const LANG_RAW = {
       resetCarryOverBtn: "កំណត់ carry-over ទាំងអស់ទៅសូន្យ",
       resetCarryOverConfirm:
         "តើអ្នកប្រាកដទេថាចង់កំណត់ថ្ងៃ carry-over របស់និយោជិកទាំងអស់ត្រឡប់ទៅសូន្យវិញ? សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។",
+      carryOverRulesTitle: "លក្ខខណ្ឌ Carry-over",
+      carryOverRuleActiveOnly: "រាប់បញ្ចូលតែនិយោជិកសកម្មប៉ុណ្ណោះ",
+      carryOverRuleBalanceCarried: (toYear) =>
+        `សមតុល្យនៅសល់នឹងត្រូវលើកទៅឆ្នាំ ${toYear}`,
+      carryOverRuleNoUndo: "សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ",
       resetCarryOverDone: (count) =>
         `បានកំណត់ carry-over ទៅសូន្យសម្រាប់និយោជិក ${count} នាក់`,
+      allStatus: "គ្រប់ស្ថានភាព",
+      searchPlaceholder: "ស្វែងរកតាមឈ្មោះបុគ្គលិក...",
+      duration: "រយៈពេល",
+      durationDays: (n) => `${n} ថ្ងៃ`,
+      appliedOn: "បានដាក់ស្នើនៅ",
+      view: "មើល",
+      showingRange: (start, end, total) =>
+        `បង្ហាញ ${start} ដល់ ${end} ក្នុងចំណោម ${total} សំណើ`,
+      perPage: (n) => `${n} ក្នុងមួយទំព័រ`,
     },
     ot: {
       addBtn: "សុំ OT ថ្មី",
@@ -1795,6 +1810,20 @@ const LANG_RAW = {
         "Reset every employee's carry-over days back to 0? This can't be undone.",
       resetCarryOverDone: (count) =>
         `Carry-over reset to 0 for ${count} employee(s)`,
+      carryOverRulesTitle: "Carry-over Rules",
+      carryOverRuleActiveOnly: "Only active employees are included",
+      carryOverRuleBalanceCarried: (toYear) =>
+        `Remaining balance will be carried to ${toYear}`,
+      carryOverRuleNoUndo: "This action cannot be undone",
+      allStatus: "All Status",
+      searchPlaceholder: "Search by employee...",
+      duration: "Duration",
+      durationDays: (n) => `${n} day${n === 1 ? "" : "s"}`,
+      appliedOn: "Applied On",
+      view: "View",
+      showingRange: (start, end, total) =>
+        `Showing ${start} to ${end} of ${total} requests`,
+      perPage: (n) => `${n} per page`,
     },
     ot: {
       addBtn: "New OT Request",
@@ -3359,6 +3388,7 @@ html,body,#root{height:100%;}
 .wf-dp-link:hover{background:${T.forestSoft};}
 .wf-dr-triggers{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .wf-dp-pop-wide{width:520px;max-width:calc(100vw - 64px);padding:14px;}
+.wf-dp-pop-right{left:auto;right:0;}
 .wf-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 @media (max-width:480px){.wf-grid-2{grid-template-columns:1fr;}}
 .wf-dp-head-dual{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;}
@@ -6399,6 +6429,42 @@ function dateRange(start, end) {
   }
   return out;
 }
+// Number of calendar days a leave request spans, inclusive. Falls back to
+// 1 if the dates are missing/invalid so the UI never shows "0 days".
+function leaveDurationDays(r) {
+  return dateRange(r.startDate, r.endDate).length || 1;
+}
+// Small color dot shown next to each leave type in the requests table —
+// purely a visual grouping aid, not tied to status semantics.
+const LEAVE_TYPE_DOT = {
+  annual: "#5B8DEF",
+  sick: "#E5637A",
+  unpaid: "#F0A83B",
+  other: "#1FA26B",
+};
+// Splits a request's createdAt ISO timestamp into a locale-formatted date
+// and time pair for display in the "Applied On" column.
+function fmtAppliedOn(iso, lang) {
+  if (!iso) return { date: "—", time: "" };
+  const d = new Date(iso);
+  if (isNaN(d)) return { date: "—", time: "" };
+  const locale = lang === "en" ? "en-US" : "km-KH";
+  try {
+    return {
+      date: new Intl.DateTimeFormat(locale, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      }).format(d),
+      time: new Intl.DateTimeFormat(locale, {
+        hour: "numeric",
+        minute: "2-digit",
+      }).format(d),
+    };
+  } catch {
+    return { date: iso, time: "" };
+  }
+}
 function StatusPill({ status }) {
   const { lang } = useLang();
   const STATUS_MAP = getStatusMap(lang);
@@ -7252,6 +7318,7 @@ function DateRangePicker({
   endLabel,
   placeholder,
   style,
+  compact,
 }) {
   const { t } = useLang();
   const [open, setOpen] = useState(false);
@@ -7343,41 +7410,71 @@ function DateRangePicker({
 
   return (
     <div className="wf-dp-wrap" ref={wrapRef} style={style}>
-      <div className="wf-dr-triggers">
-        <div>
-          <span className="wf-field-label">{startLabel}</span>
-          <button
-            type="button"
-            className={`wf-dp-trigger${open ? " open" : ""}`}
-            onClick={() => setOpen((o) => !o)}
+      {compact ? (
+        <button
+          type="button"
+          className={`wf-dp-trigger${open ? " open" : ""}`}
+          onClick={() => setOpen((o) => !o)}
+        >
+          <span
+            className={startValue || endValue ? "" : "wf-dp-placeholder"}
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
           >
-            <span className={startValue ? "" : "wf-dp-placeholder"}>
-              {startValue
+            {startValue && endValue
+              ? `${fmtDateDisplay(startValue)} – ${fmtDateDisplay(endValue)}`
+              : startValue
                 ? fmtDateDisplay(startValue)
                 : placeholder || t.selectDate}
-            </span>
-            <CalendarDays size={15} style={{ opacity: 0.55, flexShrink: 0 }} />
-          </button>
+          </span>
+          <CalendarDays size={15} style={{ opacity: 0.55, flexShrink: 0 }} />
+        </button>
+      ) : (
+        <div className="wf-dr-triggers">
+          <div>
+            <span className="wf-field-label">{startLabel}</span>
+            <button
+              type="button"
+              className={`wf-dp-trigger${open ? " open" : ""}`}
+              onClick={() => setOpen((o) => !o)}
+            >
+              <span className={startValue ? "" : "wf-dp-placeholder"}>
+                {startValue
+                  ? fmtDateDisplay(startValue)
+                  : placeholder || t.selectDate}
+              </span>
+              <CalendarDays
+                size={15}
+                style={{ opacity: 0.55, flexShrink: 0 }}
+              />
+            </button>
+          </div>
+          <div>
+            <span className="wf-field-label">{endLabel}</span>
+            <button
+              type="button"
+              className={`wf-dp-trigger${open ? " open" : ""}`}
+              onClick={() => setOpen((o) => !o)}
+            >
+              <span className={endValue ? "" : "wf-dp-placeholder"}>
+                {endValue
+                  ? fmtDateDisplay(endValue)
+                  : placeholder || t.selectDate}
+              </span>
+              <CalendarDays
+                size={15}
+                style={{ opacity: 0.55, flexShrink: 0 }}
+              />
+            </button>
+          </div>
         </div>
-        <div>
-          <span className="wf-field-label">{endLabel}</span>
-          <button
-            type="button"
-            className={`wf-dp-trigger${open ? " open" : ""}`}
-            onClick={() => setOpen((o) => !o)}
-          >
-            <span className={endValue ? "" : "wf-dp-placeholder"}>
-              {endValue
-                ? fmtDateDisplay(endValue)
-                : placeholder || t.selectDate}
-            </span>
-            <CalendarDays size={15} style={{ opacity: 0.55, flexShrink: 0 }} />
-          </button>
-        </div>
-      </div>
+      )}
       {open && (
         <div
-          className="wf-dp-pop wf-dp-pop-wide"
+          className={`wf-dp-pop wf-dp-pop-wide${compact ? " wf-dp-pop-right" : ""}`}
           onMouseDown={(e) => e.stopPropagation()}
         >
           <div className="wf-dp-head-dual">
@@ -8725,7 +8822,9 @@ function Dashboard({
           // accent in the palette is dark enough for white text.
           const onColor = s.accent === T.gold ? "#1A1300" : "#fff";
           const subColor =
-            s.accent === T.gold ? "rgba(26,19,0,0.72)" : "rgba(255,255,255,0.82)";
+            s.accent === T.gold
+              ? "rgba(26,19,0,0.72)"
+              : "rgba(255,255,255,0.82)";
           return (
             <div
               key={s.label}
@@ -15530,6 +15629,12 @@ function LeaveRequests({
   const [confirmDel, setConfirmDel] = useState(null);
   const [confirmRollover, setConfirmRollover] = useState(false);
   const [confirmResetCarry, setConfirmResetCarry] = useState(false);
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [pageSize, setPageSize] = useState(10);
+  const [viewFor, setViewFor] = useState(null);
   const empOf = (id) => employees.find((e) => e.id === id);
   const accrualMode = leavePolicy?.annualLeaveAccrualMode || "monthly";
 
@@ -15845,87 +15950,292 @@ function LeaveRequests({
     );
   }
 
-  // Admin view — newest first, pending requests surfaced on top.
-  const sorted = [...leaveRequests].sort((a, b) => {
-    if (a.status === "pending" && b.status !== "pending") return -1;
-    if (a.status !== "pending" && b.status === "pending") return 1;
-    return b.createdAt.localeCompare(a.createdAt);
-  });
+  // Admin view — newest first, pending requests surfaced on top. Also
+  // applies the status / date-range / employee search filters from the
+  // toolbar above the table before sorting and paginating.
+  const sorted = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return [...leaveRequests]
+      .filter((r) => {
+        if (statusFilter && r.status !== statusFilter) return false;
+        if (dateFrom && r.endDate < dateFrom) return false;
+        if (dateTo && r.startDate > dateTo) return false;
+        if (q) {
+          const emp = empOf(r.employeeId);
+          const hay = `${emp?.name || ""} ${emp?.code || ""}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        if (a.status === "pending" && b.status !== "pending") return -1;
+        if (a.status !== "pending" && b.status === "pending") return 1;
+        return b.createdAt.localeCompare(a.createdAt);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leaveRequests, employees, statusFilter, dateFrom, dateTo, query]);
+  const pg = usePagination(sorted, pageSize);
+  const pageNumbers = useMemo(() => {
+    const out = [];
+    for (let n = 1; n <= pg.pageCount; n++) {
+      if (n === 1 || n === pg.pageCount || Math.abs(n - pg.page) <= 1) {
+        out.push(n);
+      } else if (out[out.length - 1] !== "…") {
+        out.push("…");
+      }
+    }
+    return out;
+  }, [pg.page, pg.pageCount]);
   return (
     <div>
       {isSuperAdmin && (
-        <Card style={{ padding: "14px 18px", marginBottom: 16 }}>
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              textTransform: "uppercase",
-              letterSpacing: ".04em",
-              color: T.muted,
-              marginBottom: 2,
-            }}
-          >
-            {t.lv.accrualPolicyTitle}
-          </div>
-          <div style={{ fontSize: 12.5, color: T.textSoft, marginBottom: 10 }}>
-            {t.lv.accrualPolicyDesc}
-          </div>
-          <Field label={t.lv.accrualModeLabel}>
-            <Select
-              value={accrualMode}
-              onChange={(e) =>
-                setLeavePolicy({
-                  ...(leavePolicy || DEFAULT_LEAVE_POLICY),
-                  annualLeaveAccrualMode: e.target.value,
-                })
-              }
+        <Card style={{ padding: "16px 18px", marginBottom: 16 }}>
+          <div style={{ display: "flex", gap: 12 }}>
+            <div
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: 10,
+                background: T.forestSoft,
+                color: T.forestText,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
             >
-              <option value="monthly">{t.lv.accrualModeMonthly}</option>
-              <option value="flat">{t.lv.accrualModeFlat}</option>
-            </Select>
-          </Field>
-          <p style={{ fontSize: 11.5, color: T.muted, marginTop: -6 }}>
-            {accrualMode === "flat"
-              ? t.lv.accrualModeFlatHint
-              : t.lv.accrualModeMonthlyHint}
-          </p>
+              <CalendarDays size={18} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 14.5, fontWeight: 700, color: T.ink }}>
+                {t.lv.accrualPolicyTitle}
+              </div>
+              <div style={{ fontSize: 12.5, color: T.textSoft, marginTop: 2 }}>
+                {t.lv.accrualPolicyDesc}
+              </div>
+              <div style={{ marginTop: 12 }}>
+                <Field label={t.lv.accrualModeLabel}>
+                  <Select
+                    value={accrualMode}
+                    onChange={(e) =>
+                      setLeavePolicy({
+                        ...(leavePolicy || DEFAULT_LEAVE_POLICY),
+                        annualLeaveAccrualMode: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="monthly">{t.lv.accrualModeMonthly}</option>
+                    <option value="flat">{t.lv.accrualModeFlat}</option>
+                  </Select>
+                </Field>
+                <p style={{ fontSize: 11.5, color: T.muted, marginTop: -6 }}>
+                  {accrualMode === "flat"
+                    ? t.lv.accrualModeFlatHint
+                    : t.lv.accrualModeMonthlyHint}
+                </p>
+              </div>
+            </div>
+          </div>
         </Card>
       )}
       {isSuperAdmin && (
-        <Card style={{ padding: "14px 18px", marginBottom: 16 }}>
-          <div
+        <div className="wf-grid-2" style={{ marginBottom: 16 }}>
+          <Card style={{ padding: "16px 18px" }}>
+            <div style={{ display: "flex", gap: 12 }}>
+              <div
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: 10,
+                  background: T.forestSoft,
+                  color: T.forestText,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <Repeat size={18} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 14.5, fontWeight: 700, color: T.ink }}>
+                  {t.lv.rolloverTitle}
+                </div>
+                <div
+                  style={{ fontSize: 12.5, color: T.textSoft, marginTop: 2 }}
+                >
+                  {t.lv.rolloverDesc(rolloverYear, rolloverYear + 1)}
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 8,
+                    flexWrap: "wrap",
+                    marginTop: 12,
+                  }}
+                >
+                  <Button
+                    size="sm"
+                    variant="accent"
+                    onClick={() => setConfirmRollover(true)}
+                  >
+                    <Repeat size={14} /> {t.lv.rolloverBtn(rolloverYear)}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setConfirmResetCarry(true)}
+                  >
+                    <RefreshCw size={14} /> {t.lv.resetCarryOverBtn}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+          <Card
             style={{
-              fontSize: 11,
-              fontWeight: 700,
-              textTransform: "uppercase",
-              letterSpacing: ".04em",
-              color: T.muted,
-              marginBottom: 2,
+              padding: "16px 18px",
+              background: T.forestSoft,
             }}
           >
-            {t.lv.rolloverTitle}
-          </div>
-          <div style={{ fontSize: 12.5, color: T.textSoft, marginBottom: 10 }}>
-            {t.lv.rolloverDesc(rolloverYear, rolloverYear + 1)}
-          </div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <Button
-              size="sm"
-              variant="accent"
-              onClick={() => setConfirmRollover(true)}
+            <div
+              style={{
+                fontSize: 12.5,
+                fontWeight: 700,
+                color: T.forestText,
+                marginBottom: 10,
+              }}
             >
-              <Repeat size={14} /> {t.lv.rolloverBtn(rolloverYear)}
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setConfirmResetCarry(true)}
+              {t.lv.carryOverRulesTitle}
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+              }}
             >
-              <RefreshCw size={14} /> {t.lv.resetCarryOverBtn}
-            </Button>
-          </div>
-        </Card>
+              {[
+                t.lv.carryOverRuleActiveOnly,
+                t.lv.carryOverRuleBalanceCarried(rolloverYear + 1),
+                t.lv.carryOverRuleNoUndo,
+              ].map((line, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 8,
+                  }}
+                >
+                  <CheckCircle2
+                    size={15}
+                    style={{
+                      color: T.forestText,
+                      flexShrink: 0,
+                      marginTop: 1,
+                    }}
+                  />
+                  <span style={{ fontSize: 12.5, color: T.forestText }}>
+                    {line}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
       )}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 10,
+          marginBottom: 12,
+          flexWrap: "wrap",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontWeight: 700, fontSize: 14.5, color: T.ink }}>
+            {t.nav.leave}
+          </span>
+          <span
+            style={{
+              fontSize: 11.5,
+              fontWeight: 700,
+              color: T.forestText,
+              background: T.forestSoft,
+              borderRadius: 999,
+              padding: "2px 9px",
+            }}
+          >
+            {sorted.length}
+          </span>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            flexWrap: "nowrap",
+            marginLeft: "auto",
+          }}
+        >
+          <Select
+            style={{ width: 140, flexShrink: 0 }}
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="">{t.lv.allStatus}</option>
+            <option value="pending">{t.lv.pending}</option>
+            <option value="approved">{t.lv.approved}</option>
+            <option value="rejected">{t.lv.rejected}</option>
+          </Select>
+          <DateRangePicker
+            startValue={dateFrom}
+            endValue={dateTo}
+            onChangeStart={(e) => setDateFrom(e.target.value)}
+            onChangeEnd={(e) => setDateTo(e.target.value)}
+            placeholder={t.selectDate}
+            compact
+            style={{ width: 200, flexShrink: 0 }}
+          />
+          <div style={{ position: "relative", flexShrink: 0 }}>
+            <Search
+              size={14}
+              style={{
+                position: "absolute",
+                left: 10,
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: T.muted,
+              }}
+            />
+            <Input
+              style={{ paddingLeft: 30, width: 180 }}
+              placeholder={t.lv.searchPlaceholder}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+          {(statusFilter || dateFrom || dateTo || query) && (
+            <button
+              type="button"
+              className="wf-btn wf-btn-ghost wf-btn-sm"
+              title={t.clear}
+              onClick={() => {
+                setStatusFilter("");
+                setDateFrom("");
+                setDateTo("");
+                setQuery("");
+              }}
+              style={{ padding: "0 10px", height: 34, flexShrink: 0 }}
+            >
+              <Filter size={14} />
+            </button>
+          )}
+        </div>
+      </div>
       <Card style={{ overflowX: "auto" }}>
         <table className="wf-table">
           <thead>
@@ -15933,17 +16243,18 @@ function LeaveRequests({
               <th>{t.employee}</th>
               <th>{t.lv.type}</th>
               <th>{t.lv.fromShort}</th>
-              <th>{t.lv.toShort}</th>
+              <th>{t.lv.duration}</th>
               <th>{t.lv.reason}</th>
               <th>{t.status}</th>
+              <th>{t.lv.appliedOn}</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {sorted.length === 0 && (
+            {pg.pageItems.length === 0 && (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={8}
                   style={{
                     textAlign: "center",
                     color: T.muted,
@@ -15954,8 +16265,9 @@ function LeaveRequests({
                 </td>
               </tr>
             )}
-            {sorted.map((r) => {
+            {pg.pageItems.map((r) => {
               const emp = empOf(r.employeeId);
+              const applied = fmtAppliedOn(r.createdAt, lang);
               return (
                 <tr key={r.id}>
                   <td>
@@ -15990,9 +16302,28 @@ function LeaveRequests({
                     </div>
                   </td>
                   <td>
-                    {getLeaveTypeLabel(lang)[r.type] || r.type}
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 6 }}
+                    >
+                      <span
+                        style={{
+                          width: 7,
+                          height: 7,
+                          borderRadius: "50%",
+                          background: LEAVE_TYPE_DOT[r.type] || T.muted,
+                          flexShrink: 0,
+                        }}
+                      />
+                      {getLeaveTypeLabel(lang)[r.type] || r.type}
+                    </div>
                     {r.type === "annual" && emp && (
-                      <div style={{ fontSize: 10.5, color: T.muted }}>
+                      <div
+                        style={{
+                          fontSize: 10.5,
+                          color: T.muted,
+                          marginLeft: 13,
+                        }}
+                      >
                         {t.lv.remainingDays(
                           annualLeaveBalance(
                             emp,
@@ -16004,21 +16335,43 @@ function LeaveRequests({
                       </div>
                     )}
                     {r.type === "sick" && emp && (
-                      <div style={{ fontSize: 10.5, color: T.muted }}>
+                      <div
+                        style={{
+                          fontSize: 10.5,
+                          color: T.muted,
+                          marginLeft: 13,
+                        }}
+                      >
                         {t.lv.remainingDays(
                           sickLeaveBalance(emp, leaveRequests).remaining,
                         )}
                       </div>
                     )}
                   </td>
-                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                    {r.startDate}
-                  </td>
-                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                    {r.endDate}
+                  <td style={{ fontSize: 12.5 }}>
+                    <div
+                      style={{
+                        fontFamily: "'JetBrains Mono',monospace",
+                        color: T.ink,
+                      }}
+                    >
+                      {r.startDate}
+                    </div>
+                    <div style={{ fontSize: 10.5, color: T.muted }}>
+                      {t.lv.toShort} {r.endDate}
+                    </div>
                   </td>
                   <td
-                    style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}
+                    style={{
+                      fontSize: 12.5,
+                      color: T.textSoft,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {t.lv.durationDays(leaveDurationDays(r))}
+                  </td>
+                  <td
+                    style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 180 }}
                   >
                     {r.reason || "—"}
                   </td>
@@ -16026,33 +16379,61 @@ function LeaveRequests({
                     <StatusPill status={r.status} />
                     <LeaveDecisionNote r={r} admins={admins} />
                   </td>
+                  <td
+                    style={{
+                      fontSize: 11.5,
+                      color: T.textSoft,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    <div>{applied.date}</div>
+                    <div style={{ fontSize: 10.5, color: T.muted }}>
+                      {applied.time}
+                    </div>
+                  </td>
                   <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                    {r.status === "pending"
-                      ? canApprove && (
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: 6,
-                              justifyContent: "flex-end",
-                            }}
+                    {r.status === "pending" ? (
+                      canApprove && (
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: 6,
+                            justifyContent: "flex-end",
+                          }}
+                        >
+                          <Button
+                            size="sm"
+                            variant="accent"
+                            onClick={() => approve(r)}
                           >
-                            <Button
-                              size="sm"
-                              variant="accent"
-                              onClick={() => approve(r)}
-                            >
-                              {t.lv.approve}
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="danger"
-                              onClick={() => setRejectFor(r)}
-                            >
-                              {t.lv.reject}
-                            </Button>
-                          </div>
-                        )
-                      : isSuperAdmin && (
+                            {t.lv.approve}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="danger"
+                            onClick={() => setRejectFor(r)}
+                          >
+                            {t.lv.reject}
+                          </Button>
+                        </div>
+                      )
+                    ) : (
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 6,
+                          justifyContent: "flex-end",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setViewFor(r)}
+                        >
+                          <Eye size={13} /> {t.lv.view}
+                        </Button>
+                        {isSuperAdmin && (
                           <button
                             onClick={() => setConfirmDel(r)}
                             style={{
@@ -16065,13 +16446,195 @@ function LeaveRequests({
                             <Trash2 size={14} />
                           </button>
                         )}
+                      </div>
+                    )}
                   </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
+        {pg.total > 0 && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: 10,
+              padding: "12px 4px 2px",
+              fontSize: 12.5,
+              color: T.muted,
+            }}
+          >
+            <span>
+              {t.lv.showingRange(pg.rangeStart, pg.rangeEnd, pg.total)}
+            </span>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <Select
+                style={{
+                  width: "auto",
+                  fontSize: 12,
+                  padding: "5px 26px 5px 10px",
+                }}
+                value={pageSize}
+                onChange={(e) => setPageSize(Number(e.target.value))}
+              >
+                {[10, 25, 50].map((n) => (
+                  <option key={n} value={n}>
+                    {t.lv.perPage(n)}
+                  </option>
+                ))}
+              </Select>
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => pg.setPage(pg.page - 1)}
+                  disabled={pg.page <= 1}
+                  style={{ opacity: pg.page <= 1 ? 0.4 : 1 }}
+                >
+                  <ChevronLeft size={14} />
+                </Button>
+                {pageNumbers.map((n, i) =>
+                  n === "…" ? (
+                    <span key={`gap-${i}`} style={{ padding: "0 4px" }}>
+                      …
+                    </span>
+                  ) : (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => pg.setPage(n)}
+                      style={{
+                        minWidth: 28,
+                        height: 28,
+                        borderRadius: 8,
+                        border: "none",
+                        background: n === pg.page ? T.forest : "transparent",
+                        color: n === pg.page ? "#fff" : T.textSoft,
+                        fontWeight: n === pg.page ? 700 : 500,
+                        fontSize: 12.5,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {n}
+                    </button>
+                  ),
+                )}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => pg.setPage(pg.page + 1)}
+                  disabled={pg.page >= pg.pageCount}
+                  style={{ opacity: pg.page >= pg.pageCount ? 0.4 : 1 }}
+                >
+                  <ChevronRight size={14} />
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </Card>
+      {viewFor && (
+        <Modal
+          title={t.lv.modalTitle}
+          onClose={() => setViewFor(null)}
+          width={440}
+        >
+          {(() => {
+            const emp = empOf(viewFor.employeeId);
+            return (
+              <div>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    marginBottom: 16,
+                  }}
+                >
+                  <Avatar
+                    name={emp?.name || "?"}
+                    photo={emp?.photo}
+                    size={36}
+                  />
+                  <div>
+                    <div
+                      style={{ fontWeight: 600, color: T.ink, fontSize: 14 }}
+                    >
+                      {emp?.name || "—"}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: T.muted,
+                        fontFamily: "'JetBrains Mono',monospace",
+                      }}
+                    >
+                      {emp?.code}
+                    </div>
+                  </div>
+                </div>
+                <Field label={t.lv.type}>
+                  <div style={{ fontSize: 13, color: T.ink }}>
+                    {getLeaveTypeLabel(lang)[viewFor.type] || viewFor.type}
+                  </div>
+                </Field>
+                <div style={{ display: "flex", gap: 12 }}>
+                  <div style={{ flex: 1 }}>
+                    <Field label={t.lv.fromShort}>
+                      <div
+                        style={{
+                          fontFamily: "'JetBrains Mono',monospace",
+                          fontSize: 13,
+                        }}
+                      >
+                        {viewFor.startDate}
+                      </div>
+                    </Field>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <Field label={t.lv.toShort}>
+                      <div
+                        style={{
+                          fontFamily: "'JetBrains Mono',monospace",
+                          fontSize: 13,
+                        }}
+                      >
+                        {viewFor.endDate}
+                      </div>
+                    </Field>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <Field label={t.lv.duration}>
+                      <div style={{ fontSize: 13, color: T.ink }}>
+                        {t.lv.durationDays(leaveDurationDays(viewFor))}
+                      </div>
+                    </Field>
+                  </div>
+                </div>
+                <Field label={t.lv.reason}>
+                  <div style={{ fontSize: 13, color: T.textSoft }}>
+                    {viewFor.reason || "—"}
+                  </div>
+                </Field>
+                <Field label={t.status}>
+                  <div>
+                    <StatusPill status={viewFor.status} />
+                    <LeaveDecisionNote r={viewFor} admins={admins} />
+                  </div>
+                </Field>
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <Button variant="ghost" onClick={() => setViewFor(null)}>
+                    {t.cancel}
+                  </Button>
+                </div>
+              </div>
+            );
+          })()}
+        </Modal>
+      )}
       {rejectFor && (
         <LeaveRejectModal
           onCancel={() => setRejectFor(null)}
