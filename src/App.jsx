@@ -8616,6 +8616,7 @@ function Dashboard({
             sub: `${activeEmployees.length} ${t.dash.active}`,
             icon: Users,
             accent: T.forest,
+            linkTo: "employees",
           },
           {
             label: t.nav.departments,
@@ -8623,6 +8624,7 @@ function Dashboard({
             sub: t.dash.totalDeptSub,
             icon: Building2,
             accent: T.blue,
+            linkTo: "departments",
           },
           {
             label: t.dash.presentToday,
@@ -8630,6 +8632,7 @@ function Dashboard({
             sub: `${rate}% ${t.dash.attendRate}`,
             icon: Clock,
             accent: T.gold,
+            linkTo: "attendance",
           },
           {
             label: t.dash.pendingPayroll,
@@ -8637,6 +8640,7 @@ function Dashboard({
             sub: t.dash.thisMonth,
             icon: Wallet,
             accent: T.rose,
+            linkTo: "payroll",
           },
         ]
       : [
@@ -8746,111 +8750,70 @@ function Dashboard({
 
       <div className="wf-dash-stats" style={{ marginBottom: 22 }}>
         {stats.map((s) => {
-          if (role !== "admin") {
-            // Employee dashboard uses a softer pastel card style,
-            // distinct from the admin's solid-color cards.
-            const accentKey =
-              s.accent === T.forest
-                ? "forest"
-                : s.accent === T.blue
-                  ? "blue"
-                  : s.accent === T.gold
-                    ? "gold"
-                    : "rose";
-            const pastel =
-              EMP_PASTEL[theme === "dark" ? "dark" : "light"][accentKey];
-            const canLink =
-              s.linkTo &&
-              typeof setPage === "function" &&
-              (typeof moduleEnabled !== "function" ||
-                moduleEnabled(s.linkTo) !== false);
-            const clickProps = canLink
-              ? {
-                  role: "button",
-                  tabIndex: 0,
-                  onClick: () => setPage(s.linkTo),
-                  onKeyDown: (e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      setPage(s.linkTo);
-                    }
-                  },
-                }
-              : {};
-            return (
-              <div
-                key={s.label}
-                className={`wf-stat-pastel ${canLink ? "wf-stat-pastel-clickable" : ""}`}
-                style={{ background: pastel.bg }}
-                {...clickProps}
-              >
-                {canLink && (
-                  <span className="wf-stat-pastel-chevron">
-                    <ChevronRight size={13} color={pastel.text} />
-                  </span>
-                )}
-                <s.icon
-                  className="wf-stat-pastel-icon"
-                  size={46}
-                  color={pastel.icon}
-                  strokeWidth={1.6}
-                />
-                <div
-                  className="wf-stat-pastel-title"
-                  style={{ color: pastel.text }}
-                >
-                  {s.value}
-                </div>
-                <div
-                  className="wf-stat-pastel-label"
-                  style={{ color: pastel.text, opacity: 0.85 }}
-                >
-                  {s.label}
-                </div>
-                {s.sub && (
-                  <div
-                    className="wf-stat-pastel-sub"
-                    style={{ color: pastel.text }}
-                  >
-                    {s.sub}
-                  </div>
-                )}
-              </div>
-            );
-          }
-          // Gold reads best with dark text on top of it; every other
-          // accent in the palette is dark enough for white text.
-          const onColor = s.accent === T.gold ? "#1A1300" : "#fff";
-          const subColor =
-            s.accent === T.gold
-              ? "rgba(26,19,0,0.72)"
-              : "rgba(255,255,255,0.82)";
+          // Both admin and employee dashboards share the same softer
+          // pastel card style for visual consistency.
+          const accentKey =
+            s.accent === T.forest
+              ? "forest"
+              : s.accent === T.blue
+                ? "blue"
+                : s.accent === T.gold
+                  ? "gold"
+                  : "rose";
+          const pastel =
+            EMP_PASTEL[theme === "dark" ? "dark" : "light"][accentKey];
+          const canLink =
+            s.linkTo &&
+            typeof setPage === "function" &&
+            (typeof moduleEnabled !== "function" ||
+              moduleEnabled(s.linkTo) !== false);
+          const clickProps = canLink
+            ? {
+                role: "button",
+                tabIndex: 0,
+                onClick: () => setPage(s.linkTo),
+                onKeyDown: (e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setPage(s.linkTo);
+                  }
+                },
+              }
+            : {};
           return (
             <div
               key={s.label}
-              className="wf-stat-solid"
-              style={{ background: s.accent }}
+              className={`wf-stat-pastel ${canLink ? "wf-stat-pastel-clickable" : ""}`}
+              style={{ background: pastel.bg }}
+              {...clickProps}
             >
+              {canLink && (
+                <span className="wf-stat-pastel-chevron">
+                  <ChevronRight size={13} color={pastel.text} />
+                </span>
+              )}
               <s.icon
-                className="wf-stat-solid-icon"
-                size={58}
-                color={onColor}
-                strokeWidth={1.5}
+                className="wf-stat-pastel-icon"
+                size={46}
+                color={pastel.icon}
+                strokeWidth={1.6}
               />
-              <div className="wf-stat-solid-value" style={{ color: onColor }}>
+              <div
+                className="wf-stat-pastel-title"
+                style={{ color: pastel.text }}
+              >
                 {s.value}
               </div>
-              <div className="wf-stat-solid-label" style={{ color: onColor }}>
+              <div
+                className="wf-stat-pastel-label"
+                style={{ color: pastel.text, opacity: 0.85 }}
+              >
                 {s.label}
               </div>
               {s.sub && (
                 <div
-                  style={{
-                    fontSize: 11,
-                    color: subColor,
-                    marginTop: 2,
-                    position: "relative",
-                  }}
+                  className="wf-stat-pastel-sub"
+                  style={{ color: pastel.text }}
                 >
                   {s.sub}
                 </div>
