@@ -49,6 +49,7 @@ import {
   Camera,
   ChevronLeft,
   ChevronRight,
+  MoreVertical,
   Download,
   Eye,
   Star,
@@ -3401,16 +3402,31 @@ html,body,#root{height:100%;}
   --wf-danger-hover-bg:#20121A; --wf-header-bg:rgba(8,11,18,0.82);
 }
 .wf-root{display:flex;height:100vh;height:100dvh;min-height:640px;max-height:100vh;max-height:100dvh;background:${T.paper};font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.text};position:relative;overflow:hidden;border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,0.02),0 16px 40px -18px rgba(5,8,16,0.35);border:1px solid ${T.line};transition:background .15s ease,color .15s ease;}
-.wf-sidebar{background:linear-gradient(180deg,${BRAND.ink} 0%,${BRAND.inkDark} 100%);color:#fff;width:246px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,0.06);transition:transform .25s cubic-bezier(.4,0,.2,1);}
+.wf-sidebar{background:${T.card};color:${T.ink};width:246px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid ${T.line};transition:transform .25s cubic-bezier(.4,0,.2,1),background .15s ease,color .15s ease;}
 .wf-sidebar-inner{display:flex;flex-direction:column;height:100%;}
 .wf-logo-badge{width:32px;height:32px;border-radius:7px;background:${T.gold};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#1A1300;font-family:'JetBrains Mono',monospace;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);}
-.wf-nav-eyebrow{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#4C5670;padding:4px 14px 8px;}
+.wf-nav-eyebrow{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${T.muted};padding:4px 14px 8px;}
 .wf-sidebar-nav{flex:1;min-height:0;overflow-y:auto;padding:14px 10px;display:flex;flex-direction:column;gap:3px;}
-.wf-nav-item{position:relative;width:100%;display:flex;align-items:center;gap:11px;padding:9px 14px;border-radius:7px;font-size:13.5px;font-weight:500;background:transparent;color:#8891A6;border:none;cursor:pointer;text-align:left;transition:background .15s ease,color .15s ease;}
-.wf-nav-item:hover{background:rgba(255,255,255,0.045);color:#fff;}
-.wf-nav-item.active{background:rgba(240,168,59,0.09);color:#fff;font-weight:600;}
-.wf-nav-item.active::before{content:"";position:absolute;left:-10px;top:6px;bottom:6px;width:2px;border-radius:0;background:${T.gold};}
+.wf-nav-item{position:relative;width:100%;display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:500;background:transparent;color:${T.textSoft};border:none;cursor:pointer;text-align:left;transition:background .15s ease,color .15s ease;}
+.wf-nav-item:hover{background:${T.lineSoft};color:${T.ink};}
+.wf-nav-item.active{background:${T.blue}17;color:${T.blue};font-weight:600;}
+.wf-nav-chevron{margin-left:auto;flex-shrink:0;color:${T.mutedLight};}
+.wf-nav-dot{margin-left:auto;flex-shrink:0;width:7px;height:7px;border-radius:999px;background:${T.blue};}
 .wf-nav-icon-wrap{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;flex-shrink:0;}
+.wf-dark .wf-sidebar{background:linear-gradient(180deg,${BRAND.ink} 0%,${BRAND.inkDark} 100%);color:#fff;border-right:1px solid rgba(255,255,255,0.06);}
+.wf-dark .wf-nav-eyebrow{color:#4C5670;}
+.wf-dark .wf-nav-item{padding:9px 14px;border-radius:7px;color:#8891A6;}
+.wf-dark .wf-nav-item:hover{background:rgba(255,255,255,0.045);color:#fff;}
+.wf-dark .wf-nav-item.active{background:rgba(240,168,59,0.09);color:#fff;}
+.wf-dark .wf-nav-item.active::before{content:"";position:absolute;left:-10px;top:6px;bottom:6px;width:2px;border-radius:0;background:${T.gold};}
+.wf-dark .wf-nav-chevron,.wf-dark .wf-nav-dot{display:none;}
+.wf-sidebar-profile{display:flex;align-items:center;gap:10px;padding:9px 10px;margin-bottom:8px;background:${T.card};border:1px solid ${T.line};border-radius:12px;}
+.wf-dark .wf-sidebar-profile{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.07);}
+.wf-sidebar-kebab{background:none;border:none;cursor:pointer;color:${T.mutedLight};padding:4px;border-radius:6px;flex-shrink:0;transition:background .15s ease,color .15s ease;}
+.wf-sidebar-kebab:hover{background:${T.lineSoft};color:${T.ink};}
+.wf-dark .wf-sidebar-kebab:hover{background:rgba(255,255,255,0.08);color:#fff;}
+.wf-sidebar-signout{border:1px solid ${T.dangerBorder};border-radius:10px;}
+.wf-dark .wf-sidebar-signout{border-color:transparent;border-radius:7px;}
 .wf-main{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;background:${T.paper};}
 .wf-header{background:${T.headerBg};backdrop-filter:blur(8px);border-bottom:1px solid ${T.lineSoft};padding:13px 22px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;transition:background .15s ease,border-color .15s ease;}
 .wf-content{flex:1;overflow-y:auto;padding:22px;}
@@ -3582,8 +3598,9 @@ html,body,#root{height:100%;}
   .wf-sidebar-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 8px;padding:18px 14px 14px;align-content:start;}
   .wf-sidebar-nav .wf-nav-eyebrow{grid-column:1/-1;padding:0 2px 6px;}
   .wf-sidebar-nav .wf-nav-item{flex-direction:column;gap:7px;padding:10px 2px;border-radius:14px;text-align:center;font-size:10.5px;line-height:1.25;}
-  .wf-sidebar-nav .wf-nav-item.active::before{content:none;}
-  .wf-sidebar-nav .wf-nav-item.active{background:rgba(255,255,255,0.07);}
+  .wf-sidebar-nav .wf-nav-item.active{background:${T.blue}17;}
+  .wf-dark .wf-sidebar-nav .wf-nav-item.active{background:rgba(255,255,255,0.07);}
+  .wf-sidebar-nav .wf-nav-chevron,.wf-sidebar-nav .wf-nav-dot{display:none;}
   .wf-sidebar-nav .wf-nav-icon-wrap{width:46px;height:46px;border-radius:14px;}
   .wf-sidebar-nav .wf-nav-label{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
   /* Dashboard "my dept / shift / status / payroll" stat cards: force a
@@ -30940,6 +30957,11 @@ function AppInner() {
                       <n.icon size={17} />
                     </span>
                     <span className="wf-nav-label">{n.label}</span>
+                    {page === n.id ? (
+                      <span className="wf-nav-dot" />
+                    ) : (
+                      <ChevronRight size={15} className="wf-nav-chevron" />
+                    )}
                   </button>
                 );
               })}
@@ -30950,35 +30972,38 @@ function AppInner() {
                 borderTop: "1px solid rgba(255,255,255,0.1)",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "9px 10px",
-                  marginBottom: 8,
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.07)",
-                  borderRadius: 12,
-                }}
-              >
-                <Avatar
-                  name={
-                    role === "admin"
-                      ? currentAdmin?.name || "?"
-                      : currentEmp?.name || "?"
-                  }
-                  photo={
-                    role === "admin" ? currentAdmin?.photo : currentEmp?.photo
-                  }
-                  size={34}
-                />
-                <div style={{ minWidth: 0 }}>
+              <div className="wf-sidebar-profile" style={{ marginBottom: 8 }}>
+                <div style={{ position: "relative", flexShrink: 0 }}>
+                  <Avatar
+                    name={
+                      role === "admin"
+                        ? currentAdmin?.name || "?"
+                        : currentEmp?.name || "?"
+                    }
+                    photo={
+                      role === "admin" ? currentAdmin?.photo : currentEmp?.photo
+                    }
+                    size={34}
+                  />
+                  <span
+                    style={{
+                      position: "absolute",
+                      right: -1,
+                      bottom: -1,
+                      width: 9,
+                      height: 9,
+                      borderRadius: "50%",
+                      background: T.forest,
+                      border: `2px solid ${T.card}`,
+                    }}
+                  />
+                </div>
+                <div style={{ minWidth: 0, flex: 1 }}>
                   <div
                     style={{
                       fontSize: 13,
                       fontWeight: 600,
-                      color: "#fff",
+                      color: T.ink,
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
@@ -30989,7 +31014,7 @@ function AppInner() {
                   <div
                     style={{
                       fontSize: 10.5,
-                      color: "#7C8AA3",
+                      color: T.muted,
                       fontFamily: "'JetBrains Mono',monospace",
                     }}
                   >
@@ -30998,13 +31023,28 @@ function AppInner() {
                       : currentEmp?.code}
                   </div>
                 </div>
+                <button
+                  className="wf-sidebar-kebab"
+                  onClick={() => {
+                    setPage("profile");
+                    setNavOpen(false);
+                  }}
+                >
+                  <MoreVertical size={16} />
+                </button>
               </div>
               <button
-                className="wf-nav-item"
-                style={{ color: "#E3B7BE" }}
+                className="wf-nav-item wf-sidebar-signout"
+                style={{ color: T.rose }}
                 onClick={handleLogout}
               >
-                <LogOut size={17} /> {t.logout}
+                <span
+                  className="wf-nav-icon-wrap"
+                  style={{ background: T.rose + "1a", color: T.rose }}
+                >
+                  <LogOut size={16} />
+                </span>
+                <span className="wf-nav-label">{t.logout}</span>
               </button>
             </div>
           </div>
