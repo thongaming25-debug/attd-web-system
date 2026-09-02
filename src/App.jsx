@@ -83,6 +83,8 @@ import {
   LayoutGrid,
   Filter,
   DollarSign,
+  Lightbulb,
+  XCircle,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -688,6 +690,8 @@ const LANG_RAW = {
       showingRange: (start, end, total) =>
         `បង្ហាញ ${start} ដល់ ${end} ក្នុងចំណោម ${total} សំណើ`,
       perPage: (n) => `${n} ក្នុងមួយទំព័រ`,
+      tabAll: "សំណើទាំងអស់",
+      searchPlaceholderMine: "ស្វែងរកប្រភេទ ឬមូលហេតុច្បាប់...",
     },
     ot: {
       addBtn: "សុំ OT ថ្មី",
@@ -719,6 +723,24 @@ const LANG_RAW = {
       rateHoliday: "អត្រាគុណ · ថ្ងៃបុណ្យជាតិ",
       hoursPerDay: "ម៉ោងធ្វើការស្តង់ដារ/ថ្ងៃ",
       totalOtHours: "ម៉ោង OT សរុប",
+      drawerTitle: "ដាក់ស្នើសំណើ OT",
+      startTime: "ម៉ោងចាប់ផ្តើម",
+      endTime: "ម៉ោងបញ្ចប់",
+      timeRangeInvalid: "ម៉ោងបញ្ចប់ត្រូវតែក្រោយម៉ោងចាប់ផ្តើម",
+      requestedOn: "ស្នើសុំនៅ",
+      tabAll: "សំណើទាំងអស់",
+      statusApproved: "អនុម័តហើយ",
+      statusPending: "រង់ចាំ",
+      statusRejected: "បដិសេធ",
+      thisMonth: "ខែនេះ",
+      requestsCount: (n) => `${n} សំណើ`,
+      searchPlaceholder: "ស្វែងរកមូលហេតុ ឬស្ថានភាព...",
+      policyNoteTitle: "គោលការណ៍ OT",
+      policyNoteDesc:
+        "ការស្នើសុំ OT ត្រូវធ្វើឡើងជាមុន ហើយត្រូវការការអនុម័តពីអ្នកគ្រប់គ្រងរបស់អ្នក។",
+      showingRange: (start, end, total) =>
+        `បង្ហាញ ${start} ដល់ ${end} ក្នុងចំណោម ${total} លទ្ធផល`,
+      perPage: (n) => `${n} ក្នុងមួយទំព័រ`,
     },
     pay: {
       baseSalary: "ប្រាក់ខែមូលដ្ឋាន",
@@ -1839,6 +1861,8 @@ const LANG_RAW = {
       showingRange: (start, end, total) =>
         `Showing ${start} to ${end} of ${total} requests`,
       perPage: (n) => `${n} per page`,
+      tabAll: "All Requests",
+      searchPlaceholderMine: "Search leave type or reason...",
     },
     ot: {
       addBtn: "New OT Request",
@@ -1870,6 +1894,24 @@ const LANG_RAW = {
       rateHoliday: "Multiplier · Public Holiday",
       hoursPerDay: "Standard Hours / Day",
       totalOtHours: "Total OT Hours",
+      drawerTitle: "Submit Overtime Request",
+      startTime: "Start Time",
+      endTime: "End Time",
+      timeRangeInvalid: "End time must be after start time",
+      requestedOn: "Requested On",
+      tabAll: "All Requests",
+      statusApproved: "Approved",
+      statusPending: "Pending",
+      statusRejected: "Rejected",
+      thisMonth: "This Month",
+      requestsCount: (n) => `${n} request${n === 1 ? "" : "s"}`,
+      searchPlaceholder: "Search reason or status...",
+      policyNoteTitle: "Overtime Policy",
+      policyNoteDesc:
+        "Overtime must be requested in advance and requires approval from your manager.",
+      showingRange: (start, end, total) =>
+        `Showing ${start} to ${end} of ${total} results`,
+      perPage: (n) => `${n} per page`,
     },
     pay: {
       baseSalary: "Base Salary",
@@ -7046,6 +7088,79 @@ function Field({ label, children }) {
       <span className="wf-field-label">{label}</span>
       {children}
     </label>
+  );
+}
+// Right-side sliding panel, used for premium "dashboard + drawer" flows
+// (e.g. submitting an OT request) instead of a centered Modal. Reuses
+// Modal's dimmed full-screen overlay class, but the panel itself is
+// fixed to the right edge of the viewport and slides in on mount.
+function Drawer({ title, onClose, children, width = 440 }) {
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setShown(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+  return (
+    <div
+      className="wf-modal-overlay"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          right: 0,
+          height: "100vh",
+          width: `min(${width}px, 100vw)`,
+          background: T.card,
+          boxShadow: "-12px 0 32px rgba(15,23,42,0.18)",
+          display: "flex",
+          flexDirection: "column",
+          transform: shown ? "translateX(0)" : "translateX(100%)",
+          transition: "transform 240ms ease",
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            padding: "18px 20px",
+            borderBottom: `1px solid ${T.lineSoft}`,
+            flexShrink: 0,
+          }}
+        >
+          <h3
+            style={{
+              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+              fontWeight: 600,
+              fontSize: 16,
+              color: T.ink,
+              flex: 1,
+            }}
+          >
+            {title}
+          </h3>
+          <button
+            onClick={onClose}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: T.muted,
+            }}
+          >
+            <X size={18} />
+          </button>
+        </div>
+        <div style={{ padding: 20, overflowY: "auto", flex: 1 }}>
+          {children}
+        </div>
+      </div>
+    </div>
   );
 }
 // Styled replacement for window.confirm(), used only by LoginActivityPage
@@ -15832,9 +15947,6 @@ function LeaveRequests({
   };
 
   if (role !== "admin" && currentEmp) {
-    const mine = leaveRequests
-      .filter((r) => r.employeeId === currentEmp.id)
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     const bal = annualLeaveBalance(
       currentEmp,
       leaveRequests,
@@ -15842,6 +15954,31 @@ function LeaveRequests({
       accrualMode,
     );
     const sickBal = sickLeaveBalance(currentEmp, leaveRequests);
+    const TYPE_LABEL = getLeaveTypeLabel(lang);
+    const mineFiltered = leaveRequests
+      .filter((r) => r.employeeId === currentEmp.id)
+      .filter((r) => {
+        if (statusFilter && r.status !== statusFilter) return false;
+        if (dateFrom && r.endDate < dateFrom) return false;
+        if (dateTo && r.startDate > dateTo) return false;
+        if (query.trim()) {
+          const q = query.trim().toLowerCase();
+          const hay = `${TYPE_LABEL[r.type] || r.type || ""} ${
+            r.reason || ""
+          } ${r.status || ""}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const pg = usePagination(mineFiltered, pageSize);
+    const hasActiveFilter = statusFilter || dateFrom || dateTo || query;
+    const TABS = [
+      { key: "", label: t.lv.tabAll },
+      { key: "pending", label: t.lv.pending },
+      { key: "approved", label: t.lv.approved },
+      { key: "rejected", label: t.lv.rejected },
+    ];
     return (
       <div>
         <div className="wf-grid-2" style={{ marginBottom: 16 }}>
@@ -15934,17 +16071,103 @@ function LeaveRequests({
             </div>
           </Card>
         </div>
+
         <div
           style={{
             display: "flex",
-            justifyContent: "flex-end",
+            gap: 4,
+            borderBottom: `1px solid ${T.lineSoft}`,
             marginBottom: 16,
           }}
         >
-          <Button variant="accent" onClick={() => setModal(true)}>
+          {TABS.map((tb) => {
+            const active = statusFilter === tb.key;
+            return (
+              <button
+                key={tb.key || "all"}
+                type="button"
+                onClick={() => setStatusFilter(tb.key)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: "9px 14px",
+                  fontSize: 13,
+                  fontWeight: active ? 600 : 500,
+                  color: active ? T.forestText : T.muted,
+                  borderBottom: active
+                    ? `2px solid ${T.forest}`
+                    : "2px solid transparent",
+                  marginBottom: -1,
+                }}
+              >
+                {tb.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            flexWrap: "wrap",
+            marginBottom: 16,
+          }}
+        >
+          <DateRangePicker
+            startValue={dateFrom}
+            endValue={dateTo}
+            onChangeStart={(e) => setDateFrom(e.target.value)}
+            onChangeEnd={(e) => setDateTo(e.target.value)}
+            placeholder={t.selectDate}
+            compact
+            style={{ width: 200, flexShrink: 0 }}
+          />
+          <div style={{ position: "relative", flexShrink: 0 }}>
+            <Search
+              size={14}
+              style={{
+                position: "absolute",
+                left: 10,
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: T.muted,
+              }}
+            />
+            <Input
+              style={{ paddingLeft: 30, width: 200 }}
+              placeholder={t.lv.searchPlaceholderMine}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+          {hasActiveFilter && (
+            <button
+              type="button"
+              className="wf-btn wf-btn-ghost wf-btn-sm"
+              title={t.clear}
+              onClick={() => {
+                setStatusFilter("");
+                setDateFrom("");
+                setDateTo("");
+                setQuery("");
+              }}
+              style={{ padding: "0 10px", height: 34, flexShrink: 0 }}
+            >
+              <Filter size={14} />
+            </button>
+          )}
+          <Button
+            variant="accent"
+            onClick={() => setModal(true)}
+            style={{ marginLeft: "auto" }}
+          >
             <Plus size={15} /> {t.lv.addBtn}
           </Button>
         </div>
+
         <Card style={{ overflowX: "auto" }}>
           <table className="wf-table">
             <thead>
@@ -15952,15 +16175,17 @@ function LeaveRequests({
                 <th>{t.lv.type}</th>
                 <th>{t.lv.fromShort}</th>
                 <th>{t.lv.toShort}</th>
+                <th>{t.lv.duration}</th>
                 <th>{t.lv.reason}</th>
                 <th>{t.status}</th>
+                <th>{t.lv.appliedOn}</th>
               </tr>
             </thead>
             <tbody>
-              {mine.length === 0 && (
+              {pg.pageItems.length === 0 && (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={7}
                     style={{
                       textAlign: "center",
                       color: T.muted,
@@ -15971,39 +16196,132 @@ function LeaveRequests({
                   </td>
                 </tr>
               )}
-              {mine.map((r) => (
-                <tr key={r.id}>
-                  <td>{getLeaveTypeLabel(lang)[r.type] || r.type}</td>
-                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                    {r.startDate}
-                  </td>
-                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                    {r.endDate}
-                  </td>
-                  <td style={{ fontSize: 12.5, color: T.textSoft }}>
-                    {r.reason || "—"}
-                  </td>
-                  <td>
-                    <StatusPill status={r.status} />
-                    <LeaveDecisionNote r={r} admins={admins} />
-                  </td>
-                </tr>
-              ))}
+              {pg.pageItems.map((r) => {
+                const applied = fmtAppliedOn(r.createdAt, lang);
+                return (
+                  <tr key={r.id}>
+                    <td>{TYPE_LABEL[r.type] || r.type}</td>
+                    <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                      {r.startDate}
+                    </td>
+                    <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                      {r.endDate}
+                    </td>
+                    <td
+                      style={{
+                        fontSize: 12.5,
+                        color: T.textSoft,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {t.lv.durationDays(leaveDurationDays(r))}
+                    </td>
+                    <td
+                      style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}
+                    >
+                      {r.reason || "—"}
+                    </td>
+                    <td>
+                      <StatusPill status={r.status} />
+                      <LeaveDecisionNote r={r} admins={admins} />
+                    </td>
+                    <td
+                      style={{
+                        fontSize: 11.5,
+                        color: T.textSoft,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      <div>{applied.date}</div>
+                      <div style={{ fontSize: 10.5, color: T.muted }}>
+                        {applied.time}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
+          {pg.total > 0 && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: 10,
+                padding: "12px 4px 2px",
+                fontSize: 12.5,
+                color: T.muted,
+              }}
+            >
+              <span>{t.lv.showingRange(pg.rangeStart, pg.rangeEnd, pg.total)}</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <Select
+                  style={{
+                    width: "auto",
+                    fontSize: 12,
+                    padding: "5px 26px 5px 10px",
+                  }}
+                  value={pageSize}
+                  onChange={(e) => setPageSize(Number(e.target.value))}
+                >
+                  {[10, 25, 50].map((n) => (
+                    <option key={n} value={n}>
+                      {t.lv.perPage(n)}
+                    </option>
+                  ))}
+                </Select>
+                {pg.pageCount > 1 && (
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 4 }}
+                  >
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => pg.setPage(pg.page - 1)}
+                      disabled={pg.page <= 1}
+                      style={{ opacity: pg.page <= 1 ? 0.4 : 1 }}
+                    >
+                      <ChevronLeft size={14} />
+                    </Button>
+                    <span
+                      style={{
+                        fontSize: 12.5,
+                        color: T.ink,
+                        padding: "0 6px",
+                        fontFamily: "'JetBrains Mono',monospace",
+                      }}
+                    >
+                      {pg.page} / {pg.pageCount}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => pg.setPage(pg.page + 1)}
+                      disabled={pg.page >= pg.pageCount}
+                      style={{ opacity: pg.page >= pg.pageCount ? 0.4 : 1 }}
+                    >
+                      <ChevronRight size={14} />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </Card>
         {modal && (
-          <Modal
+          <Drawer
             title={t.lv.modalTitle}
             onClose={() => setModal(false)}
-            width={620}
+            width={480}
           >
             <LeaveRequestForm
               remaining={{ annual: bal.remaining, sick: sickBal.remaining }}
               onSave={submit}
               onCancel={() => setModal(false)}
             />
-          </Modal>
+          </Drawer>
         )}
       </div>
     );
@@ -16737,11 +17055,23 @@ function LeaveRequests({
    role) and stay visible to the employee. Rejections require a reason.
    Approved requests feed OT pay into Payroll via computePayroll.
 ----------------------------------------------------------------*/
+// Turns a "HH:MM" start/end pair into a decimal hour count, wrapping past
+// midnight if the end time is earlier than the start time (an overnight
+// shift). Returns 0 when either time is missing/unparseable.
+function otHoursFromRange(startVal, endVal) {
+  const s = parseHM(startVal);
+  const e = parseHM(endVal);
+  if (!s || !e) return 0;
+  let mins = e.h * 60 + e.m - (s.h * 60 + s.m);
+  if (mins < 0) mins += 24 * 60;
+  return Math.round((mins / 60) * 100) / 100;
+}
 function OvertimeRequestForm({ onSave, onCancel, holidays }) {
   const { t } = useLang();
   const [f, setF] = useState({
     date: todayStr(),
-    hours: "",
+    startTime: "",
+    endTime: "",
     dayType: suggestDayType(todayStr(), holidays),
     reason: "",
   });
@@ -16753,26 +17083,53 @@ function OvertimeRequestForm({ onSave, onCancel, holidays }) {
       setF({ ...f, [k]: val });
     }
   };
-  const hoursNum = Number(f.hours);
-  const invalid = !f.date || !hoursNum || hoursNum <= 0 || hoursNum > 16;
+  const hoursNum = otHoursFromRange(f.startTime, f.endTime);
+  const rangeEntered = !!(f.startTime && f.endTime);
+  const invalid = !f.date || !rangeEntered || hoursNum <= 0 || hoursNum > 16;
   return (
     <div>
+      <Field label={t.ot.date}>
+        <DatePicker value={f.date} onChange={set("date")} />
+      </Field>
       <div className="wf-grid-2">
-        <Field label={t.ot.date}>
-          <DatePicker value={f.date} onChange={set("date")} />
+        <Field label={t.ot.startTime}>
+          <TimePicker
+            value={f.startTime}
+            onChange={(e) => setF({ ...f, startTime: e.target.value })}
+          />
         </Field>
-        <Field label={t.ot.hours}>
-          <Input
-            type="number"
-            min="0.5"
-            max="16"
-            step="0.5"
-            value={f.hours}
-            onChange={set("hours")}
-            placeholder="2"
+        <Field label={t.ot.endTime}>
+          <TimePicker
+            value={f.endTime}
+            onChange={(e) => setF({ ...f, endTime: e.target.value })}
           />
         </Field>
       </div>
+      {rangeEntered && hoursNum <= 0 && (
+        <p
+          style={{
+            fontSize: 12.5,
+            color: T.rose,
+            marginTop: -8,
+            marginBottom: 12,
+          }}
+        >
+          {t.ot.timeRangeInvalid}
+        </p>
+      )}
+      {rangeEntered && hoursNum > 0 && (
+        <div
+          style={{
+            fontSize: 12.5,
+            color: T.textSoft,
+            marginTop: -8,
+            marginBottom: 14,
+          }}
+        >
+          {t.ot.hours}: <strong style={{ color: T.ink }}>{hoursNum}</strong>{" "}
+          {t.ot.hoursShort}
+        </div>
+      )}
       <Field label={t.ot.dayType}>
         <Select value={f.dayType} onChange={set("dayType")}>
           <option value="normal">{t.ot.dtNormal}</option>
@@ -16793,6 +17150,35 @@ function OvertimeRequestForm({ onSave, onCancel, holidays }) {
       <div
         style={{
           display: "flex",
+          gap: 10,
+          background: "rgba(91,141,239,0.08)",
+          border: `1px solid ${T.lineSoft}`,
+          borderRadius: 10,
+          padding: "12px 14px",
+          marginTop: 4,
+          marginBottom: 4,
+        }}
+      >
+        <Lightbulb size={18} color={T.blue} style={{ flexShrink: 0, marginTop: 1 }} />
+        <div>
+          <div
+            style={{
+              fontWeight: 600,
+              fontSize: 12.5,
+              color: T.ink,
+              marginBottom: 2,
+            }}
+          >
+            {t.ot.policyNoteTitle}
+          </div>
+          <div style={{ fontSize: 11.5, color: T.textSoft, lineHeight: 1.4 }}>
+            {t.ot.policyNoteDesc}
+          </div>
+        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
           justifyContent: "flex-end",
           gap: 8,
           marginTop: 16,
@@ -16805,7 +17191,14 @@ function OvertimeRequestForm({ onSave, onCancel, holidays }) {
         </Button>
         <Button
           variant="accent"
-          onClick={() => onSave({ ...f, hours: hoursNum })}
+          onClick={() =>
+            onSave({
+              date: f.date,
+              hours: hoursNum,
+              dayType: f.dayType,
+              reason: f.reason,
+            })
+          }
           disabled={invalid}
         >
           {t.ot.submit}
@@ -17377,6 +17770,69 @@ function OtDecisionNote({ r, admins }) {
   );
 }
 
+// "2.5" hours -> "2h 30m", used across the employee OT dashboard cards
+// and table so durations read the same way the reference design does.
+function fmtOtHM(hoursNum) {
+  const h = Number(hoursNum) || 0;
+  const totalMin = Math.round(h * 60);
+  const hh = Math.floor(totalMin / 60);
+  const mm = totalMin % 60;
+  return `${hh}h ${String(mm).padStart(2, "0")}m`;
+}
+const OT_STAT_TINTS = {
+  violet: { bg: "rgba(124,92,239,0.12)", fg: "#7C5CEF" },
+  forest: { bg: T.forestSoft, fg: T.forestText },
+  gold: { bg: T.goldSoft, fg: T.goldText },
+  rose: { bg: T.roseSoft, fg: T.roseDark },
+};
+function OtStatCard({ icon: Icon, tint, label, value, sub }) {
+  const c = OT_STAT_TINTS[tint] || OT_STAT_TINTS.violet;
+  return (
+    <Card style={{ padding: "16px 18px" }}>
+      <div
+        style={{
+          width: 34,
+          height: 34,
+          borderRadius: 9,
+          background: c.bg,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: 10,
+        }}
+      >
+        <Icon size={17} color={c.fg} />
+      </div>
+      <div
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: ".03em",
+          color: T.muted,
+          marginBottom: 4,
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          fontSize: 21,
+          fontWeight: 700,
+          fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+          color: T.ink,
+        }}
+      >
+        {value}
+      </div>
+      {sub && (
+        <div style={{ fontSize: 11.5, color: T.textSoft, marginTop: 2 }}>
+          {sub}
+        </div>
+      )}
+    </Card>
+  );
+}
 function OvertimeRequests({
   role,
   currentAdmin,
@@ -17395,8 +17851,36 @@ function OvertimeRequests({
   const [modal, setModal] = useState(false);
   const [rejectFor, setRejectFor] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
+  const [otTab, setOtTab] = useState("all");
+  const [otQuery, setOtQuery] = useState("");
+  const [otDateFrom, setOtDateFrom] = useState("");
+  const [otDateTo, setOtDateTo] = useState("");
+  const [otPageSize, setOtPageSize] = useState(10);
   const empOf = (id) => employees.find((e) => e.id === id);
   const DAY_TYPE_LABEL = getDayTypeLabel(lang, t);
+
+  // Computed unconditionally (not inside the employee/admin branch below)
+  // so the usePagination hook that depends on it always runs in the same
+  // order every render, regardless of role.
+  const mineAll = currentEmp
+    ? overtimeRequests
+        .filter((r) => r.employeeId === currentEmp.id)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    : [];
+  const otFiltered = mineAll.filter((r) => {
+    if (otTab !== "all" && r.status !== otTab) return false;
+    if (otDateFrom && r.date < otDateFrom) return false;
+    if (otDateTo && r.date > otDateTo) return false;
+    if (otQuery.trim()) {
+      const q = otQuery.trim().toLowerCase();
+      const hay = `${r.reason || ""} ${
+        DAY_TYPE_LABEL[r.dayType] || r.dayType || ""
+      } ${r.status || ""}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  const otPg = usePagination(otFiltered, otPageSize);
 
   const approve = (req) => {
     setOvertimeRequests(
@@ -17458,38 +17942,178 @@ function OvertimeRequests({
   };
 
   if (role !== "admin" && currentEmp) {
-    const mine = overtimeRequests
-      .filter((r) => r.employeeId === currentEmp.id)
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const now = new Date();
+    const curMonthKey = `${now.getFullYear()}-${String(
+      now.getMonth() + 1,
+    ).padStart(2, "0")}`;
+    const monthly = mineAll.filter((r) => (r.date || "").slice(0, 7) === curMonthKey);
+    const sumHours = (arr) =>
+      arr.reduce((s, r) => s + (Number(r.hours) || 0), 0);
+    const approvedMonthly = monthly.filter((r) => r.status === "approved");
+    const pendingMonthly = monthly.filter((r) => r.status === "pending");
+    const rejectedMonthly = monthly.filter((r) => r.status === "rejected");
+    const hasActiveFilter =
+      otTab !== "all" || otDateFrom || otDateTo || otQuery;
+    const TABS = [
+      { key: "all", label: t.ot.tabAll },
+      { key: "pending", label: t.ot.statusPending },
+      { key: "approved", label: t.ot.statusApproved },
+      { key: "rejected", label: t.ot.statusRejected },
+    ];
+
     return (
       <div>
         <div
           style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+            gap: 14,
+            marginBottom: 20,
+          }}
+        >
+          <OtStatCard
+            icon={ListChecks}
+            tint="violet"
+            label={t.ot.totalOtHours}
+            value={fmtOtHM(sumHours(monthly))}
+            sub={t.ot.thisMonth}
+          />
+          <OtStatCard
+            icon={CheckCircle2}
+            tint="forest"
+            label={t.ot.statusApproved}
+            value={fmtOtHM(sumHours(approvedMonthly))}
+            sub={t.ot.requestsCount(approvedMonthly.length)}
+          />
+          <OtStatCard
+            icon={Timer}
+            tint="gold"
+            label={t.ot.statusPending}
+            value={fmtOtHM(sumHours(pendingMonthly))}
+            sub={t.ot.requestsCount(pendingMonthly.length)}
+          />
+          <OtStatCard
+            icon={XCircle}
+            tint="rose"
+            label={t.ot.statusRejected}
+            value={fmtOtHM(sumHours(rejectedMonthly))}
+            sub={t.ot.requestsCount(rejectedMonthly.length)}
+          />
+        </div>
+
+        <div
+          style={{
             display: "flex",
-            justifyContent: "flex-end",
+            gap: 4,
+            borderBottom: `1px solid ${T.lineSoft}`,
             marginBottom: 16,
           }}
         >
-          <Button variant="accent" onClick={() => setModal(true)}>
+          {TABS.map((tb) => {
+            const active = otTab === tb.key;
+            return (
+              <button
+                key={tb.key}
+                type="button"
+                onClick={() => setOtTab(tb.key)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: "9px 14px",
+                  fontSize: 13,
+                  fontWeight: active ? 600 : 500,
+                  color: active ? T.forestText : T.muted,
+                  borderBottom: active
+                    ? `2px solid ${T.forest}`
+                    : "2px solid transparent",
+                  marginBottom: -1,
+                }}
+              >
+                {tb.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            flexWrap: "wrap",
+            marginBottom: 16,
+          }}
+        >
+          <DateRangePicker
+            startValue={otDateFrom}
+            endValue={otDateTo}
+            onChangeStart={(e) => setOtDateFrom(e.target.value)}
+            onChangeEnd={(e) => setOtDateTo(e.target.value)}
+            placeholder={t.selectDate}
+            compact
+            style={{ width: 200, flexShrink: 0 }}
+          />
+          <div style={{ position: "relative", flexShrink: 0 }}>
+            <Search
+              size={14}
+              style={{
+                position: "absolute",
+                left: 10,
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: T.muted,
+              }}
+            />
+            <Input
+              style={{ paddingLeft: 30, width: 200 }}
+              placeholder={t.ot.searchPlaceholder}
+              value={otQuery}
+              onChange={(e) => setOtQuery(e.target.value)}
+            />
+          </div>
+          {hasActiveFilter && (
+            <button
+              type="button"
+              className="wf-btn wf-btn-ghost wf-btn-sm"
+              title={t.clear}
+              onClick={() => {
+                setOtTab("all");
+                setOtDateFrom("");
+                setOtDateTo("");
+                setOtQuery("");
+              }}
+              style={{ padding: "0 10px", height: 34, flexShrink: 0 }}
+            >
+              <Filter size={14} />
+            </button>
+          )}
+          <Button
+            variant="accent"
+            onClick={() => setModal(true)}
+            style={{ marginLeft: "auto" }}
+          >
             <Plus size={15} /> {t.ot.addBtn}
           </Button>
         </div>
+
         <Card style={{ overflowX: "auto" }}>
           <table className="wf-table">
             <thead>
               <tr>
                 <th>{t.ot.date}</th>
-                <th>{t.ot.hours}</th>
                 <th>{t.ot.dayType}</th>
                 <th>{t.ot.reason}</th>
+                <th>{t.ot.hours}</th>
                 <th>{t.status}</th>
+                <th>{t.ot.requestedOn}</th>
               </tr>
             </thead>
             <tbody>
-              {mine.length === 0 && (
+              {otPg.pageItems.length === 0 && (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={6}
                     style={{
                       textAlign: "center",
                       color: T.muted,
@@ -17500,37 +18124,125 @@ function OvertimeRequests({
                   </td>
                 </tr>
               )}
-              {mine.map((r) => (
-                <tr key={r.id}>
-                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                    {r.date}
-                  </td>
-                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                    {r.hours} {t.ot.hoursShort}
-                  </td>
-                  <td>{DAY_TYPE_LABEL[r.dayType] || r.dayType}</td>
-                  <td
-                    style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}
-                  >
-                    {r.reason || "—"}
-                  </td>
-                  <td>
-                    <StatusPill status={r.status} />
-                    <OtDecisionNote r={r} admins={admins} />
-                  </td>
-                </tr>
-              ))}
+              {otPg.pageItems.map((r) => {
+                const applied = fmtAppliedOn(r.createdAt, lang);
+                return (
+                  <tr key={r.id}>
+                    <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                      {r.date}
+                    </td>
+                    <td>{DAY_TYPE_LABEL[r.dayType] || r.dayType}</td>
+                    <td
+                      style={{
+                        fontSize: 12.5,
+                        color: T.textSoft,
+                        maxWidth: 200,
+                      }}
+                    >
+                      {r.reason || "—"}
+                    </td>
+                    <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                      {fmtOtHM(r.hours)}
+                    </td>
+                    <td>
+                      <StatusPill status={r.status} />
+                      <OtDecisionNote r={r} admins={admins} />
+                    </td>
+                    <td
+                      style={{
+                        fontSize: 11.5,
+                        color: T.textSoft,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      <div>{applied.date}</div>
+                      <div style={{ fontSize: 10.5, color: T.muted }}>
+                        {applied.time}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
+          {otPg.total > 0 && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: 10,
+                padding: "12px 4px 2px",
+                fontSize: 12.5,
+                color: T.muted,
+              }}
+            >
+              <span>
+                {t.ot.showingRange(otPg.rangeStart, otPg.rangeEnd, otPg.total)}
+              </span>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <Select
+                  style={{
+                    width: "auto",
+                    fontSize: 12,
+                    padding: "5px 26px 5px 10px",
+                  }}
+                  value={otPageSize}
+                  onChange={(e) => setOtPageSize(Number(e.target.value))}
+                >
+                  {[10, 25, 50].map((n) => (
+                    <option key={n} value={n}>
+                      {t.ot.perPage(n)}
+                    </option>
+                  ))}
+                </Select>
+                {otPg.pageCount > 1 && (
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 4 }}
+                  >
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => otPg.setPage(otPg.page - 1)}
+                      disabled={otPg.page <= 1}
+                      style={{ opacity: otPg.page <= 1 ? 0.4 : 1 }}
+                    >
+                      <ChevronLeft size={14} />
+                    </Button>
+                    <span
+                      style={{
+                        fontSize: 12.5,
+                        color: T.ink,
+                        padding: "0 6px",
+                        fontFamily: "'JetBrains Mono',monospace",
+                      }}
+                    >
+                      {otPg.page} / {otPg.pageCount}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => otPg.setPage(otPg.page + 1)}
+                      disabled={otPg.page >= otPg.pageCount}
+                      style={{ opacity: otPg.page >= otPg.pageCount ? 0.4 : 1 }}
+                    >
+                      <ChevronRight size={14} />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </Card>
         {modal && (
-          <Modal title={t.ot.addBtn} onClose={() => setModal(false)}>
+          <Drawer title={t.ot.drawerTitle} onClose={() => setModal(false)}>
             <OvertimeRequestForm
               onSave={submit}
               onCancel={() => setModal(false)}
               holidays={holidays}
             />
-          </Modal>
+          </Drawer>
         )}
       </div>
     );
