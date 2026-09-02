@@ -7,6 +7,7 @@ import React, {
   createContext,
   useContext as useCtx,
 } from "react";
+import { createPortal } from "react-dom";
 import { supabase } from "./lib/supabaseClient";
 import ExcelJS from "exceljs";
 import {
@@ -3528,6 +3529,7 @@ html,body,#root{height:100%;}
 .wf-modal-overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(3,5,10,0.65);backdrop-filter:blur(2px);animation:wf-fade .15s ease;}
 .wf-modal{background:${T.card};border-radius:11px;border:1px solid ${T.line};box-shadow:0 24px 64px rgba(3,5,10,0.5);width:100%;max-height:90vh;overflow-y:auto;overflow-x:hidden;animation:wf-pop .18s cubic-bezier(.2,.9,.3,1.2);}
 .wf-modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid ${T.lineSoft};position:sticky;top:0;z-index:5;background:${T.card};border-radius:11px 11px 0 0;}
+.wf-drawer-panel{position:fixed;top:0;right:0;height:100vh;height:100dvh;background:${T.card};box-shadow:-12px 0 32px rgba(15,23,42,0.18);display:flex;flex-direction:column;transition:transform 240ms ease;}
 .wf-avatar{border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;flex-shrink:0;}
 .wf-badge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.02em;white-space:nowrap;}
 .wf-table{width:100%;min-width:640px;font-size:13px;border-collapse:collapse;}
@@ -7084,7 +7086,7 @@ function ChatQuickAccess({ role, currentEmp, messages, setPage }) {
   );
 }
 function Modal({ title, onClose, children, width = 480 }) {
-  return (
+  return createPortal(
     <div
       className="wf-modal-overlay"
       onMouseDown={(e) => {
@@ -7117,7 +7119,8 @@ function Modal({ title, onClose, children, width = 480 }) {
         </div>
         <div style={{ padding: 20 }}>{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 function Field({ label, children }) {
@@ -7138,7 +7141,7 @@ function Drawer({ title, onClose, children, width = 440 }) {
     const id = requestAnimationFrame(() => setShown(true));
     return () => cancelAnimationFrame(id);
   }, []);
-  return (
+  return createPortal(
     <div
       className="wf-modal-overlay"
       onMouseDown={(e) => {
@@ -7146,18 +7149,10 @@ function Drawer({ title, onClose, children, width = 440 }) {
       }}
     >
       <div
+        className="wf-drawer-panel"
         style={{
-          position: "fixed",
-          top: 0,
-          right: 0,
-          height: "100vh",
           width: `min(${width}px, 100vw)`,
-          background: T.card,
-          boxShadow: "-12px 0 32px rgba(15,23,42,0.18)",
-          display: "flex",
-          flexDirection: "column",
           transform: shown ? "translateX(0)" : "translateX(100%)",
-          transition: "transform 240ms ease",
         }}
         onMouseDown={(e) => e.stopPropagation()}
       >
@@ -7198,7 +7193,8 @@ function Drawer({ title, onClose, children, width = 440 }) {
           {children}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 // Styled replacement for window.confirm(), used only by LoginActivityPage
@@ -15699,11 +15695,13 @@ function Attendance({
                             fontSize: 10.5,
                             color:
                               rec.status === "late" ? T.goldText : T.forest,
-                            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                            fontFamily:
+                              "'Sora','Noto Sans Khmer',sans-serif",
                           }}
                         >
                           {rec.status === "late"
-                            ? formatLateDuration(lateMins, lang) || t.att.late
+                            ? formatLateDuration(lateMins, lang) ||
+                              t.att.late
                             : t.att.onTime}
                         </div>
                       </div>
@@ -15723,7 +15721,8 @@ function Attendance({
                             style={{
                               fontSize: 10.5,
                               color: T.blue,
-                              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                              fontFamily:
+                                "'Sora','Noto Sans Khmer',sans-serif",
                             }}
                           >
                             {t.att.otPrefix}
@@ -15759,7 +15758,10 @@ function Attendance({
                               marginTop: 2,
                             }}
                           >
-                            <CheckCircle2 size={11} style={{ flexShrink: 0 }} />
+                            <CheckCircle2
+                              size={11}
+                              style={{ flexShrink: 0 }}
+                            />
                             {t.att.gpsVerified}
                           </div>
                         )}
@@ -16518,11 +16520,7 @@ function LeaveRequests({
                       {t.lv.durationDays(leaveDurationDays(r))}
                     </td>
                     <td
-                      style={{
-                        fontSize: 12.5,
-                        color: T.textSoft,
-                        maxWidth: 200,
-                      }}
+                      style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}
                     >
                       {r.reason || "—"}
                     </td>
@@ -16560,9 +16558,7 @@ function LeaveRequests({
                 color: T.muted,
               }}
             >
-              <span>
-                {t.lv.showingRange(pg.rangeStart, pg.rangeEnd, pg.total)}
-              </span>
+              <span>{t.lv.showingRange(pg.rangeStart, pg.rangeEnd, pg.total)}</span>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <Select
                   style={{
@@ -17466,11 +17462,7 @@ function OvertimeRequestForm({ onSave, onCancel, holidays }) {
           marginBottom: 4,
         }}
       >
-        <Lightbulb
-          size={18}
-          color={T.blue}
-          style={{ flexShrink: 0, marginTop: 1 }}
-        />
+        <Lightbulb size={18} color={T.blue} style={{ flexShrink: 0, marginTop: 1 }} />
         <div>
           <div
             style={{
@@ -18257,9 +18249,7 @@ function OvertimeRequests({
     const curMonthKey = `${now.getFullYear()}-${String(
       now.getMonth() + 1,
     ).padStart(2, "0")}`;
-    const monthly = mineAll.filter(
-      (r) => (r.date || "").slice(0, 7) === curMonthKey,
-    );
+    const monthly = mineAll.filter((r) => (r.date || "").slice(0, 7) === curMonthKey);
     const sumHours = (arr) =>
       arr.reduce((s, r) => s + (Number(r.hours) || 0), 0);
     const approvedMonthly = monthly.filter((r) => r.status === "approved");
@@ -30981,7 +30971,9 @@ function AppInner() {
                         : currentEmp?.name || "?"
                     }
                     photo={
-                      role === "admin" ? currentAdmin?.photo : currentEmp?.photo
+                      role === "admin"
+                        ? currentAdmin?.photo
+                        : currentEmp?.photo
                     }
                     size={34}
                   />
@@ -31679,6 +31671,15 @@ export default function App() {
   const t = LANG[lang] || LANG.km;
   const [theme, setTheme] = useLocalStorage("hrsuite:theme", "light");
   const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
+  // Keep a matching "wf-dark" class on <body>, not just on .wf-root, so
+  // that content portaled straight to document.body (Modal/Drawer, which
+  // must escape .wf-root to avoid being clipped/mispositioned by any
+  // transformed ancestor — see Modal/Drawer above) still inherits the
+  // correct --wf-* CSS variables instead of silently falling back to the
+  // light-theme :root defaults.
+  useEffect(() => {
+    document.body.classList.toggle("wf-dark", theme === "dark");
+  }, [theme]);
   return (
     <LangContext.Provider value={{ lang, t, setLang }}>
       <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
