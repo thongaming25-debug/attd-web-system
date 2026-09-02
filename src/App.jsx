@@ -25,6 +25,8 @@ import {
   CalendarDays,
   Search,
   AlertCircle,
+  Info,
+  TrendingDown,
   CheckCircle2,
   Receipt,
   BadgeCheck,
@@ -50,6 +52,7 @@ import {
   Camera,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   MoreVertical,
   Download,
   Eye,
@@ -157,6 +160,16 @@ const LANG_RAW = {
       analytics: "វិភាគទិន្នន័យ",
       rolePerms: "សិទ្ធិតួនាទី",
     },
+    navGroups: {
+      main: "ទំព័រដើម",
+      people: "បុគ្គលិក",
+      attendance: "វេន & វត្តមាន",
+      communication: "ការទាក់ទង",
+      hr: "គ្រប់គ្រងធនធានមនុស្ស",
+      learning: "ការសិក្សា",
+      system: "ប្រព័ន្ធ",
+    },
+    searchMenu: "ស្វែងរកម៉ឺនុយ...",
     logout: "ចាកចេញ",
     notifications: "ការជូនដំណឹង",
     markAllRead: "កំណត់ថាបានអានទាំងអស់",
@@ -726,11 +739,13 @@ const LANG_RAW = {
       hoursShort: "ម៉ោង",
       policyTitle: "គោលការណ៍អត្រា OT",
       policyDesc:
-        "កំណត់អត្រាគុណប្រាក់ OT សម្រាប់ថ្ងៃធម្មតា ថ្ងៃឈប់សម្រាក និងថ្ងៃបុណ្យជាតិ ព្រមទាំងចំនួនម៉ោងធ្វើការស្តង់ដារក្នុងមួយថ្ងៃ។",
+        "កំណត់អត្រាគុណប្រាក់ OT សម្រាប់ថ្ងៃធម្មតា ថ្ងៃឈប់សម្រាក និងថ្ងៃបុណ្យជាតិ ចំនួនម៉ោងធ្វើការស្តង់ដារក្នុងមួយថ្ងៃ ព្រមទាំងចំនួននាទីសម្រាកដែលត្រូវដកចេញពីម៉ោង OT ដែលគណនាពីម៉ោងចូល/ចេញ។",
       rateNormal: "អត្រាគុណ · ថ្ងៃធម្មតា",
       rateWeekend: "អត្រាគុណ · ថ្ងៃឈប់សម្រាក",
       rateHoliday: "អត្រាគុណ · ថ្ងៃបុណ្យជាតិ",
       hoursPerDay: "ម៉ោងធ្វើការស្តង់ដារ/ថ្ងៃ",
+      breakMinutes: "ម៉ោងសម្រាក (នាទី)",
+      breakDeductedNote: (mins) => `(បានដកម៉ោងសម្រាក ${mins} នាទីចេញរួច)`,
       totalOtHours: "ម៉ោង OT សរុប",
       drawerTitle: "ដាក់ស្នើសំណើ OT",
       startTime: "ម៉ោងចាប់ផ្តើម",
@@ -752,6 +767,17 @@ const LANG_RAW = {
       perPage: (n) => `${n} ក្នុងមួយទំព័រ`,
     },
     pay: {
+      overviewTitle: "ទិដ្ឋភាពទូទៅប្រាក់ខែ",
+      overviewDesc: "មើលសង្ខេបប្រាក់ខែរបស់អ្នក និងទាញយកសន្លឹកប្រាក់ខែ",
+      netSalaryThisMonth: "ប្រាក់ខែសុទ្ធ (ខែនេះ)",
+      grossSalary: "ប្រាក់ខែសរុប",
+      payslipsTitle: "សន្លឹកប្រាក់ខែ",
+      payslipsDesc: "មើល និងទាញយកសន្លឹកប្រាក់ខែប្រចាំខែរបស់អ្នក",
+      viewDetails: "មើលលម្អិត",
+      loadMore: "មើលបន្ថែម",
+      infoTitle: "ព័ត៌មានអំពីប្រាក់ខែ",
+      infoDesc:
+        "ប្រាក់ខែជាធម្មតាត្រូវបានផ្តល់ជូននៅថ្ងៃធ្វើការចុងក្រោយបំផុតនៃខែ ហើយនឹងផ្ទេរចូលគណនីធនាគាររបស់អ្នក។",
       baseSalary: "ប្រាក់ខែមូលដ្ឋាន",
       netSalary: "ប្រាក់ខែសុទ្ធ",
       markPaid: "បើកប្រាក់ខែ",
@@ -1332,6 +1358,16 @@ const LANG_RAW = {
       analytics: "Analytics",
       rolePerms: "Roles & Permissions",
     },
+    navGroups: {
+      main: "Main",
+      people: "People",
+      attendance: "Time & Attendance",
+      communication: "Communication",
+      hr: "HR Management",
+      learning: "Learning",
+      system: "System",
+    },
+    searchMenu: "Search menu...",
     logout: "Sign Out",
     notifications: "Notifications",
     markAllRead: "Mark all as read",
@@ -1904,11 +1940,13 @@ const LANG_RAW = {
       hoursShort: "hrs",
       policyTitle: "Overtime Rate Policy",
       policyDesc:
-        "Set the OT pay multiplier for normal working days, days off, and public holidays, plus standard working hours per day.",
+        "Set the OT pay multiplier for normal working days, days off, and public holidays, standard working hours per day, and the break minutes to deduct from OT hours computed from clock-in/out time.",
       rateNormal: "Multiplier · Normal Day",
       rateWeekend: "Multiplier · Day Off",
       rateHoliday: "Multiplier · Public Holiday",
       hoursPerDay: "Standard Hours / Day",
+      breakMinutes: "Break Time (minutes)",
+      breakDeductedNote: (mins) => `(${mins} min break already deducted)`,
       totalOtHours: "Total OT Hours",
       drawerTitle: "Submit Overtime Request",
       startTime: "Start Time",
@@ -1930,6 +1968,17 @@ const LANG_RAW = {
       perPage: (n) => `${n} per page`,
     },
     pay: {
+      overviewTitle: "Payroll Overview",
+      overviewDesc: "View your salary summary and download your payslips",
+      netSalaryThisMonth: "Net Salary (This Month)",
+      grossSalary: "Gross Salary",
+      payslipsTitle: "Payslips",
+      payslipsDesc: "View and download your monthly payslips",
+      viewDetails: "View Details",
+      loadMore: "Load More",
+      infoTitle: "Payroll Information",
+      infoDesc:
+        "Salary is usually processed on the last working day of each month and will be credited to your bank account.",
       baseSalary: "Base Salary",
       netSalary: "Net Salary",
       markPaid: "Mark as Paid",
@@ -2503,6 +2552,16 @@ const LANG_RAW = {
       analytics: "数据分析",
       rolePerms: "角色权限",
     },
+    navGroups: {
+      main: "主页",
+      people: "人员",
+      attendance: "班次与考勤",
+      communication: "沟通",
+      hr: "人力资源管理",
+      learning: "培训",
+      system: "系统",
+    },
+    searchMenu: "搜索菜单...",
     logout: "登出",
     notifications: "通知",
     markAllRead: "标记全部已读",
@@ -3408,6 +3467,15 @@ html,body,#root{height:100%;}
 .wf-logo-badge{width:32px;height:32px;border-radius:7px;background:${T.gold};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#1A1300;font-family:'JetBrains Mono',monospace;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);}
 .wf-nav-eyebrow{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${T.muted};padding:4px 14px 8px;}
 .wf-sidebar-nav{flex:1;min-height:0;overflow-y:auto;padding:14px 10px;display:flex;flex-direction:column;gap:3px;}
+.wf-nav-group{display:flex;flex-direction:column;gap:3px;}
+.wf-nav-group + .wf-nav-group{margin-top:10px;}
+.wf-sidebar-search{position:relative;margin:2px 4px 12px;flex-shrink:0;}
+.wf-sidebar-search input{width:100%;box-sizing:border-box;padding:8px 10px 8px 32px;border-radius:9px;border:1px solid ${T.line};background:${T.paper};color:${T.ink};font-size:12.5px;font-family:inherit;outline:none;transition:border-color .15s ease,background .15s ease;}
+.wf-sidebar-search input:focus{border-color:${T.blue};}
+.wf-sidebar-search input::placeholder{color:${T.mutedLight};}
+.wf-sidebar-search svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:${T.mutedLight};pointer-events:none;}
+.wf-dark .wf-sidebar-search input{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.08);color:#fff;}
+.wf-nav-empty{padding:14px 10px;font-size:12px;color:${T.muted};text-align:center;}
 .wf-nav-item{position:relative;width:100%;display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:500;background:transparent;color:${T.textSoft};border:none;cursor:pointer;text-align:left;transition:background .15s ease,color .15s ease;}
 .wf-nav-item:hover{background:${T.lineSoft};color:${T.ink};}
 .wf-nav-item.active{background:${T.blue}17;color:${T.blue};font-weight:600;}
@@ -3597,7 +3665,9 @@ html,body,#root{height:100%;}
   /* "More" menu becomes a tidy icon grid (like a phone home-screen /
      app launcher) instead of a plain stacked list once the sidebar is
      a full-height slide-in drawer. */
+  .wf-sidebar-search{display:none;}
   .wf-sidebar-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 8px;padding:18px 14px 14px;align-content:start;}
+  .wf-sidebar-nav .wf-nav-group{display:contents;}
   .wf-sidebar-nav .wf-nav-eyebrow{grid-column:1/-1;padding:0 2px 6px;}
   .wf-sidebar-nav .wf-nav-item{flex-direction:column;gap:7px;padding:10px 2px;border-radius:14px;text-align:center;font-size:10.5px;line-height:1.25;}
   .wf-sidebar-nav .wf-nav-item.active{background:${T.blue}17;}
@@ -3743,6 +3813,9 @@ const DEFAULT_OT_POLICY = {
   rateWeekend: 2,
   rateHoliday: 3,
   hoursPerDay: 8,
+  // Unpaid break subtracted from OT hours computed from a start/end time
+  // range (e.g. 30, 60, or 90 minutes per company policy).
+  breakMinutes: 60,
 };
 // Maps an OT request's day type to the matching multiplier key in policy.
 const OT_RATE_KEY = {
@@ -4094,6 +4167,20 @@ function monthLabel(mk) {
   } catch {
     return mk;
   }
+}
+// "Sep 01 – Sep 30, 2026" style range for a "YYYY-MM" month key, used on
+// the payslip list rows.
+function monthRangeLabel(mk) {
+  const [y, m] = mk.split("-").map(Number);
+  const start = new Date(y, m - 1, 1);
+  const end = new Date(y, m, 0);
+  const fmt = (d, withYear) =>
+    new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "2-digit",
+      ...(withYear ? { year: "numeric" } : {}),
+    }).format(d);
+  return `${fmt(start, false)} – ${fmt(end, true)}`;
 }
 function fmtMoney(n) {
   return (
@@ -5863,6 +5950,7 @@ function useOtPolicy() {
           rateWeekend: data.rate_weekend ?? DEFAULT_OT_POLICY.rateWeekend,
           rateHoliday: data.rate_holiday ?? DEFAULT_OT_POLICY.rateHoliday,
           hoursPerDay: data.hours_per_day ?? DEFAULT_OT_POLICY.hoursPerDay,
+          breakMinutes: data.break_minutes ?? DEFAULT_OT_POLICY.breakMinutes,
         });
       } else {
         setValueState(DEFAULT_OT_POLICY);
@@ -5884,6 +5972,7 @@ function useOtPolicy() {
           rate_weekend: next.rateWeekend,
           rate_holiday: next.rateHoliday,
           hours_per_day: next.hoursPerDay,
+          break_minutes: next.breakMinutes,
         });
         if (error) {
           console.error("[supabase] save failed on ot_policy:", error.message);
@@ -15695,13 +15784,11 @@ function Attendance({
                             fontSize: 10.5,
                             color:
                               rec.status === "late" ? T.goldText : T.forest,
-                            fontFamily:
-                              "'Sora','Noto Sans Khmer',sans-serif",
+                            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
                           }}
                         >
                           {rec.status === "late"
-                            ? formatLateDuration(lateMins, lang) ||
-                              t.att.late
+                            ? formatLateDuration(lateMins, lang) || t.att.late
                             : t.att.onTime}
                         </div>
                       </div>
@@ -15721,8 +15808,7 @@ function Attendance({
                             style={{
                               fontSize: 10.5,
                               color: T.blue,
-                              fontFamily:
-                                "'Sora','Noto Sans Khmer',sans-serif",
+                              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
                             }}
                           >
                             {t.att.otPrefix}
@@ -15758,10 +15844,7 @@ function Attendance({
                               marginTop: 2,
                             }}
                           >
-                            <CheckCircle2
-                              size={11}
-                              style={{ flexShrink: 0 }}
-                            />
+                            <CheckCircle2 size={11} style={{ flexShrink: 0 }} />
                             {t.att.gpsVerified}
                           </div>
                         )}
@@ -16520,7 +16603,11 @@ function LeaveRequests({
                       {t.lv.durationDays(leaveDurationDays(r))}
                     </td>
                     <td
-                      style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}
+                      style={{
+                        fontSize: 12.5,
+                        color: T.textSoft,
+                        maxWidth: 200,
+                      }}
                     >
                       {r.reason || "—"}
                     </td>
@@ -16558,7 +16645,9 @@ function LeaveRequests({
                 color: T.muted,
               }}
             >
-              <span>{t.lv.showingRange(pg.rangeStart, pg.rangeEnd, pg.total)}</span>
+              <span>
+                {t.lv.showingRange(pg.rangeStart, pg.rangeEnd, pg.total)}
+              </span>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <Select
                   style={{
@@ -17360,16 +17449,19 @@ function LeaveRequests({
 ----------------------------------------------------------------*/
 // Turns a "HH:MM" start/end pair into a decimal hour count, wrapping past
 // midnight if the end time is earlier than the start time (an overnight
-// shift). Returns 0 when either time is missing/unparseable.
-function otHoursFromRange(startVal, endVal) {
+// shift). Subtracts the unpaid break (breakMinutes, from OT policy) before
+// converting to hours, floored at 0 so a short range never goes negative.
+// Returns 0 when either time is missing/unparseable.
+function otHoursFromRange(startVal, endVal, breakMinutes = 0) {
   const s = parseHM(startVal);
   const e = parseHM(endVal);
   if (!s || !e) return 0;
   let mins = e.h * 60 + e.m - (s.h * 60 + s.m);
   if (mins < 0) mins += 24 * 60;
+  mins = Math.max(0, mins - (Number(breakMinutes) || 0));
   return Math.round((mins / 60) * 100) / 100;
 }
-function OvertimeRequestForm({ onSave, onCancel, holidays }) {
+function OvertimeRequestForm({ onSave, onCancel, holidays, otPolicy }) {
   const { t } = useLang();
   const [f, setF] = useState({
     date: todayStr(),
@@ -17386,7 +17478,10 @@ function OvertimeRequestForm({ onSave, onCancel, holidays }) {
       setF({ ...f, [k]: val });
     }
   };
-  const hoursNum = otHoursFromRange(f.startTime, f.endTime);
+  const breakMinutes =
+    (otPolicy || DEFAULT_OT_POLICY).breakMinutes ??
+    DEFAULT_OT_POLICY.breakMinutes;
+  const hoursNum = otHoursFromRange(f.startTime, f.endTime, breakMinutes);
   const rangeEntered = !!(f.startTime && f.endTime);
   const invalid = !f.date || !rangeEntered || hoursNum <= 0 || hoursNum > 16;
   return (
@@ -17431,6 +17526,11 @@ function OvertimeRequestForm({ onSave, onCancel, holidays }) {
         >
           {t.ot.hours}: <strong style={{ color: T.ink }}>{hoursNum}</strong>{" "}
           {t.ot.hoursShort}
+          {breakMinutes > 0 && (
+            <span style={{ marginLeft: 6 }}>
+              {t.ot.breakDeductedNote(breakMinutes)}
+            </span>
+          )}
         </div>
       )}
       <Field label={t.ot.dayType}>
@@ -17462,7 +17562,11 @@ function OvertimeRequestForm({ onSave, onCancel, holidays }) {
           marginBottom: 4,
         }}
       >
-        <Lightbulb size={18} color={T.blue} style={{ flexShrink: 0, marginTop: 1 }} />
+        <Lightbulb
+          size={18}
+          color={T.blue}
+          style={{ flexShrink: 0, marginTop: 1 }}
+        />
         <div>
           <div
             style={{
@@ -17567,6 +17671,10 @@ function OvertimePolicySettings({ otPolicy, setOtPolicy }) {
       rateWeekend: Number(f.rateWeekend) || DEFAULT_OT_POLICY.rateWeekend,
       rateHoliday: Number(f.rateHoliday) || DEFAULT_OT_POLICY.rateHoliday,
       hoursPerDay: Number(f.hoursPerDay) || DEFAULT_OT_POLICY.hoursPerDay,
+      breakMinutes:
+        f.breakMinutes === "" || f.breakMinutes == null
+          ? 0
+          : Math.max(0, Number(f.breakMinutes) || 0),
     });
     setOpen(false);
   };
@@ -17645,6 +17753,15 @@ function OvertimePolicySettings({ otPolicy, setOtPolicy }) {
                 min="1"
                 value={f.hoursPerDay}
                 onChange={set("hoursPerDay")}
+              />
+            </Field>
+            <Field label={t.ot.breakMinutes}>
+              <Input
+                type="number"
+                step="5"
+                min="0"
+                value={f.breakMinutes}
+                onChange={set("breakMinutes")}
               />
             </Field>
           </div>
@@ -18087,6 +18204,7 @@ const OT_STAT_TINTS = {
   forest: { bg: T.forestSoft, fg: T.forestText },
   gold: { bg: T.goldSoft, fg: T.goldText },
   rose: { bg: T.roseSoft, fg: T.roseDark },
+  blue: { bg: "rgba(91,141,239,0.12)", fg: T.blue },
 };
 function OtStatCard({ icon: Icon, tint, label, value, sub }) {
   const c = OT_STAT_TINTS[tint] || OT_STAT_TINTS.violet;
@@ -18249,7 +18367,9 @@ function OvertimeRequests({
     const curMonthKey = `${now.getFullYear()}-${String(
       now.getMonth() + 1,
     ).padStart(2, "0")}`;
-    const monthly = mineAll.filter((r) => (r.date || "").slice(0, 7) === curMonthKey);
+    const monthly = mineAll.filter(
+      (r) => (r.date || "").slice(0, 7) === curMonthKey,
+    );
     const sumHours = (arr) =>
       arr.reduce((s, r) => s + (Number(r.hours) || 0), 0);
     const approvedMonthly = monthly.filter((r) => r.status === "approved");
@@ -18544,6 +18664,7 @@ function OvertimeRequests({
               onSave={submit}
               onCancel={() => setModal(false)}
               holidays={holidays}
+              otPolicy={otPolicy}
             />
           </Drawer>
         )}
@@ -28489,6 +28610,68 @@ function HistoricalPayrollModal({
   );
 }
 
+// Full-tinted stat card for the Payroll pages (staff "My Payroll" overview
+// and the admin summary row) — unlike OtStatCard, the tint covers the
+// whole card rather than just the icon chip, matching the reference
+// "Payroll Overview" design (soft colored background per stat).
+function PayStatCard({ icon: Icon, tint, label, value }) {
+  const c = OT_STAT_TINTS[tint] || OT_STAT_TINTS.violet;
+  return (
+    <div
+      style={{
+        background: c.bg,
+        borderRadius: 12,
+        padding: "16px 18px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 10,
+        minWidth: 0,
+      }}
+    >
+      <div style={{ minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 11.5,
+            fontWeight: 700,
+            color: c.fg,
+            marginBottom: 5,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {label}
+        </div>
+        <div
+          style={{
+            fontSize: 18,
+            fontWeight: 700,
+            fontFamily: "'JetBrains Mono',monospace",
+            color: T.ink,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {value}
+        </div>
+      </div>
+      <div
+        style={{
+          width: 38,
+          height: 38,
+          borderRadius: 10,
+          background: T.card,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        <Icon size={17} color={c.fg} />
+      </div>
+    </div>
+  );
+}
 function Payroll({
   role,
   currentEmp,
@@ -28515,12 +28698,365 @@ function Payroll({
   const [slipFor, setSlipFor] = useState(null);
   const [xlsxExporting, setXlsxExporting] = useState(false);
   const [showHistorical, setShowHistorical] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(5);
   const isPastMonth = mk !== currentMk;
   const activeEmployees = employees.filter((e) => e.status === "active");
   const list =
     role === "admin"
       ? activeEmployees
       : activeEmployees.filter((e) => e.id === currentEmp?.id);
+
+  if (role !== "admin" && currentEmp) {
+    const myPayroll = computePayroll(
+      currentEmp,
+      attendance,
+      currentMk,
+      overtimeRequests,
+      otPolicy,
+      payrollPolicy,
+    );
+    const myDeductions =
+      myPayroll.tax +
+      myPayroll.insurance +
+      myPayroll.lateDeduction +
+      myPayroll.absenceDeduction +
+      myPayroll.unpaidLeaveDeduction;
+    const visibleMonths = availableMonths.slice(0, visibleCount);
+    return (
+      <div>
+        <Card
+          style={{
+            padding: 0,
+            marginBottom: 16,
+            overflow: "hidden",
+            position: "relative",
+            background: `linear-gradient(135deg, color-mix(in srgb, ${T.blue} 6%, ${T.card}) 0%, ${T.card} 65%)`,
+          }}
+        >
+          <Wallet
+            size={130}
+            strokeWidth={1.3}
+            style={{
+              position: "absolute",
+              right: -14,
+              top: "50%",
+              transform: "translateY(-50%)",
+              opacity: 0.07,
+              color: T.blue,
+              pointerEvents: "none",
+            }}
+          />
+          <div style={{ padding: "22px 24px", position: "relative" }}>
+            <h2
+              style={{
+                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                fontWeight: 700,
+                fontSize: 19,
+                color: T.ink,
+                marginBottom: 4,
+              }}
+            >
+              {t.pay.overviewTitle}
+            </h2>
+            <p style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 420 }}>
+              {t.pay.overviewDesc}
+            </p>
+          </div>
+        </Card>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+            gap: 14,
+            marginBottom: 16,
+          }}
+        >
+          <PayStatCard
+            icon={Wallet}
+            tint="violet"
+            label={t.pay.netSalaryThisMonth}
+            value={fmtMoney(myPayroll.net)}
+          />
+          <PayStatCard
+            icon={BarChart3}
+            tint="forest"
+            label={t.pay.grossSalary}
+            value={fmtMoney(currentEmp.salary)}
+          />
+          <PayStatCard
+            icon={TrendingDown}
+            tint="rose"
+            label={t.pay.deductions}
+            value={"-" + fmtMoney(myDeductions)}
+          />
+          <PayStatCard
+            icon={CalendarDays}
+            tint="blue"
+            label={t.pay.monthLabel}
+            value={monthLabel(currentMk)}
+          />
+        </div>
+        <Card style={{ padding: 0, marginBottom: 16 }}>
+          <div
+            style={{
+              padding: "18px 20px",
+              borderBottom: `1px solid ${T.lineSoft}`,
+            }}
+          >
+            <h3
+              style={{
+                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                fontWeight: 600,
+                fontSize: 15,
+                color: T.ink,
+                marginBottom: 3,
+              }}
+            >
+              {t.pay.payslipsTitle}
+            </h3>
+            <p style={{ fontSize: 12, color: T.textSoft }}>
+              {t.pay.payslipsDesc}
+            </p>
+          </div>
+          <div>
+            {visibleMonths.map((m) => {
+              const p = computePayroll(
+                currentEmp,
+                attendance,
+                m,
+                overtimeRequests,
+                otPolicy,
+                payrollPolicy,
+              );
+              const ded =
+                p.tax +
+                p.insurance +
+                p.lateDeduction +
+                p.absenceDeduction +
+                p.unpaidLeaveDeduction;
+              return (
+                <div
+                  key={m}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 16,
+                    padding: "16px 20px",
+                    borderBottom: `1px solid ${T.lineSoft}`,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: 10,
+                      background: OT_STAT_TINTS.violet.bg,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <CalendarDays size={16} color={OT_STAT_TINTS.violet.fg} />
+                  </div>
+                  <div style={{ minWidth: 140, flex: 1 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontWeight: 600,
+                          fontSize: 13.5,
+                          color: T.ink,
+                        }}
+                      >
+                        {monthLabel(m)}
+                      </span>
+                      {m === currentMk && (
+                        <span
+                          style={{
+                            fontSize: 9.5,
+                            fontWeight: 700,
+                            color: T.forestText,
+                            background: T.forestSoft,
+                            padding: "2px 7px",
+                            borderRadius: 6,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {t.pay.currentMonthTag}
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ fontSize: 11.5, color: T.muted }}>
+                      {monthRangeLabel(m)}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: "right", minWidth: 76 }}>
+                    <div
+                      style={{
+                        fontFamily: "'JetBrains Mono',monospace",
+                        fontSize: 13,
+                        color: T.ink,
+                      }}
+                    >
+                      {fmtMoney(currentEmp.salary)}
+                    </div>
+                    <div style={{ fontSize: 10.5, color: T.muted }}>
+                      {t.pay.grossSalary}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: "right", minWidth: 76 }}>
+                    <div
+                      style={{
+                        fontFamily: "'JetBrains Mono',monospace",
+                        fontSize: 13,
+                        color: ded > 0 ? T.rose : T.textSoft,
+                      }}
+                    >
+                      {ded > 0 ? `-${fmtMoney(ded)}` : fmtMoney(0)}
+                    </div>
+                    <div style={{ fontSize: 10.5, color: T.muted }}>
+                      {t.pay.deductions}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: "right", minWidth: 84 }}>
+                    <div
+                      style={{
+                        fontFamily: "'JetBrains Mono',monospace",
+                        fontSize: 13.5,
+                        fontWeight: 700,
+                        color: T.forestText,
+                      }}
+                    >
+                      {fmtMoney(p.net)}
+                    </div>
+                    <div style={{ fontSize: 10.5, color: T.muted }}>
+                      {t.pay.netSalary}
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 8,
+                      alignItems: "center",
+                      marginLeft: "auto",
+                    }}
+                  >
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setMk(m);
+                        setSlipFor(currentEmp);
+                      }}
+                    >
+                      {t.pay.viewDetails}
+                    </Button>
+                    <button
+                      onClick={() => {
+                        setMk(m);
+                        setSlipFor(currentEmp);
+                      }}
+                      title={t.pay.downloadPdf}
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 8,
+                        border: `1px solid ${T.line}`,
+                        background: "none",
+                        color: T.muted,
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Download size={14} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {visibleCount < availableMonths.length && (
+            <div
+              style={{
+                padding: 16,
+                textAlign: "center",
+              }}
+            >
+              <Button
+                variant="ghost"
+                onClick={() => setVisibleCount((v) => v + 5)}
+              >
+                {t.pay.loadMore} <ChevronDown size={14} />
+              </Button>
+            </div>
+          )}
+        </Card>
+        <Card
+          style={{
+            padding: "14px 18px",
+            display: "flex",
+            gap: 12,
+            alignItems: "flex-start",
+            background: OT_STAT_TINTS.violet.bg,
+            border: "none",
+          }}
+        >
+          <div
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: 999,
+              background: OT_STAT_TINTS.violet.fg,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <Info size={15} color="#fff" />
+          </div>
+          <div>
+            <div
+              style={{
+                fontWeight: 700,
+                fontSize: 13,
+                color: T.ink,
+                marginBottom: 2,
+              }}
+            >
+              {t.pay.infoTitle}
+            </div>
+            <div style={{ fontSize: 12, color: T.textSoft, lineHeight: 1.5 }}>
+              {t.pay.infoDesc}
+            </div>
+          </div>
+        </Card>
+        {slipFor && (
+          <Payslip
+            emp={slipFor}
+            mk={mk}
+            attendance={attendance}
+            overtimeRequests={overtimeRequests}
+            otPolicy={otPolicy}
+            payrollPolicy={payrollPolicy}
+            onClose={() => setSlipFor(null)}
+          />
+        )}
+      </div>
+    );
+  }
+
   const togglePaid = (empId) => {
     const key = `${empId}-${mk}`;
     const willBePaid = !payrollPaid[key];
@@ -28748,144 +29284,84 @@ function Payroll({
           style={{
             padding: 0,
             marginBottom: 16,
-            display: "flex",
-            alignItems: "stretch",
-            flexWrap: "wrap",
             overflow: "hidden",
-            borderLeft: `4px solid ${T.blue}`,
+            position: "relative",
+            background: `linear-gradient(135deg, color-mix(in srgb, ${T.blue} 6%, ${T.card}) 0%, ${T.card} 65%)`,
           }}
         >
-          <div
+          <Wallet
+            size={130}
+            strokeWidth={1.3}
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 14,
-              padding: "18px 22px",
+              position: "absolute",
+              right: -14,
+              top: "50%",
+              transform: "translateY(-50%)",
+              opacity: 0.07,
+              color: T.blue,
+              pointerEvents: "none",
             }}
-          >
+          />
+          <div style={{ padding: "20px 22px", position: "relative" }}>
             <div
               style={{
-                width: 46,
-                height: 46,
-                borderRadius: 999,
-                background: `color-mix(in srgb, ${T.blue} 16%, transparent)`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
+                fontSize: 10.5,
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: ".04em",
+                color: T.muted,
               }}
             >
-              <Wallet size={20} color={T.blue} />
+              {t.pay.totalPaid} · {monthLabel(mk)}
             </div>
-            <div>
-              <div
-                style={{
-                  fontSize: 10.5,
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: ".04em",
-                  color: T.muted,
-                }}
-              >
-                {t.pay.totalPaid} - {monthLabel(mk)}
-              </div>
-              <div
-                style={{
-                  fontSize: 22,
-                  fontWeight: 700,
-                  color: T.ink,
-                  fontFamily: "'JetBrains Mono',monospace",
-                  marginTop: 2,
-                }}
-              >
-                {fmtMoney(totalNet)}
-              </div>
+            <div
+              style={{
+                fontSize: 24,
+                fontWeight: 700,
+                color: T.ink,
+                fontFamily: "'JetBrains Mono',monospace",
+                marginTop: 2,
+              }}
+            >
+              {fmtMoney(totalNet)}
             </div>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              flex: 1,
-            }}
-          >
-            {[
-              {
-                label: t.pay.totalEmployeesStat,
-                value: list.length,
-                icon: Users,
-                color: "#8B5CF6",
-              },
-              {
-                label: t.pay.totalNetPayStat,
-                value: fmtMoney(totalNet),
-                icon: DollarSign,
-                color: T.forest,
-              },
-              {
-                label: t.pay.totalBaseSalaryStat,
-                value: fmtMoney(totalBaseSalary),
-                icon: BarChart3,
-                color: T.blue,
-              },
-              {
-                label: t.pay.totalDeductionsStat,
-                value: fmtMoney(totalDeductions),
-                icon: FileText,
-                color: T.rose,
-              },
-            ].map((s) => (
-              <div
-                key={s.label}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "18px 20px",
-                  flex: "1 1 180px",
-                  borderLeft: `1px solid ${T.lineSoft}`,
-                }}
-              >
-                <div
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 10,
-                    background: `color-mix(in srgb, ${s.color} 14%, transparent)`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}
-                >
-                  <s.icon size={16} color={s.color} />
-                </div>
-                <div style={{ minWidth: 0 }}>
-                  <div
-                    style={{
-                      fontSize: 15,
-                      fontWeight: 700,
-                      color: T.ink,
-                      fontFamily: "'JetBrains Mono',monospace",
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {s.value}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 11,
-                      color: T.textSoft,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {s.label}
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </Card>
+      )}
+      {role === "admin" && (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+            gap: 14,
+            marginBottom: 16,
+          }}
+        >
+          <PayStatCard
+            icon={Users}
+            tint="violet"
+            label={t.pay.totalEmployeesStat}
+            value={list.length}
+          />
+          <PayStatCard
+            icon={DollarSign}
+            tint="forest"
+            label={t.pay.totalNetPayStat}
+            value={fmtMoney(totalNet)}
+          />
+          <PayStatCard
+            icon={BarChart3}
+            tint="blue"
+            label={t.pay.totalBaseSalaryStat}
+            value={fmtMoney(totalBaseSalary)}
+          />
+          <PayStatCard
+            icon={TrendingDown}
+            tint="rose"
+            label={t.pay.totalDeductionsStat}
+            value={fmtMoney(totalDeductions)}
+          />
+        </div>
       )}
       <Card style={{ overflowX: "auto" }}>
         <table className="wf-table">
@@ -29271,14 +29747,58 @@ function buildNavAdmin(n) {
     { id: "settings", label: n.settings, icon: Settings2 },
   ]);
 }
+// Section order for the grouped sidebar (eyebrow labels come from
+// t.navGroups[key]). Any nav id not listed below falls back to "main".
+const NAV_GROUP_ORDER = [
+  "main",
+  "people",
+  "attendance",
+  "communication",
+  "hr",
+  "learning",
+  "system",
+];
+const NAV_GROUP_MAP = {
+  dashboard: "main",
+  analytics: "main",
+  announcements: "main",
+  employees: "people",
+  departments: "people",
+  recruitment: "people",
+  onboarding: "people",
+  shifts: "attendance",
+  roster: "attendance",
+  attendance: "attendance",
+  messages: "communication",
+  holidays: "hr",
+  leave: "hr",
+  ot: "hr",
+  payroll: "hr",
+  review: "hr",
+  attcorr: "hr",
+  shiftswap: "hr",
+  assets: "hr",
+  docExpiry: "hr",
+  documents: "hr",
+  training: "learning",
+  admins: "system",
+  rolePerms: "system",
+  audits: "system",
+  loginActivity: "system",
+  settings: "system",
+  profile: "system",
+};
 // Cycles each nav item through the existing brand PALETTE so every module
 // gets a distinct icon color — turns the mobile "More" grid into a set of
 // recognizable colored tiles (like a phone app-launcher) instead of a wall
-// of same-color icons.
+// of same-color icons. Also tags each item with its sidebar section
+// (group) so the desktop sidebar can render it under a grouped eyebrow
+// label instead of one flat list.
 function withNavAccents(items) {
   return items.map((item, i) => ({
     ...item,
     accent: PALETTE[i % PALETTE.length],
+    group: NAV_GROUP_MAP[item.id] || "main",
   }));
 }
 function buildNavEmployee(n, enabledModules) {
@@ -30364,6 +30884,7 @@ function AppInner() {
     null,
   );
   const [navOpen, setNavOpen] = useState(false);
+  const [navSearch, setNavSearch] = useState("");
   const [portal, routedPage, goPortal, setPage] = usePortalRoute();
   // Falls back to "dashboard" only when the URL has no page segment yet
   // (e.g. a bare #/employee link) — otherwise refreshing always restores
@@ -30925,36 +31446,67 @@ function AppInner() {
                 <X size={18} />
               </button>
             </div>
+            <div className="wf-sidebar-search">
+              <Search size={14} />
+              <input
+                type="text"
+                value={navSearch}
+                onChange={(e) => setNavSearch(e.target.value)}
+                placeholder={t.searchMenu}
+              />
+            </div>
             <nav className="wf-sidebar-nav">
-              <div className="wf-nav-eyebrow">
-                {lang === "km" ? "ម៉ឺនុយ" : "Menu"}
-              </div>
-              {nav.map((n) => {
-                const accent = n.accent || T.blue;
-                return (
-                  <button
-                    key={n.id}
-                    className={`wf-nav-item ${page === n.id ? "active" : ""}`}
-                    onClick={() => {
-                      setPage(n.id);
-                      setNavOpen(false);
-                    }}
-                  >
-                    <span
-                      className="wf-nav-icon-wrap"
-                      style={{ background: accent + "26", color: accent }}
-                    >
-                      <n.icon size={17} />
-                    </span>
-                    <span className="wf-nav-label">{n.label}</span>
-                    {page === n.id ? (
-                      <span className="wf-nav-dot" />
-                    ) : (
-                      <ChevronRight size={15} className="wf-nav-chevron" />
-                    )}
-                  </button>
-                );
-              })}
+              {(() => {
+                const q = navSearch.trim().toLowerCase();
+                const filtered = q
+                  ? nav.filter((n) => n.label?.toLowerCase().includes(q))
+                  : nav;
+                if (filtered.length === 0) {
+                  return <div className="wf-nav-empty">{t.noResults}</div>;
+                }
+                const groups = NAV_GROUP_ORDER.map((groupKey) => ({
+                  groupKey,
+                  items: filtered.filter(
+                    (n) => (n.group || "main") === groupKey,
+                  ),
+                })).filter((g) => g.items.length > 0);
+                return groups.map(({ groupKey, items }) => (
+                  <div className="wf-nav-group" key={groupKey}>
+                    <div className="wf-nav-eyebrow">
+                      {t.navGroups?.[groupKey] || groupKey}
+                    </div>
+                    {items.map((n) => {
+                      const accent = n.accent || T.blue;
+                      return (
+                        <button
+                          key={n.id}
+                          className={`wf-nav-item ${page === n.id ? "active" : ""}`}
+                          onClick={() => {
+                            setPage(n.id);
+                            setNavOpen(false);
+                          }}
+                        >
+                          <span
+                            className="wf-nav-icon-wrap"
+                            style={{ background: accent + "26", color: accent }}
+                          >
+                            <n.icon size={17} />
+                          </span>
+                          <span className="wf-nav-label">{n.label}</span>
+                          {page === n.id ? (
+                            <span className="wf-nav-dot" />
+                          ) : (
+                            <ChevronRight
+                              size={15}
+                              className="wf-nav-chevron"
+                            />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ));
+              })()}
             </nav>
             <div
               style={{
@@ -30971,9 +31523,7 @@ function AppInner() {
                         : currentEmp?.name || "?"
                     }
                     photo={
-                      role === "admin"
-                        ? currentAdmin?.photo
-                        : currentEmp?.photo
+                      role === "admin" ? currentAdmin?.photo : currentEmp?.photo
                     }
                     size={34}
                   />
