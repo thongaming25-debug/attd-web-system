@@ -536,6 +536,13 @@ const LANG_RAW = {
       date: "កាលបរិច្ឆេទ",
       inTime: "ម៉ោងចូល",
       outTime: "ម៉ោងចេញ",
+      workHours: "ម៉ោងធ្វើការ",
+      allStatus: "គ្រប់ស្ថានភាព",
+      allDepartments: "គ្រប់នាយកដ្ឋាន",
+      allShifts: "គ្រប់វេន",
+      onTime: "ទាន់ពេល",
+      gpsVerified: "បញ្ជាក់ដោយ GPS",
+      otPrefix: "OT +",
       setOffice: "កំណត់ទីតាំងការិយាល័យ",
       noRecord: "មិនទាន់មានកំណត់ត្រាទេ",
       absentDays: "ថ្ងៃអវត្តមាន",
@@ -1707,6 +1714,13 @@ const LANG_RAW = {
       date: "Date",
       inTime: "In Time",
       outTime: "Out Time",
+      workHours: "Work Hours",
+      allStatus: "All Status",
+      allDepartments: "All Departments",
+      allShifts: "All Shifts",
+      onTime: "On time",
+      gpsVerified: "GPS Verified",
+      otPrefix: "OT +",
       setOffice: "Set Office Location",
       noRecord: "No records yet",
       absentDays: "Absent days",
@@ -2566,6 +2580,13 @@ const LANG_RAW = {
       date: "日期",
       inTime: "上班时间",
       outTime: "下班时间",
+      workHours: "工作时长",
+      allStatus: "所有状态",
+      allDepartments: "所有部门",
+      allShifts: "所有班次",
+      onTime: "准时",
+      gpsVerified: "GPS 已验证",
+      otPrefix: "加班 +",
       setOffice: "设置办公室位置",
       noRecord: "还没有记录",
       absentDays: "缺勤天数",
@@ -15188,10 +15209,29 @@ function Holidays({ holidays, setHolidays, isSuperAdmin }) {
   );
 }
 
+// Minutes an employee actually worked, from checkIn to checkOut. Handles
+// punches that cross midnight (checkOut earlier in the clock than checkIn)
+// by rolling the checkout time forward a day.
+function workedMinutes(checkIn, checkOut) {
+  if (!checkIn || !checkOut) return 0;
+  const [ih, im] = checkIn.split(":").map(Number);
+  const [oh, om] = checkOut.split(":").map(Number);
+  let mins = oh * 60 + om - (ih * 60 + im);
+  if (mins < 0) mins += 24 * 60;
+  return mins;
+}
+function formatHM(mins) {
+  if (!mins || mins <= 0) return "";
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
 function Attendance({
   role,
   currentEmp,
   employees,
+  departments,
   shifts,
   attendance,
   setAttendance,
@@ -15199,6 +15239,7 @@ function Attendance({
   offices,
   setOffices,
   holidays,
+  overtimeRequests = [],
   soundPreset,
 }) {
   const { t, lang } = useLang();
@@ -15206,9 +15247,26 @@ function Attendance({
   const [modal, setModal] = useState(false);
   const [editRecord, setEditRecord] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [branchFilter, setBranchFilter] = useState("");
+  const [deptFilter, setDeptFilter] = useState("");
+  const [shiftFilter, setShiftFilter] = useState("");
   const dayRecords = attendance.filter((a) => a.date === date);
   const activeEmployees = employees.filter((e) => e.status === "active");
   const shiftOf = (id) => shifts.find((s) => s.id === id);
+  const deptName = (id) => departments?.find((d) => d.id === id)?.name || "—";
+  // Approved OT hours for a given employee on the currently-viewed date —
+  // used to decide whether the Work Hours cell shows an "OT +" line at all.
+  const approvedOtHours = (employeeId) =>
+    overtimeRequests
+      .filter(
+        (r) =>
+          r.employeeId === employeeId &&
+          r.date === date &&
+          r.status === "approved",
+      )
+      .reduce((sum, r) => sum + (Number(r.hours) || 0), 0);
   // Hooks must run unconditionally (not just in the employee-view branch
   // below), so this is computed here even though only that branch uses it.
   const myHistory = useMemo(
@@ -15221,10 +15279,26 @@ function Attendance({
     [attendance, currentEmp],
   );
   const myHistoryPg = usePagination(myHistory, 15);
-  const rows = activeEmployees.map((e) => ({
+  const allRows = activeEmployees.map((e) => ({
     emp: e,
     rec: dayRecords.find((a) => a.employeeId === e.id),
   }));
+  const rows = allRows.filter(({ emp, rec }) => {
+    if (
+      query &&
+      !emp.name.toLowerCase().includes(query.toLowerCase()) &&
+      !(emp.code || "").toLowerCase().includes(query.toLowerCase())
+    )
+      return false;
+    if (statusFilter) {
+      const st = rec?.status || "absent";
+      if (st !== statusFilter) return false;
+    }
+    if (branchFilter && emp.officeId !== branchFilter) return false;
+    if (deptFilter && emp.deptId !== deptFilter) return false;
+    if (shiftFilter && emp.shiftId !== shiftFilter) return false;
+    return true;
+  });
   const holidayToday = isHoliday(date, holidays);
 
   const save = (f) => {
@@ -15357,17 +15431,96 @@ function Attendance({
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          gap: 12,
+          gap: 10,
           marginBottom: 16,
           flexWrap: "wrap",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            flexWrap: "wrap",
+            flex: 1,
+          }}
+        >
           <DatePicker
             style={{ width: 168 }}
             value={date}
             onChange={(e) => setDate(e.target.value)}
           />
+          <div style={{ position: "relative", width: 200 }}>
+            <Search
+              size={15}
+              style={{
+                position: "absolute",
+                left: 12,
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: T.muted,
+              }}
+            />
+            <Input
+              style={{ paddingLeft: 34 }}
+              placeholder={t.emps.searchPlaceholder}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+          <Select
+            style={{ width: 140 }}
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="">{t.att.allStatus}</option>
+            <option value="present">{t.att.present}</option>
+            <option value="late">{t.att.late}</option>
+            <option value="absent">{t.att.absent}</option>
+            <option value="onLeave">{t.att.onLeave}</option>
+          </Select>
+          {offices && offices.length > 0 && (
+            <Select
+              style={{ width: 150 }}
+              value={branchFilter}
+              onChange={(e) => setBranchFilter(e.target.value)}
+            >
+              <option value="">{t.emps.allBranches}</option>
+              {offices.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.name}
+                </option>
+              ))}
+            </Select>
+          )}
+          {departments && departments.length > 0 && (
+            <Select
+              style={{ width: 160 }}
+              value={deptFilter}
+              onChange={(e) => setDeptFilter(e.target.value)}
+            >
+              <option value="">{t.att.allDepartments}</option>
+              {departments.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </Select>
+          )}
+          {shifts && shifts.length > 0 && (
+            <Select
+              style={{ width: 150 }}
+              value={shiftFilter}
+              onChange={(e) => setShiftFilter(e.target.value)}
+            >
+              <option value="">{t.att.allShifts}</option>
+              {shifts.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </Select>
+          )}
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <Button
@@ -15378,17 +15531,28 @@ function Attendance({
                 [
                   t.employee,
                   t.emps.code,
+                  t.emps.dept,
                   t.att.inTime,
                   t.att.outTime,
+                  t.att.workHours,
+                  t.att.branch,
                   t.status,
                 ],
-                rows.map(({ emp, rec }) => [
-                  emp.name,
-                  emp.code,
-                  rec?.checkIn || "",
-                  rec?.checkOut || "",
-                  rec?.status || "absent",
-                ]),
+                rows.map(({ emp, rec }) => {
+                  const worked = workedMinutes(rec?.checkIn, rec?.checkOut);
+                  return [
+                    emp.name,
+                    emp.code,
+                    deptName(emp.deptId),
+                    rec?.checkIn || "",
+                    rec?.checkOut || "",
+                    worked ? formatHM(worked) : "",
+                    rec?.checkInLoc?.officeName ||
+                      rec?.checkOutLoc?.officeName ||
+                      "",
+                    rec?.status || "absent",
+                  ];
+                }),
               )
             }
           >
@@ -15410,106 +15574,213 @@ function Attendance({
           <thead>
             <tr>
               <th>{t.employee}</th>
+              <th>{t.emps.dept}</th>
               <th>{t.emps.shift}</th>
               <th>{t.att.inTime}</th>
               <th>{t.att.outTime}</th>
+              <th>{t.att.workHours}</th>
               <th>{t.att.branch}</th>
               <th>{t.status}</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {rows.map(({ emp, rec }) => (
-              <tr key={emp.id}>
-                <td>
-                  <div
-                    style={{ display: "flex", alignItems: "center", gap: 10 }}
-                  >
-                    <Avatar name={emp.name} photo={emp.photo} size={30} />
-                    <div>
-                      <div
-                        style={{ fontWeight: 500, color: T.ink, fontSize: 13 }}
-                      >
-                        {emp.name}
-                      </div>
-                      <div
-                        style={{
-                          fontSize: 10.5,
-                          color: T.muted,
-                          fontFamily: "'JetBrains Mono',monospace",
-                        }}
-                      >
-                        {emp.code}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td
-                  style={{
-                    fontSize: 11.5,
-                    color: T.muted,
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {shiftLabel(shiftOf(emp.shiftId))}
-                </td>
-                <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                  {rec?.checkIn || "—"}
-                </td>
-                <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                  {rec?.checkOut || "—"}
-                </td>
-                <td style={{ fontSize: 11.5, color: T.muted }}>
-                  {rec?.checkInLoc?.officeName &&
-                  rec?.checkOutLoc?.officeName &&
-                  rec.checkInLoc.officeName !== rec.checkOutLoc.officeName
-                    ? `${rec.checkInLoc.officeName} → ${rec.checkOutLoc.officeName}`
-                    : rec?.checkInLoc?.officeName ||
-                      rec?.checkOutLoc?.officeName ||
-                      "—"}
-                </td>
-                <td>
-                  {rec ? (
-                    <StatusPill status={rec.status} />
-                  ) : (
-                    <span style={{ fontSize: 12, color: T.mutedLight }}>
-                      {t.att.noData}
-                    </span>
-                  )}
-                </td>
-                <td style={{ textAlign: "right" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: 10,
-                      justifyContent: "flex-end",
-                    }}
-                  >
-                    <button
-                      onClick={() => {
-                        setEditRecord(
-                          rec || {
-                            employeeId: emp.id,
-                            date,
-                            checkIn: "08:00",
-                            checkOut: "",
-                            status: "present",
-                          },
-                        );
-                        setModal(true);
-                      }}
+            {rows.map(({ emp, rec }) => {
+              const shift = shiftOf(emp.shiftId);
+              const worked = workedMinutes(rec?.checkIn, rec?.checkOut);
+              const otHours = approvedOtHours(emp.id);
+              const lateMins =
+                rec?.status === "late"
+                  ? lateMinutesForShift(rec.checkIn, shift)
+                  : 0;
+              const officeName =
+                rec?.checkInLoc?.officeName &&
+                rec?.checkOutLoc?.officeName &&
+                rec.checkInLoc.officeName !== rec.checkOutLoc.officeName
+                  ? `${rec.checkInLoc.officeName} → ${rec.checkOutLoc.officeName}`
+                  : rec?.checkInLoc?.officeName ||
+                    rec?.checkOutLoc?.officeName ||
+                    "";
+              const gpsVerified = !!(
+                rec?.checkInLoc?.officeId || rec?.checkOutLoc?.officeId
+              );
+              return (
+                <tr key={emp.id}>
+                  <td>
+                    <div
                       style={{
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        color: T.mutedLight,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
                       }}
                     >
-                      <Pencil size={14} />
-                    </button>
-                    {rec && isSuperAdmin && (
+                      <Avatar name={emp.name} photo={emp.photo} size={30} />
+                      <div>
+                        <div
+                          style={{
+                            fontWeight: 500,
+                            color: T.ink,
+                            fontSize: 13,
+                          }}
+                        >
+                          {emp.name}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 10.5,
+                            color: T.muted,
+                            fontFamily: "'JetBrains Mono',monospace",
+                          }}
+                        >
+                          {emp.code}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td
+                    style={{
+                      fontSize: 11.5,
+                      color: T.muted,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {deptName(emp.deptId)}
+                  </td>
+                  <td
+                    style={{
+                      fontSize: 11.5,
+                      color: T.muted,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {shiftLabel(shift)}
+                  </td>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                    {rec?.checkIn ? (
+                      <div>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 5,
+                          }}
+                        >
+                          <span
+                            style={{
+                              width: 6,
+                              height: 6,
+                              borderRadius: "50%",
+                              background:
+                                rec.status === "late" ? T.gold : T.forest,
+                              flexShrink: 0,
+                            }}
+                          />
+                          {rec.checkIn}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 10.5,
+                            color:
+                              rec.status === "late" ? T.goldText : T.forest,
+                            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                          }}
+                        >
+                          {rec.status === "late"
+                            ? formatLateDuration(lateMins, lang) || t.att.late
+                            : t.att.onTime}
+                        </div>
+                      </div>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                    {rec?.checkOut || "—"}
+                  </td>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                    {worked ? (
+                      <div>
+                        <div style={{ color: T.ink }}>{formatHM(worked)}</div>
+                        {otHours > 0 && (
+                          <div
+                            style={{
+                              fontSize: 10.5,
+                              color: T.blue,
+                              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                            }}
+                          >
+                            {t.att.otPrefix}
+                            {otHours}h
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                  <td style={{ fontSize: 11.5, color: T.muted }}>
+                    {officeName ? (
+                      <div>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 4,
+                          }}
+                        >
+                          <MapPin size={11} style={{ flexShrink: 0 }} />
+                          {officeName}
+                        </div>
+                        {gpsVerified && (
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 4,
+                              fontSize: 10.5,
+                              color: T.forest,
+                              marginTop: 2,
+                            }}
+                          >
+                            <CheckCircle2 size={11} style={{ flexShrink: 0 }} />
+                            {t.att.gpsVerified}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                  <td>
+                    {rec ? (
+                      <StatusPill status={rec.status} />
+                    ) : (
+                      <span style={{ fontSize: 12, color: T.mutedLight }}>
+                        {t.att.noData}
+                      </span>
+                    )}
+                  </td>
+                  <td style={{ textAlign: "right" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 10,
+                        justifyContent: "flex-end",
+                      }}
+                    >
                       <button
-                        onClick={() => setConfirmDel(rec)}
+                        onClick={() => {
+                          setEditRecord(
+                            rec || {
+                              employeeId: emp.id,
+                              date,
+                              checkIn: "08:00",
+                              checkOut: "",
+                              status: "present",
+                            },
+                          );
+                          setModal(true);
+                        }}
                         style={{
                           background: "none",
                           border: "none",
@@ -15517,13 +15788,26 @@ function Attendance({
                           color: T.mutedLight,
                         }}
                       >
-                        <Trash2 size={14} />
+                        <Pencil size={14} />
                       </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
+                      {rec && isSuperAdmin && (
+                        <button
+                          onClick={() => setConfirmDel(rec)}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            color: T.mutedLight,
+                          }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </Card>
@@ -16217,7 +16501,11 @@ function LeaveRequests({
                       {t.lv.durationDays(leaveDurationDays(r))}
                     </td>
                     <td
-                      style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}
+                      style={{
+                        fontSize: 12.5,
+                        color: T.textSoft,
+                        maxWidth: 200,
+                      }}
                     >
                       {r.reason || "—"}
                     </td>
@@ -16255,7 +16543,9 @@ function LeaveRequests({
                 color: T.muted,
               }}
             >
-              <span>{t.lv.showingRange(pg.rangeStart, pg.rangeEnd, pg.total)}</span>
+              <span>
+                {t.lv.showingRange(pg.rangeStart, pg.rangeEnd, pg.total)}
+              </span>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <Select
                   style={{
@@ -17159,7 +17449,11 @@ function OvertimeRequestForm({ onSave, onCancel, holidays }) {
           marginBottom: 4,
         }}
       >
-        <Lightbulb size={18} color={T.blue} style={{ flexShrink: 0, marginTop: 1 }} />
+        <Lightbulb
+          size={18}
+          color={T.blue}
+          style={{ flexShrink: 0, marginTop: 1 }}
+        />
         <div>
           <div
             style={{
@@ -17946,7 +18240,9 @@ function OvertimeRequests({
     const curMonthKey = `${now.getFullYear()}-${String(
       now.getMonth() + 1,
     ).padStart(2, "0")}`;
-    const monthly = mineAll.filter((r) => (r.date || "").slice(0, 7) === curMonthKey);
+    const monthly = mineAll.filter(
+      (r) => (r.date || "").slice(0, 7) === curMonthKey,
+    );
     const sumHours = (arr) =>
       arr.reduce((s, r) => s + (Number(r.hours) || 0), 0);
     const approvedMonthly = monthly.filter((r) => r.status === "approved");
@@ -30996,6 +31292,7 @@ function AppInner() {
                     role={role}
                     currentEmp={currentEmp}
                     employees={employees}
+                    departments={departments}
                     shifts={shifts}
                     attendance={attendance}
                     setAttendance={setAttendance}
@@ -31003,6 +31300,7 @@ function AppInner() {
                     offices={offices}
                     setOffices={setOffices}
                     holidays={holidays}
+                    overtimeRequests={overtimeRequests}
                     soundPreset={soundPolicy.preset}
                   />
                 )}
