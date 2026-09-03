@@ -27,6 +27,7 @@ import {
   AlertCircle,
   Info,
   TrendingDown,
+  TrendingUp,
   CheckCircle2,
   Receipt,
   BadgeCheck,
@@ -251,6 +252,23 @@ const LANG_RAW = {
       statInactiveRateNote:
         "ចំណាំ៖ នេះជាភាគរយស្ថិតិបច្ចុប្បន្ន មិនមែនអត្រាចេញ-ចូលក្នុងកំឡុងពេលជាក់លាក់ទេ (ប្រព័ន្ធមិនទាន់កត់ត្រាកាលបរិច្ឆេទចាកចេញ)",
       tenureFormat: (y, m) => (y > 0 ? `${y} ឆ្នាំ ${m} ខែ` : `${m} ខែ`),
+      avgAttendRate: "អត្រាមកធ្វើការជាមធ្យម",
+      avgAttendRateSub: "ខែបច្ចុប្បន្ន",
+      filters: "តម្រង",
+      viewDetails: "មើលលម្អិត",
+      newHiresThisMonth: (n) => `+${n} បុគ្គលិកថ្មីខែនេះ`,
+      noNewHiresThisMonth: "គ្មានការជួលថ្មីខែនេះទេ",
+      deltaVsLastMonth: (v) => `${v >= 0 ? "+" : ""}${v}% ធៀបនឹងខែមុន`,
+      deptSummaryTitle: "សេចក្តីសង្ខេបនាយកដ្ឋាន",
+      deptSummarySub: "ទិដ្ឋភាពរួមសូចនាករសំខាន់ៗតាមនាយកដ្ឋាន",
+      colDept: "នាយកដ្ឋាន",
+      colActiveEmp: "បុគ្គលិកសកម្ម",
+      colAttendRate: "អត្រាមកធ្វើការ",
+      colOtHours: "ម៉ោង OT ដែលបានអនុម័ត",
+      colNetPayroll: "ចំណាយប្រាក់ខែសុទ្ធ",
+      colAbsenteeism: "អត្រាអវត្តមាន",
+      thisMonth: "ខែនេះ",
+      lastMonth: "ខែមុន",
     },
     depts: {
       addBtn: "បន្ថែមនាយកដ្ឋាន",
@@ -1451,6 +1469,23 @@ const LANG_RAW = {
       statInactiveRateNote:
         "Note: this is a current snapshot, not a turnover rate over a period — the system doesn't yet track an exit date.",
       tenureFormat: (y, m) => (y > 0 ? `${y}y ${m}m` : `${m}m`),
+      avgAttendRate: "Average Attendance Rate",
+      avgAttendRateSub: "Current month",
+      filters: "Filters",
+      viewDetails: "View Details",
+      newHiresThisMonth: (n) => `+${n} new this month`,
+      noNewHiresThisMonth: "No new hires this month",
+      deltaVsLastMonth: (v) => `${v >= 0 ? "+" : ""}${v}% vs last month`,
+      deptSummaryTitle: "Department Summary",
+      deptSummarySub: "Key metrics overview by department",
+      colDept: "Department",
+      colActiveEmp: "Active Employees",
+      colAttendRate: "Attendance Rate",
+      colOtHours: "Approved OT Hours",
+      colNetPayroll: "Net Payroll Cost",
+      colAbsenteeism: "Absenteeism Rate",
+      thisMonth: "This month",
+      lastMonth: "Last month",
     },
     depts: {
       addBtn: "Add Department",
@@ -2636,6 +2671,23 @@ const LANG_RAW = {
       noChartData: "暂无足够数据可显示",
       totalOt: "加班总数",
       hours: "小时",
+      avgAttendRate: "平均出勤率",
+      avgAttendRateSub: "本月",
+      filters: "筛选",
+      viewDetails: "查看详情",
+      newHiresThisMonth: (n) => `本月新增 ${n} 人`,
+      noNewHiresThisMonth: "本月没有新员工",
+      deltaVsLastMonth: (v) => `${v >= 0 ? "+" : ""}${v}% 较上月`,
+      deptSummaryTitle: "部门摘要",
+      deptSummarySub: "各部门关键指标概览",
+      colDept: "部门",
+      colActiveEmp: "在职员工",
+      colAttendRate: "出勤率",
+      colOtHours: "已批准加班时数",
+      colNetPayroll: "工资净支出",
+      colAbsenteeism: "缺勤率",
+      thisMonth: "本月",
+      lastMonth: "上月",
     },
     att: {
       checkIn: "上班打卡",
@@ -9343,6 +9395,25 @@ function lastMonthKeys(count) {
   }
   return out;
 }
+// Same as lastMonthKeys, but the trailing window ends at a given month
+// (endMk, "YYYY-MM") instead of always ending at the current month — lets
+// the analytics trend charts shift into the past when an older month is
+// selected in the date-range picker.
+function lastMonthKeysEnding(endMk, count) {
+  const out = [];
+  for (let i = count - 1; i >= 0; i--) {
+    out.push(shiftMonthKey(endMk, -i));
+  }
+  return out;
+}
+// Adds/subtracts whole months from a "YYYY-MM" key.
+function shiftMonthKey(mk, delta) {
+  const [y, m] = mk.split("-").map(Number);
+  return monthKey(new Date(y, m - 1 + delta, 1));
+}
+// Note: the "Aug 1 – Aug 31, 2026" style range label used by the
+// analytics date-range picker reuses the existing monthRangeLabel(mk)
+// helper defined above (already used by the payslip list).
 // Short month label ("Jan", "ម.ក") instead of monthLabel's full
 // "January 2026" — compact enough for chart axis ticks.
 function shortMonthLabel(mk, lang) {
@@ -9450,7 +9521,7 @@ function HorizontalBarChart({ data, color, formatValue }) {
           >
             <div
               style={{
-                width: `${Math.max(2, Math.round((d.value / max) * 100))}%`,
+                width: `${d.value > 0 ? Math.max(2, Math.round((d.value / max) * 100)) : 0}%`,
                 height: "100%",
                 borderRadius: 5,
                 background: color,
@@ -9459,6 +9530,320 @@ function HorizontalBarChart({ data, color, formatValue }) {
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+// A line/area chart for time-series trends (attendance rate, new hires),
+// visually distinct from MiniBarChart above so the analytics page reads
+// as a mix of chart types rather than repeating the same bar shape.
+function MiniLineChart({ data, color, formatValue, height = 170 }) {
+  const gradId = useRef(`mlg-${Math.random().toString(36).slice(2)}`).current;
+  const max = Math.max(1, ...data.map((d) => d.value));
+  const n = data.length;
+  const w = 600;
+  const padX = 20;
+  const padTop = 24;
+  const padBottom = 20;
+  const plotW = w - padX * 2;
+  const plotH = height - padTop - padBottom;
+  const stepX = n > 1 ? plotW / (n - 1) : 0;
+  const points = data.map((d, i) => ({
+    x: n > 1 ? padX + i * stepX : w / 2,
+    y: padTop + (plotH - Math.round((d.value / max) * plotH)),
+    ...d,
+  }));
+  const linePath = points
+    .map((p, i) => `${i === 0 ? "M" : "L"}${p.x},${p.y}`)
+    .join(" ");
+  const baseY = padTop + plotH;
+  const areaPath =
+    n > 0
+      ? `${linePath} L${points[n - 1].x},${baseY} L${points[0].x},${baseY} Z`
+      : "";
+  return (
+    <svg
+      viewBox={`0 0 ${w} ${height}`}
+      style={{ width: "100%", height, display: "block" }}
+      preserveAspectRatio="none"
+    >
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.28" />
+          <stop offset="100%" stopColor={color} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {n > 0 && <path d={areaPath} fill={`url(#${gradId})`} stroke="none" />}
+      {n > 1 && (
+        <path
+          d={linePath}
+          fill="none"
+          stroke={color}
+          strokeWidth="2.5"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+      )}
+      {points.map((p, i) => (
+        <g key={i}>
+          <circle
+            cx={p.x}
+            cy={p.y}
+            r="4"
+            fill={color}
+            stroke="var(--wf-card)"
+            strokeWidth="2"
+          />
+          <text
+            x={p.x}
+            y={Math.max(11, p.y - 10)}
+            textAnchor="middle"
+            fontSize="11"
+            fontFamily="'JetBrains Mono',monospace"
+            style={{ fill: "var(--wf-ink)" }}
+          >
+            {formatValue ? formatValue(p.value) : p.value}
+          </text>
+          <text
+            x={p.x}
+            y={height - 4}
+            textAnchor="middle"
+            fontSize="10.5"
+            style={{ fill: "var(--wf-muted)" }}
+          >
+            {p.label}
+          </text>
+        </g>
+      ))}
+    </svg>
+  );
+}
+// Small up/down/flat indicator used on the analytics stat cards. Only
+// rendered when a genuine period-over-period comparison exists — cards
+// with no historical baseline show a plain note instead rather than a
+// fabricated delta.
+function TrendBadge({ direction, children }) {
+  const color =
+    direction === "up" ? T.forest : direction === "down" ? T.rose : T.muted;
+  const Icon =
+    direction === "up"
+      ? TrendingUp
+      : direction === "down"
+        ? TrendingDown
+        : null;
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 4,
+        fontSize: 11.5,
+        fontWeight: 700,
+        color,
+      }}
+    >
+      {Icon && <Icon size={12} />}
+      {children}
+    </span>
+  );
+}
+// Shared card shape for the four analytics summary stats: icon chip,
+// big monospace value, label, and an optional trend badge or note.
+function AnalyticsStatCard({ icon: Icon, color, value, label, trend, note }) {
+  return (
+    <Card accent={color} style={{ padding: 16 }}>
+      <div
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 10,
+          background: color + "1A",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: 12,
+        }}
+      >
+        <Icon size={18} color={color} />
+      </div>
+      <div
+        style={{
+          fontSize: 26,
+          fontWeight: 700,
+          fontFamily: "'JetBrains Mono',monospace",
+          color: T.ink,
+        }}
+      >
+        {value}
+      </div>
+      <div
+        style={{
+          fontSize: 13,
+          fontWeight: 600,
+          color: T.textSoft,
+          marginTop: 2,
+        }}
+      >
+        {label}
+      </div>
+      {trend && <div style={{ marginTop: 6 }}>{trend}</div>}
+      {note && (
+        <div
+          style={{
+            fontSize: 10.5,
+            color: T.muted,
+            marginTop: 4,
+            lineHeight: 1.5,
+          }}
+        >
+          {note}
+        </div>
+      )}
+    </Card>
+  );
+}
+// A compact "Aug 1 – Aug 31, 2026"-style month picker: click to open a
+// small popover with prev/next month arrows, a native month input for
+// jumping straight to any month, and This month / Last month shortcuts.
+// Selecting a future month is disabled — there's no data to show yet.
+function MonthRangePicker({ value, onChange, t }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return;
+    const onDocClick = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    const onEsc = (e) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("keydown", onEsc);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("keydown", onEsc);
+    };
+  }, [open]);
+  const currentMk = monthKey();
+  const atMax = value >= currentMk;
+  return (
+    <div ref={ref} style={{ position: "relative" }}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          background: "rgba(255,255,255,0.08)",
+          border: "1px solid rgba(255,255,255,0.14)",
+          borderRadius: 10,
+          padding: "7px 12px",
+          color: "#fff",
+          fontSize: 12.5,
+          fontWeight: 600,
+          cursor: "pointer",
+        }}
+      >
+        <span>{monthRangeLabel(value)}</span>
+        <CalendarDays size={14} />
+      </button>
+      {open && (
+        <div
+          style={{
+            position: "absolute",
+            right: 0,
+            top: "calc(100% + 8px)",
+            zIndex: 40,
+            background: T.card,
+            border: `1px solid ${T.lineSoft}`,
+            borderRadius: 12,
+            boxShadow: "0 12px 28px rgba(0,0,0,0.18)",
+            padding: 14,
+            width: 220,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 10,
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => onChange(shiftMonthKey(value, -1))}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: T.ink,
+                display: "flex",
+              }}
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <strong style={{ fontSize: 12.5, color: T.ink }}>
+              {monthLabel(value)}
+            </strong>
+            <button
+              type="button"
+              disabled={atMax}
+              onClick={() => !atMax && onChange(shiftMonthKey(value, 1))}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: atMax ? "not-allowed" : "pointer",
+                color: atMax ? T.muted : T.ink,
+                display: "flex",
+              }}
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+          <input
+            type="month"
+            value={value}
+            max={currentMk}
+            onChange={(e) => e.target.value && onChange(e.target.value)}
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              border: `1px solid ${T.inputBorder}`,
+              background: T.inputBg,
+              color: T.ink,
+              borderRadius: 8,
+              padding: "6px 8px",
+              fontSize: 12.5,
+              marginBottom: 10,
+            }}
+          />
+          <div style={{ display: "flex", gap: 6 }}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              style={{ flex: 1 }}
+              onClick={() => {
+                onChange(currentMk);
+                setOpen(false);
+              }}
+            >
+              {t.analytics.thisMonth}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              style={{ flex: 1 }}
+              onClick={() => {
+                onChange(shiftMonthKey(currentMk, -1));
+                setOpen(false);
+              }}
+            >
+              {t.analytics.lastMonth}
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -9513,8 +9898,13 @@ function AnalyticsPage({
   payrollPolicy,
 }) {
   const { t, lang } = useLang();
-  const months = useMemo(() => lastMonthKeys(6), []);
+  const [selectedMonth, setSelectedMonth] = useState(monthKey());
+  const months = useMemo(
+    () => lastMonthKeysEnding(selectedMonth, 6),
+    [selectedMonth],
+  );
   const activeEmployees = employees.filter((e) => e.status === "active");
+  const [deptFilterId, setDeptFilterId] = useState("");
 
   // Attendance rate per month: share of that month's attendance records
   // that were present/late (as opposed to absent), out of all records
@@ -9528,10 +9918,22 @@ function AnalyticsPage({
     return { label: shortMonthLabel(mk, lang), value: rate };
   });
   const hasAttendData = attendance.some((a) => a.date);
+  // Real month-over-month delta for the average attendance rate stat
+  // card, taken straight from the trend series above (no invented
+  // numbers) — only shown once there are at least two months to compare.
+  const attendRateNow = attendTrend[attendTrend.length - 1]?.value ?? 0;
+  const attendRateDelta =
+    attendTrend.length >= 2
+      ? attendRateNow - attendTrend[attendTrend.length - 2].value
+      : null;
+
+  const mk = selectedMonth;
+  const filteredDepartments = deptFilterId
+    ? departments.filter((d) => d.id === deptFilterId)
+    : departments;
 
   // Net payroll cost by department for the current month.
-  const mk = monthKey();
-  const deptCost = departments
+  const deptCost = filteredDepartments
     .map((d) => {
       const total = activeEmployees
         .filter((e) => e.deptId === d.id)
@@ -9573,10 +9975,11 @@ function AnalyticsPage({
     return { label: shortMonthLabel(mkm, lang), value: count };
   });
   const hasHiresData = employees.some((e) => e.joined);
+  const newHiresThisMonth = newHiresTrend[newHiresTrend.length - 1]?.value ?? 0;
 
   // Absenteeism rate by department for the current month: share of
   // that department's attendance records this month marked "absent".
-  const absenteeismByDept = departments
+  const absenteeismByDept = filteredDepartments
     .map((d) => {
       const deptEmpIds = new Set(
         employees.filter((e) => e.deptId === d.id).map((e) => e.id),
@@ -9591,6 +9994,86 @@ function AnalyticsPage({
     .filter((d) => d.recCount > 0)
     .sort((a, b) => b.value - a.value);
   const hasAbsenceData = absenteeismByDept.length > 0;
+
+  // Per-department roll-up for the summary table: headcount, attendance
+  // rate, approved OT hours, net payroll cost and absenteeism rate, all
+  // for the current month — reusing the same computations as the charts
+  // above, just grouped per department instead of per month.
+  const deptSummary = filteredDepartments.map((d) => {
+    const deptEmployees = employees.filter((e) => e.deptId === d.id);
+    const activeDeptEmployees = deptEmployees.filter(
+      (e) => e.status === "active",
+    );
+    const deptEmpIds = new Set(deptEmployees.map((e) => e.id));
+    const recs = attendance.filter(
+      (a) => deptEmpIds.has(a.employeeId) && a.date && a.date.startsWith(mk),
+    );
+    const present = recs.filter(
+      (a) => a.status === "present" || a.status === "late",
+    ).length;
+    const absent = recs.filter((a) => a.status === "absent").length;
+    const otHours = overtimeRequests
+      .filter(
+        (r) =>
+          r.status === "approved" &&
+          r.date &&
+          r.date.startsWith(mk) &&
+          deptEmpIds.has(r.employeeId),
+      )
+      .reduce((sum, r) => sum + (Number(r.hours) || 0), 0);
+    const netPayrollCost = activeDeptEmployees.reduce((sum, e) => {
+      const p = computePayroll(
+        e,
+        attendance,
+        mk,
+        overtimeRequests,
+        otPolicy,
+        payrollPolicy,
+      );
+      return sum + p.net;
+    }, 0);
+    return {
+      id: d.id,
+      name: d.name,
+      activeCount: activeDeptEmployees.length,
+      attendanceRate: recs.length
+        ? Math.round((present / recs.length) * 100)
+        : null,
+      otHours: Math.round(otHours),
+      netPayrollCost,
+      absenteeismRate: recs.length
+        ? Math.round((absent / recs.length) * 100)
+        : null,
+    };
+  });
+
+  const handleExportSummary = () => {
+    exportCsv(
+      `department-summary-${mk}.csv`,
+      [
+        t.analytics.colDept,
+        t.analytics.colActiveEmp,
+        t.analytics.colAttendRate,
+        t.analytics.colOtHours,
+        t.analytics.colNetPayroll,
+        t.analytics.colAbsenteeism,
+      ],
+      deptSummary.map((d) => [
+        d.name,
+        d.activeCount,
+        d.attendanceRate === null ? "" : `${d.attendanceRate}%`,
+        `${d.otHours}h`,
+        fmtMoney(d.netPayrollCost),
+        d.absenteeismRate === null ? "" : `${d.absenteeismRate}%`,
+      ]),
+    );
+  };
+
+  const scrollToSummary = () => {
+    document
+      .getElementById("wf-analytics-dept-summary")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   // Snapshot workforce stats: active headcount, average tenure of
   // active employees, and the current inactive share. The inactive
@@ -9618,26 +10101,94 @@ function AnalyticsPage({
       <Card
         style={{
           padding: 20,
-          marginBottom: 22,
+          marginBottom: 16,
           background: BRAND.ink,
           color: "#fff",
         }}
       >
-        <h2
+        <div
           style={{
-            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
-            fontSize: 20,
-            fontWeight: 600,
             display: "flex",
-            alignItems: "center",
-            gap: 8,
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 14,
           }}
         >
-          <BarChart3 size={20} /> {t.analytics.title}
-        </h2>
-        <p style={{ color: "#A9B4C7", fontSize: 12, marginTop: 6 }}>
-          {t.analytics.subtitle}
-        </p>
+          <div>
+            <h2
+              style={{
+                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                fontSize: 20,
+                fontWeight: 600,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <BarChart3 size={20} /> {t.analytics.title}
+            </h2>
+            <p style={{ color: "#A9B4C7", fontSize: 12, marginTop: 6 }}>
+              {t.analytics.subtitle}
+            </p>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              flexWrap: "wrap",
+            }}
+          >
+            <MonthRangePicker
+              value={selectedMonth}
+              onChange={setSelectedMonth}
+              t={t}
+            />
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.14)",
+                borderRadius: 10,
+                padding: "6px 10px",
+              }}
+            >
+              <Filter size={13} color="#A9B4C7" />
+              <select
+                value={deptFilterId}
+                onChange={(e) => setDeptFilterId(e.target.value)}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "#fff",
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  outline: "none",
+                }}
+              >
+                <option value="" style={{ color: "#0A0F1A" }}>
+                  {t.att.allDepartments}
+                </option>
+                {departments.map((d) => (
+                  <option key={d.id} value={d.id} style={{ color: "#0A0F1A" }}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <Button
+              type="button"
+              variant="accent"
+              size="sm"
+              onClick={handleExportSummary}
+            >
+              <Download size={13} /> {t.exportCsv}
+            </Button>
+          </div>
+        </div>
       </Card>
 
       <div
@@ -9647,126 +10198,57 @@ function AnalyticsPage({
           marginBottom: 16,
         }}
       >
-        <Card accent={T.forest} style={{ padding: 16 }}>
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 10,
-              background: T.forest + "1A",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: 12,
-            }}
-          >
-            <Users size={18} color={T.forest} />
-          </div>
-          <div
-            style={{
-              fontSize: 26,
-              fontWeight: 700,
-              fontFamily: "'JetBrains Mono',monospace",
-              color: T.ink,
-            }}
-          >
-            {activeEmployees.length}
-          </div>
-          <div
-            style={{
-              fontSize: 13,
-              fontWeight: 600,
-              color: T.textSoft,
-              marginTop: 2,
-            }}
-          >
-            {t.analytics.statActiveHeadcount}
-          </div>
-        </Card>
+        <AnalyticsStatCard
+          icon={Users}
+          color={T.forest}
+          value={activeEmployees.length}
+          label={t.analytics.statActiveHeadcount}
+          trend={
+            newHiresThisMonth > 0 ? (
+              <TrendBadge direction="up">
+                {t.analytics.newHiresThisMonth(newHiresThisMonth)}
+              </TrendBadge>
+            ) : (
+              <TrendBadge direction="flat">
+                {t.analytics.noNewHiresThisMonth}
+              </TrendBadge>
+            )
+          }
+        />
 
-        <Card accent={T.blue} style={{ padding: 16 }}>
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 10,
-              background: T.blue + "1A",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: 12,
-            }}
-          >
-            <CalendarClock size={18} color={T.blue} />
-          </div>
-          <div
-            style={{
-              fontSize: 26,
-              fontWeight: 700,
-              fontFamily: "'JetBrains Mono',monospace",
-              color: T.ink,
-            }}
-          >
-            {t.analytics.tenureFormat(tenureYears, tenureMonths)}
-          </div>
-          <div
-            style={{
-              fontSize: 13,
-              fontWeight: 600,
-              color: T.textSoft,
-              marginTop: 2,
-            }}
-          >
-            {t.analytics.statAvgTenure}
-          </div>
-        </Card>
+        <AnalyticsStatCard
+          icon={CalendarClock}
+          color={T.blue}
+          value={t.analytics.tenureFormat(tenureYears, tenureMonths)}
+          label={t.analytics.statAvgTenure}
+        />
 
-        <Card accent={T.rose} style={{ padding: 16 }}>
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 10,
-              background: T.rose + "1A",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: 12,
-            }}
-          >
-            <AlertCircle size={18} color={T.rose} />
-          </div>
-          <div
-            style={{
-              fontSize: 26,
-              fontWeight: 700,
-              fontFamily: "'JetBrains Mono',monospace",
-              color: T.ink,
-            }}
-          >
-            {inactiveRate}%
-          </div>
-          <div
-            style={{
-              fontSize: 13,
-              fontWeight: 600,
-              color: T.textSoft,
-              marginTop: 2,
-            }}
-          >
-            {t.analytics.statInactiveRate}
-          </div>
-          <div
-            style={{
-              fontSize: 10.5,
-              color: T.muted,
-              marginTop: 4,
-              lineHeight: 1.5,
-            }}
-          >
-            {t.analytics.statInactiveRateNote}
-          </div>
-        </Card>
+        <AnalyticsStatCard
+          icon={Clock}
+          color={T.gold}
+          value={hasAttendData ? `${attendRateNow}%` : "—"}
+          label={t.analytics.avgAttendRate}
+          trend={
+            hasAttendData && attendRateDelta !== null ? (
+              <TrendBadge direction={attendRateDelta >= 0 ? "up" : "down"}>
+                {t.analytics.deltaVsLastMonth(attendRateDelta)}
+              </TrendBadge>
+            ) : null
+          }
+          note={
+            !hasAttendData
+              ? t.analytics.noChartData
+              : t.analytics.avgAttendRateSub
+          }
+        />
+
+        <AnalyticsStatCard
+          icon={AlertCircle}
+          color={T.rose}
+          value={`${inactiveRate}%`}
+          label={t.analytics.statInactiveRate}
+          note={t.analytics.statInactiveRateNote}
+        />
       </div>
 
       <div
@@ -9782,7 +10264,7 @@ function AnalyticsPage({
           noData={!hasAttendData}
           noDataLabel={t.analytics.noChartData}
         >
-          <MiniBarChart
+          <MiniLineChart
             data={attendTrend}
             color={T.forest}
             formatValue={(v) => `${v}%`}
@@ -9808,7 +10290,7 @@ function AnalyticsPage({
           noData={!hasHiresData}
           noDataLabel={t.analytics.noChartData}
         >
-          <MiniBarChart
+          <MiniLineChart
             data={newHiresTrend}
             color={T.blue}
             formatValue={(v) => `${v}`}
@@ -9816,33 +10298,215 @@ function AnalyticsPage({
         </ChartCard>
       </div>
 
-      <ChartCard
-        title={t.analytics.deptCost}
-        subtitle={t.analytics.deptCostSub}
-        noData={deptCost.length === 0}
-        noDataLabel={t.analytics.noChartData}
+      <div
+        className="wf-grid"
+        style={{
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px,1fr))",
+          marginBottom: 16,
+          alignItems: "stretch",
+        }}
       >
-        <HorizontalBarChart
-          data={deptCost}
-          color={T.blue}
-          formatValue={fmtMoney}
-        />
-      </ChartCard>
+        <Card style={{ padding: 18 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              gap: 10,
+              marginBottom: 2,
+            }}
+          >
+            <div>
+              <h3
+                style={{
+                  fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                  fontWeight: 600,
+                  color: T.ink,
+                  fontSize: 14,
+                }}
+              >
+                {t.analytics.deptCost}
+              </h3>
+              <p style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>
+                {t.analytics.deptCostSub}
+              </p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={scrollToSummary}>
+              {t.analytics.viewDetails}
+            </Button>
+          </div>
+          {deptCost.length === 0 ? (
+            <p
+              style={{
+                fontSize: 13,
+                color: T.muted,
+                textAlign: "center",
+                padding: "28px 0",
+              }}
+            >
+              {t.analytics.noChartData}
+            </p>
+          ) : (
+            <div style={{ marginTop: 14 }}>
+              <HorizontalBarChart
+                data={deptCost}
+                color={T.blue}
+                formatValue={fmtMoney}
+              />
+            </div>
+          )}
+        </Card>
 
-      <div style={{ marginTop: 16 }}>
-        <ChartCard
-          title={t.analytics.absenteeism}
-          subtitle={t.analytics.absenteeismSub}
-          noData={!hasAbsenceData}
-          noDataLabel={t.analytics.noChartData}
-        >
-          <HorizontalBarChart
-            data={absenteeismByDept}
-            color={T.rose}
-            formatValue={(v) => `${v}%`}
-          />
-        </ChartCard>
+        <Card style={{ padding: 18 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              gap: 10,
+              marginBottom: 2,
+            }}
+          >
+            <div>
+              <h3
+                style={{
+                  fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                  fontWeight: 600,
+                  color: T.ink,
+                  fontSize: 14,
+                }}
+              >
+                {t.analytics.absenteeism}
+              </h3>
+              <p style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>
+                {t.analytics.absenteeismSub}
+              </p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={scrollToSummary}>
+              {t.analytics.viewDetails}
+            </Button>
+          </div>
+          {!hasAbsenceData ? (
+            <p
+              style={{
+                fontSize: 13,
+                color: T.muted,
+                textAlign: "center",
+                padding: "28px 0",
+              }}
+            >
+              {t.analytics.noChartData}
+            </p>
+          ) : (
+            <div style={{ marginTop: 14 }}>
+              <HorizontalBarChart
+                data={absenteeismByDept}
+                color={T.rose}
+                formatValue={(v) => `${v}%`}
+              />
+            </div>
+          )}
+        </Card>
       </div>
+
+      <Card id="wf-analytics-dept-summary" style={{ padding: 18 }}>
+        <h3
+          style={{
+            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontWeight: 600,
+            color: T.ink,
+            fontSize: 14,
+          }}
+        >
+          {t.analytics.deptSummaryTitle}
+        </h3>
+        <p
+          style={{
+            fontSize: 11,
+            color: T.muted,
+            marginTop: 2,
+            marginBottom: 14,
+          }}
+        >
+          {t.analytics.deptSummarySub}
+        </p>
+        <div style={{ overflowX: "auto" }}>
+          <table className="wf-table">
+            <thead>
+              <tr>
+                <th>{t.analytics.colDept}</th>
+                <th>{t.analytics.colActiveEmp}</th>
+                <th>{t.analytics.colAttendRate}</th>
+                <th>{t.analytics.colOtHours}</th>
+                <th>{t.analytics.colNetPayroll}</th>
+                <th>{t.analytics.colAbsenteeism}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {deptSummary.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={6}
+                    style={{ textAlign: "center", color: T.muted }}
+                  >
+                    {t.noData}
+                  </td>
+                </tr>
+              )}
+              {deptSummary.map((d) => (
+                <tr key={d.id}>
+                  <td style={{ fontWeight: 600, color: T.ink }}>{d.name}</td>
+                  <td>{d.activeCount}</td>
+                  <td
+                    style={{
+                      color:
+                        d.attendanceRate === null
+                          ? T.muted
+                          : d.attendanceRate >= 90
+                            ? T.forest
+                            : T.ink,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {d.attendanceRate === null ? "—" : `${d.attendanceRate}%`}
+                  </td>
+                  <td>{d.otHours}h</td>
+                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                    {fmtMoney(d.netPayrollCost)}
+                  </td>
+                  <td>
+                    <span
+                      style={{
+                        display: "inline-block",
+                        padding: "2px 8px",
+                        borderRadius: 999,
+                        fontSize: 11.5,
+                        fontWeight: 700,
+                        background:
+                          d.absenteeismRate === null
+                            ? T.tableHeadBg
+                            : d.absenteeismRate > 0
+                              ? T.roseSoft
+                              : T.forestSoft,
+                        color:
+                          d.absenteeismRate === null
+                            ? T.muted
+                            : d.absenteeismRate > 0
+                              ? T.roseDark
+                              : T.forestText,
+                      }}
+                    >
+                      {d.absenteeismRate === null
+                        ? "—"
+                        : `${d.absenteeismRate}%`}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
     </div>
   );
 }
