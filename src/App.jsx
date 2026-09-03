@@ -759,6 +759,9 @@ const LANG_RAW = {
       thisMonth: "ខែនេះ",
       requestsCount: (n) => `${n} សំណើ`,
       searchPlaceholder: "ស្វែងរកមូលហេតុ ឬស្ថានភាព...",
+      searchPlaceholderAdmin: "ស្វែងរកតាមមូលហេតុ ឈ្មោះបុគ្គលិក...",
+      selectEmployeePlaceholder: "ជ្រើសរើសបុគ្គលិក",
+      policyBannerSub: "ការគណនា OT នឹងផ្អែកលើគោលការណ៍របស់ក្រុមហ៊ុន។",
       policyNoteTitle: "គោលការណ៍ OT",
       policyNoteDesc:
         "ការស្នើសុំ OT ត្រូវធ្វើឡើងជាមុន ហើយត្រូវការការអនុម័តពីអ្នកគ្រប់គ្រងរបស់អ្នក។",
@@ -1960,6 +1963,9 @@ const LANG_RAW = {
       thisMonth: "This Month",
       requestsCount: (n) => `${n} request${n === 1 ? "" : "s"}`,
       searchPlaceholder: "Search reason or status...",
+      searchPlaceholderAdmin: "Search by reason, employee...",
+      selectEmployeePlaceholder: "Select employee",
+      policyBannerSub: "Overtime will be calculated based on company policy.",
       policyNoteTitle: "Overtime Policy",
       policyNoteDesc:
         "Overtime must be requested in advance and requires approval from your manager.",
@@ -17461,8 +17467,15 @@ function otHoursFromRange(startVal, endVal, breakMinutes = 0) {
   mins = Math.max(0, mins - (Number(breakMinutes) || 0));
   return Math.round((mins / 60) * 100) / 100;
 }
-function OvertimeRequestForm({ onSave, onCancel, holidays, otPolicy }) {
+function OvertimeRequestForm({
+  onSave,
+  onCancel,
+  holidays,
+  otPolicy,
+  employees,
+}) {
   const { t } = useLang();
+  const [employeeId, setEmployeeId] = useState("");
   const [f, setF] = useState({
     date: todayStr(),
     startTime: "",
@@ -17483,9 +17496,30 @@ function OvertimeRequestForm({ onSave, onCancel, holidays, otPolicy }) {
     DEFAULT_OT_POLICY.breakMinutes;
   const hoursNum = otHoursFromRange(f.startTime, f.endTime, breakMinutes);
   const rangeEntered = !!(f.startTime && f.endTime);
-  const invalid = !f.date || !rangeEntered || hoursNum <= 0 || hoursNum > 16;
+  const invalid =
+    !f.date ||
+    !rangeEntered ||
+    hoursNum <= 0 ||
+    hoursNum > 16 ||
+    (employees && !employeeId);
   return (
     <div>
+      {employees && (
+        <Field label={t.employee}>
+          <Select
+            value={employeeId}
+            onChange={(e) => setEmployeeId(e.target.value)}
+          >
+            <option value="">{t.ot.selectEmployeePlaceholder}</option>
+            {employees.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.name}
+                {e.code ? ` (${e.code})` : ""}
+              </option>
+            ))}
+          </Select>
+        </Field>
+      )}
       <Field label={t.ot.date}>
         <DatePicker value={f.date} onChange={set("date")} />
       </Field>
@@ -17600,6 +17634,7 @@ function OvertimeRequestForm({ onSave, onCancel, holidays, otPolicy }) {
           variant="accent"
           onClick={() =>
             onSave({
+              employeeId: employees ? employeeId : undefined,
               date: f.date,
               hours: hoursNum,
               dayType: f.dayType,
@@ -17690,22 +17725,58 @@ function OvertimePolicySettings({ otPolicy, setOtPolicy }) {
         }}
         onClick={() => setOpen(!open)}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <Timer size={16} color={T.forest} />
-          <span style={{ fontWeight: 600, fontSize: 13.5, color: T.ink }}>
-            {t.ot.policyTitle}
-          </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: 9,
+              background: OT_STAT_TINTS.violet.bg,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <Timer size={16} color={OT_STAT_TINTS.violet.fg} />
+          </div>
+          <div>
+            <div style={{ fontWeight: 600, fontSize: 13.5, color: T.ink }}>
+              {t.ot.policyTitle}
+            </div>
+            <div style={{ fontSize: 11.5, color: T.textSoft, marginTop: 1 }}>
+              {t.ot.policyBannerSub}
+            </div>
+          </div>
         </div>
-        <span
+        <div
           style={{
-            fontSize: 11.5,
-            color: T.textSoft,
-            fontFamily: "'JetBrains Mono',monospace",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            flexShrink: 0,
           }}
         >
-          {otPolicy.rateNormal}x / {otPolicy.rateWeekend}x /{" "}
-          {otPolicy.rateHoliday}x
-        </span>
+          <span
+            style={{
+              fontSize: 11.5,
+              color: T.textSoft,
+              fontFamily: "'JetBrains Mono',monospace",
+              border: `1px solid ${T.lineSoft}`,
+              borderRadius: 8,
+              padding: "6px 12px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {otPolicy.rateNormal}x / {otPolicy.rateWeekend}x /{" "}
+            {otPolicy.rateHoliday}x
+          </span>
+          {open ? (
+            <ChevronDown size={16} color={T.muted} />
+          ) : (
+            <ChevronRight size={16} color={T.muted} />
+          )}
+        </div>
       </div>
       {open && (
         <div
@@ -18254,6 +18325,37 @@ function OtStatCard({ icon: Icon, tint, label, value, sub }) {
     </Card>
   );
 }
+function OtIconButton({ tint, title, onClick, children }) {
+  const c = OT_STAT_TINTS[tint] || OT_STAT_TINTS.violet;
+  return (
+    <button
+      type="button"
+      title={title}
+      aria-label={title}
+      onClick={onClick}
+      style={{
+        width: 30,
+        height: 30,
+        borderRadius: 8,
+        border: "none",
+        background: c.bg,
+        color: c.fg,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
+        flexShrink: 0,
+        transition: "filter .15s, transform .1s",
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.filter = "brightness(0.94)")}
+      onMouseLeave={(e) => (e.currentTarget.style.filter = "none")}
+      onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.94)")}
+      onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
+    >
+      {children}
+    </button>
+  );
+}
 function OvertimeRequests({
   role,
   currentAdmin,
@@ -18303,6 +18405,36 @@ function OvertimeRequests({
   });
   const otPg = usePagination(otFiltered, otPageSize);
 
+  // Admin-side filters/pagination for the all-employees requests table —
+  // kept separate from the employee self-service state above so an admin
+  // who is also linked to an employee record never mixes the two views'
+  // filters together.
+  const [otAdminTab, setOtAdminTab] = useState("all");
+  const [otAdminQuery, setOtAdminQuery] = useState("");
+  const [otAdminDateFrom, setOtAdminDateFrom] = useState("");
+  const [otAdminDateTo, setOtAdminDateTo] = useState("");
+  const [otAdminPageSize, setOtAdminPageSize] = useState(10);
+  const adminSorted = [...overtimeRequests].sort((a, b) => {
+    if (a.status === "pending" && b.status !== "pending") return -1;
+    if (a.status !== "pending" && b.status === "pending") return 1;
+    return b.createdAt.localeCompare(a.createdAt);
+  });
+  const adminFiltered = adminSorted.filter((r) => {
+    if (otAdminTab !== "all" && r.status !== otAdminTab) return false;
+    if (otAdminDateFrom && r.date < otAdminDateFrom) return false;
+    if (otAdminDateTo && r.date > otAdminDateTo) return false;
+    if (otAdminQuery.trim()) {
+      const q = otAdminQuery.trim().toLowerCase();
+      const emp = empOf(r.employeeId);
+      const hay = `${emp?.name || ""} ${emp?.code || ""} ${r.reason || ""} ${
+        DAY_TYPE_LABEL[r.dayType] || r.dayType || ""
+      } ${r.status || ""}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  const adminPg = usePagination(adminFiltered, otAdminPageSize);
+
   const approve = (req) => {
     setOvertimeRequests(
       overtimeRequests.map((r) =>
@@ -18340,12 +18472,13 @@ function OvertimeRequests({
   };
 
   const submit = (f) => {
-    if (!currentEmp) return;
+    const employeeId = f.employeeId || currentEmp?.id;
+    if (!employeeId) return;
     setOvertimeRequests([
       ...overtimeRequests,
       {
         id: uid("ot"),
-        employeeId: currentEmp.id,
+        employeeId,
         date: f.date,
         hours: f.hours,
         dayType: f.dayType,
@@ -18672,15 +18805,167 @@ function OvertimeRequests({
     );
   }
 
-  // Admin view — pending requests surfaced on top, newest first.
-  const sorted = [...overtimeRequests].sort((a, b) => {
-    if (a.status === "pending" && b.status !== "pending") return -1;
-    if (a.status !== "pending" && b.status === "pending") return 1;
-    return b.createdAt.localeCompare(a.createdAt);
-  });
+  // Admin view — pending requests surfaced on top, newest first (via
+  // adminSorted/adminFiltered/adminPg computed above).
+  const now = new Date();
+  const curMonthKey = `${now.getFullYear()}-${String(
+    now.getMonth() + 1,
+  ).padStart(2, "0")}`;
+  const monthlyAll = overtimeRequests.filter(
+    (r) => (r.date || "").slice(0, 7) === curMonthKey,
+  );
+  const sumHoursAll = (arr) =>
+    arr.reduce((s, r) => s + (Number(r.hours) || 0), 0);
+  const approvedMonthlyAll = monthlyAll.filter((r) => r.status === "approved");
+  const pendingMonthlyAll = monthlyAll.filter((r) => r.status === "pending");
+  const rejectedMonthlyAll = monthlyAll.filter((r) => r.status === "rejected");
+  const hasAdminFilter =
+    otAdminTab !== "all" || otAdminDateFrom || otAdminDateTo || otAdminQuery;
+  const ADMIN_TABS = [
+    { key: "all", label: t.ot.tabAll },
+    { key: "pending", label: t.ot.statusPending },
+    { key: "approved", label: t.ot.statusApproved },
+    { key: "rejected", label: t.ot.statusRejected },
+  ];
+
   return (
     <div>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+          gap: 14,
+          marginBottom: 16,
+        }}
+      >
+        <OtStatCard
+          icon={ListChecks}
+          tint="violet"
+          label={t.ot.totalOtHours}
+          value={fmtOtHM(sumHoursAll(monthlyAll))}
+          sub={t.ot.thisMonth}
+        />
+        <OtStatCard
+          icon={CheckCircle2}
+          tint="forest"
+          label={t.ot.statusApproved}
+          value={fmtOtHM(sumHoursAll(approvedMonthlyAll))}
+          sub={t.ot.requestsCount(approvedMonthlyAll.length)}
+        />
+        <OtStatCard
+          icon={Timer}
+          tint="gold"
+          label={t.ot.statusPending}
+          value={fmtOtHM(sumHoursAll(pendingMonthlyAll))}
+          sub={t.ot.requestsCount(pendingMonthlyAll.length)}
+        />
+        <OtStatCard
+          icon={XCircle}
+          tint="rose"
+          label={t.ot.statusRejected}
+          value={fmtOtHM(sumHoursAll(rejectedMonthlyAll))}
+          sub={t.ot.requestsCount(rejectedMonthlyAll.length)}
+        />
+      </div>
+
       <OvertimePolicySettings otPolicy={otPolicy} setOtPolicy={setOtPolicy} />
+
+      <div
+        style={{
+          display: "flex",
+          gap: 4,
+          borderBottom: `1px solid ${T.lineSoft}`,
+          marginBottom: 16,
+        }}
+      >
+        {ADMIN_TABS.map((tb) => {
+          const active = otAdminTab === tb.key;
+          return (
+            <button
+              key={tb.key}
+              type="button"
+              onClick={() => setOtAdminTab(tb.key)}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: "9px 14px",
+                fontSize: 13,
+                fontWeight: active ? 600 : 500,
+                color: active ? T.forestText : T.muted,
+                borderBottom: active
+                  ? `2px solid ${T.forest}`
+                  : "2px solid transparent",
+                marginBottom: -1,
+              }}
+            >
+              {tb.label}
+            </button>
+          );
+        })}
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          flexWrap: "wrap",
+          marginBottom: 16,
+        }}
+      >
+        <DateRangePicker
+          startValue={otAdminDateFrom}
+          endValue={otAdminDateTo}
+          onChangeStart={(e) => setOtAdminDateFrom(e.target.value)}
+          onChangeEnd={(e) => setOtAdminDateTo(e.target.value)}
+          placeholder={t.selectDate}
+          compact
+          style={{ width: 200, flexShrink: 0 }}
+        />
+        <div style={{ position: "relative", flexShrink: 0 }}>
+          <Search
+            size={14}
+            style={{
+              position: "absolute",
+              left: 10,
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: T.muted,
+            }}
+          />
+          <Input
+            style={{ paddingLeft: 30, width: 220 }}
+            placeholder={t.ot.searchPlaceholderAdmin}
+            value={otAdminQuery}
+            onChange={(e) => setOtAdminQuery(e.target.value)}
+          />
+        </div>
+        {hasAdminFilter && (
+          <button
+            type="button"
+            className="wf-btn wf-btn-ghost wf-btn-sm"
+            title={t.clear}
+            onClick={() => {
+              setOtAdminTab("all");
+              setOtAdminDateFrom("");
+              setOtAdminDateTo("");
+              setOtAdminQuery("");
+            }}
+            style={{ padding: "0 10px", height: 34, flexShrink: 0 }}
+          >
+            <Filter size={14} />
+          </button>
+        )}
+        <Button
+          variant="accent"
+          onClick={() => setModal(true)}
+          style={{ marginLeft: "auto" }}
+        >
+          <Plus size={15} /> {t.ot.addBtn}
+        </Button>
+      </div>
+
       <Card style={{ overflowX: "auto" }}>
         <table className="wf-table">
           <thead>
@@ -18691,14 +18976,15 @@ function OvertimeRequests({
               <th>{t.ot.dayType}</th>
               <th>{t.ot.reason}</th>
               <th>{t.status}</th>
-              <th></th>
+              <th>{t.ot.requestedOn}</th>
+              <th style={{ textAlign: "right" }}>{t.actions}</th>
             </tr>
           </thead>
           <tbody>
-            {sorted.length === 0 && (
+            {adminPg.pageItems.length === 0 && (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={8}
                   style={{
                     textAlign: "center",
                     color: T.muted,
@@ -18709,8 +18995,9 @@ function OvertimeRequests({
                 </td>
               </tr>
             )}
-            {sorted.map((r) => {
+            {adminPg.pageItems.map((r) => {
               const emp = empOf(r.employeeId);
+              const applied = fmtAppliedOn(r.createdAt, lang);
               return (
                 <tr key={r.id}>
                   <td>
@@ -18744,7 +19031,12 @@ function OvertimeRequests({
                       </div>
                     </div>
                   </td>
-                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                  <td
+                    style={{
+                      fontFamily: "'JetBrains Mono',monospace",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
                     {r.date}
                   </td>
                   <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
@@ -18760,6 +19052,18 @@ function OvertimeRequests({
                     <StatusPill status={r.status} />
                     <OtDecisionNote r={r} admins={admins} />
                   </td>
+                  <td
+                    style={{
+                      fontSize: 11.5,
+                      color: T.textSoft,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    <div>{applied.date}</div>
+                    <div style={{ fontSize: 10.5, color: T.muted }}>
+                      {applied.time}
+                    </div>
+                  </td>
                   <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                     {r.status === "pending"
                       ? canApprove && (
@@ -18770,20 +19074,20 @@ function OvertimeRequests({
                               justifyContent: "flex-end",
                             }}
                           >
-                            <Button
-                              size="sm"
-                              variant="accent"
+                            <OtIconButton
+                              tint="violet"
+                              title={t.ot.approve}
                               onClick={() => approve(r)}
                             >
-                              <ThumbsUp size={13} /> {t.ot.approve}
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="danger"
+                              <ThumbsUp size={14} />
+                            </OtIconButton>
+                            <OtIconButton
+                              tint="rose"
+                              title={t.ot.reject}
                               onClick={() => setRejectFor(r)}
                             >
-                              <ThumbsDown size={13} /> {t.ot.reject}
-                            </Button>
+                              <ThumbsDown size={14} />
+                            </OtIconButton>
                           </div>
                         )
                       : isSuperAdmin && (
@@ -18805,6 +19109,79 @@ function OvertimeRequests({
             })}
           </tbody>
         </table>
+        {adminPg.total > 0 && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: 10,
+              padding: "12px 4px 2px",
+              fontSize: 12.5,
+              color: T.muted,
+            }}
+          >
+            <span>
+              {t.ot.showingRange(
+                adminPg.rangeStart,
+                adminPg.rangeEnd,
+                adminPg.total,
+              )}
+            </span>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <Select
+                style={{
+                  width: "auto",
+                  fontSize: 12,
+                  padding: "5px 26px 5px 10px",
+                }}
+                value={otAdminPageSize}
+                onChange={(e) => setOtAdminPageSize(Number(e.target.value))}
+              >
+                {[10, 25, 50].map((n) => (
+                  <option key={n} value={n}>
+                    {t.ot.perPage(n)}
+                  </option>
+                ))}
+              </Select>
+              {adminPg.pageCount > 1 && (
+                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => adminPg.setPage(adminPg.page - 1)}
+                    disabled={adminPg.page <= 1}
+                    style={{ opacity: adminPg.page <= 1 ? 0.4 : 1 }}
+                  >
+                    <ChevronLeft size={14} />
+                  </Button>
+                  <span
+                    style={{
+                      fontSize: 12.5,
+                      color: T.ink,
+                      padding: "0 6px",
+                      fontFamily: "'JetBrains Mono',monospace",
+                    }}
+                  >
+                    {adminPg.page} / {adminPg.pageCount}
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => adminPg.setPage(adminPg.page + 1)}
+                    disabled={adminPg.page >= adminPg.pageCount}
+                    style={{
+                      opacity: adminPg.page >= adminPg.pageCount ? 0.4 : 1,
+                    }}
+                  >
+                    <ChevronRight size={14} />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </Card>
       {rejectFor && (
         <OvertimeRejectModal
@@ -18823,6 +19200,17 @@ function OvertimeRequests({
             setConfirmDel(null);
           }}
         />
+      )}
+      {modal && (
+        <Drawer title={t.ot.drawerTitle} onClose={() => setModal(false)}>
+          <OvertimeRequestForm
+            onSave={submit}
+            onCancel={() => setModal(false)}
+            holidays={holidays}
+            otPolicy={otPolicy}
+            employees={currentEmp ? null : employees}
+          />
+        </Drawer>
       )}
     </div>
   );
