@@ -1193,6 +1193,8 @@ const LANG_RAW = {
     },
     settings: {
       title: "ការកំណត់គណនី",
+      profileTitle: "ការកំណត់ប្រវត្តិរូប",
+      profileDesc: "កែសម្រួលព័ត៌មានប្រវត្តិរូបរបស់អ្នក",
       photoLabel: "រូបភាពប្រវត្តិរូប",
       choosePhoto: "ជ្រើសរើសរូបភាព",
       nameLabel: "ឈ្មោះ",
@@ -2439,6 +2441,8 @@ const LANG_RAW = {
     },
     settings: {
       title: "Account Settings",
+      profileTitle: "Profile Settings",
+      profileDesc: "Update your profile information",
       photoLabel: "Profile Photo",
       choosePhoto: "Choose Photo",
       nameLabel: "Name",
@@ -2832,6 +2836,8 @@ const LANG_RAW = {
     },
     settings: {
       title: "账号设置",
+      profileTitle: "个人资料设置",
+      profileDesc: "更新您的个人资料信息",
       photoLabel: "个人头像",
       choosePhoto: "选择照片",
       nameLabel: "姓名",
@@ -27651,6 +27657,59 @@ function AppearanceCard() {
 // Per-device push-notification opt-in card, shared by AdminSettings and
 // MyProfile. Renders nothing when push isn't supported/configured
 // (see usePushSubscription), so it's safe to drop in unconditionally.
+// Small numbered "01 / 02 / ..." badge used to head each Settings card,
+// matching the numbered-section layout style: a tinted rounded square
+// with the index, the title, and a one-line description stacked next
+// to it. Reuses the same tint palette as OT_STAT_TINTS so it stays
+// visually consistent with icon badges used elsewhere in the app.
+function SettingsNum({ n, tint = "violet", title, desc }) {
+  const c = OT_STAT_TINTS[tint] || OT_STAT_TINTS.violet;
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 12,
+        marginBottom: 18,
+      }}
+    >
+      <div
+        style={{
+          width: 34,
+          height: 34,
+          borderRadius: 10,
+          background: c.bg,
+          color: c.fg,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontWeight: 700,
+          fontSize: 13,
+          flexShrink: 0,
+          fontFamily: "'JetBrains Mono',monospace",
+        }}
+      >
+        {n}
+      </div>
+      <div style={{ minWidth: 0 }}>
+        <h3
+          style={{
+            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontWeight: 700,
+            color: T.ink,
+            fontSize: 14.5,
+            marginBottom: 3,
+          }}
+        >
+          {title}
+        </h3>
+        <p style={{ fontSize: 11.5, color: T.muted, lineHeight: 1.4 }}>
+          {desc}
+        </p>
+      </div>
+    </div>
+  );
+}
 function PushNotificationCard({ userType, userId }) {
   const { t } = useLang();
   const {
@@ -27667,23 +27726,12 @@ function PushNotificationCard({ userType, userId }) {
 
   return (
     <Card style={{ padding: 20 }}>
-      <h3
-        style={{
-          fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
-          fontWeight: 600,
-          color: T.ink,
-          marginBottom: 4,
-          fontSize: 14,
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-        }}
-      >
-        <Bell size={16} /> {t.settings.pushTitle}
-      </h3>
-      <p style={{ fontSize: 12, color: T.muted, marginBottom: 16 }}>
-        {t.settings.pushDesc}
-      </p>
+      <SettingsNum
+        n="03"
+        tint="forest"
+        title={t.settings.pushTitle}
+        desc={t.settings.pushDesc}
+      />
       {permission === "denied" ? (
         <p
           style={{
@@ -27792,23 +27840,12 @@ function TelegramSettingsCard() {
 
   return (
     <Card style={{ padding: 20 }}>
-      <h3
-        style={{
-          fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
-          fontWeight: 600,
-          color: T.ink,
-          marginBottom: 4,
-          fontSize: 14,
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-        }}
-      >
-        <Send size={16} /> {t.settings.telegramTitle}
-      </h3>
-      <p style={{ fontSize: 12, color: T.muted, marginBottom: 16 }}>
-        {t.settings.telegramDesc}
-      </p>
+      <SettingsNum
+        n="06"
+        tint="blue"
+        title={t.settings.telegramTitle}
+        desc={t.settings.telegramDesc}
+      />
       <label
         style={{
           display: "flex",
@@ -28068,9 +28105,15 @@ function AdminSettings({
   return (
     <div
       className="wf-grid"
-      style={{ gridTemplateColumns: "repeat(auto-fit, minmax(320px,1fr))" }}
+      style={{ gridTemplateColumns: "repeat(auto-fit, minmax(270px,1fr))" }}
     >
       <Card style={{ padding: 20 }}>
+        <SettingsNum
+          n="01"
+          tint="gold"
+          title={t.settings.profileTitle || t.settings.nameLabel}
+          desc={t.settings.profileDesc || ""}
+        />
         <div
           style={{
             display: "flex",
@@ -28178,24 +28221,12 @@ function AdminSettings({
       </Card>
 
       <Card style={{ padding: 20 }}>
-        <h3
-          style={{
-            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
-            fontWeight: 600,
-            color: T.ink,
-            marginBottom: 4,
-            fontSize: 14,
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-          }}
-        >
-          {theme === "dark" ? <Moon size={16} /> : <Sun size={16} />}{" "}
-          {t.settings.appearance}
-        </h3>
-        <p style={{ fontSize: 12, color: T.muted, marginBottom: 16 }}>
-          {t.settings.appearanceDesc}
-        </p>
+        <SettingsNum
+          n="02"
+          tint="blue"
+          title={t.settings.appearance}
+          desc={t.settings.appearanceDesc}
+        />
         <div style={{ display: "flex", gap: 10 }}>
           <button
             className="wf-btn"
@@ -28230,23 +28261,12 @@ function AdminSettings({
 
       {isSuperAdmin && (
         <Card style={{ padding: 20 }}>
-          <h3
-            style={{
-              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
-              fontWeight: 600,
-              color: T.ink,
-              marginBottom: 4,
-              fontSize: 14,
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            <Building2 size={16} /> {t.settings.brandingTitle}
-          </h3>
-          <p style={{ fontSize: 12, color: T.muted, marginBottom: 16 }}>
-            {t.settings.brandingDesc}
-          </p>
+          <SettingsNum
+            n="04"
+            tint="violet"
+            title={t.settings.brandingTitle}
+            desc={t.settings.brandingDesc}
+          />
           <div
             style={{
               display: "flex",
@@ -28354,23 +28374,12 @@ function AdminSettings({
 
       {isSuperAdmin && (
         <Card style={{ padding: 20 }}>
-          <h3
-            style={{
-              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
-              fontWeight: 600,
-              color: T.ink,
-              marginBottom: 4,
-              fontSize: 14,
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            <Bell size={16} /> {t.settings.soundTitle}
-          </h3>
-          <p style={{ fontSize: 12, color: T.muted, marginBottom: 16 }}>
-            {t.settings.soundDesc}
-          </p>
+          <SettingsNum
+            n="05"
+            tint="rose"
+            title={t.settings.soundTitle}
+            desc={t.settings.soundDesc}
+          />
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {Object.keys(SOUND_PRESETS).map((id) => (
               <label
@@ -28460,28 +28469,23 @@ function AdminSettings({
         </Card>
       )}
 
-      {isSuperAdmin && <TelegramSettingsCard />}
+      {isSuperAdmin && (
+        <div style={{ gridColumn: "span 2" }}>
+          <TelegramSettingsCard />
+        </div>
+      )}
 
-      <Card style={{ padding: 20 }}>
-        <h3
-          style={{
-            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
-            fontWeight: 600,
-            color: T.ink,
-            marginBottom: 4,
-            fontSize: 14,
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-          }}
-        >
-          <Store size={16} /> {t.dash.empPortalLink}
-        </h3>
-        <p style={{ fontSize: 12, color: T.muted, marginBottom: 16 }}>
-          {t.settings.empPortalDesc}
-        </p>
-        <EmployeeLinkCard variant="inline" />
-      </Card>
+      <div style={{ gridColumn: "span 2" }}>
+        <Card style={{ padding: 20 }}>
+          <SettingsNum
+            n="07"
+            tint="gold"
+            title={t.dash.empPortalLink}
+            desc={t.settings.empPortalDesc}
+          />
+          <EmployeeLinkCard variant="inline" />
+        </Card>
+      </div>
     </div>
   );
 }
