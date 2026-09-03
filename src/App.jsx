@@ -13,6 +13,7 @@ import ExcelJS from "exceljs";
 import {
   LayoutDashboard,
   Users,
+  Check,
   UserPlus,
   Building2,
   Clock,
@@ -1203,6 +1204,11 @@ const LANG_RAW = {
       lightMode: "ពន្លឺ (Light)",
       darkMode: "ងងឹត (Dark)",
       appearanceDesc: "ប្តូររូបរាងទំព័រសម្រាប់ឧបករណ៍នេះ",
+      primaryColor: "ពណ៌ចម្បង",
+      fontSize: "ទំហំអក្សរ",
+      fontSmall: "តូច",
+      fontMedium: "មធ្យម",
+      fontLarge: "ធំ",
       saved: "បានរក្សាទុកដោយជោគជ័យ",
       saveFailed: "រក្សាទុកមិនបានសម្រេច៖",
       nameRequired: "សូមបញ្ចូលឈ្មោះ",
@@ -2451,6 +2457,11 @@ const LANG_RAW = {
       lightMode: "Light",
       darkMode: "Dark",
       appearanceDesc: "Switch the theme for this device",
+      primaryColor: "Primary Color",
+      fontSize: "Font Size",
+      fontSmall: "Small",
+      fontMedium: "Medium",
+      fontLarge: "Large",
       saved: "Saved successfully",
       saveFailed: "Save failed:",
       nameRequired: "Please enter a name",
@@ -2846,6 +2857,11 @@ const LANG_RAW = {
       lightMode: "浅色 (Light)",
       darkMode: "深色 (Dark)",
       appearanceDesc: "切换此设备的显示外观",
+      primaryColor: "主色调",
+      fontSize: "字体大小",
+      fontSmall: "小",
+      fontMedium: "中",
+      fontLarge: "大",
       saved: "保存成功",
       saveFailed: "保存失败：",
       nameRequired: "请输入姓名",
@@ -2925,6 +2941,10 @@ const ThemeContext = createContext({
   theme: "light",
   setTheme: () => {},
   toggleTheme: () => {},
+  primaryColor: "#F0A83B",
+  setPrimaryColor: () => {},
+  fontScale: "medium",
+  setFontScale: () => {},
 });
 const useTheme = () => useCtx(ThemeContext);
 
@@ -3188,7 +3208,7 @@ const T = {
   forestSoft: "var(--wf-forest-soft)",
   forestText: "var(--wf-forest-text)",
   clay: "#D9622E",
-  gold: "#F0A83B",
+  gold: "var(--wf-gold)",
   goldSoft: "var(--wf-gold-soft)",
   goldText: "var(--wf-gold-text)",
   rose: "#E5637A",
@@ -3237,6 +3257,76 @@ const PALETTE = [
   "#35D0BA",
   "#D9622E",
 ];
+// Preset swatches for the user-selectable "Primary Color" in Appearance
+// settings (mirrors the accent-color picker shown in the reference
+// design). Picking one restyles every primary button, focus ring, and
+// selected-state highlight across the app, since T.gold now resolves
+// to the --wf-gold custom property these presets write into.
+const PRIMARY_COLOR_PRESETS = [
+  { id: "violet", hex: "#6366F1" },
+  { id: "blue", hex: "#3B82F6" },
+  { id: "forest", hex: "#10B981" },
+  { id: "gold", hex: "#F0A83B" },
+  { id: "orange", hex: "#F97316" },
+  { id: "rose", hex: "#EC4899" },
+  { id: "gray", hex: "#6B7280" },
+];
+// Tiny hex color-math helpers used to derive the "soft" (tinted
+// background) and "text" (readable accent-on-light/dark) variants of
+// whatever primary color the user picks, matching the pattern of the
+// app's other hand-picked tint pairs (goldSoft/goldText etc.) without
+// needing to hand-author a soft/text pair for every possible color.
+function hexToRgb(hex) {
+  const h = hex.replace("#", "");
+  const n =
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h;
+  const int = parseInt(n, 16);
+  return { r: (int >> 16) & 255, g: (int >> 8) & 255, b: int & 255 };
+}
+function rgbToHex({ r, g, b }) {
+  const c = (v) =>
+    Math.max(0, Math.min(255, Math.round(v)))
+      .toString(16)
+      .padStart(2, "0");
+  return `#${c(r)}${c(g)}${c(b)}`;
+}
+function mixHex(hexA, hexB, weightB) {
+  const a = hexToRgb(hexA);
+  const b = hexToRgb(hexB);
+  return rgbToHex({
+    r: a.r + (b.r - a.r) * weightB,
+    g: a.g + (b.g - a.g) * weightB,
+    b: a.b + (b.b - a.b) * weightB,
+  });
+}
+// Given a base accent hex, derive the four CSS custom property values
+// (light soft/text, dark soft/text) that pair with it.
+function derivePrimaryTints(hex) {
+  return {
+    lightSoft: mixHex(hex, "#FFFFFF", 0.86),
+    lightText: mixHex(hex, "#000000", 0.32),
+    darkSoft: mixHex(hex, "#000000", 0.78),
+    darkText: mixHex(hex, "#FFFFFF", 0.22),
+  };
+}
+// Picks readable button-label text (near-black or near-white) for a given
+// accent background, using the standard relative-luminance formula. Used so
+// solid gold/accent buttons stay legible no matter which Primary Color the
+// user picks (a pale color needs dark text; a deep color needs light text).
+function contrastTextFor(hex) {
+  const { r, g, b } = hexToRgb(hex);
+  const lin = (c) => {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  };
+  const luminance = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  return luminance > 0.45 ? "#1A1300" : "#FFFFFF";
+}
 // Legacy single admin password — kept only as a fallback reference; login now
 // checks against the ADMINS list below, which supports multiple accounts
 // with different permission levels.
@@ -3559,6 +3649,7 @@ const CSS = `
 *,*::before,*::after{box-sizing:border-box;}
 html,body,#root{height:100%;}
 :root{
+  --wf-gold:#F0A83B;
   --wf-ink:#10141C; --wf-ink-dark:#050810; --wf-paper:#F3F4F7; --wf-card:#FFFFFF;
   --wf-forest-soft:#E4F5EC; --wf-forest-text:#127449; --wf-gold-soft:#FCF0DC; --wf-gold-text:#9A6212;
   --wf-rose-dark:#B23752; --wf-rose-soft:#FBEAEE; --wf-line:#E2E5EB; --wf-line-soft:#EAECF1;
@@ -3569,7 +3660,7 @@ html,body,#root{height:100%;}
 }
 .wf-dark{
   --wf-ink:#EEF1F6; --wf-ink-dark:#AEB6C7; --wf-paper:#080B12; --wf-card:#0E121B;
-  --wf-forest-soft:#0E2A20; --wf-forest-text:#3FD996; --wf-gold-soft:#2E2211; --wf-gold-text:#F5BE5F;
+  --wf-forest-soft:#0E2A20; --wf-forest-text:#3FD996;
   --wf-rose-dark:#F0879B; --wf-rose-soft:#2C151B; --wf-line:#1C2230; --wf-line-soft:#161B27;
   --wf-muted:#717A90; --wf-muted-light:#414A5E; --wf-text-soft:#B9C0D2;
   --wf-input-border:#1F2634; --wf-input-bg:#0B0F17; --wf-field-label:#8791A8;
@@ -3638,10 +3729,10 @@ html,body,#root{height:100%;}
 .wf-btn:active:not(:disabled){transform:scale(.97);}
 .wf-btn:disabled{opacity:.5;cursor:not-allowed;}
 .wf-btn-sm{padding:6px 10px;font-size:12px;}
-.wf-btn-primary{background:${T.gold};color:#1A1300;box-shadow:0 1px 2px rgba(240,168,59,0.25);}
-.wf-btn-primary:hover:not(:disabled){background:#D89430;}
-.wf-btn-accent{position:relative;overflow:hidden;background:linear-gradient(135deg,#4F6EF7,#8B5CF6);color:#fff;box-shadow:0 3px 12px rgba(124,92,240,0.35);}
-.wf-btn-accent:hover:not(:disabled){box-shadow:0 5px 18px rgba(124,92,240,0.48);filter:brightness(1.06);}
+.wf-btn-primary{background:${T.gold};color:var(--wf-gold-fg,#1A1300);box-shadow:0 1px 2px rgba(0,0,0,0.15);}
+.wf-btn-primary:hover:not(:disabled){filter:brightness(.92);}
+.wf-btn-accent{position:relative;overflow:hidden;background:${T.gold};color:var(--wf-gold-fg,#1A1300);box-shadow:0 3px 12px rgba(0,0,0,0.18);}
+.wf-btn-accent:hover:not(:disabled){box-shadow:0 5px 18px rgba(0,0,0,0.24);filter:brightness(1.06);}
 .wf-btn-accent::after{content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;background:linear-gradient(115deg,transparent,rgba(255,255,255,0.4),transparent);transform:skewX(-20deg);animation:wf-btn-shine 3.4s ease-in-out infinite;pointer-events:none;}
 .wf-btn-premium{position:relative;overflow:hidden;background:linear-gradient(135deg,#4F6EF7,#8B5CF6);color:#fff;box-shadow:0 3px 12px rgba(124,92,240,0.35);}
 .wf-btn-premium:hover:not(:disabled){box-shadow:0 5px 18px rgba(124,92,240,0.48);filter:brightness(1.06);}
@@ -27601,7 +27692,14 @@ function MyProfile({
 
 function AppearanceCard() {
   const { t } = useLang();
-  const { theme, setTheme } = useTheme();
+  const {
+    theme,
+    setTheme,
+    primaryColor,
+    setPrimaryColor,
+    fontScale,
+    setFontScale,
+  } = useTheme();
   return (
     <Card style={{ padding: 20 }}>
       <h3
@@ -27649,6 +27747,90 @@ function AppearanceCard() {
         >
           <Moon size={14} /> {t.settings.darkMode}
         </button>
+      </div>
+
+      <div style={{ marginTop: 18 }}>
+        <div
+          style={{
+            fontSize: 11.5,
+            fontWeight: 600,
+            color: T.muted,
+            marginBottom: 8,
+            textTransform: "uppercase",
+            letterSpacing: ".03em",
+          }}
+        >
+          {t.settings.primaryColor}
+        </div>
+        <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
+          {PRIMARY_COLOR_PRESETS.map((p) => {
+            const active =
+              p.hex.toLowerCase() === (primaryColor || "").toLowerCase();
+            return (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => setPrimaryColor(p.hex)}
+                aria-label={p.id}
+                style={{
+                  width: 26,
+                  height: 26,
+                  borderRadius: "50%",
+                  background: p.hex,
+                  border: active ? `2px solid ${T.ink}` : `2px solid transparent`,
+                  boxShadow: active ? `0 0 0 2px ${T.card}` : "none",
+                  cursor: "pointer",
+                  outline: active ? `1px solid ${T.ink}` : "none",
+                  outlineOffset: active ? 2 : 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 0,
+                }}
+              >
+                {active && <Check size={13} color="#fff" strokeWidth={3} />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div style={{ marginTop: 18 }}>
+        <div
+          style={{
+            fontSize: 11.5,
+            fontWeight: 600,
+            color: T.muted,
+            marginBottom: 8,
+            textTransform: "uppercase",
+            letterSpacing: ".03em",
+          }}
+        >
+          {t.settings.fontSize}
+        </div>
+        <div style={{ display: "flex", gap: 10 }}>
+          {[
+            { id: "small", label: t.settings.fontSmall },
+            { id: "medium", label: t.settings.fontMedium },
+            { id: "large", label: t.settings.fontLarge },
+          ].map((opt) => (
+            <button
+              key={opt.id}
+              type="button"
+              className="wf-btn"
+              onClick={() => setFontScale(opt.id)}
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                background: fontScale === opt.id ? T.goldSoft : "transparent",
+                color: fontScale === opt.id ? T.gold : T.ink,
+                border: `1px solid ${fontScale === opt.id ? T.gold : T.line}`,
+              }}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
     </Card>
   );
@@ -28004,7 +28186,14 @@ function AdminSettings({
   setSoundPolicy,
 }) {
   const { t, lang } = useLang();
-  const { theme, setTheme } = useTheme();
+  const {
+    theme,
+    setTheme,
+    primaryColor,
+    setPrimaryColor,
+    fontScale,
+    setFontScale,
+  } = useTheme();
   const { branding, setBranding } = useBranding();
   const [f, setF] = useState({ name: currentAdmin.name || "" });
   const [nameError, setNameError] = useState("");
@@ -28254,6 +28443,92 @@ function AdminSettings({
           >
             <Moon size={14} /> {t.settings.darkMode}
           </button>
+        </div>
+
+        <div style={{ marginTop: 18 }}>
+          <div
+            style={{
+              fontSize: 11.5,
+              fontWeight: 600,
+              color: T.muted,
+              marginBottom: 8,
+              textTransform: "uppercase",
+              letterSpacing: ".03em",
+            }}
+          >
+            {t.settings.primaryColor}
+          </div>
+          <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
+            {PRIMARY_COLOR_PRESETS.map((p) => {
+              const active =
+                p.hex.toLowerCase() === (primaryColor || "").toLowerCase();
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setPrimaryColor(p.hex)}
+                  aria-label={p.id}
+                  style={{
+                    width: 26,
+                    height: 26,
+                    borderRadius: "50%",
+                    background: p.hex,
+                    border: active
+                      ? `2px solid ${T.ink}`
+                      : `2px solid transparent`,
+                    boxShadow: active ? `0 0 0 2px ${T.card}` : "none",
+                    cursor: "pointer",
+                    outline: active ? `1px solid ${T.ink}` : "none",
+                    outlineOffset: active ? 2 : 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: 0,
+                  }}
+                >
+                  {active && <Check size={13} color="#fff" strokeWidth={3} />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={{ marginTop: 18 }}>
+          <div
+            style={{
+              fontSize: 11.5,
+              fontWeight: 600,
+              color: T.muted,
+              marginBottom: 8,
+              textTransform: "uppercase",
+              letterSpacing: ".03em",
+            }}
+          >
+            {t.settings.fontSize}
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            {[
+              { id: "small", label: t.settings.fontSmall },
+              { id: "medium", label: t.settings.fontMedium },
+              { id: "large", label: t.settings.fontLarge },
+            ].map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                className="wf-btn"
+                onClick={() => setFontScale(opt.id)}
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  background: fontScale === opt.id ? T.goldSoft : "transparent",
+                  color: fontScale === opt.id ? T.gold : T.ink,
+                  border: `1px solid ${fontScale === opt.id ? T.gold : T.line}`,
+                }}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </div>
       </Card>
 
@@ -34512,6 +34787,14 @@ export default function App() {
   const t = LANG[lang] || LANG.km;
   const [theme, setTheme] = useLocalStorage("hrsuite:theme", "light");
   const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
+  const [primaryColor, setPrimaryColor] = useLocalStorage(
+    "hrsuite:primaryColor",
+    "#F0A83B",
+  );
+  const [fontScale, setFontScale] = useLocalStorage(
+    "hrsuite:fontScale",
+    "medium",
+  );
   // Keep a matching "wf-dark" class on <body>, not just on .wf-root, so
   // that content portaled straight to document.body (Modal/Drawer, which
   // must escape .wf-root to avoid being clipped/mispositioned by any
@@ -34521,9 +34804,50 @@ export default function App() {
   useEffect(() => {
     document.body.classList.toggle("wf-dark", theme === "dark");
   }, [theme]);
+  // Primary color: writing the four derived CSS custom properties onto
+  // document.documentElement (not just .wf-root) so portaled content
+  // (Modal/Drawer on document.body) also picks up the chosen accent,
+  // same reasoning as the wf-dark class above. --wf-gold is what T.gold
+  // resolves to, so every primary button, focus ring, and selected-date
+  // highlight repaints automatically — no per-usage changes needed.
+  useEffect(() => {
+    const tints = derivePrimaryTints(primaryColor);
+    const root = document.documentElement.style;
+    root.setProperty("--wf-gold", primaryColor);
+    root.setProperty(
+      "--wf-gold-soft",
+      theme === "dark" ? tints.darkSoft : tints.lightSoft,
+    );
+    root.setProperty(
+      "--wf-gold-text",
+      theme === "dark" ? tints.darkText : tints.lightText,
+    );
+    // Label color for solid gold/accent buttons — recomputed per color so
+    // text stays readable whether the picked accent is pale or deep.
+    root.setProperty("--wf-gold-fg", contrastTextFor(primaryColor));
+  }, [primaryColor, theme]);
+  // Font size: the app's type scale is hand-tuned in fixed px values
+  // throughout (not rem-based), so there's no single CSS variable that
+  // could cascade a size change everywhere. Zoom gives the same effect
+  // as the browser's own zoom (scales layout, not just glyphs) without
+  // requiring that rem-wide rewrite.
+  useEffect(() => {
+    const zoom = { small: "0.92", medium: "1", large: "1.1" }[fontScale] || "1";
+    document.documentElement.style.zoom = zoom;
+  }, [fontScale]);
   return (
     <LangContext.Provider value={{ lang, t, setLang }}>
-      <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
+      <ThemeContext.Provider
+        value={{
+          theme,
+          setTheme,
+          toggleTheme,
+          primaryColor,
+          setPrimaryColor,
+          fontScale,
+          setFontScale,
+        }}
+      >
         <AppInner />
         <ToastHost />
       </ThemeContext.Provider>
