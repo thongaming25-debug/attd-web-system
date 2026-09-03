@@ -13,6 +13,7 @@ import ExcelJS from "exceljs";
 import {
   LayoutDashboard,
   Users,
+  UserPlus,
   Building2,
   Clock,
   Wallet,
@@ -228,6 +229,31 @@ const LANG_RAW = {
       noOneWorkingNow: "មិនទាន់មានបុគ្គលិកចូលធ្វើការនៅឡើយទេ",
       unassignedBranch: "មិនកំណត់សាខា",
       sinceLabel: "តាំងពី",
+      welcomeBack: (name) =>
+        `សូមស្វាគមន៍មកវិញ ${name}! នេះជាព័ត៌មានថ្មីៗរបស់ស្ថាប័នអ្នក។`,
+      onLeave: "កំពុងឈប់សម្រាក",
+      ofTotal: "នៃចំនួនសរុប",
+      attendanceOverview: "ទិដ្ឋភាពទូទៅវត្តមាន",
+      attendRateSeries: "អត្រាមកធ្វើការ (%)",
+      absentRateSeries: "អត្រាអវត្តមាន (%)",
+      last6MonthsLabel: "៦ ខែចុងក្រោយ",
+      attendanceByDept: "វត្តមានតាមនាយកដ្ឋាន",
+      totalLabel: "សរុប",
+      otherDept: "ផ្សេងៗ",
+      quickActions: "សកម្មភាពរហ័ស",
+      quickAddEmployee: "បន្ថែមបុគ្គលិកថ្មី",
+      quickRequestLeave: "ស្នើសុំច្បាប់ឈប់សម្រាក",
+      quickAttCorrection: "កែតម្រូវវត្តមាន",
+      quickGeneratePayroll: "គណនាប្រាក់ខែ",
+      recentAnnouncements: "សេចក្តីប្រកាសថ្មីៗ",
+      viewAll: "មើលទាំងអស់",
+      noAnnouncements: "មិនទាន់មានសេចក្តីប្រកាសទេ",
+      leaveRequestsTitle: "សំណើសុំច្បាប់ឈប់សម្រាក",
+      noLeaveRequestsRecent: "មិនទាន់មានសំណើឈប់សម្រាកទេ",
+      recentlyJoined: "បុគ្គលិកចូលថ្មីៗ",
+      noRecentHires: "មិនទាន់មានបុគ្គលិកចូលថ្មីទេ",
+      payrollSummaryTitle: "សេចក្តីសង្ខេបប្រាក់ខែ",
+      viewPayrollBtn: "មើលប្រាក់ខែ",
     },
     analytics: {
       title: "វិភាគទិន្នន័យ",
@@ -1445,6 +1471,31 @@ const LANG_RAW = {
       noOneWorkingNow: "No one is checked in yet",
       unassignedBranch: "Unassigned branch",
       sinceLabel: "Since",
+      welcomeBack: (name) =>
+        `Welcome back, ${name}! Here's what's happening in your organization.`,
+      onLeave: "On Leave",
+      ofTotal: "of total",
+      attendanceOverview: "Attendance Overview",
+      attendRateSeries: "Attendance Rate (%)",
+      absentRateSeries: "Absent Rate (%)",
+      last6MonthsLabel: "Last 6 months",
+      attendanceByDept: "Attendance by Department",
+      totalLabel: "Total",
+      otherDept: "Others",
+      quickActions: "Quick Actions",
+      quickAddEmployee: "Add New Employee",
+      quickRequestLeave: "Request Leave",
+      quickAttCorrection: "Attendance Correction",
+      quickGeneratePayroll: "Generate Payroll",
+      recentAnnouncements: "Recent Announcements",
+      viewAll: "View All",
+      noAnnouncements: "No announcements yet",
+      leaveRequestsTitle: "Leave Requests",
+      noLeaveRequestsRecent: "No leave requests yet",
+      recentlyJoined: "Recently Joined",
+      noRecentHires: "No new hires yet",
+      payrollSummaryTitle: "Payroll Summary",
+      viewPayrollBtn: "View Payroll",
     },
     analytics: {
       title: "Analytics",
@@ -8858,6 +8909,250 @@ function EmployeeLinkCard({ variant = "card" }) {
   );
 }
 
+// Two-series line chart (e.g. attendance vs absent rate) drawn as plain
+// SVG polylines over a 0–100 y-axis, with a hover tooltip that snaps to
+// the nearest month. No chart library needed — consistent with
+// MiniBarChart/HorizontalBarChart elsewhere in this file.
+function DashLineChart({ labels, seriesA, seriesB, height = 220 }) {
+  const [hover, setHover] = useState(null);
+  const W = 640;
+  const padL = 34,
+    padR = 12,
+    padT = 16,
+    padB = 24;
+  const innerW = W - padL - padR;
+  const innerH = height - padT - padB;
+  const n = labels.length;
+  const xAt = (i) => padL + (n <= 1 ? innerW / 2 : (innerW * i) / (n - 1));
+  const yAt = (v) =>
+    padT + innerH - (Math.max(0, Math.min(100, v)) / 100) * innerH;
+  const pathOf = (vals) =>
+    vals.map((v, i) => `${i === 0 ? "M" : "L"}${xAt(i)},${yAt(v)}`).join(" ");
+  const ticks = [0, 25, 50, 75, 100];
+  return (
+    <div style={{ position: "relative" }}>
+      <svg
+        viewBox={`0 0 ${W} ${height}`}
+        style={{ width: "100%", height, display: "block" }}
+        onMouseLeave={() => setHover(null)}
+      >
+        {ticks.map((tv) => (
+          <line
+            key={tv}
+            x1={padL}
+            x2={W - padR}
+            y1={yAt(tv)}
+            y2={yAt(tv)}
+            stroke={T.lineSoft}
+            strokeWidth={1}
+          />
+        ))}
+        <path
+          d={pathOf(seriesA.values)}
+          fill="none"
+          stroke={seriesA.color}
+          strokeWidth={2.4}
+        />
+        <path
+          d={pathOf(seriesB.values)}
+          fill="none"
+          stroke={seriesB.color}
+          strokeWidth={2.4}
+        />
+        {labels.map((lb, i) => (
+          <rect
+            key={i}
+            x={xAt(i) - innerW / n / 2}
+            y={padT}
+            width={innerW / n}
+            height={innerH}
+            fill="transparent"
+            onMouseEnter={() => setHover(i)}
+          />
+        ))}
+        {hover != null && (
+          <>
+            <line
+              x1={xAt(hover)}
+              x2={xAt(hover)}
+              y1={padT}
+              y2={padT + innerH}
+              stroke={T.lineSoft}
+              strokeDasharray="3,3"
+            />
+            <circle
+              cx={xAt(hover)}
+              cy={yAt(seriesA.values[hover])}
+              r={4}
+              fill={seriesA.color}
+            />
+            <circle
+              cx={xAt(hover)}
+              cy={yAt(seriesB.values[hover])}
+              r={4}
+              fill={seriesB.color}
+            />
+          </>
+        )}
+      </svg>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          fontSize: 10.5,
+          color: T.muted,
+          padding: "0 2px",
+        }}
+      >
+        {labels.map((lb, i) => (
+          <span key={i}>{lb}</span>
+        ))}
+      </div>
+      {hover != null && (
+        <div
+          style={{
+            position: "absolute",
+            left: `${(xAt(hover) / W) * 100}%`,
+            top: 4,
+            transform: `translateX(${hover < n / 2 ? "6px" : "calc(-100% - 6px)"})`,
+            background: T.card,
+            border: `1px solid ${T.lineSoft}`,
+            borderRadius: 10,
+            padding: "8px 12px",
+            boxShadow: "0 8px 20px -10px rgba(5,8,16,0.25)",
+            fontSize: 11.5,
+            pointerEvents: "none",
+            whiteSpace: "nowrap",
+          }}
+        >
+          <div style={{ fontWeight: 600, color: T.ink, marginBottom: 4 }}>
+            {labels[hover]}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              color: T.textSoft,
+            }}
+          >
+            <span
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: 999,
+                background: seriesA.color,
+                display: "inline-block",
+              }}
+            />
+            {seriesA.name}{" "}
+            <strong style={{ color: T.ink }}>{seriesA.values[hover]}%</strong>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              color: T.textSoft,
+            }}
+          >
+            <span
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: 999,
+                background: seriesB.color,
+                display: "inline-block",
+              }}
+            />
+            {seriesB.name}{" "}
+            <strong style={{ color: T.ink }}>{seriesB.values[hover]}%</strong>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+// Headcount-by-department donut, drawn with a CSS conic-gradient (no SVG
+// arc math needed) plus a plain legend list beside it.
+function DashDonut({
+  data,
+  size = 150,
+  thickness = 26,
+  centerValue,
+  centerLabel,
+}) {
+  const total = data.reduce((s, d) => s + d.value, 0) || 1;
+  let acc = 0;
+  const stops = data
+    .map((d) => {
+      const from = (acc / total) * 360;
+      acc += d.value;
+      const to = (acc / total) * 360;
+      return `${d.color} ${from}deg ${to}deg`;
+    })
+    .join(", ");
+  return (
+    <div
+      style={{
+        width: size,
+        height: size,
+        borderRadius: "50%",
+        background: `conic-gradient(${stops})`,
+        position: "relative",
+        flexShrink: 0,
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          inset: thickness,
+          borderRadius: "50%",
+          background: T.card,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div style={{ fontSize: 20, fontWeight: 700, color: T.ink }}>
+          {centerValue}
+        </div>
+        {centerLabel && (
+          <div style={{ fontSize: 10.5, color: T.muted }}>{centerLabel}</div>
+        )}
+      </div>
+    </div>
+  );
+}
+function DashQuickAction({ icon: Icon, tint, label, onClick }) {
+  const c = OT_STAT_TINTS[tint] || OT_STAT_TINTS.violet;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        width: "100%",
+        border: "none",
+        borderRadius: 10,
+        padding: "11px 12px",
+        background: c.bg,
+        color: c.fg,
+        fontSize: 12.5,
+        fontWeight: 600,
+        cursor: "pointer",
+        textAlign: "left",
+        marginBottom: 8,
+      }}
+    >
+      <Icon size={16} />
+      {label}
+    </button>
+  );
+}
 function Dashboard({
   employees,
   departments,
@@ -8866,12 +9161,18 @@ function Dashboard({
   payrollPaid,
   role,
   currentEmp,
+  currentAdmin,
   shifts,
   offices,
   soundPreset,
   showSelfPunch,
   setPage,
   moduleEnabled,
+  leaveRequests,
+  announcements,
+  overtimeRequests,
+  otPolicy,
+  payrollPolicy,
 }) {
   const { t, lang } = useLang();
   const { theme } = useTheme();
@@ -8920,6 +9221,101 @@ function Dashboard({
   const rate = activeEmployees.length
     ? Math.round((presentToday / activeEmployees.length) * 100)
     : 0;
+
+  // ---- Admin-only derived data for the redesigned dashboard below ----
+  const onLeaveToday =
+    role === "admin"
+      ? leaveRequests.filter(
+          (r) =>
+            r.status === "approved" &&
+            r.startDate <= today &&
+            today <= r.endDate,
+        ).length
+      : 0;
+  const onLeaveRate = activeEmployees.length
+    ? Math.round((onLeaveToday / activeEmployees.length) * 100)
+    : 0;
+  const payrollRows =
+    role === "admin"
+      ? activeEmployees.map((e) => ({
+          emp: e,
+          paid: !!payrollPaid[`${e.id}-${mk}`],
+          ...computePayroll(
+            e,
+            attendance,
+            mk,
+            overtimeRequests || [],
+            otPolicy,
+            payrollPolicy,
+          ),
+        }))
+      : [];
+  const totalNetPayroll = payrollRows.reduce((s, r) => s + r.net, 0);
+  const paidNetPayroll = payrollRows
+    .filter((r) => r.paid)
+    .reduce((s, r) => s + r.net, 0);
+  const pendingRows = payrollRows.filter((r) => !r.paid);
+  const pendingNetPayroll = pendingRows.reduce((s, r) => s + r.net, 0);
+  const totalOtCost = payrollRows.reduce((s, r) => s + r.otPay, 0);
+
+  const deptCounts = departments
+    .map((d) => ({
+      label: d.name,
+      value: activeEmployees.filter((e) => e.deptId === d.id).length,
+    }))
+    .filter((d) => d.value > 0)
+    .sort((a, b) => b.value - a.value);
+  const DONUT_COLORS = PALETTE;
+  let deptDonutData = deptCounts
+    .slice(0, 6)
+    .map((d, i) => ({ ...d, color: DONUT_COLORS[i % DONUT_COLORS.length] }));
+  if (deptCounts.length > 6) {
+    const othersValue = deptCounts.slice(6).reduce((s, d) => s + d.value, 0);
+    deptDonutData.push({
+      label: t.dash.otherDept,
+      value: othersValue,
+      color: T.mutedLight,
+    });
+  }
+
+  const trendMonths = role === "admin" ? lastMonthKeys(6) : [];
+  const attendanceTrend6 = trendMonths.map((mkm) => {
+    const recs = attendance.filter((a) => a.date && a.date.startsWith(mkm));
+    const present = recs.filter(
+      (a) => a.status === "present" || a.status === "late",
+    ).length;
+    const absent = recs.filter((a) => a.status === "absent").length;
+    return {
+      label: shortMonthLabel(mkm, lang),
+      attendRate: recs.length ? Math.round((present / recs.length) * 100) : 0,
+      absentRate: recs.length ? Math.round((absent / recs.length) * 100) : 0,
+    };
+  });
+
+  const recentAnnouncements =
+    role === "admin"
+      ? [...(announcements || [])]
+          .sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""))
+          .slice(0, 3)
+      : [];
+  const recentLeaveRequests =
+    role === "admin"
+      ? [...(leaveRequests || [])]
+          .sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""))
+          .slice(0, 4)
+      : [];
+  const recentlyJoined =
+    role === "admin"
+      ? [...employees]
+          .filter((e) => e.joined)
+          .sort((a, b) => (b.joined || "").localeCompare(a.joined || ""))
+          .slice(0, 4)
+      : [];
+  const LEAVE_TYPE_LABEL2 = getLeaveTypeLabel(lang);
+  const hiresThisMonth =
+    role === "admin"
+      ? employees.filter((e) => (e.joined || "").startsWith(mk)).length
+      : 0;
 
   // Employees only ever see their own data on the dashboard — never
   // company-wide totals, which are admin/manager-only.
@@ -9014,368 +9410,1195 @@ function Dashboard({
 
   return (
     <div>
-      <Card
-        style={{
-          padding: 20,
-          marginBottom: 22,
-          background: BRAND.ink,
-          color: "#fff",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <p style={{ color: "#A9B4C7", fontSize: 13 }}>{t.dash.welcome}</p>
-        <h2
+      {role === "admin" ? (
+        <div
           style={{
-            fontFamily:
-              role === "admin"
-                ? "'Sora','Noto Sans Khmer',sans-serif"
-                : "'Poppins','Noto Sans Khmer',sans-serif",
-            fontSize: 24,
-            fontWeight: role === "admin" ? 600 : 700,
-            marginTop: 2,
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 12,
+            marginBottom: 20,
           }}
         >
-          {role === "admin" ? t.nav.admins : currentEmp?.name}
-        </h2>
-        <p
-          style={{
-            color: "#A9B4C7",
-            fontSize: 12,
-            marginTop: 6,
-            fontFamily:
-              role === "admin"
-                ? "'JetBrains Mono',monospace"
-                : "'Poppins','Noto Sans Khmer',sans-serif",
-          }}
-        >
-          {new Date().toLocaleDateString(lang === "en" ? "en-US" : "km-KH", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
-        </p>
-      </Card>
-
-      {/* Punch button lives here (not only on the Attendance page) so the
-         single action employees do twice a day — clock in/out — is one
-         tap from the home screen instead of two (open app → Dashboard →
-         tap "Attendance" tab → then find the button). Admin never sees
-         this; `showSelfPunch` also lets a company that disabled the
-         "attendance" module hide it here too. */}
-      {role !== "admin" && currentEmp && showSelfPunch && (
-        <SelfPunch
-          emp={currentEmp}
-          shift={myShift}
-          attendance={attendance}
-          setAttendance={setAttendance}
-          offices={offices}
-          soundPreset={soundPreset}
-        />
-      )}
-
-      <div className="wf-dash-stats" style={{ marginBottom: 22 }}>
-        {stats.map((s) => {
-          // Both admin and employee dashboards share the same softer
-          // pastel card style for visual consistency.
-          const accentKey =
-            s.accent === T.forest
-              ? "forest"
-              : s.accent === T.blue
-                ? "blue"
-                : s.accent === T.gold
-                  ? "gold"
-                  : "rose";
-          const pastel =
-            EMP_PASTEL[theme === "dark" ? "dark" : "light"][accentKey];
-          const canLink =
-            s.linkTo &&
-            typeof setPage === "function" &&
-            (typeof moduleEnabled !== "function" ||
-              moduleEnabled(s.linkTo) !== false);
-          const clickProps = canLink
-            ? {
-                role: "button",
-                tabIndex: 0,
-                onClick: () => setPage(s.linkTo),
-                onKeyDown: (e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setPage(s.linkTo);
-                  }
-                },
-              }
-            : {};
-          return (
-            <div
-              key={s.label}
-              className={`wf-stat-pastel ${canLink ? "wf-stat-pastel-clickable" : ""}`}
-              style={{ background: pastel.bg }}
-              {...clickProps}
+          <div>
+            <h2
+              style={{
+                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                fontWeight: 700,
+                fontSize: 24,
+                color: T.ink,
+                marginBottom: 4,
+              }}
             >
-              {canLink && (
-                <span className="wf-stat-pastel-chevron">
-                  <ChevronRight size={13} color={pastel.text} />
-                </span>
+              {t.nav.dashboard}
+            </h2>
+            <p style={{ fontSize: 13, color: T.textSoft }}>
+              {t.dash.welcomeBack(
+                currentAdmin?.name || currentAdmin?.username || "",
               )}
-              <s.icon
-                className="wf-stat-pastel-icon"
-                size={46}
-                color={pastel.icon}
-                strokeWidth={1.6}
-              />
-              <div
-                className="wf-stat-pastel-title"
-                style={{ color: pastel.text }}
-              >
-                {s.value}
-              </div>
-              <div
-                className="wf-stat-pastel-label"
-                style={{ color: pastel.text, opacity: 0.85 }}
-              >
-                {s.label}
-              </div>
-              {s.sub && (
-                <div
-                  className="wf-stat-pastel-sub"
-                  style={{ color: pastel.text }}
-                >
-                  {s.sub}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {role === "admin" && offices && offices.length > 0 && (
-        <Card style={{ padding: 18, marginBottom: 22 }}>
+            </p>
+          </div>
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: 12,
+              gap: 8,
+              border: `1px solid ${T.lineSoft}`,
+              borderRadius: 10,
+              padding: "9px 14px",
+              fontSize: 12.5,
+              color: T.ink,
+              fontFamily: "'JetBrains Mono',monospace",
+              background: T.card,
             }}
           >
+            <CalendarDays size={14} color={T.muted} />
+            {new Date().toLocaleDateString(lang === "en" ? "en-US" : "km-KH", {
+              weekday: "short",
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })}
+          </div>
+        </div>
+      ) : (
+        <Card
+          style={{
+            padding: 20,
+            marginBottom: 22,
+            background: BRAND.ink,
+            color: "#fff",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          <p style={{ color: "#A9B4C7", fontSize: 13 }}>{t.dash.welcome}</p>
+          <h2
+            style={{
+              fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
+              fontSize: 24,
+              fontWeight: 700,
+              marginTop: 2,
+            }}
+          >
+            {currentEmp?.name}
+          </h2>
+          <p
+            style={{
+              color: "#A9B4C7",
+              fontSize: 12,
+              marginTop: 6,
+              fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
+            }}
+          >
+            {new Date().toLocaleDateString(lang === "en" ? "en-US" : "km-KH", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
+        </Card>
+      )}
+
+      {role === "admin" ? (
+        <>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+              gap: 14,
+              marginBottom: 22,
+            }}
+          >
+            <div
+              role={setPage ? "button" : undefined}
+              tabIndex={setPage ? 0 : undefined}
+              onClick={() => setPage && setPage("employees")}
+              style={{
+                borderRadius: 14,
+                padding: "20px 18px",
+                minHeight: 132,
+                background: `linear-gradient(135deg, ${T.blue}, #4C63D2)`,
+                color: "#fff",
+                cursor: setPage ? "pointer" : "default",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}
+            >
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 10,
+                  background: "rgba(255,255,255,0.2)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Users size={20} color="#fff" />
+              </div>
+              <div>
+                <div style={{ fontSize: 12.5, opacity: 0.9 }}>
+                  {t.dash.totalEmp}
+                </div>
+                <div style={{ fontSize: 26, fontWeight: 700, marginTop: 2 }}>
+                  {employees.length}
+                </div>
+                <div style={{ fontSize: 11, opacity: 0.85, marginTop: 2 }}>
+                  +{hiresThisMonth} {t.dash.thisMonth}
+                </div>
+              </div>
+            </div>
+            {[
+              {
+                key: "dept",
+                icon: Building2,
+                tint: "blue",
+                label: t.nav.departments,
+                value: departments.length,
+                sub: t.dash.totalDeptSub,
+                linkTo: "departments",
+              },
+              {
+                key: "present",
+                icon: CheckCircle2,
+                tint: "forest",
+                label: t.dash.presentToday,
+                value: presentToday,
+                sub: `${rate}% ${t.dash.attendRate}`,
+                linkTo: "attendance",
+              },
+              {
+                key: "leave",
+                icon: CalendarDays,
+                tint: "gold",
+                label: t.dash.onLeave,
+                value: onLeaveToday,
+                sub: `${onLeaveRate}% ${t.dash.ofTotal}`,
+                linkTo: "leave",
+              },
+              {
+                key: "payroll",
+                icon: Wallet,
+                tint: "rose",
+                label: t.dash.pendingPayroll,
+                value: fmtMoney(pendingNetPayroll),
+                sub: `${pendingRows.length} ${STATUS_MAP.pending.label}`,
+                linkTo: "payroll",
+              },
+            ].map((s) => (
+              <div
+                key={s.key}
+                role={setPage ? "button" : undefined}
+                tabIndex={setPage ? 0 : undefined}
+                onClick={() => setPage && setPage(s.linkTo)}
+                style={{
+                  borderRadius: 14,
+                  padding: "20px 18px",
+                  minHeight: 132,
+                  background: T.card,
+                  border: `1px solid ${T.lineSoft}`,
+                  cursor: setPage ? "pointer" : "default",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 10,
+                    background: OT_STAT_TINTS[s.tint].bg,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <s.icon size={20} color={OT_STAT_TINTS[s.tint].fg} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 12.5, color: T.textSoft }}>
+                    {s.label}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 26,
+                      fontWeight: 700,
+                      color: T.ink,
+                      marginTop: 2,
+                    }}
+                  >
+                    {s.value}
+                  </div>
+                  <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>
+                    {s.sub}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1.5fr 1.1fr 0.9fr",
+              gap: 16,
+              marginBottom: 22,
+            }}
+            className="wf-dash-charts-row"
+          >
+            <Card style={{ padding: 18 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: 8,
+                }}
+              >
+                <h3
+                  style={{
+                    fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                    fontWeight: 600,
+                    color: T.ink,
+                    fontSize: 14,
+                  }}
+                >
+                  {t.dash.attendanceOverview}
+                </h3>
+                <span
+                  style={{
+                    fontSize: 11,
+                    color: T.muted,
+                    border: `1px solid ${T.lineSoft}`,
+                    borderRadius: 8,
+                    padding: "4px 10px",
+                  }}
+                >
+                  {t.dash.last6MonthsLabel}
+                </span>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 14,
+                  fontSize: 11.5,
+                  color: T.textSoft,
+                  marginBottom: 6,
+                }}
+              >
+                <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                  <span
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: 999,
+                      background: T.blue,
+                      display: "inline-block",
+                    }}
+                  />
+                  {t.dash.attendRateSeries}
+                </span>
+                <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                  <span
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: 999,
+                      background: T.rose,
+                      display: "inline-block",
+                    }}
+                  />
+                  {t.dash.absentRateSeries}
+                </span>
+              </div>
+              {attendanceTrend6.length > 0 && (
+                <DashLineChart
+                  labels={attendanceTrend6.map((d) => d.label)}
+                  seriesA={{
+                    name: t.dash.attendRateSeries,
+                    color: T.blue,
+                    values: attendanceTrend6.map((d) => d.attendRate),
+                  }}
+                  seriesB={{
+                    name: t.dash.absentRateSeries,
+                    color: T.rose,
+                    values: attendanceTrend6.map((d) => d.absentRate),
+                  }}
+                />
+              )}
+            </Card>
+
+            <Card style={{ padding: 18 }}>
+              <h3
+                style={{
+                  fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                  fontWeight: 600,
+                  color: T.ink,
+                  fontSize: 14,
+                  marginBottom: 14,
+                }}
+              >
+                {t.dash.attendanceByDept}
+              </h3>
+              {deptDonutData.length === 0 ? (
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: T.muted,
+                    textAlign: "center",
+                    padding: "28px 0",
+                  }}
+                >
+                  {t.dash.noAttend}
+                </p>
+              ) : (
+                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                  <DashDonut
+                    data={deptDonutData}
+                    centerValue={activeEmployees.length}
+                    centerLabel={t.dash.totalLabel}
+                  />
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 8,
+                      flex: 1,
+                      minWidth: 0,
+                    }}
+                  >
+                    {deptDonutData.map((d) => (
+                      <div
+                        key={d.label}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                          fontSize: 12,
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: 999,
+                            background: d.color,
+                            flexShrink: 0,
+                          }}
+                        />
+                        <span
+                          style={{
+                            color: T.ink,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            flex: 1,
+                          }}
+                        >
+                          {d.label}
+                        </span>
+                        <span
+                          style={{
+                            color: T.muted,
+                            fontFamily: "'JetBrains Mono',monospace",
+                            fontSize: 11,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {d.value} (
+                          {activeEmployees.length
+                            ? Math.round(
+                                (d.value / activeEmployees.length) * 1000,
+                              ) / 10
+                            : 0}
+                          %)
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </Card>
+
+            <Card style={{ padding: 18 }}>
+              <h3
+                style={{
+                  fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                  fontWeight: 600,
+                  color: T.ink,
+                  fontSize: 14,
+                  marginBottom: 12,
+                }}
+              >
+                {t.dash.quickActions}
+              </h3>
+              <DashQuickAction
+                icon={UserPlus}
+                tint="violet"
+                label={t.dash.quickAddEmployee}
+                onClick={() => setPage && setPage("employees")}
+              />
+              <DashQuickAction
+                icon={CalendarDays}
+                tint="forest"
+                label={t.dash.quickRequestLeave}
+                onClick={() => setPage && setPage("leave")}
+              />
+              <DashQuickAction
+                icon={AlertCircle}
+                tint="gold"
+                label={t.dash.quickAttCorrection}
+                onClick={() => setPage && setPage("attcorr")}
+              />
+              <DashQuickAction
+                icon={Wallet}
+                tint="rose"
+                label={t.dash.quickGeneratePayroll}
+                onClick={() => setPage && setPage("payroll")}
+              />
+            </Card>
+          </div>
+
+          {offices && offices.length > 0 && (
+            <Card style={{ padding: 18, marginBottom: 22 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: 12,
+                }}
+              >
+                <h3
+                  style={{
+                    fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                    fontWeight: 600,
+                    color: T.ink,
+                    fontSize: 14,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
+                  <span
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: 999,
+                      background: T.forest,
+                      display: "inline-block",
+                      boxShadow: `0 0 0 4px ${T.forestSoft}`,
+                    }}
+                  />
+                  {t.dash.workingNow}
+                </h3>
+                <span
+                  style={{
+                    fontSize: 11,
+                    color: T.muted,
+                    fontFamily: "'JetBrains Mono',monospace",
+                  }}
+                >
+                  {t.dash.workingNowSub(workingNowTotal)}
+                </span>
+              </div>
+              {workingNowByBranch.length === 0 ? (
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: T.muted,
+                    textAlign: "center",
+                    padding: "28px 0",
+                  }}
+                >
+                  {t.dash.noOneWorkingNow}
+                </p>
+              ) : (
+                <div
+                  className="wf-grid"
+                  style={{
+                    gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))",
+                    gap: 12,
+                  }}
+                >
+                  {workingNowByBranch.map((g) => (
+                    <div
+                      key={g.office?.id || "unassigned"}
+                      style={{
+                        border: `1px solid ${T.divider}`,
+                        borderRadius: 12,
+                        padding: 12,
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 6,
+                          fontSize: 12,
+                          fontWeight: 600,
+                          color: T.ink,
+                          marginBottom: 8,
+                        }}
+                      >
+                        <Store size={13} color={T.blue} />
+                        {g.office?.name || t.dash.unassignedBranch}
+                        <span
+                          style={{
+                            marginLeft: "auto",
+                            fontFamily: "'JetBrains Mono',monospace",
+                            color: T.muted,
+                            fontWeight: 500,
+                          }}
+                        >
+                          {g.entries.length}
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 6,
+                        }}
+                      >
+                        {g.entries.map(({ emp, checkIn }) => (
+                          <div
+                            key={emp.id}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 8,
+                            }}
+                          >
+                            <Avatar
+                              name={emp.name}
+                              photo={emp.photo}
+                              size={24}
+                            />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div
+                                style={{
+                                  fontSize: 12,
+                                  color: T.ink,
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {emp.name}
+                              </div>
+                            </div>
+                            <div
+                              style={{
+                                fontSize: 10,
+                                color: T.muted,
+                                fontFamily: "'JetBrains Mono',monospace",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {t.dash.sinceLabel} {checkIn}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+          )}
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+              gap: 16,
+              marginBottom: 22,
+            }}
+          >
+            <Card style={{ padding: 18 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: 12,
+                }}
+              >
+                <h3
+                  style={{
+                    fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                    fontWeight: 600,
+                    color: T.ink,
+                    fontSize: 14,
+                  }}
+                >
+                  {t.dash.recentAnnouncements}
+                </h3>
+                {setPage && (
+                  <button
+                    type="button"
+                    onClick={() => setPage("announcements")}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: T.blue,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {t.dash.viewAll}
+                  </button>
+                )}
+              </div>
+              {recentAnnouncements.length === 0 ? (
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: T.muted,
+                    textAlign: "center",
+                    padding: "20px 0",
+                  }}
+                >
+                  {t.dash.noAnnouncements}
+                </p>
+              ) : (
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: 12 }}
+                >
+                  {recentAnnouncements.map((a) => (
+                    <div
+                      key={a.id}
+                      style={{
+                        display: "flex",
+                        gap: 10,
+                        paddingBottom: 10,
+                        borderBottom: `1px solid ${T.divider}`,
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: 8,
+                          background: OT_STAT_TINTS.violet.bg,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <Megaphone size={14} color={OT_STAT_TINTS.violet.fg} />
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <div
+                          style={{
+                            fontSize: 12.5,
+                            fontWeight: 600,
+                            color: T.ink,
+                          }}
+                        >
+                          {a.title}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 11.5,
+                            color: T.textSoft,
+                            marginTop: 2,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                          }}
+                        >
+                          {a.body}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 10.5,
+                            color: T.muted,
+                            marginTop: 3,
+                          }}
+                        >
+                          {fmtAppliedOn(a.createdAt, lang).date}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+
+            <Card style={{ padding: 18 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: 12,
+                }}
+              >
+                <h3
+                  style={{
+                    fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                    fontWeight: 600,
+                    color: T.ink,
+                    fontSize: 14,
+                  }}
+                >
+                  {t.dash.leaveRequestsTitle}
+                </h3>
+                {setPage && (
+                  <button
+                    type="button"
+                    onClick={() => setPage("leave")}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: T.blue,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {t.dash.viewAll}
+                  </button>
+                )}
+              </div>
+              {recentLeaveRequests.length === 0 ? (
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: T.muted,
+                    textAlign: "center",
+                    padding: "20px 0",
+                  }}
+                >
+                  {t.dash.noLeaveRequestsRecent}
+                </p>
+              ) : (
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: 12 }}
+                >
+                  {recentLeaveRequests.map((r) => {
+                    const emp = employees.find((e) => e.id === r.employeeId);
+                    return (
+                      <div
+                        key={r.id}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 10,
+                          paddingBottom: 10,
+                          borderBottom: `1px solid ${T.divider}`,
+                        }}
+                      >
+                        <Avatar
+                          name={emp?.name || "?"}
+                          photo={emp?.photo}
+                          size={30}
+                        />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div
+                            style={{
+                              fontSize: 12.5,
+                              fontWeight: 600,
+                              color: T.ink,
+                            }}
+                          >
+                            {emp?.name || "—"}
+                          </div>
+                          <div style={{ fontSize: 11, color: T.muted }}>
+                            {LEAVE_TYPE_LABEL2[r.type] || r.type} ·{" "}
+                            {r.startDate}
+                            {r.endDate && r.endDate !== r.startDate
+                              ? `–${r.endDate}`
+                              : ""}
+                          </div>
+                        </div>
+                        <StatusPill status={r.status} />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </Card>
+
+            <Card style={{ padding: 18 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: 12,
+                }}
+              >
+                <h3
+                  style={{
+                    fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                    fontWeight: 600,
+                    color: T.ink,
+                    fontSize: 14,
+                  }}
+                >
+                  {t.dash.recentlyJoined}
+                </h3>
+                {setPage && (
+                  <button
+                    type="button"
+                    onClick={() => setPage("employees")}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: T.blue,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {t.dash.viewAll}
+                  </button>
+                )}
+              </div>
+              {recentlyJoined.length === 0 ? (
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: T.muted,
+                    textAlign: "center",
+                    padding: "20px 0",
+                  }}
+                >
+                  {t.dash.noRecentHires}
+                </p>
+              ) : (
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: 12 }}
+                >
+                  {recentlyJoined.map((e) => (
+                    <div
+                      key={e.id}
+                      style={{ display: "flex", alignItems: "center", gap: 10 }}
+                    >
+                      <Avatar name={e.name} photo={e.photo} size={30} />
+                      <div style={{ minWidth: 0 }}>
+                        <div
+                          style={{
+                            fontSize: 12.5,
+                            fontWeight: 600,
+                            color: T.ink,
+                          }}
+                        >
+                          {e.name}
+                        </div>
+                        <div style={{ fontSize: 11, color: T.muted }}>
+                          {e.position || "—"}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+          </div>
+
+          <Card style={{ padding: 18 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 14,
+                flexWrap: "wrap",
+                gap: 8,
+              }}
+            >
+              <div>
+                <h3
+                  style={{
+                    fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                    fontWeight: 600,
+                    color: T.ink,
+                    fontSize: 14,
+                  }}
+                >
+                  {t.dash.payrollSummaryTitle}
+                </h3>
+                <p style={{ fontSize: 11.5, color: T.muted, marginTop: 2 }}>
+                  {t.dash.thisMonth}
+                </p>
+              </div>
+              {setPage && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setPage("payroll")}
+                >
+                  {t.dash.viewPayrollBtn}
+                </Button>
+              )}
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+                gap: 16,
+              }}
+            >
+              {[
+                {
+                  key: "total",
+                  icon: Megaphone,
+                  tint: "violet",
+                  label: t.pay.totalPaid,
+                  value: fmtMoney(totalNetPayroll),
+                },
+                {
+                  key: "paid",
+                  icon: CheckCircle2,
+                  tint: "forest",
+                  label: t.pay.paid,
+                  value: fmtMoney(paidNetPayroll),
+                },
+                {
+                  key: "pending",
+                  icon: Timer,
+                  tint: "gold",
+                  label: STATUS_MAP.pending.label,
+                  value: fmtMoney(pendingNetPayroll),
+                },
+                {
+                  key: "ot",
+                  icon: Clock,
+                  tint: "blue",
+                  label: t.pay.otPay,
+                  value: fmtMoney(totalOtCost),
+                },
+              ].map((c) => (
+                <div
+                  key={c.key}
+                  style={{ display: "flex", alignItems: "center", gap: 10 }}
+                >
+                  <div
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: 10,
+                      background: OT_STAT_TINTS[c.tint].bg,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <c.icon size={17} color={OT_STAT_TINTS[c.tint].fg} />
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 11, color: T.muted }}>
+                      {c.label}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 15,
+                        fontWeight: 700,
+                        color: T.ink,
+                        fontFamily: "'JetBrains Mono',monospace",
+                      }}
+                    >
+                      {c.value}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </>
+      ) : (
+        <>
+          {role !== "admin" && currentEmp && showSelfPunch && (
+            <SelfPunch
+              emp={currentEmp}
+              shift={myShift}
+              attendance={attendance}
+              setAttendance={setAttendance}
+              offices={offices}
+              soundPreset={soundPreset}
+            />
+          )}
+
+          <div className="wf-dash-stats" style={{ marginBottom: 22 }}>
+            {stats.map((s) => {
+              const accentKey =
+                s.accent === T.forest
+                  ? "forest"
+                  : s.accent === T.blue
+                    ? "blue"
+                    : s.accent === T.gold
+                      ? "gold"
+                      : "rose";
+              const pastel =
+                EMP_PASTEL[theme === "dark" ? "dark" : "light"][accentKey];
+              const canLink =
+                s.linkTo &&
+                typeof setPage === "function" &&
+                (typeof moduleEnabled !== "function" ||
+                  moduleEnabled(s.linkTo) !== false);
+              const clickProps = canLink
+                ? {
+                    role: "button",
+                    tabIndex: 0,
+                    onClick: () => setPage(s.linkTo),
+                    onKeyDown: (e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setPage(s.linkTo);
+                      }
+                    },
+                  }
+                : {};
+              return (
+                <div
+                  key={s.label}
+                  className={`wf-stat-pastel ${canLink ? "wf-stat-pastel-clickable" : ""}`}
+                  style={{ background: pastel.bg }}
+                  {...clickProps}
+                >
+                  {canLink && (
+                    <span className="wf-stat-pastel-chevron">
+                      <ChevronRight size={13} color={pastel.text} />
+                    </span>
+                  )}
+                  <s.icon
+                    className="wf-stat-pastel-icon"
+                    size={46}
+                    color={pastel.icon}
+                    strokeWidth={1.6}
+                  />
+                  <div
+                    className="wf-stat-pastel-title"
+                    style={{ color: pastel.text }}
+                  >
+                    {s.value}
+                  </div>
+                  <div
+                    className="wf-stat-pastel-label"
+                    style={{ color: pastel.text, opacity: 0.85 }}
+                  >
+                    {s.label}
+                  </div>
+                  {s.sub && (
+                    <div
+                      className="wf-stat-pastel-sub"
+                      style={{ color: pastel.text }}
+                    >
+                      {s.sub}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <Card style={{ padding: 18 }}>
             <h3
               style={{
                 fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
                 fontWeight: 600,
                 color: T.ink,
+                marginBottom: 12,
                 fontSize: 14,
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
               }}
             >
-              <span
-                style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: 999,
-                  background: T.forest,
-                  display: "inline-block",
-                  boxShadow: `0 0 0 4px ${T.forestSoft}`,
-                }}
-              />
-              {t.dash.workingNow}
+              {t.dash.recentAttend}
             </h3>
-            <span
-              style={{
-                fontSize: 11,
-                color: T.muted,
-                fontFamily: "'JetBrains Mono',monospace",
-              }}
-            >
-              {t.dash.workingNowSub(workingNowTotal)}
-            </span>
-          </div>
-          {workingNowByBranch.length === 0 ? (
-            <p
-              style={{
-                fontSize: 13,
-                color: T.muted,
-                textAlign: "center",
-                padding: "28px 0",
-              }}
-            >
-              {t.dash.noOneWorkingNow}
-            </p>
-          ) : (
-            <div
-              className="wf-grid"
-              style={{
-                gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))",
-                gap: 12,
-              }}
-            >
-              {workingNowByBranch.map((g) => (
-                <div
-                  key={g.office?.id || "unassigned"}
-                  style={{
-                    border: `1px solid ${T.divider}`,
-                    borderRadius: 12,
-                    padding: 12,
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 6,
-                      fontSize: 12,
-                      fontWeight: 600,
-                      color: T.ink,
-                      marginBottom: 8,
-                    }}
-                  >
-                    <Store size={13} color={T.blue} />
-                    {g.office?.name || t.dash.unassignedBranch}
-                    <span
+            {recent.length === 0 ? (
+              <p
+                style={{
+                  fontSize: 13,
+                  color: T.muted,
+                  textAlign: "center",
+                  padding: "28px 0",
+                }}
+              >
+                {t.dash.noAttend}
+              </p>
+            ) : (
+              <div>
+                {recent.map((a) => {
+                  const emp = employees.find((e) => e.id === a.employeeId);
+                  const shift = shifts?.find((s) => s.id === emp?.shiftId);
+                  const lateMins =
+                    a.status === "late"
+                      ? lateMinutesForShift(a.checkIn, shift)
+                      : 0;
+                  return (
+                    <div
+                      key={a.id}
                       style={{
-                        marginLeft: "auto",
-                        fontFamily: "'JetBrains Mono',monospace",
-                        color: T.muted,
-                        fontWeight: 500,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 12,
+                        padding: "10px 0",
+                        borderTop: `1px solid ${T.divider}`,
                       }}
                     >
-                      {g.entries.length}
-                    </span>
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 6,
-                    }}
-                  >
-                    {g.entries.map(({ emp, checkIn }) => (
-                      <div
-                        key={emp.id}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
-                        }}
-                      >
-                        <Avatar name={emp.name} photo={emp.photo} size={24} />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div
-                            style={{
-                              fontSize: 12,
-                              color: T.ink,
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {emp.name}
-                          </div>
+                      <Avatar
+                        name={emp?.name || "?"}
+                        photo={emp?.photo}
+                        size={32}
+                      />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 500,
+                            color: T.ink,
+                          }}
+                        >
+                          {emp?.name}
                         </div>
                         <div
                           style={{
-                            fontSize: 10,
+                            fontSize: 11,
                             color: T.muted,
                             fontFamily: "'JetBrains Mono',monospace",
-                            whiteSpace: "nowrap",
                           }}
                         >
-                          {t.dash.sinceLabel} {checkIn}
+                          {t.att.checkIn} {a.checkIn || "—"}{" "}
+                          {a.checkOut
+                            ? `· ${t.att.checkOut} ${a.checkOut}`
+                            : ""}
                         </div>
+                        {lateMins > 0 && (
+                          <div
+                            style={{
+                              fontSize: 11,
+                              color: T.goldText,
+                              marginTop: 2,
+                            }}
+                          >
+                            {formatLateDuration(lateMins, lang)}
+                          </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
+                      <StatusPill status={a.status} />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </Card>
+        </>
       )}
-
-      <Card style={{ padding: 18 }}>
-        <h3
-          style={{
-            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
-            fontWeight: 600,
-            color: T.ink,
-            marginBottom: 12,
-            fontSize: 14,
-          }}
-        >
-          {t.dash.recentAttend}
-        </h3>
-        {recent.length === 0 ? (
-          <p
-            style={{
-              fontSize: 13,
-              color: T.muted,
-              textAlign: "center",
-              padding: "28px 0",
-            }}
-          >
-            {t.dash.noAttend}
-          </p>
-        ) : (
-          <div>
-            {recent.map((a) => {
-              const emp = employees.find((e) => e.id === a.employeeId);
-              const shift = shifts?.find((s) => s.id === emp?.shiftId);
-              const lateMins =
-                a.status === "late" ? lateMinutesForShift(a.checkIn, shift) : 0;
-              return (
-                <div
-                  key={a.id}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                    padding: "10px 0",
-                    borderTop: `1px solid ${T.divider}`,
-                  }}
-                >
-                  <Avatar
-                    name={emp?.name || "?"}
-                    photo={emp?.photo}
-                    size={32}
-                  />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{ fontSize: 13, fontWeight: 500, color: T.ink }}
-                    >
-                      {emp?.name}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 11,
-                        color: T.muted,
-                        fontFamily: "'JetBrains Mono',monospace",
-                      }}
-                    >
-                      {t.att.checkIn} {a.checkIn || "—"}{" "}
-                      {a.checkOut ? `· ${t.att.checkOut} ${a.checkOut}` : ""}
-                    </div>
-                    {lateMins > 0 && (
-                      <div
-                        style={{
-                          fontSize: 11,
-                          color: T.goldText,
-                          marginTop: 2,
-                        }}
-                      >
-                        {formatLateDuration(lateMins, lang)}
-                      </div>
-                    )}
-                  </div>
-                  <StatusPill status={a.status} />
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </Card>
     </div>
   );
 }
@@ -32811,12 +34034,18 @@ function AppInner() {
                   payrollPaid={payrollPaid}
                   role={role}
                   currentEmp={currentEmp}
+                  currentAdmin={currentAdmin}
                   shifts={shifts}
                   offices={offices}
                   soundPreset={soundPolicy.preset}
                   showSelfPunch={moduleEnabled("attendance")}
                   setPage={setPage}
                   moduleEnabled={moduleEnabled}
+                  leaveRequests={leaveRequests}
+                  announcements={announcements}
+                  overtimeRequests={overtimeRequests}
+                  otPolicy={otPolicy}
+                  payrollPolicy={payrollPolicy}
                 />
               )}
               {page === "analytics" && role === "admin" && (
