@@ -3792,6 +3792,12 @@ html,body,#root{height:100%;}
   .wf-dash-stats .wf-card{padding:13px !important;}
   .wf-dash-stats .wf-stat-solid{padding:13px !important;}
   .wf-dash-stats .wf-stat-solid-value{font-size:23px !important;}
+  /* The "Attendance Overview / Employees by Department / Quick Actions"
+     row is a fixed 3-column grid (1.5fr 1.1fr 0.9fr) sized for desktop.
+     On phones that squeezes all three cards side-by-side and forces
+     horizontal overflow/cut-off. Stack them full-width instead, so
+     each card reads top-to-bottom like the rest of the mobile page. */
+  .wf-dash-charts-row{grid-template-columns:1fr !important;}
   /* Loading skeleton: the desktop shape (fixed 220px sidebar rail +
      content column) squeezed the sidebar into a sliver and left the
      rest of a phone screen blank/empty instead of filling it — on
