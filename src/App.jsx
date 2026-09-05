@@ -4478,7 +4478,17 @@ function initials(name) {
   return (parts[0]?.[0] || "").concat(parts[1]?.[0] || "").toUpperCase();
 }
 function todayStr() {
-  return new Date().toISOString().slice(0, 10);
+  // Use the LOCAL calendar date (Cambodia, GMT+7), not UTC. toISOString()
+  // returns the UTC date, which only rolls over to the next day at 07:00
+  // local time — so between 00:00–06:59 local time, check-in/check-out
+  // would still be tied to "yesterday" and the Check In button would stay
+  // hidden until 7am. Building the string from local getFullYear/getMonth/
+  // getDate avoids that mismatch.
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
 const WEEKDAY_LABELS = ["អា", "ច", "អ", "ព", "ព្រ", "សុ", "ស"];
 // True if `dateStr` (YYYY-MM-DD) is a day off for `emp`, either because it
@@ -4649,8 +4659,22 @@ function timeNow() {
   const d = new Date();
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
+// Formats a 24-hour "HH:MM" (or "HH:MM:SS") time string as a 12-hour
+// "h:mm AM/PM" string, so times are easy to read at a glance instead of
+// mentally working out morning vs. evening from a 24h value (e.g.
+// "08:12" -> "8:12 AM", "17:36" -> "5:36 PM"). Falsy/malformed input is
+// returned unchanged, so existing `hhmm(x) || fallback` call sites keep
+// working exactly as before.
 function hhmm(v) {
-  return typeof v === "string" ? v.slice(0, 5) : v;
+  if (typeof v !== "string") return v;
+  const m = v.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+  if (!m) return v;
+  let h = Number(m[1]);
+  const min = m[2];
+  const period = h >= 12 ? "PM" : "AM";
+  h = h % 12;
+  if (h === 0) h = 12;
+  return `${h}:${min} ${period}`;
 }
 function shiftLabel(shift) {
   if (!shift) return "—";
@@ -7078,8 +7102,16 @@ function dateRange(start, end) {
   let cur = new Date(start + "T00:00:00");
   const last = new Date(end + "T00:00:00");
   if (isNaN(cur) || isNaN(last) || cur > last) return out;
+  // Build the "YYYY-MM-DD" string from LOCAL date parts, not
+  // toISOString(). `cur` was parsed as a local-time Date (no "Z" suffix),
+  // so for a Cambodia browser (GMT+7) converting it back to UTC via
+  // toISOString() rolls it back to 17:00 the PREVIOUS day — every date in
+  // the range would come out one day earlier than intended (same root
+  // cause as the todayStr() fix above).
+  const toLocalYMD = (d) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   while (cur <= last) {
-    out.push(cur.toISOString().slice(0, 10));
+    out.push(toLocalYMD(cur));
     cur.setDate(cur.getDate() + 1);
   }
   return out;
@@ -9919,14 +9951,14 @@ function Dashboard({
             icon: LogIn,
             color: T.forest,
             label: t.att.checkIn,
-            value: myTodayRecord?.checkIn || "--:--",
+            value: hhmm(myTodayRecord?.checkIn) || "--:--",
           },
           {
             id: "checkOut",
             icon: LogOut,
             color: T.clay,
             label: t.att.checkOut,
-            value: myTodayRecord?.checkOut || "--:--",
+            value: hhmm(myTodayRecord?.checkOut) || "--:--",
           },
           {
             id: "workHours",
@@ -10841,7 +10873,7 @@ function Dashboard({
                                 whiteSpace: "nowrap",
                               }}
                             >
-                              {t.dash.sinceLabel} {checkIn}
+                              {t.dash.sinceLabel} {hhmm(checkIn)}
                             </div>
                           </div>
                         ))}
@@ -11315,8 +11347,11 @@ function Dashboard({
                       lineHeight: 1.2,
                     }}
                   >
-                    {String(liveClock.getHours()).padStart(2, "0")}:
-                    {String(liveClock.getMinutes()).padStart(2, "0")}
+                    {hhmm(
+                      `${String(liveClock.getHours()).padStart(2, "0")}:${String(
+                        liveClock.getMinutes(),
+                      ).padStart(2, "0")}`,
+                    )}
                   </div>
                   <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>
                     {liveClock.toLocaleDateString(
@@ -16820,7 +16855,7 @@ function SelfPunch({
                 className="wf-punch-clock"
                 style={{ fontSize: 18, lineHeight: 1.3, marginTop: 2 }}
               >
-                {rec?.checkIn || "--:--:--"}
+                {hhmm(rec?.checkIn) || "--:--:--"}
               </div>
             </div>
           </div>
@@ -16863,7 +16898,7 @@ function SelfPunch({
                 className="wf-punch-clock"
                 style={{ fontSize: 18, lineHeight: 1.3, marginTop: 2 }}
               >
-                {rec?.checkOut || "--:--:--"}
+                {hhmm(rec?.checkOut) || "--:--:--"}
               </div>
             </div>
           </div>
@@ -16899,7 +16934,7 @@ function SelfPunch({
               className="wf-punch-clock"
               style={{ fontSize: 16, lineHeight: 1.3, marginTop: 5 }}
             >
-              {rec?.checkIn || "--:--:--"}
+              {hhmm(rec?.checkIn) || "--:--:--"}
             </div>
             {shift && (
               <div style={{ fontSize: 10.5, color: T.muted, marginTop: 3 }}>
@@ -17294,8 +17329,8 @@ function SelfPunch({
             color={T.forest}
             style={{ margin: "0 auto 8px" }}
           />
-          {t.att.checkOut} · {t.att.checkIn} {rec.checkIn} · {t.att.checkOut}{" "}
-          {rec.checkOut}
+          {t.att.checkOut} · {t.att.checkIn} {hhmm(rec.checkIn)} ·{" "}
+          {t.att.checkOut} {hhmm(rec.checkOut)}
           {rec.checkInLoc?.officeName &&
           rec.checkOutLoc?.officeName &&
           rec.checkInLoc.officeName !== rec.checkOutLoc.officeName ? (
@@ -18538,10 +18573,10 @@ function Attendance({
                       {a.date}
                     </td>
                     <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                      {a.checkIn || "—"}
+                      {hhmm(a.checkIn) || "—"}
                     </td>
                     <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                      {a.checkOut || "—"}
+                      {hhmm(a.checkOut) || "—"}
                     </td>
                     <td style={{ fontSize: 11.5, color: T.muted }}>
                       {a.checkInLoc?.officeName &&
@@ -18835,7 +18870,7 @@ function Attendance({
                               flexShrink: 0,
                             }}
                           />
-                          {rec.checkIn}
+                          {hhmm(rec.checkIn)}
                         </div>
                         <div
                           style={{
@@ -18855,7 +18890,7 @@ function Attendance({
                     )}
                   </td>
                   <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                    {rec?.checkOut || "—"}
+                    {hhmm(rec?.checkOut) || "—"}
                   </td>
                   <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
                     {worked ? (
@@ -34253,7 +34288,7 @@ function AppInner() {
         return {
           userType: "admin",
           title: "បុគ្គលិកមកយឺត",
-          body: `${emp?.name || "?"} (${emp?.code || row.employeeId}) បានចូលធ្វើការនៅម៉ោង ${row.checkIn}${lateLabel ? ` (${lateLabel})` : ""}`,
+          body: `${emp?.name || "?"} (${emp?.code || row.employeeId}) បានចូលធ្វើការនៅម៉ោង ${hhmm(row.checkIn)}${lateLabel ? ` (${lateLabel})` : ""}`,
           page: "late",
           portal: "admin",
         };
