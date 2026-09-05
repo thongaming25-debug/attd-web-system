@@ -3254,6 +3254,31 @@ function LangToggle({ variant = "dark" }) {
 // this being a time & attendance system, not just decoration: admins and
 // employees glance at it to sanity-check punch times against the system
 // clock. Ticks every second; unmounts cleanly via the interval cleanup.
+// Tracks whether the viewport is currently in the app's "mobile" range
+// (the same <=820px breakpoint the CSS media queries elsewhere use for
+// the bottom nav / sidebar drawer). Used where a screen needs genuinely
+// different *content* between phone and desktop/tablet — not just a
+// CSS rearrangement of the same markup (e.g. the employee Dashboard's
+// phone-specific check-in layout).
+function useIsMobile(breakpoint = 821) {
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth < breakpoint : false,
+  );
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mql = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+    const update = () => setIsMobile(mql.matches);
+    update();
+    if (mql.addEventListener) mql.addEventListener("change", update);
+    else mql.addListener(update);
+    return () => {
+      if (mql.removeEventListener) mql.removeEventListener("change", update);
+      else mql.removeListener(update);
+    };
+  }, [breakpoint]);
+  return isMobile;
+}
+
 function HeaderClock() {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
@@ -3932,6 +3957,13 @@ html,body,#root{height:100%;}
 .wf-emp-linkbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:11.5px;font-weight:600;color:${T.textSoft};padding:6px 4px;border-radius:6px;transition:background .15s ease,color .15s ease;white-space:nowrap;}
 .wf-emp-linkbtn:hover{background:${T.tableHeadBg};color:${T.ink};}
 .wf-dash-stats{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));}
+/* Employee dashboard — desktop/tablet only two-column layout (see the
+   matching @media (min-width:821px) block below for the grid rules).
+   On phones these wrappers stay plain stacked blocks, so the mobile
+   dashboard order/appearance is unchanged; the two "desktop only"
+   cards (today's attendance breakdown + announcements) are hidden on
+   phones entirely rather than just reflowed. */
+.wf-desktop-only-card{display:none;}
 .wf-skel-shell{display:flex;min-height:100vh;min-height:100dvh;background:${T.paper};}
 .wf-skel-side{width:220px;flex-shrink:0;padding:18px;display:flex;flex-direction:column;gap:10px;border-right:1px solid ${T.lineSoft};}
 .wf-skel-main{flex:1;min-width:0;padding:22px;}
@@ -4104,6 +4136,15 @@ html,body,#root{height:100%;}
   .wf-skel-main{padding:16px;padding-bottom:70px;width:100%;}
   .wf-skel-bottombar{display:flex;position:fixed;left:0;right:0;bottom:0;gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:${T.headerBg};border-top:1px solid ${T.lineSoft};}
   .wf-skel-bottombar > div{flex:1;height:34px;border-radius:9px;}
+}
+@media (min-width:821px){
+  /* Employee dashboard laid out like a "left: punch card, right:
+     at-a-glance tiles" desktop dashboard — matches the reference
+     layout requested for computer/tablet. Untouched below 821px. */
+  .wf-staff-dash-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,1fr);gap:18px;align-items:start;}
+  .wf-staff-dash-grid .wf-dash-col-full{grid-column:1 / -1;}
+  .wf-staff-dash-grid .wf-dash-col-side .wf-dash-stats{grid-template-columns:repeat(2,1fr);gap:12px;}
+  .wf-desktop-only-card{display:block;}
 }
 .wf-chat-layout{display:flex;gap:0;height:calc(100vh - 230px);min-height:420px;border:1px solid ${T.lineSoft};border-radius:14px;overflow:hidden;background:${T.card};}
 .wf-chat-list-pane{width:300px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid ${T.lineSoft};overflow-y:auto;}
@@ -9477,6 +9518,15 @@ function Dashboard({
 }) {
   const { t, lang } = useLang();
   const { theme } = useTheme();
+  const isMobile = useIsMobile();
+  // Ticking clock for the mobile "Current Time" card below (updates the
+  // whole Dashboard once a second while mounted — cheap given the rest
+  // of the page is otherwise driven by data, not a timer).
+  const [liveClock, setLiveClock] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setLiveClock(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
   const today = todayStr();
   // "Working now" = checked in today, not checked out yet, and not on
   // leave/absent. Driven straight off the `attendance` array, which is
@@ -9593,12 +9643,11 @@ function Dashboard({
     };
   });
 
-  const recentAnnouncements =
-    role === "admin"
-      ? [...(announcements || [])]
-          .sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""))
-          .slice(0, 3)
-      : [];
+  // Used on both the admin dashboard and (on wider screens, via the
+  // desktop/tablet two-column layout below) the employee dashboard.
+  const recentAnnouncements = [...(announcements || [])]
+    .sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""))
+    .slice(0, 3);
   const recentLeaveRequests =
     role === "admin"
       ? [...(leaveRequests || [])]
@@ -9703,6 +9752,268 @@ function Dashboard({
             linkTo: "payroll",
           },
         ];
+
+  const renderStatTiles = () => (
+    <div className="wf-dash-stats" style={{ marginBottom: 16 }}>
+      {stats.map((s) => {
+        const accentKey =
+          s.accent === T.forest
+            ? "forest"
+            : s.accent === T.blue
+              ? "blue"
+              : s.accent === T.gold
+                ? "gold"
+                : "rose";
+        const pastel =
+          EMP_PASTEL[theme === "dark" ? "dark" : "light"][accentKey];
+        const canLink =
+          s.linkTo &&
+          typeof setPage === "function" &&
+          (typeof moduleEnabled !== "function" ||
+            moduleEnabled(s.linkTo) !== false);
+        const clickProps = canLink
+          ? {
+              role: "button",
+              tabIndex: 0,
+              onClick: () => setPage(s.linkTo),
+              onKeyDown: (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setPage(s.linkTo);
+                }
+              },
+            }
+          : {};
+        return (
+          <div
+            key={s.label}
+            className={`wf-stat-pastel ${canLink ? "wf-stat-pastel-clickable" : ""}`}
+            style={{
+              background: pastel.bg,
+              minHeight: "auto",
+              padding: "14px",
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+            }}
+            {...clickProps}
+          >
+            <span
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: 10,
+                background: "rgba(255,255,255,0.55)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <s.icon size={18} color={pastel.icon} strokeWidth={2} />
+            </span>
+            <div style={{ minWidth: 0, flex: 1, textAlign: "left" }}>
+              <div
+                style={{
+                  fontSize: 13.5,
+                  fontWeight: 700,
+                  color: pastel.text,
+                  lineHeight: 1.3,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {s.label}
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 500,
+                  color: pastel.text,
+                  opacity: 0.8,
+                  marginTop: 2,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {s.value}
+                {s.sub ? ` · ${s.sub}` : ""}
+              </div>
+            </div>
+            {canLink && (
+              <ChevronRight
+                size={16}
+                color={pastel.text}
+                style={{ flexShrink: 0, opacity: 0.7 }}
+              />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  const renderRecentAttendCard = () => (
+    <Card style={{ padding: 18 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 16,
+          gap: 10,
+        }}
+      >
+        <h3
+          style={{
+            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontWeight: 600,
+            color: T.ink,
+            fontSize: 14,
+          }}
+        >
+          {t.dash.recentAttend}
+        </h3>
+        {typeof setPage === "function" && (
+          <button
+            type="button"
+            onClick={() => setPage("attendance")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              fontSize: 12,
+              fontWeight: 600,
+              color: T.forestText,
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: 0,
+            }}
+          >
+            {t.dash.viewAll} <ChevronRight size={13} />
+          </button>
+        )}
+      </div>
+      {(() => {
+        const workMins = workedMinutes(
+          myTodayRecord?.checkIn,
+          myTodayRecord?.checkOut,
+        );
+        const todayOtHours = (overtimeRequests || [])
+          .filter(
+            (r) =>
+              r.employeeId === currentEmp?.id &&
+              r.status === "approved" &&
+              r.date === today,
+          )
+          .reduce((sum, r) => sum + (Number(r.hours) || 0), 0);
+        const metrics = [
+          {
+            id: "checkIn",
+            icon: LogIn,
+            color: T.forest,
+            label: t.att.checkIn,
+            value: myTodayRecord?.checkIn || "--:--",
+          },
+          {
+            id: "checkOut",
+            icon: LogOut,
+            color: T.clay,
+            label: t.att.checkOut,
+            value: myTodayRecord?.checkOut || "--:--",
+          },
+          {
+            id: "workHours",
+            icon: Clock,
+            color: T.blue,
+            label: t.att.workHours,
+            value: formatHM(workMins) || "0h 0m",
+          },
+          {
+            id: "overtime",
+            icon: Timer,
+            color: "#8B5CF6",
+            label: t.att.overtimeShort,
+            value: formatHM(Math.round(todayOtHours * 60)) || "0h 0m",
+          },
+        ];
+        return (
+          <>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: 14,
+              }}
+            >
+              {metrics.map((m) => (
+                <div
+                  key={m.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 9,
+                  }}
+                >
+                  <span
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 9,
+                      background: m.color + "1F",
+                      color: m.color,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <m.icon size={15} />
+                  </span>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 10.5, color: T.muted }}>
+                      {m.label}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 700,
+                        color: T.ink,
+                        fontFamily: "'JetBrains Mono',monospace",
+                      }}
+                    >
+                      {m.value}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {!myTodayRecord && (
+              <p
+                style={{
+                  fontSize: 12.5,
+                  color: T.muted,
+                  textAlign: "center",
+                  marginTop: 16,
+                  paddingTop: 14,
+                  borderTop: `1px solid ${T.divider}`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                }}
+              >
+                <FileText size={13} /> {t.dash.noAttend}
+              </p>
+            )}
+          </>
+        );
+      })()}
+    </Card>
+  );
 
   return (
     <div>
@@ -10838,10 +11149,123 @@ function Dashboard({
             </div>
           </Card>
         </>
-      ) : (
+      ) : isMobile ? (
         <>
+          {/* Phone-only layout: the greeting + "Current Status" card just
+              above already covers the welcome banner, so this branch
+              starts straight at the "Current Time / Location" card,
+              then the compact check-in card, matching the requested
+              mobile reference design. Desktop/tablet (see branch below)
+              keeps the richer two-column layout untouched. */}
+          <Card style={{ padding: 16, marginBottom: 16 }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                gap: 14,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  flex: "1 1 140px",
+                }}
+              >
+                <span
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 12,
+                    background: T.forestSoft,
+                    color: T.forestText,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <Clock size={20} />
+                </span>
+                <div style={{ minWidth: 0 }}>
+                  <div
+                    style={{ fontSize: 11, color: T.textSoft, fontWeight: 600 }}
+                  >
+                    {t.att.liveClockLabel}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 22,
+                      fontWeight: 700,
+                      color: T.ink,
+                      fontFamily: "'JetBrains Mono',monospace",
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {String(liveClock.getHours()).padStart(2, "0")}:
+                    {String(liveClock.getMinutes()).padStart(2, "0")}
+                  </div>
+                  <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>
+                    {liveClock.toLocaleDateString(
+                      lang === "en" ? "en-US" : "km-KH",
+                      {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      },
+                    )}
+                  </div>
+                </div>
+              </div>
+              {offices && offices.length > 0 && (
+                <div
+                  style={{
+                    flex: "1 1 160px",
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 6,
+                    padding: "8px 10px",
+                    borderRadius: 12,
+                    border: `1px solid ${T.line}`,
+                  }}
+                >
+                  <ShieldCheck
+                    size={15}
+                    color={T.forest}
+                    style={{ marginTop: 1, flexShrink: 0 }}
+                  />
+                  <div style={{ minWidth: 0 }}>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: T.textSoft,
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {t.att.gpsRequiredHint(offices.length)}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: T.forestText,
+                        marginTop: 2,
+                      }}
+                    >
+                      {t.att.locVerifiedOnPunch}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Card>
+
           {role !== "admin" && currentEmp && showSelfPunch && (
             <SelfPunch
+              compact
               emp={currentEmp}
               shift={myShift}
               attendance={attendance}
@@ -10851,263 +11275,172 @@ function Dashboard({
             />
           )}
 
-          <div className="wf-dash-stats" style={{ marginBottom: 16 }}>
-            {stats.map((s) => {
-              const accentKey =
-                s.accent === T.forest
-                  ? "forest"
-                  : s.accent === T.blue
-                    ? "blue"
-                    : s.accent === T.gold
-                      ? "gold"
-                      : "rose";
-              const pastel =
-                EMP_PASTEL[theme === "dark" ? "dark" : "light"][accentKey];
-              const canLink =
-                s.linkTo &&
-                typeof setPage === "function" &&
-                (typeof moduleEnabled !== "function" ||
-                  moduleEnabled(s.linkTo) !== false);
-              const clickProps = canLink
-                ? {
-                    role: "button",
-                    tabIndex: 0,
-                    onClick: () => setPage(s.linkTo),
-                    onKeyDown: (e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        setPage(s.linkTo);
-                      }
-                    },
-                  }
-                : {};
-              return (
-                <div
-                  key={s.label}
-                  className={`wf-stat-pastel ${canLink ? "wf-stat-pastel-clickable" : ""}`}
-                  style={{
-                    background: pastel.bg,
-                    minHeight: "auto",
-                    padding: "14px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                  }}
-                  {...clickProps}
-                >
-                  <span
-                    style={{
-                      width: 38,
-                      height: 38,
-                      borderRadius: 10,
-                      background: "rgba(255,255,255,0.55)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <s.icon size={18} color={pastel.icon} strokeWidth={2} />
-                  </span>
-                  <div style={{ minWidth: 0, flex: 1, textAlign: "left" }}>
-                    <div
-                      style={{
-                        fontSize: 13.5,
-                        fontWeight: 700,
-                        color: pastel.text,
-                        lineHeight: 1.3,
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      {s.label}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 500,
-                        color: pastel.text,
-                        opacity: 0.8,
-                        marginTop: 2,
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      {s.value}
-                      {s.sub ? ` · ${s.sub}` : ""}
-                    </div>
-                  </div>
-                  {canLink && (
-                    <ChevronRight
-                      size={16}
-                      color={pastel.text}
-                      style={{ flexShrink: 0, opacity: 0.7 }}
-                    />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          <Card style={{ padding: 18 }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: 16,
-                gap: 10,
-              }}
-            >
-              <h3
-                style={{
-                  fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
-                  fontWeight: 600,
-                  color: T.ink,
-                  fontSize: 14,
-                }}
-              >
-                {t.dash.recentAttend}
-              </h3>
-              {typeof setPage === "function" && (
-                <button
-                  type="button"
-                  onClick={() => setPage("attendance")}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 2,
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: T.forestText,
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: 0,
-                  }}
-                >
-                  {t.dash.viewAll} <ChevronRight size={13} />
-                </button>
+          {renderStatTiles()}
+          {renderRecentAttendCard()}
+        </>
+      ) : (
+        <>
+          {/* Desktop/tablet (>820px): left column = punch card, right
+              column = at-a-glance tiles + today's attendance summary,
+              full-width row below = recent attendance + announcements.
+              On phones (see .wf-staff-dash-grid CSS) these wrapper divs
+              have no layout effect, so the mobile order/appearance is
+              unchanged from before. */}
+          <div className="wf-staff-dash-grid">
+            <div className="wf-dash-col-main">
+              {role !== "admin" && currentEmp && showSelfPunch && (
+                <SelfPunch
+                  emp={currentEmp}
+                  shift={myShift}
+                  attendance={attendance}
+                  setAttendance={setAttendance}
+                  offices={offices}
+                  soundPreset={soundPreset}
+                />
               )}
             </div>
-            {(() => {
-              const workMins = workedMinutes(
-                myTodayRecord?.checkIn,
-                myTodayRecord?.checkOut,
-              );
-              const todayOtHours = (overtimeRequests || [])
-                .filter(
-                  (r) =>
-                    r.employeeId === currentEmp?.id &&
-                    r.status === "approved" &&
-                    r.date === today,
-                )
-                .reduce((sum, r) => sum + (Number(r.hours) || 0), 0);
-              const metrics = [
-                {
-                  id: "checkIn",
-                  icon: LogIn,
-                  color: T.forest,
-                  label: t.att.checkIn,
-                  value: myTodayRecord?.checkIn || "--:--",
-                },
-                {
-                  id: "checkOut",
-                  icon: LogOut,
-                  color: T.clay,
-                  label: t.att.checkOut,
-                  value: myTodayRecord?.checkOut || "--:--",
-                },
-                {
-                  id: "workHours",
-                  icon: Clock,
-                  color: T.blue,
-                  label: t.att.workHours,
-                  value: formatHM(workMins) || "0h 0m",
-                },
-                {
-                  id: "overtime",
-                  icon: Timer,
-                  color: "#8B5CF6",
-                  label: t.att.overtimeShort,
-                  value: formatHM(Math.round(todayOtHours * 60)) || "0h 0m",
-                },
-              ];
-              return (
-                <>
-                  <div
+
+            <div className="wf-dash-col-side">
+              {renderStatTiles()}
+              {/* Note: this branch only renders for role !== "admin" (see
+                  the role === "admin" ? ... check above), so the
+                  company-wide "Attendance Overview" card — today's
+                  present/late/absent/on-leave counts across ALL
+                  employees — has been removed here. That data belongs
+                  to admins only; a regular employee should only ever
+                  see their own attendance, not everyone else's. It
+                  still shows on the admin dashboard further up. */}
+            </div>
+
+            <div className="wf-dash-col-full">
+              {renderRecentAttendCard()}
+
+              <Card
+                className="wf-desktop-only-card"
+                style={{ padding: 18, marginTop: 16 }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: 12,
+                  }}
+                >
+                  <h3
                     style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(2, 1fr)",
-                      gap: 14,
+                      fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                      fontWeight: 600,
+                      color: T.ink,
+                      fontSize: 14,
                     }}
                   >
-                    {metrics.map((m) => (
+                    {t.dash.recentAnnouncements}
+                  </h3>
+                  {setPage && (
+                    <button
+                      type="button"
+                      onClick={() => setPage("announcements")}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: T.blue,
+                        fontSize: 12,
+                        fontWeight: 600,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {t.dash.viewAll}
+                    </button>
+                  )}
+                </div>
+                {recentAnnouncements.length === 0 ? (
+                  <p
+                    style={{
+                      fontSize: 13,
+                      color: T.muted,
+                      textAlign: "center",
+                      padding: "20px 0",
+                    }}
+                  >
+                    {t.dash.noAnnouncements}
+                  </p>
+                ) : (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 12,
+                    }}
+                  >
+                    {recentAnnouncements.map((a) => (
                       <div
-                        key={m.id}
+                        key={a.id}
                         style={{
                           display: "flex",
-                          alignItems: "center",
-                          gap: 9,
+                          gap: 10,
+                          paddingBottom: 10,
+                          borderBottom: `1px solid ${T.divider}`,
                         }}
                       >
-                        <span
+                        <div
                           style={{
-                            width: 32,
-                            height: 32,
-                            borderRadius: 9,
-                            background: m.color + "1F",
-                            color: m.color,
+                            width: 30,
+                            height: 30,
+                            borderRadius: 8,
+                            background: OT_STAT_TINTS.violet.bg,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                             flexShrink: 0,
                           }}
                         >
-                          <m.icon size={15} />
-                        </span>
+                          <Megaphone
+                            size={14}
+                            color={OT_STAT_TINTS.violet.fg}
+                          />
+                        </div>
                         <div style={{ minWidth: 0 }}>
-                          <div style={{ fontSize: 10.5, color: T.muted }}>
-                            {m.label}
+                          <div
+                            style={{
+                              fontSize: 12.5,
+                              fontWeight: 600,
+                              color: T.ink,
+                            }}
+                          >
+                            {a.title}
                           </div>
                           <div
                             style={{
-                              fontSize: 14,
-                              fontWeight: 700,
-                              color: T.ink,
-                              fontFamily: "'JetBrains Mono',monospace",
+                              fontSize: 11.5,
+                              color: T.textSoft,
+                              marginTop: 2,
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              display: "-webkit-box",
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: "vertical",
                             }}
                           >
-                            {m.value}
+                            {a.body}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: 10.5,
+                              color: T.muted,
+                              marginTop: 3,
+                            }}
+                          >
+                            {fmtAppliedOn(a.createdAt, lang).date}
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
-                  {!myTodayRecord && (
-                    <p
-                      style={{
-                        fontSize: 12.5,
-                        color: T.muted,
-                        textAlign: "center",
-                        marginTop: 16,
-                        paddingTop: 14,
-                        borderTop: `1px solid ${T.divider}`,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: 6,
-                      }}
-                    >
-                      <FileText size={13} /> {t.dash.noAttend}
-                    </p>
-                  )}
-                </>
-              );
-            })()}
-          </Card>
+                )}
+              </Card>
+            </div>
+          </div>
         </>
       )}
     </div>
@@ -16172,6 +16505,7 @@ function SelfPunch({
   setAttendance,
   offices,
   soundPreset,
+  compact,
 }) {
   const { t, lang } = useLang();
   const today = todayStr();
@@ -16326,45 +16660,125 @@ function SelfPunch({
   };
 
   return (
-    <Card style={{ padding: 18, marginBottom: 16 }}>
+    <Card style={{ padding: compact ? 16 : 18, marginBottom: 16 }}>
+      {!compact && (
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 14,
+            marginBottom: 14,
+          }}
+        >
+          <div
+            style={{
+              flex: "1 1 150px",
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              textAlign: "left",
+            }}
+          >
+            <span
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 11,
+                background: T.forestSoft,
+                color: T.forestText,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <LogIn size={18} />
+            </span>
+            <div style={{ minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  color: T.textSoft,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {t.att.checkIn}
+              </div>
+              <div
+                className="wf-punch-clock"
+                style={{ fontSize: 18, lineHeight: 1.3, marginTop: 2 }}
+              >
+                {rec?.checkIn || "--:--:--"}
+              </div>
+            </div>
+          </div>
+          <div
+            style={{
+              flex: "1 1 150px",
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              textAlign: "left",
+            }}
+          >
+            <span
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 11,
+                background: T.roseSoft,
+                color: T.roseDark,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <LogOut size={18} />
+            </span>
+            <div style={{ minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  color: T.textSoft,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {t.att.checkOut}
+              </div>
+              <div
+                className="wf-punch-clock"
+                style={{ fontSize: 18, lineHeight: 1.3, marginTop: 2 }}
+              >
+                {rec?.checkOut || "--:--:--"}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div
         style={{
           display: "flex",
           flexWrap: "wrap",
           gap: 14,
+          paddingTop: compact ? 0 : 12,
           marginBottom: 14,
+          borderTop: compact ? "none" : `1px solid ${T.lineSoft}`,
+          textAlign: "left",
         }}
       >
-        <div
-          style={{
-            flex: "1 1 150px",
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            textAlign: "left",
-          }}
-        >
-          <span
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 11,
-              background: T.forestSoft,
-              color: T.forestText,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
-            <LogIn size={18} />
-          </span>
-          <div style={{ minWidth: 0 }}>
+        {compact && (
+          <div style={{ flex: "1.3 1 130px", minWidth: 0 }}>
             <div
               style={{
-                fontSize: 12.5,
-                fontWeight: 600,
-                color: T.textSoft,
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: ".06em",
+                color: T.muted,
+                textTransform: "uppercase",
                 whiteSpace: "nowrap",
               }}
             >
@@ -16372,68 +16786,17 @@ function SelfPunch({
             </div>
             <div
               className="wf-punch-clock"
-              style={{ fontSize: 18, lineHeight: 1.3, marginTop: 2 }}
+              style={{ fontSize: 16, lineHeight: 1.3, marginTop: 5 }}
             >
               {rec?.checkIn || "--:--:--"}
             </div>
+            {shift && (
+              <div style={{ fontSize: 10.5, color: T.muted, marginTop: 3 }}>
+                {t.att.workTimeLabel} {hhmm(shift.start)}–{hhmm(shift.end)}
+              </div>
+            )}
           </div>
-        </div>
-        <div
-          style={{
-            flex: "1 1 150px",
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            textAlign: "left",
-          }}
-        >
-          <span
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 11,
-              background: T.roseSoft,
-              color: T.roseDark,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
-            <LogOut size={18} />
-          </span>
-          <div style={{ minWidth: 0 }}>
-            <div
-              style={{
-                fontSize: 12.5,
-                fontWeight: 600,
-                color: T.textSoft,
-                whiteSpace: "nowrap",
-              }}
-            >
-              {t.att.checkOut}
-            </div>
-            <div
-              className="wf-punch-clock"
-              style={{ fontSize: 18, lineHeight: 1.3, marginTop: 2 }}
-            >
-              {rec?.checkOut || "--:--:--"}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 14,
-          paddingTop: 12,
-          marginBottom: 14,
-          borderTop: `1px solid ${T.lineSoft}`,
-          textAlign: "left",
-        }}
-      >
+        )}
         <div style={{ flex: "1 1 120px", minWidth: 0 }}>
           <div
             style={{
@@ -16481,7 +16844,7 @@ function SelfPunch({
             {rec?.checkInLoc?.officeName || "—"}
           </div>
         </div>
-        {shift && (
+        {!compact && shift && (
           <div style={{ flex: "1.2 1 150px", minWidth: 0 }}>
             <div
               style={{
@@ -16509,7 +16872,7 @@ function SelfPunch({
         )}
       </div>
 
-      {hasOffices && (
+      {!compact && hasOffices && (
         <div
           style={{
             display: "flex",
@@ -16624,7 +16987,8 @@ function SelfPunch({
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
+            flexDirection: compact ? "row" : "column",
+            alignItems: compact ? "center" : "stretch",
             gap: 10,
           }}
         >
@@ -16637,6 +17001,7 @@ function SelfPunch({
               padding: "13px 22px",
               fontSize: 15,
               borderRadius: 11,
+              flex: compact ? 1 : undefined,
             }}
           >
             {locBusy ? (
@@ -16649,37 +17014,65 @@ function SelfPunch({
             )}{" "}
             {t.att.checkIn}
           </Button>
-          {hasOffices && (
-            <>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  color: T.mutedLight,
-                  fontSize: 11,
-                }}
-              >
-                <span style={{ flex: 1, height: 1, background: T.lineSoft }} />
-                {t.att.scanQrOr}
-                <span style={{ flex: 1, height: 1, background: T.lineSoft }} />
-              </div>
-              <Button
-                variant="ghost"
-                onClick={() => setScanOpen(true)}
-                disabled={locBusy}
-                style={{
-                  justifyContent: "center",
-                  padding: "13px 22px",
-                  fontSize: 14,
-                  borderRadius: 11,
-                  border: `1px solid ${T.line}`,
-                }}
-              >
-                <QrCode size={15} /> {t.att.scanQrBtn}
-              </Button>
-            </>
-          )}
+          {hasOffices &&
+            (compact ? (
+              <>
+                <span
+                  style={{ color: T.mutedLight, fontSize: 11, flexShrink: 0 }}
+                >
+                  {t.att.scanQrOr}
+                </span>
+                <Button
+                  variant="ghost"
+                  onClick={() => setScanOpen(true)}
+                  disabled={locBusy}
+                  style={{
+                    justifyContent: "center",
+                    padding: "13px 16px",
+                    fontSize: 14,
+                    borderRadius: 11,
+                    border: `1px solid ${T.line}`,
+                    flex: 1,
+                  }}
+                >
+                  <QrCode size={15} /> {t.att.scanQrBtn}
+                </Button>
+              </>
+            ) : (
+              <>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    color: T.mutedLight,
+                    fontSize: 11,
+                  }}
+                >
+                  <span
+                    style={{ flex: 1, height: 1, background: T.lineSoft }}
+                  />
+                  {t.att.scanQrOr}
+                  <span
+                    style={{ flex: 1, height: 1, background: T.lineSoft }}
+                  />
+                </div>
+                <Button
+                  variant="ghost"
+                  onClick={() => setScanOpen(true)}
+                  disabled={locBusy}
+                  style={{
+                    justifyContent: "center",
+                    padding: "13px 22px",
+                    fontSize: 14,
+                    borderRadius: 11,
+                    border: `1px solid ${T.line}`,
+                  }}
+                >
+                  <QrCode size={15} /> {t.att.scanQrBtn}
+                </Button>
+              </>
+            ))}
         </div>
       )}
 
@@ -16687,7 +17080,8 @@ function SelfPunch({
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
+            flexDirection: compact ? "row" : "column",
+            alignItems: compact ? "center" : "stretch",
             gap: 10,
           }}
         >
@@ -16700,6 +17094,7 @@ function SelfPunch({
               padding: "13px 22px",
               fontSize: 15,
               borderRadius: 11,
+              flex: compact ? 1 : undefined,
             }}
           >
             {locBusy ? (
@@ -16712,37 +17107,65 @@ function SelfPunch({
             )}{" "}
             {t.att.punchOutBtn}
           </Button>
-          {hasOffices && (
-            <>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  color: T.mutedLight,
-                  fontSize: 11,
-                }}
-              >
-                <span style={{ flex: 1, height: 1, background: T.lineSoft }} />
-                {t.att.scanQrOr}
-                <span style={{ flex: 1, height: 1, background: T.lineSoft }} />
-              </div>
-              <Button
-                variant="ghost"
-                onClick={() => setScanOpen(true)}
-                disabled={locBusy}
-                style={{
-                  justifyContent: "center",
-                  padding: "13px 22px",
-                  fontSize: 14,
-                  borderRadius: 11,
-                  border: `1px solid ${T.line}`,
-                }}
-              >
-                <QrCode size={15} /> {t.att.scanQrBtn}
-              </Button>
-            </>
-          )}
+          {hasOffices &&
+            (compact ? (
+              <>
+                <span
+                  style={{ color: T.mutedLight, fontSize: 11, flexShrink: 0 }}
+                >
+                  {t.att.scanQrOr}
+                </span>
+                <Button
+                  variant="ghost"
+                  onClick={() => setScanOpen(true)}
+                  disabled={locBusy}
+                  style={{
+                    justifyContent: "center",
+                    padding: "13px 16px",
+                    fontSize: 14,
+                    borderRadius: 11,
+                    border: `1px solid ${T.line}`,
+                    flex: 1,
+                  }}
+                >
+                  <QrCode size={15} /> {t.att.scanQrBtn}
+                </Button>
+              </>
+            ) : (
+              <>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    color: T.mutedLight,
+                    fontSize: 11,
+                  }}
+                >
+                  <span
+                    style={{ flex: 1, height: 1, background: T.lineSoft }}
+                  />
+                  {t.att.scanQrOr}
+                  <span
+                    style={{ flex: 1, height: 1, background: T.lineSoft }}
+                  />
+                </div>
+                <Button
+                  variant="ghost"
+                  onClick={() => setScanOpen(true)}
+                  disabled={locBusy}
+                  style={{
+                    justifyContent: "center",
+                    padding: "13px 22px",
+                    fontSize: 14,
+                    borderRadius: 11,
+                    border: `1px solid ${T.line}`,
+                  }}
+                >
+                  <QrCode size={15} /> {t.att.scanQrBtn}
+                </Button>
+              </>
+            ))}
         </div>
       )}
 
