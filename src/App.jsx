@@ -95,6 +95,7 @@ import {
   Lightbulb,
   XCircle,
   Droplets,
+  BedDouble,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -623,6 +624,8 @@ const LANG_RAW = {
       inTime: "ម៉ោងចូល",
       outTime: "ម៉ោងចេញ",
       workHours: "ម៉ោងធ្វើការ",
+      overtimeShort: "ម៉ោងបន្ថែម",
+      workTimeLabel: "ម៉ោងធ្វើការ",
       allStatus: "គ្រប់ស្ថានភាព",
       allDepartments: "គ្រប់នាយកដ្ឋាន",
       allShifts: "គ្រប់វេន",
@@ -1905,6 +1908,8 @@ const LANG_RAW = {
       inTime: "In Time",
       outTime: "Out Time",
       workHours: "Work Hours",
+      overtimeShort: "Overtime",
+      workTimeLabel: "Work Time",
       allStatus: "All Status",
       allDepartments: "All Departments",
       allShifts: "All Shifts",
@@ -2850,6 +2855,8 @@ const LANG_RAW = {
       inTime: "上班时间",
       outTime: "下班时间",
       workHours: "工作时长",
+      overtimeShort: "加班",
+      workTimeLabel: "工作时间",
       allStatus: "所有状态",
       allDepartments: "所有部门",
       allShifts: "所有班次",
@@ -9669,11 +9676,6 @@ function Dashboard({
             linkTo: "payroll",
           },
         ];
-  const recent = [...attendance]
-    .filter((a) => a.date === today)
-    .filter((a) => role === "admin" || a.employeeId === currentEmp?.id)
-    .slice(-5)
-    .reverse();
 
   return (
     <div>
@@ -9741,108 +9743,7 @@ function Dashboard({
             overflow: "hidden",
           }}
         >
-          {/* Decorative "ID badge" illustration — hand-built from layered
-              shapes/icons rather than a raster image, so it always matches
-              the current primary-color/glass theming and needs no asset
-              file. Purely decorative: aria-hidden and clipped on very
-              narrow screens by overflow:hidden on the Card above. */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              top: -6,
-              right: -6,
-              width: 128,
-              height: 128,
-              pointerEvents: "none",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: 6,
-                right: 30,
-                width: 62,
-                height: 82,
-                borderRadius: 13,
-                background: "rgba(255,255,255,0.16)",
-                transform: "rotate(-10deg)",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                top: 18,
-                right: 6,
-                width: 70,
-                height: 90,
-                borderRadius: 15,
-                background: "rgba(255,255,255,0.95)",
-                boxShadow: "0 14px 30px -8px rgba(15,10,40,0.45)",
-                padding: 10,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <div
-                style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: "50%",
-                  background: T.blue,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                <UserCircle2 size={18} color="#fff" />
-              </div>
-              <div
-                style={{
-                  marginTop: 9,
-                  height: 3.5,
-                  width: "72%",
-                  background: "rgba(16,20,28,0.14)",
-                  borderRadius: 2,
-                }}
-              />
-              <div
-                style={{
-                  marginTop: 5,
-                  height: 3.5,
-                  width: "50%",
-                  background: "rgba(16,20,28,0.1)",
-                  borderRadius: 2,
-                }}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: -6,
-                  right: -6,
-                  width: 22,
-                  height: 22,
-                  borderRadius: "50%",
-                  background: T.forest,
-                  border: "2px solid #fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Check size={12} color="#fff" strokeWidth={3} />
-              </div>
-            </div>
-            <Star
-              size={16}
-              color="#FFD76B"
-              fill="#FFD76B"
-              style={{ position: "absolute", top: 0, right: 78 }}
-            />
-          </div>
-          <div style={{ position: "relative", maxWidth: "72%" }}>
+          <div style={{ position: "relative" }}>
             <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 13 }}>
               {t.dash.welcomeBackLabel}
             </p>
@@ -10881,93 +10782,161 @@ function Dashboard({
           </div>
 
           <Card style={{ padding: 18 }}>
-            <h3
+            <div
               style={{
-                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
-                fontWeight: 600,
-                color: T.ink,
-                marginBottom: 12,
-                fontSize: 14,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 16,
+                gap: 10,
               }}
             >
-              {t.dash.recentAttend}
-            </h3>
-            {recent.length === 0 ? (
-              <p
+              <h3
                 style={{
-                  fontSize: 13,
-                  color: T.muted,
-                  textAlign: "center",
-                  padding: "28px 0",
+                  fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                  fontWeight: 600,
+                  color: T.ink,
+                  fontSize: 14,
                 }}
               >
-                {t.dash.noAttend}
-              </p>
-            ) : (
-              <div>
-                {recent.map((a) => {
-                  const emp = employees.find((e) => e.id === a.employeeId);
-                  const shift = shifts?.find((s) => s.id === emp?.shiftId);
-                  const lateMins =
-                    a.status === "late"
-                      ? lateMinutesForShift(a.checkIn, shift)
-                      : 0;
-                  return (
-                    <div
-                      key={a.id}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 12,
-                        padding: "10px 0",
-                        borderTop: `1px solid ${T.divider}`,
-                      }}
-                    >
-                      <Avatar
-                        name={emp?.name || "?"}
-                        photo={emp?.photo}
-                        size={32}
-                      />
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div
+                {t.dash.recentAttend}
+              </h3>
+              {typeof setPage === "function" && (
+                <button
+                  type="button"
+                  onClick={() => setPage("attendance")}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: T.forestText,
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 0,
+                  }}
+                >
+                  {t.dash.viewAll} <ChevronRight size={13} />
+                </button>
+              )}
+            </div>
+            {(() => {
+              const workMins = workedMinutes(
+                myTodayRecord?.checkIn,
+                myTodayRecord?.checkOut,
+              );
+              const todayOtHours = (overtimeRequests || [])
+                .filter(
+                  (r) =>
+                    r.employeeId === currentEmp?.id &&
+                    r.status === "approved" &&
+                    r.date === today,
+                )
+                .reduce((sum, r) => sum + (Number(r.hours) || 0), 0);
+              const metrics = [
+                {
+                  id: "checkIn",
+                  icon: LogIn,
+                  color: T.forest,
+                  label: t.att.checkIn,
+                  value: myTodayRecord?.checkIn || "--:--",
+                },
+                {
+                  id: "checkOut",
+                  icon: LogOut,
+                  color: T.clay,
+                  label: t.att.checkOut,
+                  value: myTodayRecord?.checkOut || "--:--",
+                },
+                {
+                  id: "workHours",
+                  icon: Clock,
+                  color: T.blue,
+                  label: t.att.workHours,
+                  value: formatHM(workMins) || "0h 0m",
+                },
+                {
+                  id: "overtime",
+                  icon: Timer,
+                  color: "#8B5CF6",
+                  label: t.att.overtimeShort,
+                  value: formatHM(Math.round(todayOtHours * 60)) || "0h 0m",
+                },
+              ];
+              return (
+                <>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(2, 1fr)",
+                      gap: 14,
+                    }}
+                  >
+                    {metrics.map((m) => (
+                      <div
+                        key={m.id}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 9,
+                        }}
+                      >
+                        <span
                           style={{
-                            fontSize: 13,
-                            fontWeight: 500,
-                            color: T.ink,
+                            width: 32,
+                            height: 32,
+                            borderRadius: 9,
+                            background: m.color + "1F",
+                            color: m.color,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
                           }}
                         >
-                          {emp?.name}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: 11,
-                            color: T.muted,
-                            fontFamily: "'JetBrains Mono',monospace",
-                          }}
-                        >
-                          {t.att.checkIn} {a.checkIn || "—"}{" "}
-                          {a.checkOut
-                            ? `· ${t.att.checkOut} ${a.checkOut}`
-                            : ""}
-                        </div>
-                        {lateMins > 0 && (
+                          <m.icon size={15} />
+                        </span>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: 10.5, color: T.muted }}>
+                            {m.label}
+                          </div>
                           <div
                             style={{
-                              fontSize: 11,
-                              color: T.goldText,
-                              marginTop: 2,
+                              fontSize: 14,
+                              fontWeight: 700,
+                              color: T.ink,
+                              fontFamily: "'JetBrains Mono',monospace",
                             }}
                           >
-                            {formatLateDuration(lateMins, lang)}
+                            {m.value}
                           </div>
-                        )}
+                        </div>
                       </div>
-                      <StatusPill status={a.status} />
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                    ))}
+                  </div>
+                  {!myTodayRecord && (
+                    <p
+                      style={{
+                        fontSize: 12.5,
+                        color: T.muted,
+                        textAlign: "center",
+                        marginTop: 16,
+                        paddingTop: 14,
+                        borderTop: `1px solid ${T.divider}`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 6,
+                      }}
+                    >
+                      <FileText size={13} /> {t.dash.noAttend}
+                    </p>
+                  )}
+                </>
+              );
+            })()}
           </Card>
         </>
       )}
@@ -16187,93 +16156,163 @@ function SelfPunch({
   };
 
   return (
-    <Card
-      accent={T.forest}
-      style={{ padding: 26, marginBottom: 22, textAlign: "center" }}
-    >
+    <Card style={{ padding: 22, marginBottom: 22, textAlign: "center" }}>
       <div
         style={{
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: ".08em",
-          color: T.muted,
-          textTransform: "uppercase",
-          marginBottom: 4,
+          display: "flex",
+          flexWrap: "nowrap",
+          alignItems: "center",
+          gap: 10,
+          marginBottom: hasOffices ? 14 : 6,
+          textAlign: "left",
         }}
       >
-        {t.att.liveClockLabel}
-      </div>
-      <div className="wf-punch-clock" style={{ marginBottom: 8 }}>
-        {timeNow()}
-      </div>
-      {shift && (
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 5,
-            fontSize: 11.5,
-            color: T.muted,
-            background: T.paper,
-            padding: "4px 10px",
-            borderRadius: 999,
-            marginBottom: hasOffices ? 14 : 16,
-          }}
-        >
-          <Watch size={12} /> {shiftLabel(shift)}
-        </div>
-      )}
-      {!shift && <div style={{ marginBottom: hasOffices ? 10 : 16 }} />}
-      {hasOffices && (
         <div
           style={{
             display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "center",
-            gap: 22,
-            padding: "12px 0",
-            marginBottom: 16,
-            borderTop: `1px solid ${T.lineSoft}`,
-            borderBottom: `1px solid ${T.lineSoft}`,
+            alignItems: "center",
+            gap: 10,
+            flex: "1.15 1 0",
+            minWidth: 0,
           }}
         >
-          <div style={{ display: "flex", alignItems: "flex-start", gap: 6 }}>
-            <MapPin size={14} color={T.muted} style={{ marginTop: 1 }} />
-            <div style={{ textAlign: "left" }}>
-              <div style={{ fontSize: 12, color: T.textSoft }}>
+          <span
+            style={{
+              width: 42,
+              height: 42,
+              borderRadius: 12,
+              background: T.forestSoft,
+              color: T.forestText,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <Clock size={19} />
+          </span>
+          <div style={{ minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: ".06em",
+                color: T.muted,
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {t.att.liveClockLabel}
+            </div>
+            <div
+              className="wf-punch-clock"
+              style={{ fontSize: 22, lineHeight: 1.15 }}
+            >
+              {timeNow()}
+            </div>
+            {shift && (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 4,
+                  fontSize: 10.5,
+                  color: T.muted,
+                  marginTop: 4,
+                  lineHeight: 1.3,
+                }}
+              >
+                <Watch size={10} style={{ flexShrink: 0, marginTop: 1 }} />
+                <span>
+                  {t.att.workTimeLabel} {hhmm(shift.start)}–{hhmm(shift.end)}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+        {hasOffices && (
+          <div
+            style={{
+              flex: "1 1 0",
+              minWidth: 0,
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 6,
+              padding: "8px 9px",
+              borderRadius: 12,
+              border: `1px solid ${T.line}`,
+            }}
+          >
+            <MapPin
+              size={13}
+              color={T.blue}
+              style={{ marginTop: 1, flexShrink: 0 }}
+            />
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 10, color: T.textSoft, lineHeight: 1.3 }}>
                 {t.att.gpsRequiredHint(offices.length)}
               </div>
               <div
                 style={{
-                  fontSize: 11,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 3,
+                  fontSize: 10,
                   color: locBusy ? T.muted : T.forestText,
                   fontWeight: 600,
-                  marginTop: 1,
+                  marginTop: 3,
                 }}
               >
-                {locBusy ? t.att.locatingNow : t.att.locVerifiedOnPunch}
+                <span style={{ flexShrink: 0 }}>
+                  {!locBusy && <CheckCircle2 size={11} />}
+                </span>
+                <span>
+                  {locBusy ? t.att.locatingNow : t.att.locVerifiedOnPunch}
+                </span>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
       {todayIsDayOff && (
-        <p
+        <div
           style={{
-            fontSize: 12.5,
-            fontWeight: 600,
-            color: T.goldText,
-            background: T.goldSoft,
-            padding: "8px 12px",
-            borderRadius: 10,
-            marginBottom: 12,
-            maxWidth: 320,
-            marginLeft: "auto",
-            marginRight: "auto",
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            textAlign: "left",
+            background: T.forestSoft,
+            padding: "12px 14px",
+            borderRadius: 13,
+            marginBottom: 14,
           }}
         >
-          {t.att.dayOffNote}
-        </p>
+          <span
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: 10,
+              background: "rgba(255,255,255,0.5)",
+              color: T.forestText,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <BedDouble size={17} />
+          </span>
+          <p
+            style={{
+              fontSize: 12.5,
+              fontWeight: 600,
+              color: T.forestText,
+              lineHeight: 1.4,
+            }}
+          >
+            {t.att.dayOffNote}
+          </p>
+        </div>
       )}
       {branchWarning && (
         <p
@@ -16311,8 +16350,9 @@ function SelfPunch({
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
             alignItems: "center",
+            justifyContent: "center",
+            flexWrap: "wrap",
             gap: 10,
           }}
         >
@@ -16321,10 +16361,10 @@ function SelfPunch({
             onClick={() => punchIn()}
             disabled={locBusy}
             style={{
-              width: "100%",
+              flex: "1 1 170px",
               maxWidth: 340,
               justifyContent: "center",
-              padding: "13px 26px",
+              padding: "13px 22px",
               fontSize: 15,
               borderRadius: 11,
             }}
@@ -16341,7 +16381,13 @@ function SelfPunch({
           </Button>
           {hasOffices && (
             <>
-              <div style={{ fontSize: 11, color: T.mutedLight }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: T.mutedLight,
+                  flexShrink: 0,
+                }}
+              >
                 {t.att.scanQrOr}
               </div>
               <Button
@@ -16349,6 +16395,7 @@ function SelfPunch({
                 size="sm"
                 onClick={() => setScanOpen(true)}
                 disabled={locBusy}
+                style={{ flexShrink: 0 }}
               >
                 <QrCode size={13} /> {t.att.scanQrBtn}
               </Button>
@@ -16442,8 +16489,9 @@ function SelfPunch({
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
               alignItems: "center",
+              justifyContent: "center",
+              flexWrap: "wrap",
               gap: 10,
             }}
           >
@@ -16452,10 +16500,10 @@ function SelfPunch({
               onClick={() => punchOut()}
               disabled={locBusy}
               style={{
-                width: "100%",
+                flex: "1 1 170px",
                 maxWidth: 340,
                 justifyContent: "center",
-                padding: "13px 26px",
+                padding: "13px 22px",
                 fontSize: 15,
                 borderRadius: 11,
               }}
@@ -16472,7 +16520,13 @@ function SelfPunch({
             </Button>
             {hasOffices && (
               <>
-                <div style={{ fontSize: 11, color: T.mutedLight }}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: T.mutedLight,
+                    flexShrink: 0,
+                  }}
+                >
                   {t.att.scanQrOr}
                 </div>
                 <Button
@@ -16480,6 +16534,7 @@ function SelfPunch({
                   size="sm"
                   onClick={() => setScanOpen(true)}
                   disabled={locBusy}
+                  style={{ flexShrink: 0 }}
                 >
                   <QrCode size={13} /> {t.att.scanQrBtn}
                 </Button>
