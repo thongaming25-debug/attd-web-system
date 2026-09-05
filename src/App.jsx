@@ -620,6 +620,12 @@ const LANG_RAW = {
         `ត្រូវការទីតាំង GPS នៅជិតសាខាមួយក្នុងចំណោម ${n} សាខា`,
       locatingNow: "កំពុងកំណត់ទីតាំង...",
       locVerifiedOnPunch: "នឹងផ្ទៀងផ្ទាត់ពេលចុះឈ្មោះ",
+      offlinePending:
+        "🔄 បានកត់ត្រាទុកក្នុងឧបករណ៍នេះ — គ្មានអ៊ីនធឺណិត នឹងផ្ញើទៅប្រព័ន្ធដោយស្វ័យប្រវត្តិពេលមានអ៊ីនធឺណិតឡើងវិញ",
+      offlinePendingShort: "រង់ចាំអ៊ីនធឺណិត",
+      offlineQueuedToast:
+        "គ្មានអ៊ីនធឺណិត — បានកត់ត្រាទុកជាមួយឧបករណ៍នេះ នឹងធ្វើសមកាលកម្មដោយស្វ័យប្រវត្តិ",
+      offlineSyncedToast: "បានធ្វើសមកាលកម្មដោយជោគជ័យ",
       locationLabel: "ទីតាំង",
       noData: "គ្មានទិន្នន័យ",
       manualEntry: "កត់ត្រាដោយដៃ",
@@ -1872,6 +1878,12 @@ const LANG_RAW = {
       gpsRequiredHint: (n) => `GPS location required near one of ${n} branches`,
       locatingNow: "Locating...",
       locVerifiedOnPunch: "Verified when you check in/out",
+      offlinePending:
+        "🔄 Saved on this device — no internet connection. It will sync automatically once you're back online.",
+      offlinePendingShort: "Waiting to sync",
+      offlineQueuedToast:
+        "No internet — saved on this device, will sync automatically",
+      offlineSyncedToast: "Synced successfully",
       locationLabel: "Location",
       noData: "No data",
       manualEntry: "Manual Entry",
@@ -2787,6 +2799,11 @@ const LANG_RAW = {
       gpsRequiredHint: (n) => `需要在 ${n} 个分店之一的 GPS 范围内`,
       locatingNow: "正在定位...",
       locVerifiedOnPunch: "打卡时将验证位置",
+      offlinePending:
+        "🔄 已保存在本设备 — 目前没有网络连接，恢复网络后将自动同步",
+      offlinePendingShort: "等待同步",
+      offlineQueuedToast: "没有网络 — 已保存在本设备，将自动同步",
+      offlineSyncedToast: "已成功同步",
       locationLabel: "位置",
       noData: "没有数据",
       manualEntry: "手动登记",
@@ -5663,10 +5680,24 @@ function useSupabaseArray(
     // failures are logged, never surfaced to the user or thrown, since a
     // push failing shouldn't block the save that triggered it.
     notify,
+    // Optional: when true, a write that fails because the device has no
+    // real connectivity (as opposed to a genuine server-side rejection —
+    // bad column, RLS denial, etc.) is stashed in localStorage instead of
+    // surfacing as a "save failed" error, and retried automatically once
+    // the device is back online. Off by default: most tables (payroll,
+    // employees, ...) would rather fail loudly than silently queue a
+    // write an admin might not remember making. Turned on for `attendance`
+    // so a staff check-in/check-out made with no signal isn't lost.
+    offlineQueue,
   } = {},
 ) {
   const [value, setValueState] = useState([]);
   const [ready, setReady] = useState(false);
+  // Ids of rows currently sitting in the offline queue for this table —
+  // i.e. saved locally but not yet confirmed on the server. Exposed as the
+  // 5th return value so a screen (e.g. the self check-in card) can show a
+  // "waiting to sync" badge instead of pretending the write already landed.
+  const [pendingIds, setPendingIds] = useState(() => new Set());
   // Surfaces the last save/delete failure so screens like Settings can
   // tell the user "this didn't actually save" instead of showing a
   // success checkmark while Supabase silently rejected the write (e.g. a
@@ -5688,6 +5719,44 @@ function useSupabaseArray(
     dateField && daysBack
       ? new Date(Date.now() - daysBack * 86400000).toISOString().slice(0, 10)
       : null;
+
+  // --- Offline queue (only active when offlineQueue: true) ---------------
+  // Rows are stored here already in DB shape (post-mapToDb), keyed by the
+  // localStorage key below, so flushing them later is a straight upsert
+  // with no re-mapping needed. Scoped per-table so different tables never
+  // collide or get flushed into the wrong one.
+  const offlineKey = `wf:offlineQueue:${table}`;
+  const readOfflineQueue = () => {
+    try {
+      const raw = localStorage.getItem(offlineKey);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  };
+  const writeOfflineQueue = (rows) => {
+    try {
+      if (rows.length) localStorage.setItem(offlineKey, JSON.stringify(rows));
+      else localStorage.removeItem(offlineKey);
+    } catch {
+      // Storage full/unavailable (e.g. private browsing) — the queued row
+      // still lives in memory for this tab via pendingIds/optimistic state,
+      // it just won't survive a reload before it manages to sync.
+    }
+  };
+  // A row that failed to reach Supabase is only worth silently queuing (as
+  // opposed to showing the normal "save failed" error) when the failure
+  // looks like a connectivity problem rather than a real server rejection.
+  // Supabase/PostgREST errors that actually reached the server carry a
+  // `code` (e.g. a Postgres error code or RLS violation); a request that
+  // never reached the server (offline, DNS failure, etc.) surfaces as a
+  // plain JS/fetch error with no such code. We also trust the browser's
+  // own `navigator.onLine` as a second, independent signal — either one
+  // pointing to "offline" is enough to queue instead of erroring loudly.
+  const looksOffline = (error) =>
+    typeof navigator !== "undefined" &&
+    (navigator.onLine === false || !error?.code);
 
   useEffect(() => {
     let cancelled = false;
@@ -5718,14 +5787,32 @@ function useSupabaseArray(
         if (!data || data.length < PAGE_SIZE) break;
         offset += PAGE_SIZE;
       }
+      // Fold in anything still sitting in this table's offline queue — a
+      // punch made while offline (see setValue below) that hasn't managed
+      // to sync yet. Without this, reloading the page before the device
+      // is back online would make an employee's own pending check-in
+      // vanish from view, even though it's still safely queued locally.
+      let queuedRows = [];
+      if (offlineQueue) {
+        queuedRows = readOfflineQueue();
+        setPendingIds(new Set(queuedRows.map((r) => r.id)));
+      }
       if (pageError) {
         console.error(`[supabase] failed to load ${table}:`, pageError.message);
-        prevRef.current = [];
-        setValueState([]);
-      } else {
-        const mapped = all.map(mapFromDb);
+        const mapped = queuedRows.map(mapFromDb);
         prevRef.current = mapped;
         setValueState(mapped);
+      } else {
+        const mapped = all.map(mapFromDb);
+        // Prefer the queued (not-yet-confirmed) version of a row over
+        // whatever the server returned for that same id, since the server
+        // copy can only be stale here — if it were current, the row
+        // wouldn't still be queued.
+        const merged = mapped
+          .filter((r) => !queuedRows.some((q) => q.id === r.id))
+          .concat(queuedRows.map(mapFromDb));
+        prevRef.current = merged;
+        setValueState(merged);
       }
       setReady(true);
     })();
@@ -5829,6 +5916,7 @@ function useSupabaseArray(
       setSaveError(null);
       (async () => {
         let hadError = false;
+        let wasQueued = false;
         if (toDelete.length) {
           const { error } = await supabase
             .from(table)
@@ -5845,24 +5933,43 @@ function useSupabaseArray(
           }
         }
         if (toUpsert.length) {
-          const { error } = await supabase
-            .from(table)
-            .upsert(toUpsert.map(mapToDb));
+          const rowsToSend = toUpsert.map(mapToDb);
+          const { error } = await supabase.from(table).upsert(rowsToSend);
           if (error) {
-            console.error(
-              `[supabase] upsert failed on ${table}:`,
-              error.message,
-            );
-            setSaveError(error.message);
-            pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
-            hadError = true;
+            if (offlineQueue && looksOffline(error)) {
+              // Looks like a connectivity failure rather than a real
+              // rejection — stash these rows so the next reconnect
+              // (see the flush effect below) retries them automatically,
+              // instead of telling the user the save "failed" when it
+              // really just hasn't reached the server yet.
+              console.warn(
+                `[supabase] ${table} write queued offline (no connection):`,
+                error.message,
+              );
+              const queue = readOfflineQueue();
+              const byId = new Map(queue.map((r) => [r.id, r]));
+              rowsToSend.forEach((r) => byId.set(r.id, r));
+              const nextQueue = Array.from(byId.values());
+              writeOfflineQueue(nextQueue);
+              setPendingIds(new Set(nextQueue.map((r) => r.id)));
+              pushToast(t.att.offlineQueuedToast, "info");
+              wasQueued = true;
+            } else {
+              console.error(
+                `[supabase] upsert failed on ${table}:`,
+                error.message,
+              );
+              setSaveError(error.message);
+              pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
+              hadError = true;
+            }
           }
         }
         // Confirms the optimistic update the UI already made actually
         // stuck server-side. Only fires when something real changed
         // (toDelete/toUpsert non-empty) — not on every re-render — so
         // it stays a genuine confirmation rather than background noise.
-        if (!hadError && (toDelete.length || toUpsert.length)) {
+        if (!hadError && !wasQueued && (toDelete.length || toUpsert.length)) {
           pushToast(t.settings.saved, "success");
         }
       })();
@@ -5970,7 +6077,48 @@ function useSupabaseArray(
     [table, mapToDb, audit, actorRef, labelOf, notify, t],
   );
 
-  return [value, setValue, ready, saveError];
+  // Retries whatever is left in this table's offline queue. Safe to call
+  // any time (including with an empty queue — it's just a no-op then).
+  // Confirmed rows are dropped from the queue and folded into `value` via
+  // the normal realtime handler above once the insert/update actually
+  // lands, so we don't duplicate that merge here.
+  const flushOfflineQueue = useCallback(async () => {
+    if (!offlineQueue) return;
+    const queue = readOfflineQueue();
+    if (!queue.length) return;
+    const { error } = await supabase.from(table).upsert(queue);
+    if (error) {
+      // Still offline (or the server is genuinely down) — leave the queue
+      // untouched and try again on the next trigger.
+      console.warn(
+        `[supabase] ${table} offline queue retry failed:`,
+        error.message,
+      );
+      return;
+    }
+    writeOfflineQueue([]);
+    setPendingIds(new Set());
+    pushToast(t.att.offlineSyncedToast, "success");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [table, offlineQueue, t]);
+
+  useEffect(() => {
+    if (!offlineQueue) return;
+    // Try right away in case the tab was reopened already online with a
+    // queue left over from a previous offline session, then again whenever
+    // the browser tells us connectivity came back, and as a periodic
+    // backstop for cases the `online` event misses (e.g. a flaky captive
+    // portal that never fires it).
+    flushOfflineQueue();
+    window.addEventListener("online", flushOfflineQueue);
+    const interval = setInterval(flushOfflineQueue, 20000);
+    return () => {
+      window.removeEventListener("online", flushOfflineQueue);
+      clearInterval(interval);
+    };
+  }, [offlineQueue, flushOfflineQueue]);
+
+  return [value, setValue, ready, saveError, pendingIds];
 }
 
 // payroll_paid is stored as one row per (employee, month) but the app
@@ -9261,6 +9409,7 @@ function Dashboard({
   departments,
   attendance,
   setAttendance,
+  attendancePendingIds,
   payrollPaid,
   role,
   currentEmp,
@@ -10533,6 +10682,7 @@ function Dashboard({
               shift={myShift}
               attendance={attendance}
               setAttendance={setAttendance}
+              pendingIds={attendancePendingIds}
               offices={offices}
               soundPreset={soundPreset}
             />
@@ -15762,6 +15912,7 @@ function SelfPunch({
   shift,
   attendance,
   setAttendance,
+  pendingIds,
   offices,
   soundPreset,
 }) {
@@ -15770,6 +15921,12 @@ function SelfPunch({
   const rec = attendance.find(
     (a) => a.employeeId === emp.id && a.date === today,
   );
+  // True while today's punch is saved on this device but hasn't reached
+  // Supabase yet (no internet) — see the offlineQueue option on the
+  // `attendance` useSupabaseArray call. The check-in/check-out itself
+  // already happened locally at this point; this only affects whether we
+  // show a "waiting to sync" note instead of assuming it's confirmed.
+  const isPending = !!(rec && pendingIds && pendingIds.has(rec.id));
   const [locBusy, setLocBusy] = useState(false);
   const [locError, setLocError] = useState("");
   const [branchWarning, setBranchWarning] = useState("");
@@ -16036,6 +16193,24 @@ function SelfPunch({
           }}
         >
           {locError}
+        </p>
+      )}
+      {isPending && (
+        <p
+          style={{
+            fontSize: 12.5,
+            fontWeight: 600,
+            color: T.goldText,
+            background: T.goldSoft,
+            padding: "8px 12px",
+            borderRadius: 10,
+            marginBottom: 12,
+            maxWidth: 320,
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
+        >
+          {t.att.offlinePending}
         </p>
       )}
       {!rec && (
@@ -17333,6 +17508,7 @@ function Attendance({
   shifts,
   attendance,
   setAttendance,
+  attendancePendingIds,
   isSuperAdmin,
   offices,
   setOffices,
@@ -17429,6 +17605,7 @@ function Attendance({
           shift={shiftOf(currentEmp.shiftId)}
           attendance={attendance}
           setAttendance={setAttendance}
+          pendingIds={attendancePendingIds}
           offices={offices}
           soundPreset={soundPreset}
         />
@@ -27777,7 +27954,9 @@ function AppearanceCard() {
                   height: 26,
                   borderRadius: "50%",
                   background: p.hex,
-                  border: active ? `2px solid ${T.ink}` : `2px solid transparent`,
+                  border: active
+                    ? `2px solid ${T.ink}`
+                    : `2px solid transparent`,
                   boxShadow: active ? `0 0 0 2px ${T.card}` : "none",
                   cursor: "pointer",
                   outline: active ? `1px solid ${T.ink}` : "none",
@@ -32720,60 +32899,68 @@ function AppInner() {
       entityLabel: (r) => `${r.date || "?"} · ${r.employeeId || "?"}`,
     },
   );
-  const [attendance, setAttendance, aReady] = useSupabaseArray("attendance", {
-    // Attendance grows without bound (every check-in/out, forever), so we
-    // only keep a rolling 6-month window live in the app — enough for the
-    // Payroll month-picker's usual back-history and the Analytics trend
-    // (which only ever looks at the last 6 months anyway). This keeps the
-    // payload bounded even at 1000+ staff instead of dragging in years of
-    // punches on every load. Combined with the pagination fix in
-    // useSupabaseArray above, this also protects against Supabase/
-    // PostgREST's default 1000-row response cap.
-    dateField: "date",
-    daysBack: 180,
-    fromDb: (r) => ({
-      id: r.id,
-      employeeId: r.employee_id,
-      date: r.date,
-      checkIn: r.check_in,
-      checkOut: r.check_out,
-      status: r.status,
-      checkInLoc: r.check_in_loc,
-      checkOutLoc: r.check_out_loc,
-    }),
-    toDb: (r) => ({
-      id: r.id,
-      employee_id: r.employeeId,
-      date: r.date,
-      // check_in/check_out are Postgres `time` columns, which reject an
-      // empty string ("") with a 400 — only null or a valid "HH:MM" is
-      // accepted. Any upstream code path (manual entry, self-punch,
-      // corrections, leave approval) that leaves these as "" instead of
-      // null would otherwise fail the whole batch upsert silently
-      // (console-only error), so normalize defensively right here.
-      check_in: r.checkIn || null,
-      check_out: r.checkOut || null,
-      status: r.status,
-      check_in_loc: r.checkInLoc,
-      check_out_loc: r.checkOutLoc,
-    }),
-    notify: ({ type, row }) => {
-      if (type === "create" && row.status === "late") {
-        const emp = employees.find((e) => e.id === row.employeeId);
-        const empShift = shifts.find((s) => s.id === emp?.shiftId);
-        const mins = lateMinutesForShift(row.checkIn, empShift);
-        const lateLabel = formatLateDuration(mins, "km"); // e.g. "មកយឺត 4 ម៉ោង 49 នាទី"
-        return {
-          userType: "admin",
-          title: "បុគ្គលិកមកយឺត",
-          body: `${emp?.name || "?"} (${emp?.code || row.employeeId}) បានចូលធ្វើការនៅម៉ោង ${row.checkIn}${lateLabel ? ` (${lateLabel})` : ""}`,
-          page: "late",
-          portal: "admin",
-        };
-      }
-      return null;
-    },
-  });
+  const [attendance, setAttendance, aReady, aSaveError, attendancePendingIds] =
+    useSupabaseArray("attendance", {
+      // Attendance grows without bound (every check-in/out, forever), so we
+      // only keep a rolling 6-month window live in the app — enough for the
+      // Payroll month-picker's usual back-history and the Analytics trend
+      // (which only ever looks at the last 6 months anyway). This keeps the
+      // payload bounded even at 1000+ staff instead of dragging in years of
+      // punches on every load. Combined with the pagination fix in
+      // useSupabaseArray above, this also protects against Supabase/
+      // PostgREST's default 1000-row response cap.
+      dateField: "date",
+      daysBack: 180,
+      // A staff check-in/check-out is the one write in this app that has to
+      // work even with no signal (a phone in a warehouse basement, a branch
+      // with an unreliable line, etc.) — see SelfPunch below. Everything
+      // else (payroll, employee records, ...) intentionally still fails
+      // loudly instead of queuing, so an admin never wonders whether an
+      // edit "really" saved.
+      offlineQueue: true,
+      fromDb: (r) => ({
+        id: r.id,
+        employeeId: r.employee_id,
+        date: r.date,
+        checkIn: r.check_in,
+        checkOut: r.check_out,
+        status: r.status,
+        checkInLoc: r.check_in_loc,
+        checkOutLoc: r.check_out_loc,
+      }),
+      toDb: (r) => ({
+        id: r.id,
+        employee_id: r.employeeId,
+        date: r.date,
+        // check_in/check_out are Postgres `time` columns, which reject an
+        // empty string ("") with a 400 — only null or a valid "HH:MM" is
+        // accepted. Any upstream code path (manual entry, self-punch,
+        // corrections, leave approval) that leaves these as "" instead of
+        // null would otherwise fail the whole batch upsert silently
+        // (console-only error), so normalize defensively right here.
+        check_in: r.checkIn || null,
+        check_out: r.checkOut || null,
+        status: r.status,
+        check_in_loc: r.checkInLoc,
+        check_out_loc: r.checkOutLoc,
+      }),
+      notify: ({ type, row }) => {
+        if (type === "create" && row.status === "late") {
+          const emp = employees.find((e) => e.id === row.employeeId);
+          const empShift = shifts.find((s) => s.id === emp?.shiftId);
+          const mins = lateMinutesForShift(row.checkIn, empShift);
+          const lateLabel = formatLateDuration(mins, "km"); // e.g. "មកយឺត 4 ម៉ោង 49 នាទី"
+          return {
+            userType: "admin",
+            title: "បុគ្គលិកមកយឺត",
+            body: `${emp?.name || "?"} (${emp?.code || row.employeeId}) បានចូលធ្វើការនៅម៉ោង ${row.checkIn}${lateLabel ? ` (${lateLabel})` : ""}`,
+            page: "late",
+            portal: "admin",
+          };
+        }
+        return null;
+      },
+    });
   const [payrollPaid, setPayrollPaid, pReady] = usePayrollPaid();
   const [leaveRequests, setLeaveRequests, lrReady] = useSupabaseArray(
     "leave_requests",
@@ -34316,6 +34503,7 @@ function AppInner() {
                   departments={departments}
                   attendance={attendance}
                   setAttendance={setAttendance}
+                  attendancePendingIds={attendancePendingIds}
                   payrollPaid={payrollPaid}
                   role={role}
                   currentEmp={currentEmp}
@@ -34444,6 +34632,7 @@ function AppInner() {
                     shifts={shifts}
                     attendance={attendance}
                     setAttendance={setAttendance}
+                    attendancePendingIds={attendancePendingIds}
                     isSuperAdmin={isSuperAdmin}
                     offices={offices}
                     setOffices={setOffices}
@@ -34688,10 +34877,15 @@ function AppInner() {
 // exception is the service worker itself (registered at /sw.js):
 // browsers require it to be a real same-origin script file reachable
 // at a stable URL — that's a platform security rule, not something we
-// can inline into the JS bundle. Deliberately does NOT cache or queue
-// Supabase writes — checking in/out, payroll, etc. still need a live
-// connection; this only makes the shell load fast and work when the
-// network blips.
+// can inline into the JS bundle. This service worker itself deliberately
+// does NOT cache or queue Supabase writes — it only makes the app shell
+// load fast and stay usable when the network blips. Most writes (payroll,
+// employee records, ...) still need a live connection and fail loudly if
+// not. The one deliberate exception is the staff self check-in/check-out
+// (see the `offlineQueue` option on useSupabaseArray, used for the
+// `attendance` table): a punch made with no signal is saved to
+// localStorage and retried automatically once the device is back online,
+// since losing a punch is worse than a short sync delay.
 const PWA_ICON_SVG =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
   '<rect width="100" height="100" rx="22" fill="#0A0F1A"/>' +
