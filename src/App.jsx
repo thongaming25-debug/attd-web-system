@@ -4060,6 +4060,18 @@ html,body,#root{height:100%;}
   .wf-dash-stats .wf-card{padding:13px !important;}
   .wf-dash-stats .wf-stat-solid{padding:13px !important;}
   .wf-dash-stats .wf-stat-solid-value{font-size:23px !important;}
+  /* Employee "Sale Department / My Shift / Status / Payroll" pastel
+     tiles are sized generously for desktop (min-height 132px) — on a
+     phone, four of those plus the punch card, banner and attendance
+     strip push the whole dashboard well past one screen. Tighten them
+     down so the page reads as a single, unhurried scroll instead of a
+     long one. */
+  .wf-stat-pastel{min-height:92px !important;padding:13px 14px !important;}
+  .wf-stat-pastel-title{font-size:16px !important;padding-right:20px !important;}
+  .wf-stat-pastel-label{font-size:11px !important;}
+  .wf-stat-pastel-sub{font-size:10.5px !important;}
+  .wf-stat-pastel-icon{width:30px !important;height:30px !important;}
+  .wf-stat-pastel-chevron{width:20px !important;height:20px !important;top:10px !important;right:10px !important;}
   /* The "Attendance Overview / Employees by Department / Quick Actions"
      row is a fixed 3-column grid (1.5fr 1.1fr 0.9fr) sized for desktop.
      On phones that squeezes all three cards side-by-side and forces
@@ -9734,8 +9746,8 @@ function Dashboard({
       ) : (
         <Card
           style={{
-            padding: 22,
-            marginBottom: 22,
+            padding: 18,
+            marginBottom: 16,
             background:
               "linear-gradient(135deg, #5B8DEF 0%, #7C6FF5 55%, #8B5CF6 100%)",
             color: "#fff",
@@ -9744,13 +9756,18 @@ function Dashboard({
           }}
         >
           <div style={{ position: "relative" }}>
-            <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 13 }}>
+            <p
+              style={{
+                color: "rgba(255,255,255,0.85)",
+                fontSize: 12,
+              }}
+            >
               {t.dash.welcomeBackLabel}
             </p>
             <h2
               style={{
                 fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
-                fontSize: 23,
+                fontSize: 20,
                 fontWeight: 700,
                 marginTop: 2,
                 display: "flex",
@@ -9764,8 +9781,8 @@ function Dashboard({
             <p
               style={{
                 color: "rgba(255,255,255,0.85)",
-                fontSize: 12.5,
-                marginTop: 6,
+                fontSize: 11.5,
+                marginTop: 4,
                 fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
               }}
             >
@@ -10708,7 +10725,7 @@ function Dashboard({
             />
           )}
 
-          <div className="wf-dash-stats" style={{ marginBottom: 22 }}>
+          <div className="wf-dash-stats" style={{ marginBottom: 16 }}>
             {stats.map((s) => {
               const accentKey =
                 s.accent === T.forest
@@ -16156,7 +16173,7 @@ function SelfPunch({
   };
 
   return (
-    <Card style={{ padding: 22, marginBottom: 22, textAlign: "center" }}>
+    <Card style={{ padding: 18, marginBottom: 16, textAlign: "center" }}>
       <div
         style={{
           display: "flex",
