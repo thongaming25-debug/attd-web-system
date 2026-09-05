@@ -254,6 +254,7 @@ const LANG_RAW = {
       onLeave: "កំពុងឈប់សម្រាក",
       ofTotal: "នៃចំនួនសរុប",
       attendanceOverview: "ទិដ្ឋភាពទូទៅវត្តមាន",
+      todayAttendanceOverview: "ទិដ្ឋភាពទូទៅវត្តមានថ្ងៃនេះ",
       attendRateSeries: "អត្រាមកធ្វើការ (%)",
       absentRateSeries: "អត្រាអវត្តមាន (%)",
       last6MonthsLabel: "៦ ខែចុងក្រោយ",
@@ -1539,6 +1540,7 @@ const LANG_RAW = {
       onLeave: "On Leave",
       ofTotal: "of total",
       attendanceOverview: "Attendance Overview",
+      todayAttendanceOverview: "Today's Attendance Overview",
       attendRateSeries: "Attendance Rate (%)",
       absentRateSeries: "Absent Rate (%)",
       last6MonthsLabel: "Last 6 months",
@@ -2828,6 +2830,7 @@ const LANG_RAW = {
       statLeaveDays: "本月请假天数",
       statOtHours: "本月加班时数",
       statTrainingsProgress: "进行中的培训",
+      todayAttendanceOverview: "今日考勤概览",
     },
     analytics: {
       title: "数据分析",
@@ -10592,6 +10595,114 @@ function Dashboard({
               />
             </Card>
           </div>
+
+          <Card style={{ padding: 18, marginBottom: 22 }}>
+            <h3
+              style={{
+                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                fontWeight: 600,
+                color: T.ink,
+                fontSize: 14,
+                marginBottom: 14,
+              }}
+            >
+              {t.dash.todayAttendanceOverview}
+            </h3>
+            {(() => {
+              const todaysRecords = attendance.filter((a) => a.date === today);
+              const todaysItems = [
+                {
+                  icon: CheckCircle2,
+                  bg: T.forestSoft,
+                  fg: T.forestText,
+                  value: todaysRecords.filter((a) => a.status === "present")
+                    .length,
+                  label: STATUS_MAP.present.label,
+                },
+                {
+                  icon: Clock,
+                  bg: T.goldSoft,
+                  fg: T.goldText,
+                  value: todaysRecords.filter((a) => a.status === "late")
+                    .length,
+                  label: STATUS_MAP.late.label,
+                },
+                {
+                  icon: XCircle,
+                  bg: T.roseSoft,
+                  fg: T.roseDark,
+                  value: todaysRecords.filter((a) => a.status === "absent")
+                    .length,
+                  label: STATUS_MAP.absent.label,
+                },
+                {
+                  icon: CalendarDays,
+                  bg: OT_STAT_TINTS.blue.bg,
+                  fg: OT_STAT_TINTS.blue.fg,
+                  value: (leaveRequests || []).filter(
+                    (r) =>
+                      r.status === "approved" &&
+                      r.startDate <= today &&
+                      today <= r.endDate,
+                  ).length,
+                  label: t.dash.onLeave,
+                },
+              ];
+              return (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+                    gap: 16,
+                  }}
+                >
+                  {todaysItems.map((it, i) => (
+                    <div
+                      key={i}
+                      style={{ display: "flex", alignItems: "center", gap: 10 }}
+                    >
+                      <span
+                        style={{
+                          width: 38,
+                          height: 38,
+                          borderRadius: 10,
+                          background: it.bg,
+                          color: it.fg,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <it.icon size={17} />
+                      </span>
+                      <div style={{ minWidth: 0 }}>
+                        <div
+                          style={{
+                            fontSize: 20,
+                            fontWeight: 700,
+                            color: T.ink,
+                            lineHeight: 1.15,
+                          }}
+                        >
+                          {it.value}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 12,
+                            color: T.textSoft,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {it.label}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+          </Card>
 
           {offices && offices.length > 0 && (
             <Card style={{ padding: 18, marginBottom: 22 }}>
