@@ -3284,6 +3284,11 @@ function useIsMobile(breakpoint = 821) {
 
 function HeaderClock() {
   const [now, setNow] = useState(() => new Date());
+  // Desktop/tablet gets a tidier bordered box with a clock icon (matching
+  // the other header badges); mobile keeps the original compact live-dot
+  // pill untouched, per request — this only ever changes the look on
+  // screens ≥821px (same breakpoint the dashboard layout switches on).
+  const isMobile = useIsMobile();
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
@@ -3291,6 +3296,31 @@ function HeaderClock() {
   const hh = String(now.getHours()).padStart(2, "0");
   const mm = String(now.getMinutes()).padStart(2, "0");
   const ss = String(now.getSeconds()).padStart(2, "0");
+
+  if (!isMobile) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 7,
+          fontFamily: "'JetBrains Mono',monospace",
+          fontSize: 13,
+          fontWeight: 600,
+          color: T.ink,
+          padding: "9px 14px",
+          borderRadius: 10,
+          border: `1px solid ${T.lineSoft}`,
+          background: T.card,
+          letterSpacing: "-.01em",
+        }}
+      >
+        <Clock size={14} color={T.muted} />
+        {hh}:{mm}:{ss}
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
@@ -4144,7 +4174,7 @@ html,body,#root{height:100%;}
   /* Employee dashboard laid out like a "left: punch card, right:
      at-a-glance tiles" desktop dashboard — matches the reference
      layout requested for computer/tablet. Untouched below 821px. */
-  .wf-staff-dash-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,1fr);gap:18px;align-items:start;}
+  .wf-staff-dash-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,1.05fr);gap:18px;align-items:start;}
   .wf-staff-dash-grid .wf-dash-col-full{grid-column:1 / -1;}
   .wf-staff-dash-grid .wf-dash-col-side .wf-dash-stats{grid-template-columns:repeat(2,1fr);gap:12px;}
   .wf-desktop-only-card{display:block;}
@@ -7162,10 +7192,10 @@ function StatusPill({ status }) {
     </span>
   );
 }
-function Card({ children, style, accent, ...rest }) {
+function Card({ children, style, accent, className, ...rest }) {
   return (
     <div
-      className="wf-card"
+      className={`wf-card${className ? ` ${className}` : ""}`}
       style={{
         ...(accent ? { borderLeft: `4px solid ${accent}` } : {}),
         ...style,
@@ -9823,14 +9853,31 @@ function Dashboard({
           <div
             key={s.label}
             className={`wf-stat-pastel ${canLink ? "wf-stat-pastel-clickable" : ""}`}
-            style={{
-              background: pastel.bg,
-              minHeight: "auto",
-              padding: "14px",
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-            }}
+            style={
+              isMobile
+                ? {
+                    // Mobile: unchanged from before — the original solid
+                    // pastel tile with a translucent icon roundel.
+                    background: pastel.bg,
+                    minHeight: "auto",
+                    padding: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                  }
+                : {
+                    // Desktop/tablet only: white card + a tinted icon
+                    // circle instead of a solid pastel-filled tile, per
+                    // the requested reference layout.
+                    background: T.card,
+                    border: `1px solid ${T.lineSoft}`,
+                    minHeight: "auto",
+                    padding: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                  }
+            }
             {...clickProps}
           >
             <span
@@ -9838,14 +9885,18 @@ function Dashboard({
                 width: 38,
                 height: 38,
                 borderRadius: 10,
-                background: "rgba(255,255,255,0.55)",
+                background: isMobile ? "rgba(255,255,255,0.55)" : pastel.bg,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 flexShrink: 0,
               }}
             >
-              <s.icon size={18} color={pastel.icon} strokeWidth={2} />
+              <s.icon
+                size={18}
+                color={isMobile ? pastel.icon : pastel.text}
+                strokeWidth={2}
+              />
             </span>
             <div style={{ minWidth: 0, flex: 1, textAlign: "left" }}>
               <div
@@ -9865,8 +9916,8 @@ function Dashboard({
                 style={{
                   fontSize: 12,
                   fontWeight: 500,
-                  color: pastel.text,
-                  opacity: 0.8,
+                  color: isMobile ? pastel.text : T.textSoft,
+                  opacity: isMobile ? 0.8 : 1,
                   marginTop: 2,
                   whiteSpace: "nowrap",
                   overflow: "hidden",
@@ -9880,8 +9931,8 @@ function Dashboard({
             {canLink && (
               <ChevronRight
                 size={16}
-                color={pastel.text}
-                style={{ flexShrink: 0, opacity: 0.7 }}
+                color={isMobile ? pastel.text : T.mutedLight}
+                style={{ flexShrink: 0, opacity: isMobile ? 0.7 : 1 }}
               />
             )}
           </div>
@@ -10050,8 +10101,17 @@ function Dashboard({
     </Card>
   );
 
+  // Desktop/tablet only: cap the dashboard's width and center it so it
+  // reads as a tidy, purpose-built layout instead of stretching every
+  // card and grid gap across an ultra-wide monitor. Mobile (isMobile)
+  // deliberately gets no wrapper style at all here — it keeps exactly
+  // the full-width, edge-to-edge layout it already had.
+  const dashboardWrapStyle = isMobile
+    ? undefined
+    : { maxWidth: 1280, margin: "0 auto" };
+
   return (
-    <div>
+    <div style={dashboardWrapStyle}>
       {role === "admin" ? (
         <div
           style={{
@@ -11448,6 +11508,7 @@ function Dashboard({
 
             <div className="wf-dash-col-side">
               {renderStatTiles()}
+              {renderRecentAttendCard()}
               {/* Note: this branch only renders for role !== "admin" (see
                   the role === "admin" ? ... check above), so the
                   company-wide "Attendance Overview" card — today's
@@ -11459,7 +11520,12 @@ function Dashboard({
             </div>
 
             <div className="wf-dash-col-full">
-              {renderRecentAttendCard()}
+              {/* "Today's Attendance" (renderRecentAttendCard) now lives in
+                  the side column above, right under the stat tiles — on
+                  desktop/tablet it no longer stretches full-width with
+                  large gaps between its four metrics; on mobile it's
+                  unaffected since .wf-staff-dash-grid collapses to a
+                  single column there regardless of which wrapper it's in. */}
 
               <Card
                 className="wf-desktop-only-card"
@@ -16808,6 +16874,19 @@ function SelfPunch({
   return (
     <Card style={{ padding: compact ? 16 : 18, marginBottom: 16 }}>
       {!compact && (
+        <h3
+          style={{
+            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontWeight: 700,
+            fontSize: 14,
+            color: T.ink,
+            marginBottom: 14,
+          }}
+        >
+          {lang === "en" ? "Check In / Check Out" : "ចូល / ចេញ"}
+        </h3>
+      )}
+      {!compact && (
         <div
           style={{
             display: "flex",
@@ -17133,8 +17212,9 @@ function SelfPunch({
         <div
           style={{
             display: "flex",
-            flexDirection: compact ? "row" : "column",
-            alignItems: compact ? "center" : "stretch",
+            flexDirection: "row",
+            flexWrap: compact ? "nowrap" : "wrap",
+            alignItems: "center",
             gap: 10,
           }}
         >
@@ -17147,7 +17227,8 @@ function SelfPunch({
               padding: "13px 22px",
               fontSize: 15,
               borderRadius: 11,
-              flex: compact ? 1 : undefined,
+              flex: 1,
+              minWidth: compact ? undefined : 160,
             }}
           >
             {locBusy ? (
@@ -17160,65 +17241,31 @@ function SelfPunch({
             )}{" "}
             {t.att.checkIn}
           </Button>
-          {hasOffices &&
-            (compact ? (
-              <>
-                <span
-                  style={{ color: T.mutedLight, fontSize: 11, flexShrink: 0 }}
-                >
-                  {t.att.scanQrOr}
-                </span>
-                <Button
-                  variant="ghost"
-                  onClick={() => setScanOpen(true)}
-                  disabled={locBusy}
-                  style={{
-                    justifyContent: "center",
-                    padding: "13px 16px",
-                    fontSize: 14,
-                    borderRadius: 11,
-                    border: `1px solid ${T.line}`,
-                    flex: 1,
-                  }}
-                >
-                  <QrCode size={15} /> {t.att.scanQrBtn}
-                </Button>
-              </>
-            ) : (
-              <>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    color: T.mutedLight,
-                    fontSize: 11,
-                  }}
-                >
-                  <span
-                    style={{ flex: 1, height: 1, background: T.lineSoft }}
-                  />
-                  {t.att.scanQrOr}
-                  <span
-                    style={{ flex: 1, height: 1, background: T.lineSoft }}
-                  />
-                </div>
-                <Button
-                  variant="ghost"
-                  onClick={() => setScanOpen(true)}
-                  disabled={locBusy}
-                  style={{
-                    justifyContent: "center",
-                    padding: "13px 22px",
-                    fontSize: 14,
-                    borderRadius: 11,
-                    border: `1px solid ${T.line}`,
-                  }}
-                >
-                  <QrCode size={15} /> {t.att.scanQrBtn}
-                </Button>
-              </>
-            ))}
+          {hasOffices && (
+            <>
+              <span
+                style={{ color: T.mutedLight, fontSize: 11, flexShrink: 0 }}
+              >
+                {t.att.scanQrOr}
+              </span>
+              <Button
+                variant="ghost"
+                onClick={() => setScanOpen(true)}
+                disabled={locBusy}
+                style={{
+                  justifyContent: "center",
+                  padding: compact ? "13px 16px" : "13px 22px",
+                  fontSize: 14,
+                  borderRadius: 11,
+                  border: `1px solid ${T.line}`,
+                  flex: 1,
+                  minWidth: compact ? undefined : 160,
+                }}
+              >
+                <QrCode size={15} /> {t.att.scanQrBtn}
+              </Button>
+            </>
+          )}
         </div>
       )}
 
@@ -17226,8 +17273,9 @@ function SelfPunch({
         <div
           style={{
             display: "flex",
-            flexDirection: compact ? "row" : "column",
-            alignItems: compact ? "center" : "stretch",
+            flexDirection: "row",
+            flexWrap: compact ? "nowrap" : "wrap",
+            alignItems: "center",
             gap: 10,
           }}
         >
@@ -17240,7 +17288,8 @@ function SelfPunch({
               padding: "13px 22px",
               fontSize: 15,
               borderRadius: 11,
-              flex: compact ? 1 : undefined,
+              flex: 1,
+              minWidth: compact ? undefined : 160,
             }}
           >
             {locBusy ? (
@@ -17253,65 +17302,31 @@ function SelfPunch({
             )}{" "}
             {t.att.punchOutBtn}
           </Button>
-          {hasOffices &&
-            (compact ? (
-              <>
-                <span
-                  style={{ color: T.mutedLight, fontSize: 11, flexShrink: 0 }}
-                >
-                  {t.att.scanQrOr}
-                </span>
-                <Button
-                  variant="ghost"
-                  onClick={() => setScanOpen(true)}
-                  disabled={locBusy}
-                  style={{
-                    justifyContent: "center",
-                    padding: "13px 16px",
-                    fontSize: 14,
-                    borderRadius: 11,
-                    border: `1px solid ${T.line}`,
-                    flex: 1,
-                  }}
-                >
-                  <QrCode size={15} /> {t.att.scanQrBtn}
-                </Button>
-              </>
-            ) : (
-              <>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    color: T.mutedLight,
-                    fontSize: 11,
-                  }}
-                >
-                  <span
-                    style={{ flex: 1, height: 1, background: T.lineSoft }}
-                  />
-                  {t.att.scanQrOr}
-                  <span
-                    style={{ flex: 1, height: 1, background: T.lineSoft }}
-                  />
-                </div>
-                <Button
-                  variant="ghost"
-                  onClick={() => setScanOpen(true)}
-                  disabled={locBusy}
-                  style={{
-                    justifyContent: "center",
-                    padding: "13px 22px",
-                    fontSize: 14,
-                    borderRadius: 11,
-                    border: `1px solid ${T.line}`,
-                  }}
-                >
-                  <QrCode size={15} /> {t.att.scanQrBtn}
-                </Button>
-              </>
-            ))}
+          {hasOffices && (
+            <>
+              <span
+                style={{ color: T.mutedLight, fontSize: 11, flexShrink: 0 }}
+              >
+                {t.att.scanQrOr}
+              </span>
+              <Button
+                variant="ghost"
+                onClick={() => setScanOpen(true)}
+                disabled={locBusy}
+                style={{
+                  justifyContent: "center",
+                  padding: compact ? "13px 16px" : "13px 22px",
+                  fontSize: 14,
+                  borderRadius: 11,
+                  border: `1px solid ${T.line}`,
+                  flex: 1,
+                  minWidth: compact ? undefined : 160,
+                }}
+              >
+                <QrCode size={15} /> {t.att.scanQrBtn}
+              </Button>
+            </>
+          )}
         </div>
       )}
 
