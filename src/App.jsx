@@ -276,6 +276,11 @@ const LANG_RAW = {
       viewPayrollBtn: "មើលប្រាក់ខែ",
       welcomeBackLabel: "សូមស្វាគមន៍មកវិញ,",
       haveGreatDay: "សូមឲ្យថ្ងៃនេះជោគជ័យ និងផលិតភាព!",
+      greetingHello: "សួស្តី,",
+      currentStatusLabel: "ស្ថានភាពបច្ចុប្បន្ន",
+      checkedInValue: "បានចូលធ្វើការ",
+      checkedOutValue: "បានចេញពីការងារ",
+      haveGreatShift: "សូមឲ្យវេនការងាររបស់អ្នកល្អ!",
       appsCustomize: "កំណត់ផ្ទាល់ខ្លួន",
       appsDone: "រួចរាល់",
       statPresentDays: "ថ្ងៃមកធ្វើការខែនេះ",
@@ -1556,6 +1561,11 @@ const LANG_RAW = {
       viewPayrollBtn: "View Payroll",
       welcomeBackLabel: "Welcome back,",
       haveGreatDay: "Have a productive day ahead!",
+      greetingHello: "Hello,",
+      currentStatusLabel: "Current Status",
+      checkedInValue: "Checked In",
+      checkedOutValue: "Checked Out",
+      haveGreatShift: "Have a great shift!",
       appsCustomize: "Customize",
       appsDone: "Done",
       statPresentDays: "Days Present This Month",
@@ -2807,6 +2817,11 @@ const LANG_RAW = {
       sinceLabel: "自",
       welcomeBackLabel: "欢迎回来,",
       haveGreatDay: "祝您今天工作顺利高效!",
+      greetingHello: "你好,",
+      currentStatusLabel: "当前状态",
+      checkedInValue: "已打卡",
+      checkedOutValue: "已下班",
+      haveGreatShift: "祝您班次顺利!",
       appsCustomize: "自定义",
       appsDone: "完成",
       statPresentDays: "本月出勤天数",
@@ -9744,25 +9759,10 @@ function Dashboard({
           </div>
         </div>
       ) : (
-        <Card
-          style={{
-            padding: 18,
-            marginBottom: 16,
-            background:
-              "linear-gradient(135deg, #5B8DEF 0%, #7C6FF5 55%, #8B5CF6 100%)",
-            color: "#fff",
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
-          <div style={{ position: "relative" }}>
-            <p
-              style={{
-                color: "rgba(255,255,255,0.85)",
-                fontSize: 12,
-              }}
-            >
-              {t.dash.welcomeBackLabel}
+        <>
+          <div style={{ marginBottom: 14 }}>
+            <p style={{ color: T.textSoft, fontSize: 12 }}>
+              {t.dash.greetingHello}
             </p>
             <h2
               style={{
@@ -9770,6 +9770,7 @@ function Dashboard({
                 fontSize: 20,
                 fontWeight: 700,
                 marginTop: 2,
+                color: T.ink,
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
@@ -9780,7 +9781,7 @@ function Dashboard({
             </h2>
             <p
               style={{
-                color: "rgba(255,255,255,0.85)",
+                color: T.textSoft,
                 fontSize: 11.5,
                 marginTop: 4,
                 fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
@@ -9789,7 +9790,132 @@ function Dashboard({
               {t.dash.haveGreatDay}
             </p>
           </div>
-        </Card>
+          <Card
+            style={{
+              padding: 18,
+              marginBottom: 16,
+              background:
+                "linear-gradient(135deg, #5B8DEF 0%, #7C6FF5 55%, #8B5CF6 100%)",
+              color: "#fff",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                position: "relative",
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 16,
+              }}
+            >
+              <div>
+                <p
+                  style={{
+                    color: "rgba(255,255,255,0.85)",
+                    fontSize: 11.5,
+                    fontWeight: 600,
+                    textTransform: "uppercase",
+                    letterSpacing: ".04em",
+                  }}
+                >
+                  {t.dash.currentStatusLabel}
+                </p>
+                <h2
+                  style={{
+                    fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
+                    fontSize: 21,
+                    fontWeight: 700,
+                    marginTop: 4,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
+                  {myTodayRecord?.checkOut
+                    ? t.dash.checkedOutValue
+                    : myTodayRecord
+                      ? t.dash.checkedInValue
+                      : t.dash.notCheckedIn}
+                  {myTodayRecord && !myTodayRecord.checkOut && (
+                    <CheckCircle2 size={19} color="#fff" />
+                  )}
+                </h2>
+                <p
+                  style={{
+                    color: "rgba(255,255,255,0.85)",
+                    fontSize: 11.5,
+                    marginTop: 4,
+                    fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
+                  }}
+                >
+                  {t.dash.haveGreatShift}
+                </p>
+              </div>
+              <div style={{ textAlign: "left" }}>
+                <p
+                  style={{
+                    color: "rgba(255,255,255,0.85)",
+                    fontSize: 11.5,
+                    fontWeight: 600,
+                    textTransform: "uppercase",
+                    letterSpacing: ".04em",
+                  }}
+                >
+                  {t.att.liveClockLabel}
+                </p>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    marginTop: 4,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 21,
+                      fontWeight: 700,
+                      fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
+                    {timeNow()}
+                  </span>
+                  <Clock size={17} color="rgba(255,255,255,0.9)" />
+                </div>
+                {myShift && (
+                  <>
+                    <p
+                      style={{
+                        color: "rgba(255,255,255,0.85)",
+                        fontSize: 11.5,
+                        fontWeight: 600,
+                        textTransform: "uppercase",
+                        letterSpacing: ".04em",
+                        marginTop: 8,
+                      }}
+                    >
+                      {t.att.workTimeLabel}
+                    </p>
+                    <p
+                      style={{
+                        fontSize: 13.5,
+                        fontWeight: 700,
+                        marginTop: 2,
+                        fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
+                      }}
+                    >
+                      {hhmm(myShift.start)} – {hhmm(myShift.end)}
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+          </Card>
+        </>
       )}
 
       {role === "admin" ? (
@@ -10759,39 +10885,66 @@ function Dashboard({
                 <div
                   key={s.label}
                   className={`wf-stat-pastel ${canLink ? "wf-stat-pastel-clickable" : ""}`}
-                  style={{ background: pastel.bg }}
+                  style={{
+                    background: pastel.bg,
+                    minHeight: "auto",
+                    padding: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                  }}
                   {...clickProps}
                 >
-                  {canLink && (
-                    <span className="wf-stat-pastel-chevron">
-                      <ChevronRight size={13} color={pastel.text} />
-                    </span>
-                  )}
-                  <s.icon
-                    className="wf-stat-pastel-icon"
-                    size={46}
-                    color={pastel.icon}
-                    strokeWidth={1.6}
-                  />
-                  <div
-                    className="wf-stat-pastel-title"
-                    style={{ color: pastel.text }}
+                  <span
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: 10,
+                      background: "rgba(255,255,255,0.55)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
                   >
-                    {s.value}
-                  </div>
-                  <div
-                    className="wf-stat-pastel-label"
-                    style={{ color: pastel.text, opacity: 0.85 }}
-                  >
-                    {s.label}
-                  </div>
-                  {s.sub && (
+                    <s.icon size={18} color={pastel.icon} strokeWidth={2} />
+                  </span>
+                  <div style={{ minWidth: 0, flex: 1, textAlign: "left" }}>
                     <div
-                      className="wf-stat-pastel-sub"
-                      style={{ color: pastel.text }}
+                      style={{
+                        fontSize: 13.5,
+                        fontWeight: 700,
+                        color: pastel.text,
+                        lineHeight: 1.3,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
                     >
-                      {s.sub}
+                      {s.label}
                     </div>
+                    <div
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 500,
+                        color: pastel.text,
+                        opacity: 0.8,
+                        marginTop: 2,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {s.value}
+                      {s.sub ? ` · ${s.sub}` : ""}
+                    </div>
+                  </div>
+                  {canLink && (
+                    <ChevronRight
+                      size={16}
+                      color={pastel.text}
+                      style={{ flexShrink: 0, opacity: 0.7 }}
+                    />
                   )}
                 </div>
               );
@@ -16173,31 +16326,29 @@ function SelfPunch({
   };
 
   return (
-    <Card style={{ padding: 18, marginBottom: 16, textAlign: "center" }}>
+    <Card style={{ padding: 18, marginBottom: 16 }}>
       <div
         style={{
           display: "flex",
-          flexWrap: "nowrap",
-          alignItems: "center",
-          gap: 10,
-          marginBottom: hasOffices ? 14 : 6,
-          textAlign: "left",
+          flexWrap: "wrap",
+          gap: 14,
+          marginBottom: 14,
         }}
       >
         <div
           style={{
+            flex: "1 1 150px",
             display: "flex",
             alignItems: "center",
             gap: 10,
-            flex: "1.15 1 0",
-            minWidth: 0,
+            textAlign: "left",
           }}
         >
           <span
             style={{
-              width: 42,
-              height: 42,
-              borderRadius: 12,
+              width: 40,
+              height: 40,
+              borderRadius: 11,
               background: T.forestSoft,
               color: T.forestText,
               display: "flex",
@@ -16206,9 +16357,132 @@ function SelfPunch({
               flexShrink: 0,
             }}
           >
-            <Clock size={19} />
+            <LogIn size={18} />
           </span>
           <div style={{ minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 12.5,
+                fontWeight: 600,
+                color: T.textSoft,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {t.att.checkIn}
+            </div>
+            <div
+              className="wf-punch-clock"
+              style={{ fontSize: 18, lineHeight: 1.3, marginTop: 2 }}
+            >
+              {rec?.checkIn || "--:--:--"}
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            flex: "1 1 150px",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            textAlign: "left",
+          }}
+        >
+          <span
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 11,
+              background: T.roseSoft,
+              color: T.roseDark,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <LogOut size={18} />
+          </span>
+          <div style={{ minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 12.5,
+                fontWeight: 600,
+                color: T.textSoft,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {t.att.checkOut}
+            </div>
+            <div
+              className="wf-punch-clock"
+              style={{ fontSize: 18, lineHeight: 1.3, marginTop: 2 }}
+            >
+              {rec?.checkOut || "--:--:--"}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 14,
+          paddingTop: 12,
+          marginBottom: 14,
+          borderTop: `1px solid ${T.lineSoft}`,
+          textAlign: "left",
+        }}
+      >
+        <div style={{ flex: "1 1 120px", minWidth: 0 }}>
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: ".06em",
+              color: T.muted,
+              textTransform: "uppercase",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {t.status}
+          </div>
+          <div style={{ marginTop: 6 }}>
+            {rec ? (
+              <StatusPill status={rec.status} />
+            ) : (
+              <span style={{ fontSize: 13, fontWeight: 600, color: T.ink }}>
+                {t.dash.notCheckedIn}
+              </span>
+            )}
+          </div>
+        </div>
+        <div style={{ flex: "1.4 1 150px", minWidth: 0 }}>
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: ".06em",
+              color: T.muted,
+              textTransform: "uppercase",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {t.att.locationLabel}
+          </div>
+          <div
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              color: T.ink,
+              marginTop: 5,
+            }}
+          >
+            {rec?.checkInLoc?.officeName || "—"}
+          </div>
+        </div>
+        {shift && (
+          <div style={{ flex: "1.2 1 150px", minWidth: 0 }}>
             <div
               style={{
                 fontSize: 10,
@@ -16219,78 +16493,66 @@ function SelfPunch({
                 whiteSpace: "nowrap",
               }}
             >
-              {t.att.liveClockLabel}
+              {t.att.workTimeLabel}
             </div>
             <div
-              className="wf-punch-clock"
-              style={{ fontSize: 22, lineHeight: 1.15 }}
+              style={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: T.ink,
+                marginTop: 5,
+              }}
             >
-              {timeNow()}
-            </div>
-            {shift && (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: 4,
-                  fontSize: 10.5,
-                  color: T.muted,
-                  marginTop: 4,
-                  lineHeight: 1.3,
-                }}
-              >
-                <Watch size={10} style={{ flexShrink: 0, marginTop: 1 }} />
-                <span>
-                  {t.att.workTimeLabel} {hhmm(shift.start)}–{hhmm(shift.end)}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-        {hasOffices && (
-          <div
-            style={{
-              flex: "1 1 0",
-              minWidth: 0,
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 6,
-              padding: "8px 9px",
-              borderRadius: 12,
-              border: `1px solid ${T.line}`,
-            }}
-          >
-            <MapPin
-              size={13}
-              color={T.blue}
-              style={{ marginTop: 1, flexShrink: 0 }}
-            />
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 10, color: T.textSoft, lineHeight: 1.3 }}>
-                {t.att.gpsRequiredHint(offices.length)}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 3,
-                  fontSize: 10,
-                  color: locBusy ? T.muted : T.forestText,
-                  fontWeight: 600,
-                  marginTop: 3,
-                }}
-              >
-                <span style={{ flexShrink: 0 }}>
-                  {!locBusy && <CheckCircle2 size={11} />}
-                </span>
-                <span>
-                  {locBusy ? t.att.locatingNow : t.att.locVerifiedOnPunch}
-                </span>
-              </div>
+              {hhmm(shift.start)}–{hhmm(shift.end)}
             </div>
           </div>
         )}
       </div>
+
+      {hasOffices && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 6,
+            padding: "8px 9px",
+            borderRadius: 12,
+            border: `1px solid ${T.line}`,
+            marginBottom: 14,
+            textAlign: "left",
+          }}
+        >
+          <MapPin
+            size={13}
+            color={T.blue}
+            style={{ marginTop: 1, flexShrink: 0 }}
+          />
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 10, color: T.textSoft, lineHeight: 1.3 }}>
+              {t.att.gpsRequiredHint(offices.length)}
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 3,
+                fontSize: 10,
+                color: locBusy ? T.muted : T.forestText,
+                fontWeight: 600,
+                marginTop: 3,
+              }}
+            >
+              <span style={{ flexShrink: 0 }}>
+                {!locBusy && <CheckCircle2 size={11} />}
+              </span>
+              <span>
+                {locBusy ? t.att.locatingNow : t.att.locVerifiedOnPunch}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {todayIsDayOff && (
         <div
           style={{
@@ -16341,9 +16603,6 @@ function SelfPunch({
             padding: "8px 12px",
             borderRadius: 10,
             marginBottom: 12,
-            maxWidth: 320,
-            marginLeft: "auto",
-            marginRight: "auto",
           }}
         >
           {branchWarning}
@@ -16355,21 +16614,17 @@ function SelfPunch({
             fontSize: 12.5,
             color: T.rose,
             marginBottom: 12,
-            maxWidth: 320,
-            marginLeft: "auto",
-            marginRight: "auto",
           }}
         >
           {locError}
         </p>
       )}
+
       {!rec && (
         <div
           style={{
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexWrap: "wrap",
+            flexDirection: "column",
             gap: 10,
           }}
         >
@@ -16378,8 +16633,6 @@ function SelfPunch({
             onClick={() => punchIn()}
             disabled={locBusy}
             style={{
-              flex: "1 1 170px",
-              maxWidth: 340,
               justifyContent: "center",
               padding: "13px 22px",
               fontSize: 15,
@@ -16400,172 +16653,106 @@ function SelfPunch({
             <>
               <div
                 style={{
-                  fontSize: 11,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
                   color: T.mutedLight,
-                  flexShrink: 0,
+                  fontSize: 11,
                 }}
               >
+                <span style={{ flex: 1, height: 1, background: T.lineSoft }} />
                 {t.att.scanQrOr}
+                <span style={{ flex: 1, height: 1, background: T.lineSoft }} />
               </div>
               <Button
                 variant="ghost"
-                size="sm"
                 onClick={() => setScanOpen(true)}
                 disabled={locBusy}
-                style={{ flexShrink: 0 }}
+                style={{
+                  justifyContent: "center",
+                  padding: "13px 22px",
+                  fontSize: 14,
+                  borderRadius: 11,
+                  border: `1px solid ${T.line}`,
+                }}
               >
-                <QrCode size={13} /> {t.att.scanQrBtn}
+                <QrCode size={15} /> {t.att.scanQrBtn}
               </Button>
             </>
           )}
         </div>
       )}
+
       {rec && !rec.checkOut && (
-        <div>
-          <div
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 10,
+          }}
+        >
+          <Button
+            variant="danger-solid"
+            onClick={() => punchOut()}
+            disabled={locBusy}
             style={{
-              display: "flex",
-              marginBottom: 18,
-              maxWidth: 340,
-              marginLeft: "auto",
-              marginRight: "auto",
-            }}
-          >
-            <div style={{ flex: 1 }}>
-              <div
-                style={{
-                  fontSize: 10.5,
-                  fontWeight: 700,
-                  letterSpacing: ".05em",
-                  color: T.muted,
-                  textTransform: "uppercase",
-                }}
-              >
-                {t.att.checkIn}
-              </div>
-              <div
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: T.ink,
-                  fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
-                  marginTop: 3,
-                }}
-              >
-                {rec.checkIn}
-              </div>
-            </div>
-            <div
-              style={{
-                flex: 1,
-                borderLeft: `1px solid ${T.lineSoft}`,
-                borderRight: `1px solid ${T.lineSoft}`,
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 10.5,
-                  fontWeight: 700,
-                  letterSpacing: ".05em",
-                  color: T.muted,
-                  textTransform: "uppercase",
-                }}
-              >
-                {t.status}
-              </div>
-              <div style={{ marginTop: 4 }}>
-                <StatusPill status={rec.status} />
-              </div>
-            </div>
-            {rec.checkInLoc?.officeName && (
-              <div style={{ flex: 1 }}>
-                <div
-                  style={{
-                    fontSize: 10.5,
-                    fontWeight: 700,
-                    letterSpacing: ".05em",
-                    color: T.muted,
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {t.att.locationLabel}
-                </div>
-                <div
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: T.ink,
-                    marginTop: 3,
-                  }}
-                >
-                  {rec.checkInLoc.officeName}
-                </div>
-              </div>
-            )}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
               justifyContent: "center",
-              flexWrap: "wrap",
-              gap: 10,
+              padding: "13px 22px",
+              fontSize: 15,
+              borderRadius: 11,
             }}
           >
-            <Button
-              variant="danger-solid"
-              onClick={() => punchOut()}
-              disabled={locBusy}
-              style={{
-                flex: "1 1 170px",
-                maxWidth: 340,
-                justifyContent: "center",
-                padding: "13px 22px",
-                fontSize: 15,
-                borderRadius: 11,
-              }}
-            >
-              {locBusy ? (
-                <Loader2
-                  size={18}
-                  style={{ animation: "spin 1s linear infinite" }}
-                />
-              ) : (
-                <LogOut size={18} />
-              )}{" "}
-              {t.att.punchOutBtn}
-            </Button>
-            {hasOffices && (
-              <>
-                <div
-                  style={{
-                    fontSize: 11,
-                    color: T.mutedLight,
-                    flexShrink: 0,
-                  }}
-                >
-                  {t.att.scanQrOr}
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setScanOpen(true)}
-                  disabled={locBusy}
-                  style={{ flexShrink: 0 }}
-                >
-                  <QrCode size={13} /> {t.att.scanQrBtn}
-                </Button>
-              </>
-            )}
-          </div>
+            {locBusy ? (
+              <Loader2
+                size={18}
+                style={{ animation: "spin 1s linear infinite" }}
+              />
+            ) : (
+              <LogOut size={18} />
+            )}{" "}
+            {t.att.punchOutBtn}
+          </Button>
+          {hasOffices && (
+            <>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  color: T.mutedLight,
+                  fontSize: 11,
+                }}
+              >
+                <span style={{ flex: 1, height: 1, background: T.lineSoft }} />
+                {t.att.scanQrOr}
+                <span style={{ flex: 1, height: 1, background: T.lineSoft }} />
+              </div>
+              <Button
+                variant="ghost"
+                onClick={() => setScanOpen(true)}
+                disabled={locBusy}
+                style={{
+                  justifyContent: "center",
+                  padding: "13px 22px",
+                  fontSize: 14,
+                  borderRadius: 11,
+                  border: `1px solid ${T.line}`,
+                }}
+              >
+                <QrCode size={15} /> {t.att.scanQrBtn}
+              </Button>
+            </>
+          )}
         </div>
       )}
+
       {rec && rec.checkOut && (
         <div
           style={{
             fontSize: 13,
             color: T.textSoft,
             fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
+            textAlign: "center",
           }}
         >
           <CheckCircle2
