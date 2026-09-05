@@ -56,6 +56,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
+  ChevronUp,
   MoreVertical,
   Download,
   Eye,
@@ -93,6 +94,7 @@ import {
   DollarSign,
   Lightbulb,
   XCircle,
+  Droplets,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -162,6 +164,22 @@ const LANG_RAW = {
       loginActivity: "សកម្មភាពចូលគណនី",
       analytics: "វិភាគទិន្នន័យ",
       rolePerms: "សិទ្ធិតួនាទី",
+    },
+    navDesc: {
+      announcements: "ព័ត៌មាន និងសេចក្តីប្រកាសរបស់ក្រុមហ៊ុន",
+      attendance: "មើលកំណត់ត្រាវត្តមានរបស់អ្នក",
+      messages: "សារ និងការជជែករបស់អ្នក",
+      leave: "ស្នើសុំ និងតាមដានច្បាប់ឈប់សម្រាក",
+      ot: "សំណើ និងកំណត់ត្រា OT",
+      payroll: "មើលប្រាក់ខែ និងការទូទាត់",
+      review: "ការវាយតម្លៃ និងមតិត្រឡប់",
+      training: "ការបណ្តុះបណ្តាល និងសញ្ញាបត្ររបស់អ្នក",
+      attcorr: "ស្នើសុំកែតម្រូវវត្តមាន",
+      shiftswap: "ស្នើសុំដូរវេនការងារ",
+      roster: "កាលវិភាគវេនការងាររបស់អ្នក",
+      documents: "ចូលមើលឯកសារសំខាន់ៗរបស់អ្នក",
+      loginActivity: "សកម្មភាពចូលគណនីរបស់អ្នក",
+      profile: "គ្រប់គ្រងប្រវត្តិរូបរបស់អ្នក",
     },
     navGroups: {
       main: "ទំព័រដើម",
@@ -255,6 +273,14 @@ const LANG_RAW = {
       noRecentHires: "មិនទាន់មានបុគ្គលិកចូលថ្មីទេ",
       payrollSummaryTitle: "សេចក្តីសង្ខេបប្រាក់ខែ",
       viewPayrollBtn: "មើលប្រាក់ខែ",
+      welcomeBackLabel: "សូមស្វាគមន៍មកវិញ,",
+      haveGreatDay: "សូមឲ្យថ្ងៃនេះជោគជ័យ និងផលិតភាព!",
+      appsCustomize: "កំណត់ផ្ទាល់ខ្លួន",
+      appsDone: "រួចរាល់",
+      statPresentDays: "ថ្ងៃមកធ្វើការខែនេះ",
+      statLeaveDays: "ថ្ងៃឈប់សម្រាកខែនេះ",
+      statOtHours: "ម៉ោង OT ខែនេះ",
+      statTrainingsProgress: "ការបណ្តុះបណ្តាលកំពុងដំណើរការ",
     },
     analytics: {
       title: "វិភាគទិន្នន័យ",
@@ -620,12 +646,6 @@ const LANG_RAW = {
         `ត្រូវការទីតាំង GPS នៅជិតសាខាមួយក្នុងចំណោម ${n} សាខា`,
       locatingNow: "កំពុងកំណត់ទីតាំង...",
       locVerifiedOnPunch: "នឹងផ្ទៀងផ្ទាត់ពេលចុះឈ្មោះ",
-      offlinePending:
-        "🔄 បានកត់ត្រាទុកក្នុងឧបករណ៍នេះ — គ្មានអ៊ីនធឺណិត នឹងផ្ញើទៅប្រព័ន្ធដោយស្វ័យប្រវត្តិពេលមានអ៊ីនធឺណិតឡើងវិញ",
-      offlinePendingShort: "រង់ចាំអ៊ីនធឺណិត",
-      offlineQueuedToast:
-        "គ្មានអ៊ីនធឺណិត — បានកត់ត្រាទុកជាមួយឧបករណ៍នេះ នឹងធ្វើសមកាលកម្មដោយស្វ័យប្រវត្តិ",
-      offlineSyncedToast: "បានធ្វើសមកាលកម្មដោយជោគជ័យ",
       locationLabel: "ទីតាំង",
       noData: "គ្មានទិន្នន័យ",
       manualEntry: "កត់ត្រាដោយដៃ",
@@ -1211,6 +1231,11 @@ const LANG_RAW = {
       darkMode: "ងងឹត (Dark)",
       appearanceDesc: "ប្តូររូបរាងទំព័រសម្រាប់ឧបករណ៍នេះ",
       primaryColor: "ពណ៌ចម្បង",
+      glassEffect: "Liquid Glass",
+      glassEffectDesc:
+        "បើកបញ្ចាំងកញ្ចក់តម្លាភាព (Blur) លើកាតនិងម៉ឺនុយ សម្រាប់ឧបករណ៍នេះ",
+      glassOn: "បើក",
+      glassOff: "បិទ",
       fontSize: "ទំហំអក្សរ",
       fontSmall: "តូច",
       fontMedium: "មធ្យម",
@@ -1419,6 +1444,22 @@ const LANG_RAW = {
       analytics: "Analytics",
       rolePerms: "Roles & Permissions",
     },
+    navDesc: {
+      announcements: "Company updates and news",
+      attendance: "View your attendance records",
+      messages: "Your messages and chats",
+      leave: "Request and track your leave",
+      ot: "Overtime requests and records",
+      payroll: "View salary and payments",
+      review: "Reviews and feedback",
+      training: "Your training and certificates",
+      attcorr: "Request attendance corrections",
+      shiftswap: "Request shift swaps easily",
+      roster: "View your work schedule",
+      documents: "Access your important docs",
+      loginActivity: "Your account sign-in activity",
+      profile: "Manage your profile",
+    },
     navGroups: {
       main: "Main",
       people: "People",
@@ -1510,6 +1551,14 @@ const LANG_RAW = {
       noRecentHires: "No new hires yet",
       payrollSummaryTitle: "Payroll Summary",
       viewPayrollBtn: "View Payroll",
+      welcomeBackLabel: "Welcome back,",
+      haveGreatDay: "Have a productive day ahead!",
+      appsCustomize: "Customize",
+      appsDone: "Done",
+      statPresentDays: "Days Present This Month",
+      statLeaveDays: "Leave Days This Month",
+      statOtHours: "OT Hours This Month",
+      statTrainingsProgress: "Trainings In Progress",
     },
     analytics: {
       title: "Analytics",
@@ -1878,12 +1927,6 @@ const LANG_RAW = {
       gpsRequiredHint: (n) => `GPS location required near one of ${n} branches`,
       locatingNow: "Locating...",
       locVerifiedOnPunch: "Verified when you check in/out",
-      offlinePending:
-        "🔄 Saved on this device — no internet connection. It will sync automatically once you're back online.",
-      offlinePendingShort: "Waiting to sync",
-      offlineQueuedToast:
-        "No internet — saved on this device, will sync automatically",
-      offlineSyncedToast: "Synced successfully",
       locationLabel: "Location",
       noData: "No data",
       manualEntry: "Manual Entry",
@@ -2470,6 +2513,11 @@ const LANG_RAW = {
       darkMode: "Dark",
       appearanceDesc: "Switch the theme for this device",
       primaryColor: "Primary Color",
+      glassEffect: "Liquid Glass",
+      glassEffectDesc:
+        "Turn on frosted, translucent blur on cards and menus for this device",
+      glassOn: "On",
+      glassOff: "Off",
       fontSize: "Font Size",
       fontSmall: "Small",
       fontMedium: "Medium",
@@ -2671,6 +2719,22 @@ const LANG_RAW = {
       analytics: "数据分析",
       rolePerms: "角色权限",
     },
+    navDesc: {
+      announcements: "公司最新消息与公告",
+      attendance: "查看您的考勤记录",
+      messages: "您的消息与聊天",
+      leave: "申请并跟踪您的请假",
+      ot: "加班申请与记录",
+      payroll: "查看薪资与付款",
+      review: "绩效评估与反馈",
+      training: "您的培训与证书",
+      attcorr: "申请考勤更正",
+      shiftswap: "轻松申请换班",
+      roster: "查看您的工作排班",
+      documents: "访问您的重要文件",
+      loginActivity: "您的账号登录活动",
+      profile: "管理您的个人资料",
+    },
     navGroups: {
       main: "主页",
       people: "人员",
@@ -2736,6 +2800,14 @@ const LANG_RAW = {
       noOneWorkingNow: "目前还没有员工打卡上班",
       unassignedBranch: "未分配分店",
       sinceLabel: "自",
+      welcomeBackLabel: "欢迎回来,",
+      haveGreatDay: "祝您今天工作顺利高效!",
+      appsCustomize: "自定义",
+      appsDone: "完成",
+      statPresentDays: "本月出勤天数",
+      statLeaveDays: "本月请假天数",
+      statOtHours: "本月加班时数",
+      statTrainingsProgress: "进行中的培训",
     },
     analytics: {
       title: "数据分析",
@@ -2799,10 +2871,6 @@ const LANG_RAW = {
       gpsRequiredHint: (n) => `需要在 ${n} 个分店之一的 GPS 范围内`,
       locatingNow: "正在定位...",
       locVerifiedOnPunch: "打卡时将验证位置",
-      offlinePending: "🔄 已保存在本设备 — 目前没有网络连接，恢复网络后将自动同步",
-      offlinePendingShort: "等待同步",
-      offlineQueuedToast: "没有网络 — 已保存在本设备，将自动同步",
-      offlineSyncedToast: "已成功同步",
       locationLabel: "位置",
       noData: "没有数据",
       manualEntry: "手动登记",
@@ -2874,6 +2942,10 @@ const LANG_RAW = {
       darkMode: "深色 (Dark)",
       appearanceDesc: "切换此设备的显示外观",
       primaryColor: "主色调",
+      glassEffect: "液态玻璃效果",
+      glassEffectDesc: "为此设备的卡片和菜单开启磨砂半透明模糊效果",
+      glassOn: "开启",
+      glassOff: "关闭",
       fontSize: "字体大小",
       fontSmall: "小",
       fontMedium: "中",
@@ -2961,6 +3033,8 @@ const ThemeContext = createContext({
   setPrimaryColor: () => {},
   fontScale: "medium",
   setFontScale: () => {},
+  glassEffect: false,
+  setGlassEffect: () => {},
 });
 const useTheme = () => useCtx(ThemeContext);
 
@@ -3673,6 +3747,8 @@ html,body,#root{height:100%;}
   --wf-input-border:#D6DAE2; --wf-input-bg:#FAFBFC; --wf-field-label:#5B6274;
   --wf-table-head-bg:#F6F7F9; --wf-divider:#ECEEF2; --wf-danger-border:#F0C7D0;
   --wf-danger-hover-bg:#FBEEF1; --wf-header-bg:rgba(255,255,255,0.85);
+  --wf-glass-card:rgba(255,255,255,0.55); --wf-glass-header:rgba(255,255,255,0.55);
+  --wf-glass-border:rgba(255,255,255,0.45); --wf-glass-highlight:rgba(255,255,255,0.35);
 }
 .wf-dark{
   --wf-ink:#EEF1F6; --wf-ink-dark:#AEB6C7; --wf-paper:#080B12; --wf-card:#0E121B;
@@ -3682,6 +3758,8 @@ html,body,#root{height:100%;}
   --wf-input-border:#1F2634; --wf-input-bg:#0B0F17; --wf-field-label:#8791A8;
   --wf-table-head-bg:#0B0F18; --wf-divider:#171D29; --wf-danger-border:#3D1D26;
   --wf-danger-hover-bg:#20121A; --wf-header-bg:rgba(8,11,18,0.82);
+  --wf-glass-card:rgba(22,27,39,0.55); --wf-glass-header:rgba(10,13,21,0.6);
+  --wf-glass-border:rgba(255,255,255,0.08); --wf-glass-highlight:rgba(255,255,255,0.06);
 }
 .wf-root{display:flex;height:100vh;height:100dvh;min-height:640px;max-height:100vh;max-height:100dvh;background:${T.paper};font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.text};position:relative;overflow:hidden;border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,0.02),0 16px 40px -18px rgba(5,8,16,0.35);border:1px solid ${T.line};transition:background .15s ease,color .15s ease;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
 .wf-sidebar{background:${T.card};color:${T.ink};width:246px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid ${T.line};transition:transform .25s cubic-bezier(.4,0,.2,1),background .15s ease,color .15s ease;}
@@ -3842,6 +3920,9 @@ html,body,#root{height:100%;}
 .wf-apps-tile:active{transform:scale(.96);}
 .wf-apps-tile-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .wf-apps-tile-label{font-size:12px;font-weight:600;color:${T.ink};line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.wf-apps-tile-desc{font-size:10.5px;font-weight:500;color:${T.muted};line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.wf-apps-tile:disabled{cursor:default;}
+.wf-apps-tile:disabled:hover{border-color:${T.line};box-shadow:none;}
 .wf-punch-clock{font-size:34px;font-weight:700;font-family:'Poppins','Noto Sans Khmer',sans-serif;color:${T.ink};font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
 .wf-menu-btn{display:none;background:none;border:none;color:${T.ink};cursor:pointer;padding:4px;}
 .wf-overlay-scrim{display:none;}
@@ -3868,6 +3949,72 @@ html,body,#root{height:100%;}
 .wf-bnav-icon-wrap{width:38px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:background .15s ease;}
 .wf-bottomnav-item.active .wf-bnav-icon-wrap{background:${T.goldSoft};}
 .wf-bottomnav-item .wf-bnav-dot{position:absolute;top:2px;right:calc(50% - 20px);width:7px;height:7px;border-radius:999px;background:${T.rose};border:1.5px solid ${T.card};}
+/* Liquid Glass — optional frosted/translucent surface style, toggled by
+   the user in Appearance settings (see Settings > Appearance) independently
+   of light/dark mode and primary color. Applied via a .wf-glass class on
+   the root app shell (and document.body, for portaled Modal/Drawer content)
+   so every card, panel, header and nav picks it up automatically.
+   Deliberately NOT !important below: a handful of cards (the gradient
+   welcome banner, the colored quick-stat tiles) set their own inline
+   background — those must keep winning, or the frosted override paints
+   over the gradient and leaves white-on-white text. Class selectors here
+   already out-specify the plain .wf-card/.wf-header/etc. base rules on
+   their own (two classes vs one), so they don't need !important to apply
+   — they just no longer beat an element's own inline style, which is
+   exactly the fix. */
+.wf-glass .wf-card,.wf-glass .wf-apps-tile,.wf-glass .wf-stat-solid,.wf-glass .wf-stat-pastel,.wf-glass .wf-sidebar-profile{
+  background:var(--wf-glass-card);
+  backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  border:1px solid var(--wf-glass-border);
+  box-shadow:0 8px 32px -14px rgba(5,8,16,0.3),inset 0 1px 0 var(--wf-glass-highlight);
+}
+.wf-glass .wf-header{
+  background:var(--wf-glass-header);
+  backdrop-filter:blur(22px) saturate(180%);
+  -webkit-backdrop-filter:blur(22px) saturate(180%);
+}
+/* Bottom nav: a floating rounded "pill" bar instead of the plain
+   edge-to-edge strip — inset from the screen edges, blurred, with a
+   soft shadow, matching a modern iOS-style tab bar. */
+.wf-glass .wf-bottomnav{
+  left:12px;right:12px;bottom:10px;
+  border-radius:24px;
+  background:var(--wf-glass-header);
+  backdrop-filter:blur(24px) saturate(200%);
+  -webkit-backdrop-filter:blur(24px) saturate(200%);
+  border:1px solid var(--wf-glass-border);
+  box-shadow:0 10px 34px -12px rgba(5,8,16,0.35),inset 0 1px 0 var(--wf-glass-highlight);
+}
+/* The active tab gets its own small frosted "glass pill" — translucent,
+   blurred, bordered and lightly shadowed — rather than a flat tint. */
+.wf-glass .wf-bottomnav-item.active{
+  background:var(--wf-glass-card);
+  backdrop-filter:blur(14px) saturate(180%);
+  -webkit-backdrop-filter:blur(14px) saturate(180%);
+  border:1px solid var(--wf-glass-border);
+  border-radius:16px;
+  box-shadow:0 4px 14px -6px rgba(5,8,16,0.22),inset 0 1px 0 var(--wf-glass-highlight);
+}
+.wf-glass .wf-sidebar{
+  background:var(--wf-glass-card);
+  backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+}
+.wf-glass .wf-modal{
+  background:var(--wf-glass-card);
+  backdrop-filter:blur(26px) saturate(180%);
+  -webkit-backdrop-filter:blur(26px) saturate(180%);
+}
+.wf-glass .wf-bnav-icon-wrap,.wf-glass .wf-stat-pastel-chevron{backdrop-filter:blur(6px);}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){
+  /* Fallback for browsers without backdrop-filter support: keep the
+     translucent tint so the toggle still visibly does something, just
+     without the blur. Plain elements only (no :where/:not workaround
+     needed) — the rest of the app already reads fine at this tint. */
+  .wf-glass .wf-header,.wf-glass .wf-bottomnav,.wf-glass .wf-sidebar,.wf-glass .wf-modal{background:var(--wf-glass-card);}
+}
+@media (prefers-reduced-motion:reduce){.wf-glass *{transition:none !important;}}
 @media (max-width: 820px){
   .wf-sidebar{position:absolute;inset:0 auto 0 0;z-index:40;transform:translateX(-100%);height:100%;box-shadow:8px 0 24px rgba(0,0,0,0.4);}
   .wf-sidebar.open{transform:translateX(0);}
@@ -3878,6 +4025,7 @@ html,body,#root{height:100%;}
   .wf-role-badge{display:none;}
   .wf-bottomnav{display:flex;}
   .wf-content.wf-content-bnpad{padding-bottom:86px;}
+  .wf-glass .wf-content.wf-content-bnpad{padding-bottom:104px;}
   .wf-role-staff .wf-menu-btn{display:none;}
   .wf-chat-layout{height:calc(100vh - 190px) !important;}
   .wf-chat-list-pane{width:100% !important;border-right:none !important;}
@@ -5679,24 +5827,10 @@ function useSupabaseArray(
     // failures are logged, never surfaced to the user or thrown, since a
     // push failing shouldn't block the save that triggered it.
     notify,
-    // Optional: when true, a write that fails because the device has no
-    // real connectivity (as opposed to a genuine server-side rejection —
-    // bad column, RLS denial, etc.) is stashed in localStorage instead of
-    // surfacing as a "save failed" error, and retried automatically once
-    // the device is back online. Off by default: most tables (payroll,
-    // employees, ...) would rather fail loudly than silently queue a
-    // write an admin might not remember making. Turned on for `attendance`
-    // so a staff check-in/check-out made with no signal isn't lost.
-    offlineQueue,
   } = {},
 ) {
   const [value, setValueState] = useState([]);
   const [ready, setReady] = useState(false);
-  // Ids of rows currently sitting in the offline queue for this table —
-  // i.e. saved locally but not yet confirmed on the server. Exposed as the
-  // 5th return value so a screen (e.g. the self check-in card) can show a
-  // "waiting to sync" badge instead of pretending the write already landed.
-  const [pendingIds, setPendingIds] = useState(() => new Set());
   // Surfaces the last save/delete failure so screens like Settings can
   // tell the user "this didn't actually save" instead of showing a
   // success checkmark while Supabase silently rejected the write (e.g. a
@@ -5718,74 +5852,6 @@ function useSupabaseArray(
     dateField && daysBack
       ? new Date(Date.now() - daysBack * 86400000).toISOString().slice(0, 10)
       : null;
-
-  // --- Offline queue (only active when offlineQueue: true) ---------------
-  // Rows are stored here already in DB shape (post-mapToDb), keyed by the
-  // localStorage key below, so flushing them later is a straight upsert
-  // with no re-mapping needed. Scoped per-table so different tables never
-  // collide or get flushed into the wrong one.
-  const offlineKey = `wf:offlineQueue:${table}`;
-  const readOfflineQueue = () => {
-    try {
-      const raw = localStorage.getItem(offlineKey);
-      const parsed = raw ? JSON.parse(raw) : [];
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  };
-  const writeOfflineQueue = (rows) => {
-    try {
-      if (rows.length) localStorage.setItem(offlineKey, JSON.stringify(rows));
-      else localStorage.removeItem(offlineKey);
-    } catch {
-      // Storage full/unavailable (e.g. private browsing) — the queued row
-      // still lives in memory for this tab via pendingIds/optimistic state,
-      // it just won't survive a reload before it manages to sync.
-    }
-  };
-  // A row that failed to reach Supabase is only worth silently queuing (as
-  // opposed to showing the normal "save failed" error) when the failure
-  // looks like a connectivity problem rather than a real server rejection.
-  // Supabase/PostgREST errors that actually reached the server carry a
-  // `code` (e.g. a Postgres error code or RLS violation); a request that
-  // never reached the server (offline, DNS failure, etc.) surfaces as a
-  // plain JS/fetch error with no such code. We also trust the browser's
-  // own `navigator.onLine` as a second, independent signal — either one
-  // pointing to "offline" is enough to queue instead of erroring loudly.
-  const looksOffline = (error) =>
-    typeof navigator !== "undefined" &&
-    (navigator.onLine === false || !error?.code);
-
-  // --- Last-known-good snapshot cache (all tables, always on) -------------
-  // Separate from the offline write queue above: this caches the last
-  // successful *read* of the table (already in JS/fromDb shape) so that if
-  // a later load fails outright (device offline, DNS hiccup, etc.) the app
-  // can fall back to "what we last knew" instead of silently wiping the
-  // table to an empty array. That matters far beyond attendance — e.g.
-  // `employees` going empty on a failed fetch used to make an already
-  // logged-in staff member's session look invalid (their id could no
-  // longer be found in the now-empty list) and bounce them back to the
-  // login screen, with no way to log back in either since the same empty
-  // list also has nothing to authenticate against.
-  const snapshotKey = `wf:snapshot:${table}`;
-  const readSnapshot = () => {
-    try {
-      const raw = localStorage.getItem(snapshotKey);
-      const parsed = raw ? JSON.parse(raw) : null;
-      return Array.isArray(parsed) ? parsed : null;
-    } catch {
-      return null;
-    }
-  };
-  const writeSnapshot = (rows) => {
-    try {
-      localStorage.setItem(snapshotKey, JSON.stringify(rows));
-    } catch {
-      // Storage full/unavailable — just means no fallback is available
-      // next time a load fails; today's in-memory data still works fine.
-    }
-  };
 
   useEffect(() => {
     let cancelled = false;
@@ -5816,36 +5882,14 @@ function useSupabaseArray(
         if (!data || data.length < PAGE_SIZE) break;
         offset += PAGE_SIZE;
       }
-      // Fold in anything still sitting in this table's offline queue — a
-      // punch made while offline (see setValue below) that hasn't managed
-      // to sync yet. Without this, reloading the page before the device
-      // is back online would make an employee's own pending check-in
-      // vanish from view, even though it's still safely queued locally.
-      let queuedRows = [];
-      if (offlineQueue) {
-        queuedRows = readOfflineQueue();
-        setPendingIds(new Set(queuedRows.map((r) => r.id)));
-      }
       if (pageError) {
         console.error(`[supabase] failed to load ${table}:`, pageError.message);
-        const fallback = readSnapshot() || [];
-        const merged = fallback
-          .filter((r) => !queuedRows.some((q) => q.id === r.id))
-          .concat(queuedRows.map(mapFromDb));
-        prevRef.current = merged;
-        setValueState(merged);
+        prevRef.current = [];
+        setValueState([]);
       } else {
         const mapped = all.map(mapFromDb);
-        writeSnapshot(mapped);
-        // Prefer the queued (not-yet-confirmed) version of a row over
-        // whatever the server returned for that same id, since the server
-        // copy can only be stale here — if it were current, the row
-        // wouldn't still be queued.
-        const merged = mapped
-          .filter((r) => !queuedRows.some((q) => q.id === r.id))
-          .concat(queuedRows.map(mapFromDb));
-        prevRef.current = merged;
-        setValueState(merged);
+        prevRef.current = mapped;
+        setValueState(mapped);
       }
       setReady(true);
     })();
@@ -5915,7 +5959,6 @@ function useSupabaseArray(
         // straight back to Supabase (and logged to the audit trail
         // a second time, credited to the wrong device).
         prevRef.current = next;
-        writeSnapshot(next);
         return next;
       });
     };
@@ -5933,7 +5976,6 @@ function useSupabaseArray(
           : nextOrUpdater;
       prevRef.current = next;
       setValueState(next);
-      writeSnapshot(next);
 
       const nextIds = new Set(next.map((r) => r.id));
       const deletedRows = prev.filter((r) => !nextIds.has(r.id));
@@ -5951,7 +5993,6 @@ function useSupabaseArray(
       setSaveError(null);
       (async () => {
         let hadError = false;
-        let wasQueued = false;
         if (toDelete.length) {
           const { error } = await supabase
             .from(table)
@@ -5968,43 +6009,24 @@ function useSupabaseArray(
           }
         }
         if (toUpsert.length) {
-          const rowsToSend = toUpsert.map(mapToDb);
-          const { error } = await supabase.from(table).upsert(rowsToSend);
+          const { error } = await supabase
+            .from(table)
+            .upsert(toUpsert.map(mapToDb));
           if (error) {
-            if (offlineQueue && looksOffline(error)) {
-              // Looks like a connectivity failure rather than a real
-              // rejection — stash these rows so the next reconnect
-              // (see the flush effect below) retries them automatically,
-              // instead of telling the user the save "failed" when it
-              // really just hasn't reached the server yet.
-              console.warn(
-                `[supabase] ${table} write queued offline (no connection):`,
-                error.message,
-              );
-              const queue = readOfflineQueue();
-              const byId = new Map(queue.map((r) => [r.id, r]));
-              rowsToSend.forEach((r) => byId.set(r.id, r));
-              const nextQueue = Array.from(byId.values());
-              writeOfflineQueue(nextQueue);
-              setPendingIds(new Set(nextQueue.map((r) => r.id)));
-              pushToast(t.att.offlineQueuedToast, "info");
-              wasQueued = true;
-            } else {
-              console.error(
-                `[supabase] upsert failed on ${table}:`,
-                error.message,
-              );
-              setSaveError(error.message);
-              pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
-              hadError = true;
-            }
+            console.error(
+              `[supabase] upsert failed on ${table}:`,
+              error.message,
+            );
+            setSaveError(error.message);
+            pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
+            hadError = true;
           }
         }
         // Confirms the optimistic update the UI already made actually
         // stuck server-side. Only fires when something real changed
         // (toDelete/toUpsert non-empty) — not on every re-render — so
         // it stays a genuine confirmation rather than background noise.
-        if (!hadError && !wasQueued && (toDelete.length || toUpsert.length)) {
+        if (!hadError && (toDelete.length || toUpsert.length)) {
           pushToast(t.settings.saved, "success");
         }
       })();
@@ -6112,45 +6134,7 @@ function useSupabaseArray(
     [table, mapToDb, audit, actorRef, labelOf, notify, t],
   );
 
-  // Retries whatever is left in this table's offline queue. Safe to call
-  // any time (including with an empty queue — it's just a no-op then).
-  // Confirmed rows are dropped from the queue and folded into `value` via
-  // the normal realtime handler above once the insert/update actually
-  // lands, so we don't duplicate that merge here.
-  const flushOfflineQueue = useCallback(async () => {
-    if (!offlineQueue) return;
-    const queue = readOfflineQueue();
-    if (!queue.length) return;
-    const { error } = await supabase.from(table).upsert(queue);
-    if (error) {
-      // Still offline (or the server is genuinely down) — leave the queue
-      // untouched and try again on the next trigger.
-      console.warn(`[supabase] ${table} offline queue retry failed:`, error.message);
-      return;
-    }
-    writeOfflineQueue([]);
-    setPendingIds(new Set());
-    pushToast(t.att.offlineSyncedToast, "success");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [table, offlineQueue, t]);
-
-  useEffect(() => {
-    if (!offlineQueue) return;
-    // Try right away in case the tab was reopened already online with a
-    // queue left over from a previous offline session, then again whenever
-    // the browser tells us connectivity came back, and as a periodic
-    // backstop for cases the `online` event misses (e.g. a flaky captive
-    // portal that never fires it).
-    flushOfflineQueue();
-    window.addEventListener("online", flushOfflineQueue);
-    const interval = setInterval(flushOfflineQueue, 20000);
-    return () => {
-      window.removeEventListener("online", flushOfflineQueue);
-      clearInterval(interval);
-    };
-  }, [offlineQueue, flushOfflineQueue]);
-
-  return [value, setValue, ready, saveError, pendingIds];
+  return [value, setValue, ready, saveError];
 }
 
 // payroll_paid is stored as one row per (employee, month) but the app
@@ -9441,7 +9425,6 @@ function Dashboard({
   departments,
   attendance,
   setAttendance,
-  attendancePendingIds,
   payrollPaid,
   role,
   currentEmp,
@@ -9749,40 +9732,145 @@ function Dashboard({
       ) : (
         <Card
           style={{
-            padding: 20,
+            padding: 22,
             marginBottom: 22,
-            background: BRAND.ink,
+            background:
+              "linear-gradient(135deg, #5B8DEF 0%, #7C6FF5 55%, #8B5CF6 100%)",
             color: "#fff",
             position: "relative",
             overflow: "hidden",
           }}
         >
-          <p style={{ color: "#A9B4C7", fontSize: 13 }}>{t.dash.welcome}</p>
-          <h2
+          {/* Decorative "ID badge" illustration — hand-built from layered
+              shapes/icons rather than a raster image, so it always matches
+              the current primary-color/glass theming and needs no asset
+              file. Purely decorative: aria-hidden and clipped on very
+              narrow screens by overflow:hidden on the Card above. */}
+          <div
+            aria-hidden="true"
             style={{
-              fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
-              fontSize: 24,
-              fontWeight: 700,
-              marginTop: 2,
+              position: "absolute",
+              top: -6,
+              right: -6,
+              width: 128,
+              height: 128,
+              pointerEvents: "none",
             }}
           >
-            {currentEmp?.name}
-          </h2>
-          <p
-            style={{
-              color: "#A9B4C7",
-              fontSize: 12,
-              marginTop: 6,
-              fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
-            }}
-          >
-            {new Date().toLocaleDateString(lang === "en" ? "en-US" : "km-KH", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </p>
+            <div
+              style={{
+                position: "absolute",
+                top: 6,
+                right: 30,
+                width: 62,
+                height: 82,
+                borderRadius: 13,
+                background: "rgba(255,255,255,0.16)",
+                transform: "rotate(-10deg)",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                top: 18,
+                right: 6,
+                width: 70,
+                height: 90,
+                borderRadius: 15,
+                background: "rgba(255,255,255,0.95)",
+                boxShadow: "0 14px 30px -8px rgba(15,10,40,0.45)",
+                padding: 10,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <div
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: "50%",
+                  background: T.blue,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <UserCircle2 size={18} color="#fff" />
+              </div>
+              <div
+                style={{
+                  marginTop: 9,
+                  height: 3.5,
+                  width: "72%",
+                  background: "rgba(16,20,28,0.14)",
+                  borderRadius: 2,
+                }}
+              />
+              <div
+                style={{
+                  marginTop: 5,
+                  height: 3.5,
+                  width: "50%",
+                  background: "rgba(16,20,28,0.1)",
+                  borderRadius: 2,
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: -6,
+                  right: -6,
+                  width: 22,
+                  height: 22,
+                  borderRadius: "50%",
+                  background: T.forest,
+                  border: "2px solid #fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Check size={12} color="#fff" strokeWidth={3} />
+              </div>
+            </div>
+            <Star
+              size={16}
+              color="#FFD76B"
+              fill="#FFD76B"
+              style={{ position: "absolute", top: 0, right: 78 }}
+            />
+          </div>
+          <div style={{ position: "relative", maxWidth: "72%" }}>
+            <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 13 }}>
+              {t.dash.welcomeBackLabel}
+            </p>
+            <h2
+              style={{
+                fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
+                fontSize: 23,
+                fontWeight: 700,
+                marginTop: 2,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                flexWrap: "wrap",
+              }}
+            >
+              {currentEmp?.name} <span aria-hidden="true">👋</span>
+            </h2>
+            <p
+              style={{
+                color: "rgba(255,255,255,0.85)",
+                fontSize: 12.5,
+                marginTop: 6,
+                fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
+              }}
+            >
+              {t.dash.haveGreatDay}
+            </p>
+          </div>
         </Card>
       )}
 
@@ -10714,7 +10802,6 @@ function Dashboard({
               shift={myShift}
               attendance={attendance}
               setAttendance={setAttendance}
-              pendingIds={attendancePendingIds}
               offices={offices}
               soundPreset={soundPreset}
             />
@@ -15944,7 +16031,6 @@ function SelfPunch({
   shift,
   attendance,
   setAttendance,
-  pendingIds,
   offices,
   soundPreset,
 }) {
@@ -15953,12 +16039,6 @@ function SelfPunch({
   const rec = attendance.find(
     (a) => a.employeeId === emp.id && a.date === today,
   );
-  // True while today's punch is saved on this device but hasn't reached
-  // Supabase yet (no internet) — see the offlineQueue option on the
-  // `attendance` useSupabaseArray call. The check-in/check-out itself
-  // already happened locally at this point; this only affects whether we
-  // show a "waiting to sync" note instead of assuming it's confirmed.
-  const isPending = !!(rec && pendingIds && pendingIds.has(rec.id));
   const [locBusy, setLocBusy] = useState(false);
   const [locError, setLocError] = useState("");
   const [branchWarning, setBranchWarning] = useState("");
@@ -16225,24 +16305,6 @@ function SelfPunch({
           }}
         >
           {locError}
-        </p>
-      )}
-      {isPending && (
-        <p
-          style={{
-            fontSize: 12.5,
-            fontWeight: 600,
-            color: T.goldText,
-            background: T.goldSoft,
-            padding: "8px 12px",
-            borderRadius: 10,
-            marginBottom: 12,
-            maxWidth: 320,
-            marginLeft: "auto",
-            marginRight: "auto",
-          }}
-        >
-          {t.att.offlinePending}
         </p>
       )}
       {!rec && (
@@ -17540,7 +17602,6 @@ function Attendance({
   shifts,
   attendance,
   setAttendance,
-  attendancePendingIds,
   isSuperAdmin,
   offices,
   setOffices,
@@ -17637,7 +17698,6 @@ function Attendance({
           shift={shiftOf(currentEmp.shiftId)}
           attendance={attendance}
           setAttendance={setAttendance}
-          pendingIds={attendancePendingIds}
           offices={offices}
           soundPreset={soundPreset}
         />
@@ -27899,6 +27959,119 @@ function MyProfile({
   );
 }
 
+// A single on/off row for the "Liquid Glass" display preference — a
+// frosted/translucent surface style the user can switch on or off for
+// this device, independent of light/dark mode and the primary color
+// (same idea as those two, just a toggle instead of a swatch/segmented
+// control). Shared between the employee and admin Appearance settings
+// below so both stay in sync in behavior and copy.
+function GlassToggleRow() {
+  const { t } = useLang();
+  const { glassEffect, setGlassEffect } = useTheme();
+  return (
+    <div style={{ marginTop: 18 }}>
+      <div
+        style={{
+          fontSize: 11.5,
+          fontWeight: 600,
+          color: T.muted,
+          marginBottom: 8,
+          textTransform: "uppercase",
+          letterSpacing: ".03em",
+        }}
+      >
+        {t.settings.glassEffect}
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          padding: "10px 12px",
+          borderRadius: 10,
+          border: `1px solid ${T.line}`,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 9,
+            minWidth: 0,
+          }}
+        >
+          <span
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: 9,
+              background: T.goldSoft,
+              color: T.goldText,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <Droplets size={15} />
+          </span>
+          <p style={{ fontSize: 12, color: T.muted, lineHeight: 1.4 }}>
+            {t.settings.glassEffectDesc}
+          </p>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 9,
+            flexShrink: 0,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 11.5,
+              fontWeight: 600,
+              color: glassEffect ? T.gold : T.muted,
+            }}
+          >
+            {glassEffect ? t.settings.glassOn : t.settings.glassOff}
+          </span>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={!!glassEffect}
+            aria-label={t.settings.glassEffect}
+            onClick={() => setGlassEffect(!glassEffect)}
+            style={{
+              width: 42,
+              height: 24,
+              borderRadius: 999,
+              border: "none",
+              cursor: "pointer",
+              padding: 2,
+              background: glassEffect ? T.gold : T.line,
+              display: "flex",
+              justifyContent: glassEffect ? "flex-end" : "flex-start",
+              transition: "background .15s ease",
+            }}
+          >
+            <span
+              style={{
+                width: 20,
+                height: 20,
+                borderRadius: "50%",
+                background: "#fff",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+                transition: "transform .15s ease",
+              }}
+            />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 function AppearanceCard() {
   const { t } = useLang();
   const {
@@ -28005,6 +28178,8 @@ function AppearanceCard() {
           })}
         </div>
       </div>
+
+      <GlassToggleRow />
 
       <div style={{ marginTop: 18 }}>
         <div
@@ -28703,6 +28878,8 @@ function AdminSettings({
             })}
           </div>
         </div>
+
+        <GlassToggleRow />
 
         <div style={{ marginTop: 18 }}>
           <div
@@ -32362,42 +32539,302 @@ function Payroll({
 // have room for — replaces the old "More" slide-in drawer for the
 // employee/staff mobile view so it reads as its own page (like a phone
 // app-launcher) instead of an overlay panel.
-function MoreAppsPage({ nav, setPage, onLogout }) {
+// The employee "Apps" grid — also doubles as the admin app launcher on
+// phones (see the shared "Apps" bottomnav tab in AppInner). Three things
+// layered on top of the original plain icon grid:
+//  1. Optional one-line description under each tile (buildNavEmployee
+//     attaches `desc`; admin items simply have none and render as before).
+//  2. A "Customize" mode that lets the person reorder their own tiles with
+//     up/down arrows — order is a per-device display preference, so it's
+//     kept in localStorage (see useLocalStorage) the same way theme,
+//     primaryColor and glassEffect are, not written to the server.
+//  3. A "this month" stats strip for employees (present days, leave days,
+//     OT hours, trainings in progress) — omitted for admins, since those
+//     are personal attendance figures an admin browsing the launcher
+//     doesn't have (no linked employee record).
+function MoreAppsPage({
+  nav,
+  setPage,
+  onLogout,
+  role,
+  currentEmp,
+  attendance,
+  overtimeRequests,
+  otPolicy,
+  trainings,
+}) {
   const { t } = useLang();
-  const items = nav.filter((n) => n.id !== "dashboard");
+  const items = useMemo(() => nav.filter((n) => n.id !== "dashboard"), [nav]);
+  const orderKey = `hrsuite:appsOrder:${role || "employee"}`;
+  const [savedOrder, setSavedOrder] = useLocalStorage(orderKey, []);
+  const [customizing, setCustomizing] = useState(false);
+
+  // Apply the saved order (ids), then append anything new (a module just
+  // enabled, or a permission just granted) that isn't in it yet — so a
+  // stale/partial saved order never hides an item, it just falls back to
+  // the end of the list.
+  const orderedItems = useMemo(() => {
+    const byId = new Map(items.map((it) => [it.id, it]));
+    const ordered = (savedOrder || [])
+      .map((id) => byId.get(id))
+      .filter(Boolean);
+    const seen = new Set(ordered.map((it) => it.id));
+    items.forEach((it) => {
+      if (!seen.has(it.id)) ordered.push(it);
+    });
+    return ordered;
+  }, [items, savedOrder]);
+
+  const moveItem = (index, dir) => {
+    const next = [...orderedItems];
+    const target = index + dir;
+    if (target < 0 || target >= next.length) return;
+    [next[index], next[target]] = [next[target], next[index]];
+    setSavedOrder(next.map((it) => it.id));
+  };
+
+  // ---- Employee-only "this month" stats strip ----
+  const mk = monthKey();
+  const showStats = role !== "admin" && !!currentEmp;
+  const presentDays = showStats
+    ? attendance.filter(
+        (a) =>
+          a.employeeId === currentEmp.id &&
+          a.date &&
+          a.date.startsWith(mk) &&
+          (a.status === "present" || a.status === "late"),
+      ).length
+    : 0;
+  const leaveDays = showStats
+    ? monthAttendanceStats(attendance, currentEmp.id, mk).leaveDays
+    : 0;
+  const otHours = showStats
+    ? Math.round(
+        computeOvertimeForMonth(
+          currentEmp,
+          overtimeRequests || [],
+          mk,
+          otPolicy,
+        ).otHours,
+      )
+    : 0;
+  const trainingsInProgress = showStats
+    ? (trainings || []).filter(
+        (r) => r.employeeId === currentEmp.id && r.status === "ongoing",
+      ).length
+    : 0;
+  const statCards = [
+    {
+      id: "present",
+      icon: CheckCircle2,
+      color: T.blue,
+      value: presentDays,
+      label: t.dash.statPresentDays,
+    },
+    {
+      id: "leave",
+      icon: CalendarDays,
+      color: T.forest,
+      value: leaveDays,
+      label: t.dash.statLeaveDays,
+    },
+    {
+      id: "ot",
+      icon: Timer,
+      color: T.gold,
+      value: otHours,
+      label: t.dash.statOtHours,
+    },
+    {
+      id: "training",
+      icon: GraduationCap,
+      color: "#8B5CF6",
+      value: trainingsInProgress,
+      label: t.dash.statTrainingsProgress,
+    },
+  ];
+
   return (
     <div>
-      <h2
+      <div
         style={{
-          fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
-          fontSize: 19,
-          fontWeight: 700,
-          color: T.ink,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
           marginBottom: 16,
+          gap: 10,
         }}
       >
-        {t.nav.apps}
-      </h2>
+        <h2
+          style={{
+            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontSize: 19,
+            fontWeight: 700,
+            color: T.ink,
+          }}
+        >
+          {t.nav.apps}
+        </h2>
+        <button
+          type="button"
+          className="wf-btn wf-btn-sm"
+          onClick={() => setCustomizing((v) => !v)}
+          style={{
+            background: customizing ? T.gold : "transparent",
+            color: customizing ? "var(--wf-gold-fg, #1A1300)" : T.ink,
+            border: `1px solid ${customizing ? T.gold : T.line}`,
+          }}
+        >
+          <Settings2 size={13} />{" "}
+          {customizing ? t.dash.appsDone : t.dash.appsCustomize}
+        </button>
+      </div>
       <div className="wf-apps-grid">
-        {items.map((n) => {
+        {orderedItems.map((n, i) => {
           const accent = n.accent || T.blue;
           return (
-            <button
-              key={n.id}
-              className="wf-apps-tile"
-              onClick={() => setPage(n.id)}
-            >
-              <span
-                className="wf-apps-tile-icon"
-                style={{ background: accent + "1F", color: accent }}
+            <div key={n.id} style={{ position: "relative" }}>
+              <button
+                className="wf-apps-tile"
+                onClick={() => !customizing && setPage(n.id)}
+                disabled={customizing}
+                style={{
+                  width: "100%",
+                  cursor: customizing ? "default" : "pointer",
+                }}
               >
-                <n.icon size={22} />
-              </span>
-              <span className="wf-apps-tile-label">{n.label}</span>
-            </button>
+                <span
+                  className="wf-apps-tile-icon"
+                  style={{ background: accent + "1F", color: accent }}
+                >
+                  <n.icon size={22} />
+                </span>
+                <span className="wf-apps-tile-label">{n.label}</span>
+                {n.desc && <span className="wf-apps-tile-desc">{n.desc}</span>}
+              </button>
+              {customizing && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 6,
+                    right: 6,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 3,
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => moveItem(i, -1)}
+                    disabled={i === 0}
+                    aria-label="move up"
+                    style={{
+                      width: 22,
+                      height: 22,
+                      borderRadius: 6,
+                      border: `1px solid ${T.line}`,
+                      background: T.card,
+                      color: T.ink,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: i === 0 ? "not-allowed" : "pointer",
+                      opacity: i === 0 ? 0.4 : 1,
+                      padding: 0,
+                    }}
+                  >
+                    <ChevronUp size={13} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveItem(i, 1)}
+                    disabled={i === orderedItems.length - 1}
+                    aria-label="move down"
+                    style={{
+                      width: 22,
+                      height: 22,
+                      borderRadius: 6,
+                      border: `1px solid ${T.line}`,
+                      background: T.card,
+                      color: T.ink,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor:
+                        i === orderedItems.length - 1
+                          ? "not-allowed"
+                          : "pointer",
+                      opacity: i === orderedItems.length - 1 ? 0.4 : 1,
+                      padding: 0,
+                    }}
+                  >
+                    <ChevronDown size={13} />
+                  </button>
+                </div>
+              )}
+            </div>
           );
         })}
       </div>
+
+      {showStats && (
+        <Card
+          style={{
+            marginTop: 20,
+            padding: "16px 14px",
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: 14,
+          }}
+        >
+          {statCards.map((s) => (
+            <div
+              key={s.id}
+              style={{ display: "flex", alignItems: "center", gap: 10 }}
+            >
+              <span
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: 10,
+                  background: s.color + "1F",
+                  color: s.color,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <s.icon size={16} />
+              </span>
+              <div style={{ minWidth: 0 }}>
+                <div
+                  style={{
+                    fontFamily: "'JetBrains Mono',monospace",
+                    fontSize: 17,
+                    fontWeight: 700,
+                    color: T.ink,
+                    lineHeight: 1.1,
+                  }}
+                >
+                  {s.value}
+                </div>
+                <div
+                  style={{
+                    fontSize: 10.5,
+                    color: T.muted,
+                    lineHeight: 1.3,
+                    marginTop: 2,
+                  }}
+                >
+                  {s.label}
+                </div>
+              </div>
+            </div>
+          ))}
+        </Card>
+      )}
+
       {/* Mobile phones drop the desktop hamburger + slide-in sidebar
           (see buildBottomNavAdmin/Employee above), so Sign Out — which
           lives in that sidebar on desktop — has no other home on phones.
@@ -32572,25 +33009,71 @@ function withNavAccents(items) {
     group: NAV_GROUP_MAP[item.id] || "main",
   }));
 }
-function buildNavEmployee(n, enabledModules) {
+function buildNavEmployee(n, enabledModules, navDesc) {
   const enabled = enabledModules || DEFAULT_EMPLOYEE_MODULES;
+  const d = navDesc || {};
   return withNavAccents(
     [
       { id: "dashboard", label: n.dashboard, icon: LayoutDashboard },
-      { id: "announcements", label: n.announcements, icon: Megaphone },
-      { id: "attendance", label: n.myAttendance, icon: Clock },
-      { id: "messages", label: n.messages, icon: MessageCircle },
-      { id: "leave", label: n.myLeave, icon: CalendarDays },
-      { id: "ot", label: n.myOvertime, icon: Timer },
-      { id: "payroll", label: n.myPayroll, icon: Wallet },
-      { id: "review", label: n.myPerformance, icon: Star },
-      { id: "training", label: n.myTraining, icon: GraduationCap },
-      { id: "attcorr", label: n.myAttCorrection, icon: CalendarClock },
-      { id: "shiftswap", label: n.myShiftSwap, icon: Repeat },
-      { id: "roster", label: n.myRoster, icon: CalendarClock },
-      { id: "documents", label: n.myDocuments, icon: FileText },
-      { id: "loginActivity", label: n.loginActivity, icon: Smartphone },
-      { id: "profile", label: n.myProfile, icon: UserCircle2 },
+      {
+        id: "announcements",
+        label: n.announcements,
+        icon: Megaphone,
+        desc: d.announcements,
+      },
+      {
+        id: "attendance",
+        label: n.myAttendance,
+        icon: Clock,
+        desc: d.attendance,
+      },
+      {
+        id: "messages",
+        label: n.messages,
+        icon: MessageCircle,
+        desc: d.messages,
+      },
+      { id: "leave", label: n.myLeave, icon: CalendarDays, desc: d.leave },
+      { id: "ot", label: n.myOvertime, icon: Timer, desc: d.ot },
+      { id: "payroll", label: n.myPayroll, icon: Wallet, desc: d.payroll },
+      { id: "review", label: n.myPerformance, icon: Star, desc: d.review },
+      {
+        id: "training",
+        label: n.myTraining,
+        icon: GraduationCap,
+        desc: d.training,
+      },
+      {
+        id: "attcorr",
+        label: n.myAttCorrection,
+        icon: CalendarClock,
+        desc: d.attcorr,
+      },
+      {
+        id: "shiftswap",
+        label: n.myShiftSwap,
+        icon: Repeat,
+        desc: d.shiftswap,
+      },
+      { id: "roster", label: n.myRoster, icon: CalendarClock, desc: d.roster },
+      {
+        id: "documents",
+        label: n.myDocuments,
+        icon: FileText,
+        desc: d.documents,
+      },
+      {
+        id: "loginActivity",
+        label: n.loginActivity,
+        icon: Smartphone,
+        desc: d.loginActivity,
+      },
+      {
+        id: "profile",
+        label: n.myProfile,
+        icon: UserCircle2,
+        desc: d.profile,
+      },
     ].filter((item) => item.id === "dashboard" || enabled[item.id] !== false),
   );
 }
@@ -32627,7 +33110,7 @@ function AppInner() {
   const { t, lang } = useLang();
   const [branding, setBranding, brandingReady] = useBrandingSettings();
   const brandDisplayName = branding.name?.trim() || t.appName;
-  const { theme } = useTheme();
+  const { theme, glassEffect } = useTheme();
   // Shows a styled AlertDialog (instead of window.alert) when this
   // device's session gets force-signed-out via the Login Activity page.
   // Rendered in the logged-out branches below, since checkRevoked always
@@ -32931,13 +33414,7 @@ function AppInner() {
       entityLabel: (r) => `${r.date || "?"} · ${r.employeeId || "?"}`,
     },
   );
-  const [
-    attendance,
-    setAttendance,
-    aReady,
-    aSaveError,
-    attendancePendingIds,
-  ] = useSupabaseArray("attendance", {
+  const [attendance, setAttendance, aReady] = useSupabaseArray("attendance", {
     // Attendance grows without bound (every check-in/out, forever), so we
     // only keep a rolling 6-month window live in the app — enough for the
     // Payroll month-picker's usual back-history and the Analytics trend
@@ -32948,13 +33425,6 @@ function AppInner() {
     // PostgREST's default 1000-row response cap.
     dateField: "date",
     daysBack: 180,
-    // A staff check-in/check-out is the one write in this app that has to
-    // work even with no signal (a phone in a warehouse basement, a branch
-    // with an unreliable line, etc.) — see SelfPunch below. Everything
-    // else (payroll, employee records, ...) intentionally still fails
-    // loudly instead of queuing, so an admin never wonders whether an
-    // edit "really" saved.
-    offlineQueue: true,
     fromDb: (r) => ({
       id: r.id,
       employeeId: r.employee_id,
@@ -33804,7 +34274,7 @@ function AppInner() {
             (!n.superadminOnly || isSuperAdmin) &&
             (!n.permission || can(n.permission)),
         )
-      : buildNavEmployee(t.nav, employeeModulesForNav);
+      : buildNavEmployee(t.nav, employeeModulesForNav, t.navDesc);
   const bottomNav =
     role === "admin"
       ? buildBottomNavAdmin(t.nav)
@@ -34176,8 +34646,8 @@ function AppInner() {
     <BrandingContext.Provider value={{ branding, setBranding }}>
       <div
         className={`wf-root wf-app-enter ${theme === "dark" ? "wf-dark" : ""} ${
-          bottomNav ? "wf-role-staff" : ""
-        }`}
+          glassEffect ? "wf-glass" : ""
+        } ${bottomNav ? "wf-role-staff" : ""}`}
       >
         <div
           className={`wf-overlay-scrim ${navOpen ? "open" : ""}`}
@@ -34532,6 +35002,12 @@ function AppInner() {
                   nav={nav}
                   setPage={setPage}
                   onLogout={handleLogout}
+                  role={role}
+                  currentEmp={currentEmp}
+                  attendance={attendance}
+                  overtimeRequests={overtimeRequests}
+                  otPolicy={otPolicy}
+                  trainings={trainings}
                 />
               )}
               {page === "dashboard" && (
@@ -34540,7 +35016,6 @@ function AppInner() {
                   departments={departments}
                   attendance={attendance}
                   setAttendance={setAttendance}
-                  attendancePendingIds={attendancePendingIds}
                   payrollPaid={payrollPaid}
                   role={role}
                   currentEmp={currentEmp}
@@ -34669,7 +35144,6 @@ function AppInner() {
                     shifts={shifts}
                     attendance={attendance}
                     setAttendance={setAttendance}
-                    attendancePendingIds={attendancePendingIds}
                     isSuperAdmin={isSuperAdmin}
                     offices={offices}
                     setOffices={setOffices}
@@ -34914,22 +35388,10 @@ function AppInner() {
 // exception is the service worker itself (registered at /sw.js):
 // browsers require it to be a real same-origin script file reachable
 // at a stable URL — that's a platform security rule, not something we
-// can inline into the JS bundle. This service worker itself deliberately
-// does NOT cache or queue Supabase writes — it only makes the app shell
-// load fast and stay usable when the network blips. Most writes (payroll,
-// employee records, ...) still need a live connection and fail loudly if
-// not. The one deliberate exception is the staff self check-in/check-out
-// (see the `offlineQueue` option on useSupabaseArray, used for the
-// `attendance` table): a punch made with no signal is saved to
-// localStorage and retried automatically once the device is back online,
-// since losing a punch is worse than a short sync delay. Separately,
-// every useSupabaseArray table also keeps a last-known-good *read*
-// snapshot in localStorage (see `writeSnapshot`/`readSnapshot` there), so
-// a failed reload while offline falls back to that instead of wiping the
-// table to empty — without this, an already-logged-in employee's own id
-// could stop resolving against a suddenly-empty `employees` list, which
-// silently bounced them back to the login screen with no way to sign in
-// again either (same empty list, nothing to authenticate against).
+// can inline into the JS bundle. Deliberately does NOT cache or queue
+// Supabase writes — checking in/out, payroll, etc. still need a live
+// connection; this only makes the shell load fast and work when the
+// network blips.
 const PWA_ICON_SVG =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
   '<rect width="100" height="100" rx="22" fill="#0A0F1A"/>' +
@@ -35033,6 +35495,18 @@ export default function App() {
     "hrsuite:fontScale",
     "medium",
   );
+  const [glassEffect, setGlassEffect] = useLocalStorage(
+    "hrsuite:glassEffect",
+    false,
+  );
+  // Liquid Glass: a per-device display preference like theme/primaryColor
+  // above, not tied to either. Mirrored onto document.body (in addition to
+  // the "wf-glass" class applied to .wf-root in AppInner) so portaled
+  // content — Modal/Drawer render straight to document.body — also picks
+  // up the frosted-glass surfaces.
+  useEffect(() => {
+    document.body.classList.toggle("wf-glass", !!glassEffect);
+  }, [glassEffect]);
   // Keep a matching "wf-dark" class on <body>, not just on .wf-root, so
   // that content portaled straight to document.body (Modal/Drawer, which
   // must escape .wf-root to avoid being clipped/mispositioned by any
@@ -35084,6 +35558,8 @@ export default function App() {
           setPrimaryColor,
           fontScale,
           setFontScale,
+          glassEffect,
+          setGlassEffect,
         }}
       >
         <AppInner />
