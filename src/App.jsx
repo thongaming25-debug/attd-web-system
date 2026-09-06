@@ -60,6 +60,7 @@ import {
   MoreVertical,
   Download,
   Eye,
+  EyeOff,
   Star,
   Megaphone,
   FileText,
@@ -116,8 +117,18 @@ const LANG_RAW = {
       password: "ពាក្យសម្ងាត់អ្នកគ្រប់គ្រង",
       passwordPlaceholder: "••••••••",
       adminTitle: "ចូលប្រើសម្រាប់អ្នកគ្រប់គ្រង",
+      adminSubtitle: "សូមស្វាគមន៍! សូមចូលគណនីដើម្បីបន្ត។",
       employeePortal: "ចូលប្រើបុគ្គលិក",
+      employeeSubtitle: "សូមចូលគណនីដើម្បីចូលប្រើប្រព័ន្ធរបស់អ្នក។",
       demoLabel: "សម្រាប់សាកល្បង៖",
+      rememberMe: "ចងចាំខ្ញុំ",
+      forgotPassword: "ភ្លេចពាក្យសម្ងាត់?",
+      forgotPin: "ភ្លេចកូដសម្ងាត់?",
+      contactAdminMsg: "សូមទាក់ទងអ្នកគ្រប់គ្រងប្រព័ន្ធ ដើម្បីជំនួយ។",
+      secureLogin: "ការចូលប្រើប្រកបដោយសុវត្ថិភាព",
+      authorizedOnly: "សម្រាប់តែអ្នកមានសិទ្ធិប៉ុណ្ណោះ",
+      showPassword: "បង្ហាញ",
+      hidePassword: "លាក់",
       errNoEmp: "រកមិនឃើញលេខសម្គាល់បុគ្គលិកនេះទេ",
       errInactive: "គណនីនេះមិនទាន់សកម្មទេ សូមទាក់ទង Admin",
       errPin: "កូដសម្ងាត់ (PIN) មិនត្រឹមត្រូវទេ",
@@ -193,6 +204,8 @@ const LANG_RAW = {
     },
     searchMenu: "ស្វែងរកម៉ឺនុយ...",
     logout: "ចាកចេញ",
+    confirmLogoutTitle: "បញ្ជាក់ការចាកចេញ",
+    confirmLogoutMsg: "តើអ្នកពិតជាចង់ចាកចេញពីប្រព័ន្ធមែនទេ?",
     notifications: "ការជូនដំណឹង",
     markAllRead: "កំណត់ថាបានអានទាំងអស់",
     noNotif: "មិនមានការជូនដំណឹងទេ",
@@ -1403,8 +1416,18 @@ const LANG_RAW = {
       password: "Password",
       passwordPlaceholder: "••••••••",
       adminTitle: "Admin Login",
+      adminSubtitle: "Welcome back! Please sign in to continue.",
       employeePortal: "Employee Portal",
+      employeeSubtitle: "Sign in to access your workspace.",
       demoLabel: "Demo credentials:",
+      rememberMe: "Remember me",
+      forgotPassword: "Forgot password?",
+      forgotPin: "Forgot PIN?",
+      contactAdminMsg: "Please contact your administrator for help.",
+      secureLogin: "Secure login",
+      authorizedOnly: "Authorized access only",
+      showPassword: "Show",
+      hidePassword: "Hide",
       errNoEmp: "Employee ID not found",
       errInactive: "This account is inactive. Contact Admin.",
       errPin: "Incorrect PIN code",
@@ -1480,6 +1503,8 @@ const LANG_RAW = {
     },
     searchMenu: "Search menu...",
     logout: "Sign Out",
+    confirmLogoutTitle: "Confirm Sign Out",
+    confirmLogoutMsg: "Are you sure you want to sign out?",
     notifications: "Notifications",
     markAllRead: "Mark all as read",
     noNotif: "No notifications",
@@ -2695,8 +2720,18 @@ const LANG_RAW = {
       password: "管理员密码",
       passwordPlaceholder: "••••••••",
       adminTitle: "管理员登录",
+      adminSubtitle: "欢迎回来！请登录以继续。",
       employeePortal: "员工登录",
+      employeeSubtitle: "登录以访问您的工作台。",
       demoLabel: "测试账号：",
+      rememberMe: "记住我",
+      forgotPassword: "忘记密码？",
+      forgotPin: "忘记密码？",
+      contactAdminMsg: "请联系管理员以获取帮助。",
+      secureLogin: "安全登录",
+      authorizedOnly: "仅限授权访问",
+      showPassword: "显示",
+      hidePassword: "隐藏",
       errNoEmp: "找不到此员工编号",
       errInactive: "此账号尚未启用，请联系管理员",
       errPin: "PIN 密码不正确",
@@ -2763,6 +2798,8 @@ const LANG_RAW = {
     },
     searchMenu: "搜索菜单...",
     logout: "登出",
+    confirmLogoutTitle: "确认登出",
+    confirmLogoutMsg: "您确定要登出系统吗？",
     notifications: "通知",
     markAllRead: "标记全部已读",
     noNotif: "没有通知",
@@ -5959,6 +5996,18 @@ function useSupabaseArray(
     // failures are logged, never surfaced to the user or thrown, since a
     // push failing shouldn't block the save that triggered it.
     notify,
+    // Optional: defer the initial fetch (and realtime subscribe) until
+    // this is true. For tables only ever read by one specific admin
+    // page (recruitment, onboarding, assets, roster — verified via grep
+    // that nothing outside that page's own render subtree touches
+    // them: no dashboard tile, no notification bell, no nav badge), this
+    // avoids pulling their data into every session on login. Tables that
+    // ANYTHING else depends on (notifications, dashboard stats, nav
+    // badges) must keep the default `true` — deferring those would just
+    // delay a feature elsewhere instead of removing dead work. Defaults
+    // to true (current always-load behavior) so every existing call site
+    // is unaffected unless it opts in.
+    enabled = true,
   } = {},
 ) {
   const [value, setValueState] = useState([]);
@@ -5986,6 +6035,7 @@ function useSupabaseArray(
       : null;
 
   useEffect(() => {
+    if (!enabled) return; // deferred — wait until the owning page mounts
     let cancelled = false;
     (async () => {
       // Supabase/PostgREST caps any single response at its configured
@@ -6029,7 +6079,7 @@ function useSupabaseArray(
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [table, cutoffDate]);
+  }, [table, cutoffDate, enabled]);
 
   // Live sync: without this, admin and staff only ever see what was on the
   // table at the moment their tab loaded — a staff check-in, an admin's
@@ -8462,240 +8512,221 @@ function ConfirmDialog({
 const APP_VERSION = "1.0.0";
 const LOGIN_CSS_ID = "wf-login-style";
 const LOGIN_CSS = `
-@keyframes wf-float-up { from { opacity:0; transform:translateY(28px) scale(.96); } to { opacity:1; transform:translateY(0) scale(1); } }
-@keyframes wf-bg-drift { 0%,100% { transform:translate(0,0) scale(1.05); } 50% { transform:translate(-20px, -14px) scale(1.08); } }
-@keyframes wf-bg-hue { 0%,100% { filter:hue-rotate(0deg); } 50% { filter:hue-rotate(12deg); } }
-@keyframes wf-pulse-ring { 0%,100% { transform:scale(1); opacity:.5; } 50% { transform:scale(1.12); opacity:.2; } }
-@keyframes wf-orb-a { 0%,100% { transform:translate(0,0) scale(1); } 33% { transform:translate(60px,-70px) scale(1.15); } 66% { transform:translate(-40px,40px) scale(.9); } }
-@keyframes wf-orb-b { 0%,100% { transform:translate(0,0) scale(1); } 50% { transform:translate(-70px,60px) scale(1.2); } }
-@keyframes wf-orb-c { 0%,100% { transform:translate(0,0) scale(1); } 40% { transform:translate(70px,50px) scale(.88); } 75% { transform:translate(-50px,-30px) scale(1.1); } }
-@keyframes wf-orb-d { 0%,100% { transform:translate(0,0) scale(1); } 45% { transform:translate(-55px,-50px) scale(1.12); } }
+@keyframes wf-float-up { from { opacity:0; transform:translateY(20px) scale(.98); } to { opacity:1; transform:translateY(0) scale(1); } }
+@keyframes wf-blob-drift-a { 0%,100% { transform:translate(0,0) scale(1); } 50% { transform:translate(18px,-14px) scale(1.04); } }
+@keyframes wf-blob-drift-b { 0%,100% { transform:translate(0,0) scale(1); } 50% { transform:translate(-16px,16px) scale(1.05); } }
 @keyframes wf-credit-in { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
-@keyframes wf-border-spin { to { transform: rotate(1turn); } }
 .wf-login-root {
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   min-height:100vh; min-height:100dvh; position:relative; overflow:hidden;
   background: var(--wfl-bg);
   transition: background .3s ease;
+  padding: 24px 16px;
+  box-sizing: border-box;
   /* dark (default) theme tokens */
-  --wfl-bg: linear-gradient(160deg, #050810 0%, #0A0F1A 55%, #0D1420 100%);
-  --wfl-grid-line: rgba(255,255,255,0.035);
-  --wfl-orb-opacity: .4;
-  --wfl-card-bg: linear-gradient(180deg, rgba(20,25,37,0.92), rgba(12,16,25,0.88));
-  --wfl-card-border: rgba(255,255,255,0.09);
-  --wfl-card-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 0 0 1px rgba(0,0,0,0.2), 0 36px 90px rgba(0,0,0,0.6), 0 8px 24px rgba(240,168,59,0.06);
-  --wfl-border-a: ${T.gold};
-  --wfl-border-b: rgba(91,141,239,0.9);
+  --wfl-bg: linear-gradient(160deg, #0b1220 0%, #0f1729 55%, #0b1220 100%);
+  --wfl-blob-a: rgba(91,141,239,0.20);
+  --wfl-blob-b: rgba(91,141,239,0.14);
+  --wfl-dot-color: rgba(255,255,255,0.10);
+  --wfl-card-bg: #121a2b;
+  --wfl-card-border: rgba(255,255,255,0.08);
+  --wfl-card-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.35);
   --wfl-text: #EEF1F6;
-  --wfl-text-soft: #8891A6;
-  --wfl-text-softer: #8A93A8;
+  --wfl-text-soft: #93A0B8;
+  --wfl-text-softer: #7C879C;
   --wfl-input-bg: rgba(255,255,255,0.04);
-  --wfl-input-bg-focus: rgba(255,255,255,0.06);
-  --wfl-input-border: rgba(255,255,255,0.1);
+  --wfl-input-bg-focus: rgba(255,255,255,0.07);
+  --wfl-input-border: rgba(255,255,255,0.12);
   --wfl-input-placeholder: #5B6478;
-  --wfl-divider: rgba(255,255,255,0.1);
+  --wfl-input-icon: #6B7690;
+  --wfl-divider: rgba(255,255,255,0.09);
   --wfl-demo-bg: rgba(255,255,255,0.04);
   --wfl-demo-border: rgba(255,255,255,0.07);
   --wfl-demo-text: #8891A6;
-  --wfl-credit-bg: rgba(255,255,255,0.055);
-  --wfl-credit-border: rgba(255,255,255,0.11);
-  --wfl-credit-text: #AEB6C9;
-  --wfl-credit-name: #EEF1F6;
-  --wfl-btn-adm-bg: rgba(255,255,255,0.07);
-  --wfl-btn-adm-border: rgba(255,255,255,0.16);
-  --wfl-btn-adm-hover-bg: rgba(255,255,255,0.12);
-  --wfl-btn-adm-hover-border: rgba(255,255,255,0.24);
+  --wfl-credit-text: #7C879C;
+  --wfl-credit-name: #A9C2F9;
+  --wfl-link: #8FB0F7;
+  --wfl-accent: #5B8DEF;
+  --wfl-accent-dark: #3F68D8;
+  --wfl-logo-bg: #1A2338;
 }
 .wf-login-root.wf-login-light {
-  /* light theme tokens */
-  --wfl-bg: linear-gradient(160deg, #eef1f8 0%, #f6f8fb 55%, #eef2f7 100%);
-  --wfl-grid-line: rgba(15,20,35,0.05);
-  --wfl-orb-opacity: .22;
-  --wfl-card-bg: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.82));
-  --wfl-card-border: rgba(15,20,35,0.08);
-  --wfl-card-shadow: 0 1px 0 rgba(255,255,255,0.7) inset, 0 0 0 1px rgba(15,20,35,0.03), 0 30px 70px rgba(20,25,45,0.12), 0 8px 20px rgba(240,168,59,0.10);
-  --wfl-border-a: ${T.gold};
-  --wfl-border-b: #5B8DEF;
-  --wfl-text: #12151F;
+  /* light theme tokens — clean/standard look */
+  --wfl-bg: linear-gradient(160deg, #eef2fb 0%, #f7f9fc 55%, #eef1f8 100%);
+  --wfl-blob-a: rgba(91,141,239,0.24);
+  --wfl-blob-b: rgba(91,141,239,0.16);
+  --wfl-dot-color: rgba(15,23,42,0.14);
+  --wfl-card-bg: #ffffff;
+  --wfl-card-border: rgba(15,23,42,0.06);
+  --wfl-card-shadow: 0 20px 50px rgba(15,23,42,0.10), 0 4px 14px rgba(15,23,42,0.05);
+  --wfl-text: #0F172A;
   --wfl-text-soft: #5B6274;
-  --wfl-text-softer: #6B7284;
-  --wfl-input-bg: rgba(15,20,35,0.035);
-  --wfl-input-bg-focus: rgba(15,20,35,0.05);
-  --wfl-input-border: rgba(15,20,35,0.12);
+  --wfl-text-softer: #94A3B8;
+  --wfl-input-bg: #F8FAFC;
+  --wfl-input-bg-focus: #FFFFFF;
+  --wfl-input-border: #E2E8F0;
   --wfl-input-placeholder: #9AA1B2;
-  --wfl-divider: rgba(15,20,35,0.1);
+  --wfl-input-icon: #94A3B8;
+  --wfl-divider: #E5E9F0;
   --wfl-demo-bg: rgba(15,20,35,0.035);
   --wfl-demo-border: rgba(15,20,35,0.08);
   --wfl-demo-text: #5B6274;
-  --wfl-credit-bg: rgba(15,20,35,0.045);
-  --wfl-credit-border: rgba(15,20,35,0.09);
-  --wfl-credit-text: #5B6274;
-  --wfl-credit-name: #12151F;
-  --wfl-btn-adm-bg: rgba(15,20,35,0.05);
-  --wfl-btn-adm-border: rgba(15,20,35,0.14);
-  --wfl-btn-adm-hover-bg: rgba(15,20,35,0.08);
-  --wfl-btn-adm-hover-border: rgba(15,20,35,0.2);
+  --wfl-credit-text: #94A3B8;
+  --wfl-credit-name: #2F6FED;
+  --wfl-link: #2F6FED;
+  --wfl-accent: #3D7CF4;
+  --wfl-accent-dark: #2358D6;
+  --wfl-logo-bg: #ffffff;
 }
-.wf-login-bg {
-  position:absolute; inset:-40px; z-index:0; pointer-events:none;
-  background: radial-gradient(ellipse 80% 60% at 20% 30%, rgba(240,168,59,0.10) 0%, transparent 60%),
-              radial-gradient(ellipse 60% 80% at 80% 70%, rgba(91,141,239,0.12) 0%, transparent 60%),
-              radial-gradient(ellipse 50% 40% at 60% 10%, rgba(31,162,107,0.08) 0%, transparent 60%);
-  animation: wf-bg-drift 14s ease-in-out infinite, wf-bg-hue 22s ease-in-out infinite;
-  will-change: transform, filter;
+.wf-login-blobs { position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.wf-login-blob {
+  position:absolute; border-radius:50%; filter:blur(60px); will-change:transform;
 }
-.wf-login-bg::after {
-  content:''; position:absolute; inset:0;
-  background-image:
-    linear-gradient(var(--wfl-grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--wfl-grid-line) 1px, transparent 1px);
-  background-size:42px 42px;
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 0%, transparent 75%);
+.wf-login-blob-tl {
+  width:480px; height:480px; top:-220px; left:-200px;
+  background: radial-gradient(circle, var(--wfl-blob-a) 0%, transparent 70%);
+  animation: wf-blob-drift-a 18s ease-in-out infinite;
 }
-.wf-login-orbs { position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
-.wf-login-orb {
-  position:absolute; border-radius:50%; filter:blur(50px); opacity:var(--wfl-orb-opacity);
-  will-change: transform;
+.wf-login-blob-br {
+  width:420px; height:420px; bottom:-200px; right:-180px;
+  background: radial-gradient(circle, var(--wfl-blob-b) 0%, transparent 70%);
+  animation: wf-blob-drift-b 20s ease-in-out infinite;
 }
-.wf-login-orb-1 {
-  width:260px; height:260px; top:8%; left:8%;
-  background:radial-gradient(circle,rgba(31,162,107,0.5),transparent 70%);
-  animation: wf-orb-a 16s ease-in-out infinite;
+.wf-login-dots {
+  position:absolute; z-index:0; pointer-events:none;
+  width:110px; height:110px;
+  background-image: radial-gradient(var(--wfl-dot-color) 1.6px, transparent 1.6px);
+  background-size: 18px 18px;
 }
-.wf-login-orb-2 {
-  width:320px; height:320px; bottom:6%; right:6%;
-  background:radial-gradient(circle,rgba(91,141,239,0.45),transparent 70%);
-  animation: wf-orb-b 20s ease-in-out infinite;
-}
-.wf-login-orb-3 {
-  width:200px; height:200px; top:55%; left:2%;
-  background:radial-gradient(circle,rgba(240,168,59,0.4),transparent 70%);
-  animation: wf-orb-c 18s ease-in-out infinite;
-}
-.wf-login-orb-4 {
-  width:180px; height:180px; top:4%; right:16%;
-  background:radial-gradient(circle,rgba(229,99,122,0.3),transparent 70%);
-  animation: wf-orb-d 15s ease-in-out infinite;
-}
-.wf-login-card-glow {
+.wf-login-dots-tl { top:6%; left:5%; }
+.wf-login-dots-br { bottom:6%; right:5%; }
+.wf-login-card-wrap {
   position:relative; z-index:2;
-  width:100%; max-width:420px; margin:16px;
-  border-radius:22px;
-  padding:2px;
-  overflow:hidden;
-  animation: wf-float-up .6s cubic-bezier(.16,.9,.28,1) both;
-}
-.wf-login-card-glow::before {
-  content:'';
-  position:absolute;
-  inset:-50%;
-  background: conic-gradient(from 0deg, transparent 0%, var(--wfl-border-a) 10%, var(--wfl-border-b) 28%, transparent 46%, transparent 100%);
-  animation: wf-border-spin 5s linear infinite;
+  width:100%; max-width:420px;
+  animation: wf-float-up .5s cubic-bezier(.16,.9,.28,1) both;
 }
 .wf-login-card {
-  position:relative; z-index:1;
+  position:relative;
   width:100%;
-  padding:38px 32px 30px;
+  padding:36px 32px 28px;
   background:var(--wfl-card-bg);
-  backdrop-filter:blur(28px);
-  border-radius:20px;
+  border-radius:22px;
   border:1px solid var(--wfl-card-border);
   box-shadow: var(--wfl-card-shadow);
-  overflow:hidden;
-}
-.wf-login-logo-ring {
-  width:58px; height:58px; border-radius:14px;
-  background:linear-gradient(150deg, ${T.gold}, #d98f22);
-  display:flex; align-items:center; justify-content:center;
-  font-weight:800; font-size:18px; color:#1A1300;
-  font-family:'JetBrains Mono',monospace;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.3), 0 8px 22px rgba(240,168,59,0.35);
-  position:relative;
-}
-.wf-login-logo-ring::before {
-  content:''; position:absolute; inset:-9px; border-radius:20px;
-  border:1px solid rgba(240,168,59,0.35);
-  animation: wf-pulse-ring 3s ease-in-out infinite;
-}
-.wf-login-input {
-  width:100%; padding:13px 14px; border-radius:10px;
-  border:1.5px solid var(--wfl-input-border); font-size:14px;
-  background:var(--wfl-input-bg); color:var(--wfl-text); outline:none;
-  font-family:inherit; transition:border-color .25s ease, box-shadow .25s ease, background .25s ease, transform .15s ease;
   box-sizing:border-box;
 }
+.wf-login-back-btn {
+  display:flex; align-items:center; gap:6px;
+  background:none; border:none; cursor:pointer;
+  color:var(--wfl-text-soft); font-size:12.5px; font-weight:600;
+  margin-bottom:18px; padding:0; font-family:inherit;
+}
+.wf-login-logo {
+  width:60px; height:60px; border-radius:16px;
+  background:var(--wfl-logo-bg);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 8px 22px rgba(15,23,42,0.10), inset 0 0 0 1px var(--wfl-card-border);
+  overflow:hidden; flex-shrink:0;
+}
+.wf-login-eyebrow {
+  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--wfl-text-softer); margin-top:14px;
+}
+.wf-login-title {
+  font-family:'Sora','Noto Sans Khmer',sans-serif;
+  font-weight:800; font-size:22px; color:var(--wfl-text); margin-top:4px; text-align:center;
+}
+.wf-login-subtitle { font-size:13px; color:var(--wfl-text-soft); margin-top:6px; text-align:center; }
+.wf-login-divider { display:flex; align-items:center; gap:10px; margin:22px 0 18px; }
+.wf-login-divider::before,.wf-login-divider::after { content:''; flex:1; height:1px; background:var(--wfl-divider); }
+.wf-login-divider-icon {
+  width:26px; height:26px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--wfl-accent); background:var(--wfl-input-bg); border:1px solid var(--wfl-divider);
+}
+.wf-login-input-wrap { position:relative; display:flex; align-items:center; }
+.wf-login-input-icon {
+  position:absolute; left:13px; display:flex; align-items:center; justify-content:center;
+  color:var(--wfl-input-icon); pointer-events:none;
+}
+.wf-login-input {
+  width:100%; padding:12.5px 14px 12.5px 40px; border-radius:11px;
+  border:1.5px solid var(--wfl-input-border); font-size:14px;
+  background:var(--wfl-input-bg); color:var(--wfl-text); outline:none;
+  font-family:inherit; transition:border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  box-sizing:border-box;
+}
+.wf-login-input-pw { padding-right:40px; }
 .wf-login-input::placeholder { color:var(--wfl-input-placeholder); }
 .wf-login-input:focus {
-  border-color:${T.gold}; background:var(--wfl-input-bg-focus);
-  box-shadow:0 0 0 4px rgba(240,168,59,0.14);
-  transform:translateY(-1px);
+  border-color:var(--wfl-accent); background:var(--wfl-input-bg-focus);
+  box-shadow:0 0 0 4px rgba(61,124,244,0.14);
 }
+.wf-login-input-toggle {
+  position:absolute; right:12px; display:flex; align-items:center; justify-content:center;
+  background:none; border:none; cursor:pointer; color:var(--wfl-input-icon); padding:2px;
+}
+.wf-login-row { display:flex; align-items:center; justify-content:space-between; margin:2px 0 20px; gap:10px; }
+.wf-login-checkbox-label { display:flex; align-items:center; gap:7px; font-size:13px; color:var(--wfl-text-soft); cursor:pointer; user-select:none; }
+.wf-login-checkbox-label input { accent-color:var(--wfl-accent); width:15px; height:15px; cursor:pointer; }
+.wf-login-link-btn { background:none; border:none; padding:0; cursor:pointer; font-size:13px; font-weight:600; color:var(--wfl-link); font-family:inherit; }
 .wf-login-btn {
-  width:100%; padding:14px; border:none; border-radius:11px;
+  width:100%; padding:14px; border:none; border-radius:12px;
   font-size:15px; font-weight:700; cursor:pointer; display:flex;
   align-items:center; justify-content:center; gap:8px;
-  font-family:inherit; transition:transform .2s cubic-bezier(.2,.9,.3,1), box-shadow .2s ease, filter .2s ease;
-  position:relative; overflow:hidden;
+  font-family:inherit; transition:transform .15s ease, box-shadow .2s ease, filter .2s ease;
 }
 .wf-login-btn:hover:not(:disabled) { transform:translateY(-1px); }
-.wf-login-btn:active:not(:disabled) { transform:scale(.97) translateY(0); }
+.wf-login-btn:active:not(:disabled) { transform:scale(.98) translateY(0); }
 .wf-login-btn-emp {
   background:linear-gradient(135deg, #ffcf76, ${T.gold} 55%, #dd9a2e);
   color:#1A1300;
-  box-shadow:0 6px 20px rgba(240,168,59,0.35);
+  box-shadow:0 8px 20px rgba(240,168,59,0.3);
 }
-.wf-login-btn-emp:hover { box-shadow:0 8px 28px rgba(240,168,59,0.45); filter:brightness(1.05); }
+.wf-login-btn-emp:hover { box-shadow:0 10px 26px rgba(240,168,59,0.4); filter:brightness(1.03); }
 .wf-login-btn-adm {
-  background:var(--wfl-btn-adm-bg);
-  color:var(--wfl-text);
-  border:1px solid var(--wfl-btn-adm-border);
-  box-shadow:none;
+  background:linear-gradient(135deg, var(--wfl-accent), var(--wfl-accent-dark));
+  color:#fff;
+  box-shadow:0 8px 20px rgba(61,124,244,0.3);
 }
-.wf-login-btn-adm:hover { background:var(--wfl-btn-adm-hover-bg); border-color:var(--wfl-btn-adm-hover-border); }
-.wf-login-divider { display:flex; align-items:center; gap:10px; margin:18px 0; }
-.wf-login-divider::before,.wf-login-divider::after { content:''; flex:1; height:1px; background:var(--wfl-divider); }
+.wf-login-btn-adm:hover { box-shadow:0 10px 26px rgba(61,124,244,0.4); filter:brightness(1.03); }
 .wf-login-error {
   display:flex; align-items:center; gap:7px; font-size:12.5px;
-  color:#F0879B; background:rgba(229,99,122,0.12); border-radius:8px;
+  color:#C0334A; background:rgba(229,99,122,0.12); border-radius:8px;
   padding:9px 12px; margin-bottom:14px; border:1px solid rgba(229,99,122,0.25);
 }
+.wf-login-root.wf-login-light .wf-login-error { color:#B3273F; }
 .wf-login-demo {
-  margin-top:20px; padding:11px 14px; background:var(--wfl-demo-bg);
+  margin-top:18px; padding:11px 14px; background:var(--wfl-demo-bg);
   border-radius:8px; font-size:11px; color:var(--wfl-demo-text);
   line-height:1.7; border:1px solid var(--wfl-demo-border);
 }
+.wf-login-footer-note {
+  margin-top:22px; padding-top:16px; border-top:1px solid var(--wfl-divider);
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  font-size:11.5px; color:var(--wfl-text-softer); text-align:center;
+}
 .wf-login-credit {
-  margin-top:26px; display:inline-flex; align-items:center; gap:8px;
-  text-align:center; font-size:11.5px; font-weight:600;
-  letter-spacing:0.2px; color:var(--wfl-credit-text);
-  padding:8px 18px; border-radius:999px;
-  background:var(--wfl-credit-bg);
-  border:1px solid var(--wfl-credit-border);
-  backdrop-filter:blur(10px);
-  box-shadow:0 4px 14px rgba(0,0,0,0.25);
-  animation: wf-credit-in .6s ease .15s both;
+  margin-top:18px; display:flex; align-items:center; justify-content:center; gap:7px;
+  font-size:12px; font-weight:500; color:var(--wfl-credit-text); text-align:center;
+  animation: wf-credit-in .5s ease .1s both;
 }
-.wf-login-credit .wf-login-credit-ver {
-  color:${T.gold}; font-weight:700; font-family:'JetBrains Mono',monospace; font-size:11px;
+.wf-login-credit .wf-login-credit-ver { font-weight:700; color:var(--wfl-text-soft); font-family:'JetBrains Mono',monospace; font-size:11px; }
+.wf-login-credit .wf-login-credit-dot { width:3px; height:3px; border-radius:50%; background:var(--wfl-text-softer); flex-shrink:0; }
+.wf-login-credit .wf-login-credit-name { color:var(--wfl-credit-name); font-weight:700; }
+@media (max-width: 480px) {
+  .wf-login-card { padding:30px 22px 24px; }
+  .wf-login-dots { display:none; }
 }
-.wf-login-credit .wf-login-credit-dot {
-  width:3px; height:3px; border-radius:50%; background:var(--wfl-text-soft); flex-shrink:0;
-}
-.wf-login-credit .wf-login-credit-name {
-  color:var(--wfl-credit-name); font-weight:700;
-}
-.wf-login-credit-wrap { margin-top:6px; display:flex; justify-content:center; }
 `;
 function LoginCredit() {
   return (
-    <div className="wf-login-credit-wrap">
-      <div className="wf-login-credit">
-        <span className="wf-login-credit-ver">v{APP_VERSION}</span>
-        <span className="wf-login-credit-dot" />
-        <span>
-          Developed by <span className="wf-login-credit-name">Ou SoThon</span>
-        </span>
-      </div>
+    <div className="wf-login-credit">
+      <span className="wf-login-credit-ver">v{APP_VERSION}</span>
+      <span className="wf-login-credit-dot" />
+      <span>
+        Developed by <span className="wf-login-credit-name">Ou SoThon</span>
+      </span>
     </div>
   );
 }
@@ -8710,19 +8741,18 @@ function useLoginStyle() {
   }, []);
 }
 
-// Layered, slowly-drifting gradient blobs behind the login card. Purely
-// decorative (CSS animation only, no JS ticking) so it's cheap even on
-// low-end phones, but gives the screen a living, non-static feel.
+// Soft, slowly-drifting gradient blobs + a faint dot-grid in two corners —
+// a calmer, "standard" backdrop (no neon glow / spinning border) behind
+// the login card. Purely decorative (CSS animation only, no JS ticking).
 function LoginBackground() {
   return (
     <>
-      <div className="wf-login-bg" />
-      <div className="wf-login-orbs">
-        <div className="wf-login-orb wf-login-orb-1" />
-        <div className="wf-login-orb wf-login-orb-2" />
-        <div className="wf-login-orb wf-login-orb-3" />
-        <div className="wf-login-orb wf-login-orb-4" />
+      <div className="wf-login-blobs">
+        <div className="wf-login-blob wf-login-blob-tl" />
+        <div className="wf-login-blob wf-login-blob-br" />
       </div>
+      <div className="wf-login-dots wf-login-dots-tl" />
+      <div className="wf-login-dots wf-login-dots-br" />
     </>
   );
 }
@@ -8755,8 +8785,14 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
   const isLight = theme === "light";
   const displayName = branding.name?.trim() || t.appName;
   const L = t.login;
-  const [code, setCode] = useState("");
+  const [rememberedCode, setRememberedCode] = useLocalStorage(
+    "hrsuite:emp:rememberedCode",
+    "",
+  );
+  const [code, setCode] = useState(rememberedCode || "");
   const [pin, setPin] = useState("");
+  const [showPin, setShowPin] = useState(false);
+  const [remember, setRemember] = useState(!!rememberedCode);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -8784,6 +8820,7 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
     }
     setError("");
     setLoading(false);
+    setRememberedCode(remember ? emp.code : "");
     onLogin(emp.id);
   };
 
@@ -8803,17 +8840,16 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
         <ThemeToggle variant={isLight ? "light" : "dark"} />
         <LangToggle variant={isLight ? "light" : "dark"} />
       </div>
-      <div className="wf-login-card-glow">
+      <div className="wf-login-card-wrap">
         <div className="wf-login-card">
           <div
             style={{
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              marginBottom: 28,
             }}
           >
-            <div className="wf-login-logo-ring">
+            <div className="wf-login-logo">
               {branding.logo ? (
                 <img
                   src={branding.logo}
@@ -8822,61 +8858,93 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
                     width: "100%",
                     height: "100%",
                     objectFit: "cover",
-                    borderRadius: "inherit",
                   }}
                 />
               ) : (
-                getInitials(displayName)
+                <span
+                  style={{
+                    fontWeight: 800,
+                    fontSize: 17,
+                    color: "var(--wfl-accent)",
+                    fontFamily: "'JetBrains Mono',monospace",
+                  }}
+                >
+                  {getInitials(displayName)}
+                </span>
               )}
             </div>
-            <div
-              style={{
-                marginTop: 14,
-                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
-                fontWeight: 700,
-                fontSize: 20,
-                color: "var(--wfl-text)",
-              }}
-            >
-              {displayName}
-            </div>
-            <div
-              style={{
-                fontSize: 13,
-                color: "var(--wfl-text-soft)",
-                marginTop: 4,
-              }}
-            >
-              {L.employeePortal}
+            <div className="wf-login-eyebrow">{displayName}</div>
+            <div className="wf-login-title">{L.employeePortal}</div>
+            <div className="wf-login-subtitle">{L.employeeSubtitle}</div>
+          </div>
+          <div className="wf-login-divider">
+            <div className="wf-login-divider-icon">
+              <ShieldCheck size={14} />
             </div>
           </div>
           <form onSubmit={submit}>
             <LoginField label={L.employeeId}>
-              <input
-                className="wf-login-input"
-                value={code}
-                onChange={(e) => {
-                  setCode(e.target.value);
-                  setError("");
-                }}
-                placeholder={L.employeeIdPlaceholder}
-                autoFocus
-              />
+              <div className="wf-login-input-wrap">
+                <span className="wf-login-input-icon">
+                  <UserCircle2 size={17} />
+                </span>
+                <input
+                  className="wf-login-input"
+                  value={code}
+                  onChange={(e) => {
+                    setCode(e.target.value);
+                    setError("");
+                  }}
+                  placeholder={L.employeeIdPlaceholder}
+                  autoFocus
+                />
+              </div>
             </LoginField>
             <LoginField label={L.pin}>
-              <input
-                className="wf-login-input"
-                value={pin}
-                onChange={(e) => {
-                  setPin(e.target.value);
-                  setError("");
-                }}
-                placeholder={L.pinPlaceholder}
-                type="password"
-                inputMode="numeric"
-                maxLength={6}
-              />
+              <div className="wf-login-input-wrap">
+                <span className="wf-login-input-icon">
+                  <KeyRound size={17} />
+                </span>
+                <input
+                  className="wf-login-input wf-login-input-pw"
+                  value={pin}
+                  onChange={(e) => {
+                    setPin(e.target.value);
+                    setError("");
+                  }}
+                  placeholder={L.pinPlaceholder}
+                  type={showPin ? "text" : "password"}
+                  inputMode="numeric"
+                  maxLength={6}
+                />
+                <button
+                  type="button"
+                  className="wf-login-input-toggle"
+                  onClick={() => setShowPin((v) => !v)}
+                  aria-label={showPin ? L.hidePassword : L.showPassword}
+                  title={showPin ? L.hidePassword : L.showPassword}
+                >
+                  {showPin ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
             </LoginField>
+            <div className="wf-login-row">
+              <label className="wf-login-checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                />
+                {L.rememberMe}
+              </label>
+              <button
+                type="button"
+                className="wf-login-link-btn"
+                onClick={() => pushToast(L.contactAdminMsg, "info")}
+              >
+                {L.forgotPin}
+              </button>
+            </div>
             {error && (
               <div className="wf-login-error">
                 <AlertCircle size={14} /> {error}
@@ -8898,6 +8966,10 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
               {loading ? "..." : L.submit}
             </button>
           </form>
+          <div className="wf-login-footer-note">
+            <ShieldCheck size={13} />
+            {L.secureLogin} • {L.authorizedOnly}
+          </div>
         </div>
       </div>
       <LoginCredit />
@@ -8913,8 +8985,14 @@ function AdminLoginScreen({ admins, onLogin, go }) {
   const isLight = theme === "light";
   const displayName = branding.name?.trim() || t.appName;
   const L = t.login;
-  const [username, setUsername] = useState("");
+  const [rememberedUser, setRememberedUser] = useLocalStorage(
+    "hrsuite:admin:rememberedUsername",
+    "",
+  );
+  const [username, setUsername] = useState(rememberedUser || "");
   const [adminPass, setAdminPass] = useState("");
+  const [showPass, setShowPass] = useState(false);
+  const [remember, setRemember] = useState(!!rememberedUser);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -8942,6 +9020,7 @@ function AdminLoginScreen({ admins, onLogin, go }) {
     }
     setError("");
     setLoading(false);
+    setRememberedUser(remember ? acct.username : "");
     onLogin(acct.id);
   };
 
@@ -8961,24 +9040,9 @@ function AdminLoginScreen({ admins, onLogin, go }) {
         <ThemeToggle variant={isLight ? "light" : "dark"} />
         <LangToggle variant={isLight ? "light" : "dark"} />
       </div>
-      <div className="wf-login-card-glow">
+      <div className="wf-login-card-wrap">
         <div className="wf-login-card">
-          <button
-            onClick={() => go("employee")}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              color: "var(--wfl-text-soft)",
-              fontSize: 12.5,
-              fontWeight: 600,
-              marginBottom: 20,
-              padding: 0,
-            }}
-          >
+          <button className="wf-login-back-btn" onClick={() => go("employee")}>
             <ArrowLeft size={14} /> {L.back}
           </button>
           <div
@@ -8986,83 +9050,93 @@ function AdminLoginScreen({ admins, onLogin, go }) {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              marginBottom: 28,
             }}
           >
-            <div
-              style={{
-                width: 58,
-                height: 58,
-                borderRadius: 14,
-                background: branding.logo
-                  ? "#fff"
-                  : `linear-gradient(150deg, ${T.blue}, #3a5fc4)`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: branding.logo
-                  ? "inset 0 0 0 1px rgba(255,255,255,0.25)"
-                  : "inset 0 0 0 1px rgba(255,255,255,0.3), 0 8px 22px rgba(91,141,239,0.35)",
-                overflow: "hidden",
-                border: branding.logo ? `1px solid ${T.line}` : "none",
-              }}
-            >
+            <div className="wf-login-logo">
               {branding.logo ? (
                 <img
                   src={branding.logo}
                   alt={displayName}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
                 />
               ) : (
-                <ShieldCheck size={26} color="#fff" />
+                <ShieldCheck size={26} color="var(--wfl-accent)" />
               )}
             </div>
-            <div
-              style={{
-                marginTop: 14,
-                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
-                fontWeight: 700,
-                fontSize: 20,
-                color: "var(--wfl-text)",
-              }}
-            >
-              {L.adminTitle}
-            </div>
-            <div
-              style={{
-                fontSize: 13,
-                color: "var(--wfl-text-soft)",
-                marginTop: 4,
-              }}
-            >
-              {displayName}
+            <div className="wf-login-eyebrow">{displayName}</div>
+            <div className="wf-login-title">{L.adminTitle}</div>
+            <div className="wf-login-subtitle">{L.adminSubtitle}</div>
+          </div>
+          <div className="wf-login-divider">
+            <div className="wf-login-divider-icon">
+              <ShieldCheck size={14} />
             </div>
           </div>
           <form onSubmit={submit}>
             <LoginField label={L.username}>
-              <input
-                className="wf-login-input"
-                value={username}
-                onChange={(e) => {
-                  setUsername(e.target.value);
-                  setError("");
-                }}
-                placeholder={L.usernamePlaceholder}
-                autoFocus
-              />
+              <div className="wf-login-input-wrap">
+                <span className="wf-login-input-icon">
+                  <UserCircle2 size={17} />
+                </span>
+                <input
+                  className="wf-login-input"
+                  value={username}
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                    setError("");
+                  }}
+                  placeholder={L.usernamePlaceholder}
+                  autoFocus
+                />
+              </div>
             </LoginField>
             <LoginField label={L.password}>
-              <input
-                className="wf-login-input"
-                value={adminPass}
-                onChange={(e) => {
-                  setAdminPass(e.target.value);
-                  setError("");
-                }}
-                placeholder={L.passwordPlaceholder}
-                type="password"
-              />
+              <div className="wf-login-input-wrap">
+                <span className="wf-login-input-icon">
+                  <Lock size={17} />
+                </span>
+                <input
+                  className="wf-login-input wf-login-input-pw"
+                  value={adminPass}
+                  onChange={(e) => {
+                    setAdminPass(e.target.value);
+                    setError("");
+                  }}
+                  placeholder={L.passwordPlaceholder}
+                  type={showPass ? "text" : "password"}
+                />
+                <button
+                  type="button"
+                  className="wf-login-input-toggle"
+                  onClick={() => setShowPass((v) => !v)}
+                  aria-label={showPass ? L.hidePassword : L.showPassword}
+                  title={showPass ? L.hidePassword : L.showPassword}
+                >
+                  {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
             </LoginField>
+            <div className="wf-login-row">
+              <label className="wf-login-checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                />
+                {L.rememberMe}
+              </label>
+              <button
+                type="button"
+                className="wf-login-link-btn"
+                onClick={() => pushToast(L.contactAdminMsg, "info")}
+              >
+                {L.forgotPassword}
+              </button>
+            </div>
             {error && (
               <div className="wf-login-error">
                 <AlertCircle size={14} /> {error}
@@ -9079,11 +9153,15 @@ function AdminLoginScreen({ admins, onLogin, go }) {
                   style={{ animation: "spin 1s linear infinite" }}
                 />
               ) : (
-                <ShieldCheck size={16} />
+                <Lock size={16} />
               )}
               {loading ? "..." : L.adminSubmit}
             </button>
           </form>
+          <div className="wf-login-footer-note">
+            <ShieldCheck size={13} />
+            {L.secureLogin} • {L.authorizedOnly}
+          </div>
         </div>
       </div>
       <LoginCredit />
@@ -33987,6 +34065,28 @@ function AppInner() {
   // moment a change is saved without needing to be re-created whenever
   // the logged-in person changes.
   const actorRef = useRef(null);
+  // Routing (portal/page) is set up here, before the useSupabaseArray
+  // calls below, because a few of those hooks (assets, recruitment,
+  // onboarding, roster) need `visitedPages` — declaring it any later
+  // would reference it before initialization (temporal dead zone).
+  const [portal, routedPage, goPortal, setPage] = usePortalRoute();
+  // Falls back to "dashboard" only when the URL has no page segment yet
+  // (e.g. a bare #/employee link) — otherwise refreshing always restores
+  // whatever page was open, for both the admin and staff portals.
+  const page = routedPage || "dashboard";
+  // Lets a handful of table hooks below defer their initial Supabase
+  // fetch until the one admin page that actually reads them has been
+  // opened at least once, instead of pulling recruitment/onboarding/
+  // assets/roster data into every session on login regardless of
+  // whether the user ever visits those pages. Once a page has been
+  // visited its flag stays true for the rest of the session (no need
+  // to re-defer / unload on navigating away).
+  const [visitedPages, setVisitedPages] = useState(() => ({
+    [page]: true,
+  }));
+  useEffect(() => {
+    setVisitedPages((v) => (v[page] ? v : { ...v, [page]: true }));
+  }, [page]);
   const [departments, setDepartments, dReady] = useSupabaseArray(
     "departments",
     {
@@ -34007,6 +34107,9 @@ function AppInner() {
     },
   );
   const [assets, setAssets, assetsReady] = useSupabaseArray("assets", {
+    // Only the Assets admin page reads this table — defer its fetch
+    // until that page has actually been opened once this session.
+    enabled: !!visitedPages.assets,
     fromDb: (r) => ({
       id: r.id,
       name: r.name,
@@ -34033,6 +34136,9 @@ function AppInner() {
   const [jobPostings, setJobPostings, jobPostingsReady] = useSupabaseArray(
     "job_postings",
     {
+      // Only the Recruitment admin page reads job_postings/candidates —
+      // defer both until that page has actually been opened once.
+      enabled: !!visitedPages.recruitment,
       fromDb: (r) => ({
         id: r.id,
         title: r.title,
@@ -34061,6 +34167,7 @@ function AppInner() {
   const [candidates, setCandidates, candidatesReady] = useSupabaseArray(
     "candidates",
     {
+      enabled: !!visitedPages.recruitment,
       fromDb: (r) => ({
         id: r.id,
         name: r.name,
@@ -34094,6 +34201,8 @@ function AppInner() {
   );
   const [onboardingTasks, setOnboardingTasks, onboardingTasksReady] =
     useSupabaseArray("onboarding_tasks", {
+      // Only the Onboarding/Offboarding admin page reads this table.
+      enabled: !!visitedPages.onboarding,
       fromDb: (r) => ({
         id: r.id,
         employeeId: r.employee_id,
@@ -34238,6 +34347,9 @@ function AppInner() {
   const [shiftRoster, setShiftRoster, rosterReady] = useSupabaseArray(
     "shift_roster",
     {
+      // Only the Roster page (admin and employee "my roster" view, same
+      // page id) reads this table — defer until it's been opened once.
+      enabled: !!visitedPages.roster,
       fromDb: (r) => ({
         id: r.id,
         employeeId: r.employee_id,
@@ -34982,11 +35094,11 @@ function AppInner() {
   );
   const [navOpen, setNavOpen] = useState(false);
   const [navSearch, setNavSearch] = useState("");
-  const [portal, routedPage, goPortal, setPage] = usePortalRoute();
-  // Falls back to "dashboard" only when the URL has no page segment yet
-  // (e.g. a bare #/employee link) — otherwise refreshing always restores
-  // whatever page was open, for both the admin and staff portals.
-  const page = routedPage || "dashboard";
+  // Confirmation gate in front of performLogout below — declared up
+  // here (not next to performLogout) because performLogout sits after
+  // several early `if (...) return` branches (kiosk portal, not-yet-
+  // logged-in), and hooks can't be called conditionally after those.
+  const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
   // wf-content is one persistent scroll container shared by every page
   // (pages themselves aren't remounted-with-scroll-reset by the browser),
   // so without this, switching from a long scrolled-down list straight to
@@ -35440,10 +35552,18 @@ function AppInner() {
     );
   }
 
+  // handleLogout just opens the confirm dialog gated by confirmLogoutOpen
+  // (declared earlier, before the early-return branches above); both the
+  // desktop sidebar's Sign Out button and the mobile "Apps" page's Sign
+  // Out tile call it. performLogout (renamed from the old handleLogout)
+  // only runs once the user taps Confirm.
+  const handleLogout = () => setConfirmLogoutOpen(true);
+
   // Shared by the desktop sidebar's Sign Out button and the mobile
   // "Apps" page's Sign Out tile — kept in one place so both stay in
   // sync with the audit-log/login-activity bookkeeping.
-  const handleLogout = () => {
+  const performLogout = () => {
+    setConfirmLogoutOpen(false);
     if (role === "admin") {
       writeAuditLog({
         actor: {
@@ -36220,6 +36340,17 @@ function AppInner() {
         onToggleMute={voiceCall.toggleMute}
         onDismissError={voiceCall.clearCallError}
       />
+      {confirmLogoutOpen && (
+        <ConfirmDialog
+          title={t.confirmLogoutTitle}
+          text={t.confirmLogoutMsg}
+          confirmLabel={t.logout}
+          icon={LogOut}
+          variant="danger-solid"
+          onCancel={() => setConfirmLogoutOpen(false)}
+          onConfirm={performLogout}
+        />
+      )}
     </BrandingContext.Provider>
   );
 }
