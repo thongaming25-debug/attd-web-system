@@ -3854,7 +3854,8 @@ const WORKING_DAYS_PER_MONTH = 26;
 const STYLE_ID = "wf-suite-style";
 const CSS = `
 *,*::before,*::after{box-sizing:border-box;}
-html,body,#root{height:100%;}
+html,body,#root{height:100%;margin:0;padding:0;}
+body{background:var(--wf-paper);}
 :root{
   --wf-gold:#F0A83B;
   --wf-ink:#10141C; --wf-ink-dark:#050810; --wf-paper:#F3F4F7; --wf-card:#FFFFFF;
@@ -3878,7 +3879,7 @@ html,body,#root{height:100%;}
   --wf-glass-card:rgba(22,27,39,0.55); --wf-glass-header:rgba(10,13,21,0.6);
   --wf-glass-border:rgba(255,255,255,0.08); --wf-glass-highlight:rgba(255,255,255,0.06);
 }
-.wf-root{display:flex;height:100vh;height:100dvh;min-height:640px;max-height:100vh;max-height:100dvh;background:${T.paper};font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.text};position:relative;overflow:hidden;border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,0.02),0 16px 40px -18px rgba(5,8,16,0.35);border:1px solid ${T.line};transition:background .15s ease,color .15s ease;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
+.wf-root{display:flex;width:100%;height:100vh;height:100dvh;min-height:640px;max-height:100vh;max-height:100dvh;background:${T.paper};font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.text};position:relative;overflow:hidden;border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,0.02),0 16px 40px -18px rgba(5,8,16,0.35);border:1px solid ${T.line};transition:background .15s ease,color .15s ease;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
 .wf-sidebar{background:${T.card};color:${T.ink};width:246px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid ${T.line};transition:transform .25s cubic-bezier(.4,0,.2,1),background .15s ease,color .15s ease;}
 .wf-sidebar-inner{display:flex;flex-direction:column;height:100%;}
 .wf-logo-badge{width:32px;height:32px;border-radius:7px;background:${T.gold};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#1A1300;font-family:'JetBrains Mono',monospace;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);}
@@ -4215,6 +4216,14 @@ html,body,#root{height:100%;}
   .wf-staff-dash-grid .wf-dash-col-full{grid-column:1 / -1;}
   .wf-staff-dash-grid .wf-dash-col-side .wf-dash-stats{grid-template-columns:repeat(2,1fr);gap:12px;}
   .wf-desktop-only-card{display:block;}
+  /* Full-bleed desktop shell: on tablet/desktop the app should fill the
+     whole browser viewport edge-to-edge like a real app, not float as a
+     rounded, bordered, drop-shadowed "card" centered on the page. That
+     floating-card look only came from the decorative styling below —
+     drop it here so desktop/tablet renders flush with the window while
+     phones (<=820px, which already look full-bleed) are left exactly
+     as they were. */
+  .wf-root{border-radius:0;box-shadow:none;border:none;}
 }
 .wf-chat-layout{display:flex;gap:0;height:calc(100vh - 230px);min-height:420px;border:1px solid ${T.lineSoft};border-radius:14px;overflow:hidden;background:${T.card};}
 .wf-chat-list-pane{width:300px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid ${T.lineSoft};overflow-y:auto;}
@@ -6010,7 +6019,26 @@ function useSupabaseArray(
     enabled = true,
   } = {},
 ) {
-  const [value, setValueState] = useState([]);
+  // Session-critical tables (employees, admins, etc.) must survive a
+  // fetch that fails or simply hasn't finished yet — otherwise a staff
+  // member who opens the app with a weak/no connection sees `employees`
+  // resolve to `[]`, their `currentEmp` lookup miss, and `loggedIn` flip
+  // to false: from their side, indistinguishable from being logged out,
+  // even though nothing actually signed them out. Seeding state from a
+  // localStorage cache (written on every successful load below) means
+  // there's still last-known-good data to render from immediately, and
+  // a failed fetch is treated as "couldn't refresh" rather than "there
+  // is no data".
+  const cacheKey = `wf-cache:${table}`;
+  const readCache = () => {
+    try {
+      const raw = localStorage.getItem(cacheKey);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  };
+  const [value, setValueState] = useState(readCache);
   const [ready, setReady] = useState(false);
   // Surfaces the last save/delete failure so screens like Settings can
   // tell the user "this didn't actually save" instead of showing a
@@ -6024,7 +6052,7 @@ function useSupabaseArray(
   // below — so a write that silently fails on a page with no bespoke
   // error UI (which, before this, was most pages) still tells the user.
   const { t } = useLang();
-  const prevRef = useRef([]);
+  const prevRef = useRef(value);
   const mapFromDb = fromDb || ((r) => r);
   const mapToDb = toDb || ((r) => r);
   const labelOf =
@@ -6065,13 +6093,24 @@ function useSupabaseArray(
         offset += PAGE_SIZE;
       }
       if (pageError) {
+        // Offline or a transient network/server error: keep whatever we
+        // already had (from the cache seeded above, or from a prior
+        // successful load this session) instead of wiping it to `[]`.
+        // A failed refresh should never look, to the rest of the app,
+        // like "this table is now empty" — that's what was turning a
+        // dropped connection into an apparent forced logout.
         console.error(`[supabase] failed to load ${table}:`, pageError.message);
-        prevRef.current = [];
-        setValueState([]);
       } else {
         const mapped = all.map(mapFromDb);
         prevRef.current = mapped;
         setValueState(mapped);
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify(mapped));
+        } catch {
+          // Quota exceeded or storage unavailable — caching is a
+          // best-effort offline fallback, never required for the app
+          // to keep working, so silently skip it.
+        }
       }
       setReady(true);
     })();
