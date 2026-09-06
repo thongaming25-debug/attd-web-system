@@ -6038,6 +6038,42 @@ function useSupabaseArray(
       return [];
     }
   };
+  // Offline write queue: any create/update/delete that can't reach
+  // Supabase right now (no connection, or a mid-flight network drop) is
+  // kept here instead of just showing an error and forgetting it — see
+  // isNetworkIssue / flushPending below for how it's filled and drained.
+  // Keyed by row id so pressing the same action twice while offline (e.g.
+  // tapping Check In again) just replaces the queued entry instead of
+  // piling up duplicates.
+  const pendingKey = `wf-pending:${table}`;
+  const pendingEventName = `wf-pending-changed:${table}`;
+  const readPending = () => {
+    try {
+      return JSON.parse(localStorage.getItem(pendingKey) || "{}");
+    } catch {
+      return {};
+    }
+  };
+  const writePending = (map) => {
+    try {
+      if (Object.keys(map).length) {
+        localStorage.setItem(pendingKey, JSON.stringify(map));
+      } else {
+        localStorage.removeItem(pendingKey);
+      }
+    } catch {
+      // best-effort — an offline queue that fails to persist just means
+      // the retry-on-reconnect below has nothing to retry, not a crash
+    }
+    setPendingCount(Object.keys(map).length);
+    window.dispatchEvent(new Event(pendingEventName));
+  };
+  const isNetworkIssue = (err) =>
+    !navigator.onLine ||
+    /fetch|network|load failed/i.test(err?.message || "");
+  const [pendingCount, setPendingCount] = useState(
+    () => Object.keys(readPending()).length,
+  );
   const [value, setValueState] = useState(readCache);
   const [ready, setReady] = useState(false);
   // Surfaces the last save/delete failure so screens like Settings can
@@ -6051,7 +6087,7 @@ function useSupabaseArray(
   // regardless of whether its screen also wires up the saveError banner
   // below — so a write that silently fails on a page with no bespoke
   // error UI (which, before this, was most pages) still tells the user.
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const prevRef = useRef(value);
   const mapFromDb = fromDb || ((r) => r);
   const mapToDb = toDb || ((r) => r);
@@ -6119,6 +6155,7 @@ function useSupabaseArray(
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [table, cutoffDate, enabled]);
+
 
   // Live sync: without this, admin and staff only ever see what was on the
   // table at the moment their tab loaded — a staff check-in, an admin's
@@ -6214,41 +6251,80 @@ function useSupabaseArray(
       setSaveError(null);
       (async () => {
         let hadError = false;
+        let hadNetworkIssue = false;
+        const pending = readPending();
         if (toDelete.length) {
-          const { error } = await supabase
-            .from(table)
-            .delete()
-            .in("id", toDelete);
-          if (error) {
-            console.error(
-              `[supabase] delete failed on ${table}:`,
-              error.message,
-            );
-            setSaveError(error.message);
-            pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
-            hadError = true;
+          if (!navigator.onLine) {
+            toDelete.forEach((id) => {
+              pending[id] = { kind: "delete", id };
+            });
+            hadNetworkIssue = true;
+          } else {
+            const { error } = await supabase
+              .from(table)
+              .delete()
+              .in("id", toDelete);
+            if (error && isNetworkIssue(error)) {
+              toDelete.forEach((id) => {
+                pending[id] = { kind: "delete", id };
+              });
+              hadNetworkIssue = true;
+            } else if (error) {
+              console.error(
+                `[supabase] delete failed on ${table}:`,
+                error.message,
+              );
+              setSaveError(error.message);
+              pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
+              hadError = true;
+            }
           }
         }
         if (toUpsert.length) {
-          const { error } = await supabase
-            .from(table)
-            .upsert(toUpsert.map(mapToDb));
-          if (error) {
-            console.error(
-              `[supabase] upsert failed on ${table}:`,
-              error.message,
-            );
-            setSaveError(error.message);
-            pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
-            hadError = true;
+          if (!navigator.onLine) {
+            toUpsert.forEach((r) => {
+              pending[r.id] = { kind: "upsert", row: r };
+            });
+            hadNetworkIssue = true;
+          } else {
+            const { error } = await supabase
+              .from(table)
+              .upsert(toUpsert.map(mapToDb));
+            if (error && isNetworkIssue(error)) {
+              toUpsert.forEach((r) => {
+                pending[r.id] = { kind: "upsert", row: r };
+              });
+              hadNetworkIssue = true;
+            } else if (error) {
+              console.error(
+                `[supabase] upsert failed on ${table}:`,
+                error.message,
+              );
+              setSaveError(error.message);
+              pushToast(`${t.settings.saveFailed} ${error.message}`, "error");
+              hadError = true;
+            }
           }
         }
+        writePending(pending);
         // Confirms the optimistic update the UI already made actually
         // stuck server-side. Only fires when something real changed
         // (toDelete/toUpsert non-empty) — not on every re-render — so
         // it stays a genuine confirmation rather than background noise.
-        if (!hadError && (toDelete.length || toUpsert.length)) {
+        if (!hadError && !hadNetworkIssue && (toDelete.length || toUpsert.length)) {
           pushToast(t.settings.saved, "success");
+        } else if (hadNetworkIssue) {
+          // Keep this distinct from the hard-error toast above — nothing
+          // is actually wrong, the change is just held locally until the
+          // connection comes back, so it shouldn't read as a failure.
+          pushToast(
+            lang === "km"
+              ? "រក្សាទុកក្នុងឧបករណ៍ — នឹងបញ្ជូនស្វ័យប្រវត្តិពេលមាន Internet"
+              : lang === "zh"
+                ? "已保存在本机，网络恢复后会自动同步"
+                : "Saved on this device — will sync once you're back online",
+            "info",
+          );
         }
       })();
 
@@ -6355,8 +6431,91 @@ function useSupabaseArray(
     [table, mapToDb, audit, actorRef, labelOf, notify, t],
   );
 
-  return [value, setValue, ready, saveError];
+  // Retries anything the offline queue is still holding for this table —
+  // once right after mount (covers "app was reopened after being offline
+  // with unsynced changes still queued") and again every time the browser
+  // fires 'online' (covers "connection came back mid-session"). Merges
+  // each successfully-synced id back into local state as delivered rather
+  // than reloading the whole table, and leaves failed entries queued for
+  // the next attempt.
+  useEffect(() => {
+    const flushPending = async () => {
+      if (!navigator.onLine) return;
+      const pending = readPending();
+      const ids = Object.keys(pending);
+      if (!ids.length) return;
+      const deleteIds = ids.filter((id) => pending[id].kind === "delete");
+      const upsertRows = ids
+        .filter((id) => pending[id].kind === "upsert")
+        .map((id) => pending[id].row);
+      let synced = false;
+      if (deleteIds.length) {
+        const { error } = await supabase
+          .from(table)
+          .delete()
+          .in("id", deleteIds);
+        if (!error) {
+          deleteIds.forEach((id) => delete pending[id]);
+          synced = true;
+        }
+      }
+      if (upsertRows.length) {
+        const { error } = await supabase
+          .from(table)
+          .upsert(upsertRows.map(mapToDb));
+        if (!error) {
+          upsertRows.forEach((r) => delete pending[r.id]);
+          synced = true;
+        }
+      }
+      writePending(pending);
+      if (synced) pushToast(t.settings.saved, "success");
+    };
+    flushPending();
+    window.addEventListener("online", flushPending);
+    return () => window.removeEventListener("online", flushPending);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [table, mapToDb]);
+
+  return [value, setValue, ready, saveError, pendingCount];
 }
+
+// Reads how many not-yet-synced writes a table's offline queue (see
+// useSupabaseArray above) is currently holding, and keeps that count live
+// as the queue fills or drains — including drains triggered by another
+// useSupabaseArray instance for the same table (e.g. a different mounted
+// screen), which is why this listens for the custom event rather than
+// only reading localStorage once. Use this to show a small "saved
+// locally, will sync when back online" indicator near an action that
+// writes to `table` (e.g. the employee Check In/Out button).
+function useOfflinePendingCount(table) {
+  const key = `wf-pending:${table}`;
+  const eventName = `wf-pending-changed:${table}`;
+  const read = () => {
+    try {
+      return Object.keys(JSON.parse(localStorage.getItem(key) || "{}"))
+        .length;
+    } catch {
+      return 0;
+    }
+  };
+  const [count, setCount] = useState(read);
+  useEffect(() => {
+    const update = () => setCount(read());
+    update();
+    window.addEventListener(eventName, update);
+    window.addEventListener("storage", update);
+    window.addEventListener("online", update);
+    return () => {
+      window.removeEventListener(eventName, update);
+      window.removeEventListener("storage", update);
+      window.removeEventListener("online", update);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [table]);
+  return count;
+}
+
 
 // payroll_paid is stored as one row per (employee, month) but the app
 // works with it as a flat map: { "<employeeId>-<YYYY-MM>": true }.
@@ -12285,6 +12444,44 @@ function ChartCard({ title, subtitle, children, noData, noDataLabel }) {
     </Card>
   );
 }
+// A department/company attendance-rate report is only honest if a day
+// nobody punched in for — and nobody bothered to mark absent by hand —
+// actually counts against the rate. Left to raw attendance rows alone,
+// that day has no row at all, so it silently drops out of both the
+// numerator and denominator instead of counting as a miss; the more
+// people simply never check in, the *better* the reported rate looks,
+// which is backwards. This returns `emp`'s real attendance rows for
+// `monthKey` plus one synthetic `{status:"absent"}` row for every
+// scheduled work day in that month with no row — skipping days before
+// they joined, days already covered by a real row (present, late, an
+// explicit absent mark, approved leave/unpaid — all already correctly
+// recorded), their weekly/custom days off, and, for the current month,
+// any day still in the future. Callers use the combined list exactly
+// like a plain attendance filter — same present/absent/rate math as
+// before, just fed a complete picture instead of a partial one.
+function attendanceRecordsForMonth(emp, attendance, monthKey, todayStr) {
+  const real = attendance.filter(
+    (a) => a.employeeId === emp.id && a.date && a.date.startsWith(monthKey),
+  );
+  const covered = new Set(real.map((a) => a.date));
+  const [y, m] = monthKey.split("-").map(Number);
+  if (!y || !m) return real;
+  const daysInMonth = new Date(y, m, 0).getDate();
+  const isCurrentMonth = monthKey === todayStr.slice(0, 7);
+  const lastDay = isCurrentMonth
+    ? Number(todayStr.slice(8, 10))
+    : daysInMonth;
+  const synthetic = [];
+  for (let day = 1; day <= lastDay; day++) {
+    const dateStr = `${monthKey}-${String(day).padStart(2, "0")}`;
+    if (covered.has(dateStr)) continue;
+    if (emp.joined && dateStr < emp.joined) continue; // not hired yet
+    if (isDayOff(emp, dateStr)) continue; // scheduled off, not a miss
+    synthetic.push({ employeeId: emp.id, date: dateStr, status: "absent" });
+  }
+  return synthetic.length ? real.concat(synthetic) : real;
+}
+
 function AnalyticsPage({
   employees,
   departments,
@@ -12304,14 +12501,18 @@ function AnalyticsPage({
 
   // Attendance rate per month: share of that month's attendance records
   // that were present/late (as opposed to absent), out of all records
-  // logged in that month.
-  const attendTrend = months.map((mk) => {
-    const recs = attendance.filter((a) => a.date && a.date.startsWith(mk));
+  // logged in that month — including implicit absences (see
+  // attendanceRecordsForMonth) for scheduled work days nobody logged
+  // anything for at all.
+  const attendTrend = months.map((mk2) => {
+    const recs = activeEmployees.flatMap((e) =>
+      attendanceRecordsForMonth(e, attendance, mk2, todayStr()),
+    );
     const present = recs.filter(
       (a) => a.status === "present" || a.status === "late",
     ).length;
     const rate = recs.length ? Math.round((present / recs.length) * 100) : 0;
-    return { label: shortMonthLabel(mk, lang), value: rate };
+    return { label: shortMonthLabel(mk2, lang), value: rate };
   });
   const hasAttendData = attendance.some((a) => a.date);
   // Real month-over-month delta for the average attendance rate stat
@@ -12374,14 +12575,17 @@ function AnalyticsPage({
   const newHiresThisMonth = newHiresTrend[newHiresTrend.length - 1]?.value ?? 0;
 
   // Absenteeism rate by department for the current month: share of
-  // that department's attendance records this month marked "absent".
+  // that department's attendance records this month marked "absent" —
+  // including implicit absences for scheduled work days with no record
+  // at all (see attendanceRecordsForMonth), so a day nobody logged
+  // anything for counts against the rate instead of vanishing from it.
   const absenteeismByDept = filteredDepartments
     .map((d) => {
-      const deptEmpIds = new Set(
-        employees.filter((e) => e.deptId === d.id).map((e) => e.id),
+      const deptActiveEmployees = employees.filter(
+        (e) => e.deptId === d.id && e.status === "active",
       );
-      const recs = attendance.filter(
-        (a) => deptEmpIds.has(a.employeeId) && a.date && a.date.startsWith(mk),
+      const recs = deptActiveEmployees.flatMap((e) =>
+        attendanceRecordsForMonth(e, attendance, mk, todayStr()),
       );
       const absent = recs.filter((a) => a.status === "absent").length;
       const rate = recs.length ? Math.round((absent / recs.length) * 100) : 0;
@@ -12401,8 +12605,8 @@ function AnalyticsPage({
       (e) => e.status === "active",
     );
     const deptEmpIds = new Set(deptEmployees.map((e) => e.id));
-    const recs = attendance.filter(
-      (a) => deptEmpIds.has(a.employeeId) && a.date && a.date.startsWith(mk),
+    const recs = activeDeptEmployees.flatMap((e) =>
+      attendanceRecordsForMonth(e, attendance, mk, todayStr()),
     );
     const present = recs.filter(
       (a) => a.status === "present" || a.status === "late",
@@ -16847,6 +17051,13 @@ function SelfPunch({
   const [scanOpen, setScanOpen] = useState(false);
   const hasOffices = offices && offices.length > 0;
   const todayIsDayOff = isDayOff(emp, today);
+  // Non-zero while today's punch is queued locally, waiting to reach
+  // Supabase (see useOfflinePendingCount / the offline queue in
+  // useSupabaseArray above) — e.g. the employee tapped Check In with no
+  // signal. Surfacing this here is what tells them "this was recorded,
+  // it just hasn't synced yet" instead of leaving them unsure whether
+  // the tap did anything.
+  const pendingSyncCount = useOfflinePendingCount("attendance");
 
   // If one or more office branches (each with lat/lng + radius) are
   // configured, require the employee's current GPS position to fall
@@ -17322,6 +17533,32 @@ function SelfPunch({
           }}
         >
           {locError}
+        </p>
+      )}
+      {pendingSyncCount > 0 && (
+        <p
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            fontSize: 12.5,
+            fontWeight: 600,
+            color: T.goldText,
+            background: T.goldSoft,
+            padding: "8px 12px",
+            borderRadius: 10,
+            marginBottom: 12,
+          }}
+        >
+          <Loader2
+            size={14}
+            style={{ animation: "spin 1.4s linear infinite", flexShrink: 0 }}
+          />
+          {lang === "km"
+            ? "កំពុងរង់ចាំផ្ញើ — នឹងបញ្ជូនស្វ័យប្រវត្តិពេលមាន Internet"
+            : lang === "zh"
+              ? "等待同步 — 网络恢复后自动发送"
+              : "Waiting to sync — will send automatically once you're back online"}
         </p>
       )}
 
