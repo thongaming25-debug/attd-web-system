@@ -3506,6 +3506,24 @@ const PALETTE = [
   "#35D0BA",
   "#D9622E",
 ];
+// Muted, deeper tile colors for the dashboard stat cards in dark mode
+// on desktop (toned down from the earlier candy-bright set, which read
+// as too vivid/light-mode-like against a dark background) — one fixed
+// hue per card position, cycling if there are ever more cards than
+// colors.
+const VIVID_STAT_COLORS = ["#3B5BC4", "#5B4FA8", "#1C7A54", "#A33862"];
+// Gradient pairs for the admin dashboard's 4 secondary KPI cards
+// (Departments/Present Today/On Leave/Pending Payroll) in dark mode —
+// keyed by each card's fixed `key`, per the requested reference layout.
+// Total Employees keeps its own existing blue gradient inline. Deeper,
+// less saturated tones than a first pass, to read as dark-mode-native
+// rather than a bright light-mode palette dropped onto a dark page.
+const ADMIN_STAT_GRADIENTS = {
+  dept: ["#5B4FA8", "#423876"],
+  present: ["#1C7A54", "#145C3F"],
+  leave: ["#A6701F", "#7D5416"],
+  payroll: ["#A33862", "#7D2A4C"],
+};
 // Preset swatches for the user-selectable "Primary Color" in Appearance
 // settings (mirrors the accent-color picker shown in the reference
 // design). Picking one restyles every primary button, focus ring, and
@@ -3911,15 +3929,15 @@ body{background:var(--wf-paper);}
   --wf-glass-border:rgba(255,255,255,0.45); --wf-glass-highlight:rgba(255,255,255,0.35);
 }
 .wf-dark{
-  --wf-ink:#EEF1F6; --wf-ink-dark:#AEB6C7; --wf-paper:#080B12; --wf-card:#0E121B;
+  --wf-ink:#EEF1F6; --wf-ink-dark:#AEB6C7; --wf-paper:#0A0E1A; --wf-card:#141A2B;
   --wf-forest-soft:#0E2A20; --wf-forest-text:#3FD996;
-  --wf-rose-dark:#F0879B; --wf-rose-soft:#2C151B; --wf-line:#1C2230; --wf-line-soft:#161B27;
-  --wf-muted:#717A90; --wf-muted-light:#414A5E; --wf-text-soft:#B9C0D2;
-  --wf-input-border:#1F2634; --wf-input-bg:#0B0F17; --wf-field-label:#8791A8;
-  --wf-table-head-bg:#0B0F18; --wf-divider:#171D29; --wf-danger-border:#3D1D26;
-  --wf-danger-hover-bg:#20121A; --wf-header-bg:rgba(8,11,18,0.82);
-  --wf-glass-card:rgba(22,27,39,0.55); --wf-glass-header:rgba(10,13,21,0.6);
-  --wf-glass-border:rgba(255,255,255,0.08); --wf-glass-highlight:rgba(255,255,255,0.06);
+  --wf-rose-dark:#F0879B; --wf-rose-soft:#2C151B; --wf-line:#262E45; --wf-line-soft:#1C2338;
+  --wf-muted:#818AA3; --wf-muted-light:#4C5670; --wf-text-soft:#C4CADC;
+  --wf-input-border:#2A3249; --wf-input-bg:#111627; --wf-field-label:#9AA3BC;
+  --wf-table-head-bg:#111627; --wf-divider:#1E2438; --wf-danger-border:#3D1D26;
+  --wf-danger-hover-bg:#20121A; --wf-header-bg:rgba(10,14,26,0.82);
+  --wf-glass-card:rgba(24,30,48,0.55); --wf-glass-header:rgba(12,16,29,0.6);
+  --wf-glass-border:rgba(255,255,255,0.09); --wf-glass-highlight:rgba(255,255,255,0.07);
 }
 .wf-root{display:flex;width:100%;height:100vh;height:100dvh;min-height:640px;max-height:100vh;max-height:100dvh;background:${T.paper};font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.text};position:relative;overflow:hidden;border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,0.02),0 16px 40px -18px rgba(5,8,16,0.35);border:1px solid ${T.line};transition:background .15s ease,color .15s ease;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
 .wf-sidebar{background:${T.card};color:${T.ink};width:246px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid ${T.line};transition:transform .25s cubic-bezier(.4,0,.2,1),background .15s ease,color .15s ease;}
@@ -3942,12 +3960,12 @@ body{background:var(--wf-paper);}
 .wf-nav-chevron{margin-left:auto;flex-shrink:0;color:${T.mutedLight};}
 .wf-nav-dot{margin-left:auto;flex-shrink:0;width:7px;height:7px;border-radius:999px;background:${T.blue};}
 .wf-nav-icon-wrap{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;flex-shrink:0;}
-.wf-dark .wf-sidebar{background:linear-gradient(180deg,${BRAND.ink} 0%,${BRAND.inkDark} 100%);color:#fff;border-right:1px solid rgba(255,255,255,0.06);}
+.wf-dark .wf-sidebar{background:${T.paper};color:#fff;border-right:1px solid rgba(255,255,255,0.05);}
 .wf-dark .wf-nav-eyebrow{color:#4C5670;}
-.wf-dark .wf-nav-item{padding:9px 14px;border-radius:7px;color:#8891A6;}
+.wf-dark .wf-nav-item{padding:9px 14px;border-radius:9px;color:#8891A6;}
 .wf-dark .wf-nav-item:hover{background:rgba(255,255,255,0.045);color:#fff;}
-.wf-dark .wf-nav-item.active{background:rgba(240,168,59,0.09);color:#fff;}
-.wf-dark .wf-nav-item.active::before{content:"";position:absolute;left:-10px;top:6px;bottom:6px;width:2px;border-radius:0;background:${T.gold};}
+.wf-dark .wf-nav-item.active{background:${T.blue};color:#fff;box-shadow:0 4px 14px -4px rgba(91,141,239,0.55);}
+.wf-dark .wf-nav-item.active::before{display:none;}
 .wf-dark .wf-nav-chevron,.wf-dark .wf-nav-dot{display:none;}
 .wf-sidebar-profile{display:flex;align-items:center;gap:10px;padding:9px 10px;margin-bottom:8px;background:${T.card};border:1px solid ${T.line};border-radius:12px;}
 .wf-dark .wf-sidebar-profile{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.07);}
@@ -9998,8 +10016,24 @@ function DashDonut({
     </div>
   );
 }
+// Solid vivid colors for the dashboard Quick Actions buttons in dark
+// mode (per the requested reference layout) — light mode keeps the
+// existing soft translucent tint look, which reads fine on white.
+const VIVID_QUICK_ACTION_COLORS = {
+  violet: "#5B4FA8",
+  forest: "#1C7A54",
+  gold: "#A6701F",
+  rose: "#A33862",
+  blue: "#3B5BC4",
+};
 function DashQuickAction({ icon: Icon, tint, label, onClick }) {
+  const { theme } = useTheme();
   const c = OT_STAT_TINTS[tint] || OT_STAT_TINTS.violet;
+  const vivid = theme === "dark";
+  const bg = vivid
+    ? VIVID_QUICK_ACTION_COLORS[tint] || VIVID_QUICK_ACTION_COLORS.violet
+    : c.bg;
+  const fg = vivid ? "#fff" : c.fg;
   return (
     <button
       type="button"
@@ -10012,8 +10046,8 @@ function DashQuickAction({ icon: Icon, tint, label, onClick }) {
         border: "none",
         borderRadius: 10,
         padding: "11px 12px",
-        background: c.bg,
-        color: c.fg,
+        background: bg,
+        color: fg,
         fontSize: 12.5,
         fontWeight: 600,
         cursor: "pointer",
@@ -10284,9 +10318,10 @@ function Dashboard({
           },
         ];
 
+  const useVividStats = theme === "dark" && !isMobile;
   const renderStatTiles = () => (
     <div className="wf-dash-stats" style={{ marginBottom: 16 }}>
-      {stats.map((s) => {
+      {stats.map((s, idx) => {
         const accentKey =
           s.accent === T.forest
             ? "forest"
@@ -10315,6 +10350,45 @@ function Dashboard({
               },
             }
           : {};
+        if (useVividStats) {
+          // Dark-mode desktop: solid saturated color tiles (per the
+          // requested reference layout) instead of the card+icon-circle
+          // style used elsewhere — one fixed hue per card position.
+          const vividBg = VIVID_STAT_COLORS[idx % VIVID_STAT_COLORS.length];
+          return (
+            <div
+              key={s.label}
+              className="wf-stat-solid"
+              style={{
+                background: vividBg,
+                color: "#fff",
+                cursor: canLink ? "pointer" : "default",
+                minHeight: 108,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+              }}
+              {...clickProps}
+            >
+              <s.icon size={64} className="wf-stat-solid-icon" color="#fff" />
+              <div className="wf-stat-solid-value">{s.value}</div>
+              <div className="wf-stat-solid-label">{s.label}</div>
+              {s.sub && (
+                <div
+                  style={{
+                    position: "relative",
+                    fontSize: 11.5,
+                    fontWeight: 500,
+                    marginTop: 4,
+                    opacity: 0.85,
+                  }}
+                >
+                  {s.sub}
+                </div>
+              )}
+            </div>
+          );
+        }
         return (
           <div
             key={s.label}
@@ -10567,14 +10641,9 @@ function Dashboard({
     </Card>
   );
 
-  // Desktop/tablet only: cap the dashboard's width and center it so it
-  // reads as a tidy, purpose-built layout instead of stretching every
-  // card and grid gap across an ultra-wide monitor. Mobile (isMobile)
-  // deliberately gets no wrapper style at all here — it keeps exactly
-  // the full-width, edge-to-edge layout it already had.
-  const dashboardWrapStyle = isMobile
-    ? undefined
-    : { maxWidth: 1280, margin: "0 auto" };
+  // No width cap here — the dashboard now fills the content area exactly
+  // like the Analytics page does, instead of being boxed in at 1280px.
+  const dashboardWrapStyle = undefined;
 
   return (
     <div style={dashboardWrapStyle}>
@@ -10808,7 +10877,7 @@ function Dashboard({
                 borderRadius: 14,
                 padding: "20px 18px",
                 minHeight: 132,
-                background: `linear-gradient(135deg, ${T.blue}, #4C63D2)`,
+                background: `linear-gradient(135deg, #3B5BC4, #2D4494)`,
                 color: "#fff",
                 cursor: setPage ? "pointer" : "default",
                 display: "flex",
@@ -10878,57 +10947,82 @@ function Dashboard({
                 sub: `${pendingRows.length} ${STATUS_MAP.pending.label}`,
                 linkTo: "payroll",
               },
-            ].map((s) => (
-              <div
-                key={s.key}
-                role={setPage ? "button" : undefined}
-                tabIndex={setPage ? 0 : undefined}
-                onClick={() => setPage && setPage(s.linkTo)}
-                style={{
-                  borderRadius: 14,
-                  padding: "20px 18px",
-                  minHeight: 132,
-                  background: T.card,
-                  border: `1px solid ${T.lineSoft}`,
-                  cursor: setPage ? "pointer" : "default",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                }}
-              >
+            ].map((s) => {
+              const grad = ADMIN_STAT_GRADIENTS[s.key];
+              // Apply the same colored-gradient card style in both
+              // light and dark mode now (previously dark-mode only).
+              const vivid = !!grad;
+              return (
                 <div
+                  key={s.key}
+                  role={setPage ? "button" : undefined}
+                  tabIndex={setPage ? 0 : undefined}
+                  onClick={() => setPage && setPage(s.linkTo)}
                   style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 10,
-                    background: OT_STAT_TINTS[s.tint].bg,
+                    borderRadius: 14,
+                    padding: "20px 18px",
+                    minHeight: 132,
+                    background: vivid
+                      ? `linear-gradient(135deg, ${grad[0]}, ${grad[1]})`
+                      : T.card,
+                    border: vivid ? "none" : `1px solid ${T.lineSoft}`,
+                    color: vivid ? "#fff" : undefined,
+                    cursor: setPage ? "pointer" : "default",
                     display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
                   }}
                 >
-                  <s.icon size={20} color={OT_STAT_TINTS[s.tint].fg} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 12.5, color: T.textSoft }}>
-                    {s.label}
-                  </div>
                   <div
                     style={{
-                      fontSize: 26,
-                      fontWeight: 700,
-                      color: T.ink,
-                      marginTop: 2,
+                      width: 40,
+                      height: 40,
+                      borderRadius: 10,
+                      background: vivid
+                        ? "rgba(255,255,255,0.2)"
+                        : OT_STAT_TINTS[s.tint].bg,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
-                    {s.value}
+                    <s.icon
+                      size={20}
+                      color={vivid ? "#fff" : OT_STAT_TINTS[s.tint].fg}
+                    />
                   </div>
-                  <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>
-                    {s.sub}
+                  <div>
+                    <div
+                      style={{
+                        fontSize: 12.5,
+                        color: vivid ? "rgba(255,255,255,0.9)" : T.textSoft,
+                      }}
+                    >
+                      {s.label}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 26,
+                        fontWeight: 700,
+                        color: vivid ? "#fff" : T.ink,
+                        marginTop: 2,
+                      }}
+                    >
+                      {s.value}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: vivid ? "rgba(255,255,255,0.85)" : T.muted,
+                        marginTop: 2,
+                      }}
+                    >
+                      {s.sub}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div
