@@ -3957,6 +3957,7 @@ body{background:var(--wf-paper);}
 .wf-nav-item{position:relative;width:100%;display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:500;background:transparent;color:${T.ink};border:none;cursor:pointer;text-align:left;transition:background .15s ease,color .15s ease;}
 .wf-nav-item:hover{background:${T.lineSoft};color:${T.ink};}
 .wf-nav-item.active{background:${T.blue}17;color:${T.blue};font-weight:600;}
+.wf-nav-item.active::before{content:"";position:absolute;left:-1px;top:6px;bottom:6px;width:3px;border-radius:3px;background:${T.blue};}
 .wf-nav-chevron{margin-left:auto;flex-shrink:0;color:${T.mutedLight};}
 .wf-nav-dot{margin-left:auto;flex-shrink:0;width:7px;height:7px;border-radius:999px;background:${T.blue};}
 .wf-nav-icon-wrap{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;flex-shrink:0;}
@@ -3966,7 +3967,8 @@ body{background:var(--wf-paper);}
 .wf-dark .wf-nav-item:hover{background:rgba(255,255,255,0.045);color:#fff;}
 .wf-dark .wf-nav-item.active{background:${T.blue};color:#fff;box-shadow:0 4px 14px -4px rgba(91,141,239,0.55);}
 .wf-dark .wf-nav-item.active::before{display:none;}
-.wf-dark .wf-nav-chevron,.wf-dark .wf-nav-dot{display:none;}
+.wf-dark .wf-nav-chevron{color:rgba(255,255,255,0.35);}
+.wf-dark .wf-nav-item.active .wf-nav-chevron{color:rgba(255,255,255,0.75);}
 .wf-sidebar-profile{display:flex;align-items:center;gap:10px;padding:9px 10px;margin-bottom:8px;background:${T.card};border:1px solid ${T.line};border-radius:12px;}
 .wf-dark .wf-sidebar-profile{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.07);}
 .wf-sidebar-kebab{background:none;border:none;cursor:pointer;color:${T.mutedLight};padding:4px;border-radius:6px;flex-shrink:0;transition:background .15s ease,color .15s ease;}
@@ -34938,7 +34940,7 @@ function AppInner() {
   const { t, lang } = useLang();
   const [branding, setBranding, brandingReady] = useBrandingSettings();
   const brandDisplayName = branding.name?.trim() || t.appName;
-  const { theme, glassEffect } = useTheme();
+  const { theme, glassEffect, toggleTheme } = useTheme();
   // Shows a styled AlertDialog (instead of window.alert) when this
   // device's session gets force-signed-out via the Login Activity page.
   // Rendered in the logged-out branches below, since checkRevoked always
@@ -36664,10 +36666,11 @@ function AppInner() {
                     </div>
                     {items.map((n) => {
                       const accent = n.accent || T.blue;
+                      const isActive = page === n.id;
                       return (
                         <button
                           key={n.id}
-                          className={`wf-nav-item ${page === n.id ? "active" : ""}`}
+                          className={`wf-nav-item ${isActive ? "active" : ""}`}
                           onClick={() => {
                             setPage(n.id);
                             setNavOpen(false);
@@ -36675,19 +36678,23 @@ function AppInner() {
                         >
                           <span
                             className="wf-nav-icon-wrap"
-                            style={{ background: accent + "26", color: accent }}
+                            style={
+                              theme === "dark"
+                                ? {
+                                    background: isActive
+                                      ? "rgba(255,255,255,0.22)"
+                                      : accent,
+                                    color: "#fff",
+                                  }
+                                : isActive
+                                  ? { background: T.blue, color: "#fff" }
+                                  : { background: accent + "26", color: accent }
+                            }
                           >
                             <n.icon size={17} />
                           </span>
                           <span className="wf-nav-label">{n.label}</span>
-                          {page === n.id ? (
-                            <span className="wf-nav-dot" />
-                          ) : (
-                            <ChevronRight
-                              size={15}
-                              className="wf-nav-chevron"
-                            />
-                          )}
+                          <ChevronRight size={15} className="wf-nav-chevron" />
                         </button>
                       );
                     })}
@@ -36774,6 +36781,56 @@ function AppInner() {
                   <LogOut size={16} />
                 </span>
                 <span className="wf-nav-label">{t.logout}</span>
+              </button>
+              <button
+                type="button"
+                onClick={toggleTheme}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  width: "100%",
+                  marginTop: 8,
+                  padding: "10px 12px",
+                  borderRadius: 10,
+                  border: `1px solid ${T.line}`,
+                  background: T.card,
+                  color: T.ink,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  cursor: "pointer",
+                }}
+              >
+                {theme === "dark" ? <Moon size={16} /> : <Sun size={16} />}
+                <span style={{ flex: 1, textAlign: "left" }}>
+                  {theme === "dark"
+                    ? t.settings.darkMode
+                    : t.settings.lightMode}
+                </span>
+                <span
+                  style={{
+                    width: 34,
+                    height: 19,
+                    borderRadius: 999,
+                    background: theme === "dark" ? T.blue : T.line,
+                    position: "relative",
+                    flexShrink: 0,
+                    transition: "background .15s ease",
+                  }}
+                >
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: 2,
+                      left: theme === "dark" ? 17 : 2,
+                      width: 15,
+                      height: 15,
+                      borderRadius: "50%",
+                      background: "#fff",
+                      transition: "left .15s ease",
+                    }}
+                  />
+                </span>
               </button>
             </div>
           </div>
