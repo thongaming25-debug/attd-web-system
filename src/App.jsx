@@ -136,6 +136,8 @@ const LANG_RAW = {
       errPass: "ពាក្យសម្ងាត់មិនត្រឹមត្រូវទេ",
       back: "ត្រឡប់ក្រោយ",
       switchToAdmin: "អ្នកគ្រប់គ្រង? ចូលពីទីនេះ",
+      signingIn: "កំពុងផ្ទៀងផ្ទាត់...",
+      welcomeSuccess: "ចូលបានជោគជ័យ!",
     },
     nav: {
       dashboard: "ផ្ទាំងគ្រប់គ្រង",
@@ -535,6 +537,20 @@ const LANG_RAW = {
       rolePlaceholder: "ឧ. Accountant",
       pinLabel: "កូដសម្ងាត់ PIN (សម្រាប់ Login)",
       pinRegenerate: "បង្កើតថ្មី",
+      pinKeepUnchanged: "ទុកទទេ ដើម្បីរក្សាកូដសម្ងាត់ដដែល",
+      pinAutoNote:
+        'កូដសម្ងាត់ PIN ចាប់ផ្តើមនឹងត្រូវបានបង្កើតដោយស្វ័យប្រវត្តិ។ អ្នកអាចកំណត់ PIN ជាក់លាក់នៅពេលក្រោយ តាមរយៈប៊ូតុង "កំណត់ PIN ឡើងវិញ" ក្រោយពេលរក្សាទុក។',
+      pinResetBtn: "កំណត់ PIN ឡើងវិញ",
+      pinResetConfirmTitle: (name) => `កំណត់ PIN ឡើងវិញសម្រាប់ ${name}`,
+      pinResetDesc:
+        "សម្រាប់សុវត្ថិភាព សូមបញ្ចូលពាក្យសម្ងាត់គណនី Admin របស់អ្នកផ្ទាល់ ដើម្បីបញ្ជាក់សកម្មភាពនេះ។",
+      pinResetPasswordLabel: "ពាក្យសម្ងាត់ Admin របស់អ្នក",
+      pinResetSubmit: "បញ្ជាក់ និងកំណត់ PIN ថ្មី",
+      pinResetCancel: "បោះបង់",
+      pinResetSuccess: (pin) => `បានកំណត់ PIN ថ្មីរួចរាល់៖ ${pin}`,
+      pinResetErrInvalidPassword: "ពាក្យសម្ងាត់ Admin មិនត្រឹមត្រូវទេ",
+      pinResetErrForbidden: "អ្នកមិនមានសិទ្ធិកំណត់ PIN បុគ្គលិកឡើងវិញទេ",
+      pinResetErrGeneric: "កំណត់ PIN ឡើងវិញមិនជោគជ័យទេ សូមព្យាយាមម្តងទៀត",
       status: "ស្ថានភាព",
       branch: "សាខា (Branch)",
       branchNotSet: "មិនទាន់កំណត់",
@@ -910,6 +926,11 @@ const LANG_RAW = {
       noThreshold: "អនុវត្តលើគ្រប់បុគ្គលិកទាំងអស់",
       latePolicyDesc:
         "កំណត់ចំនួនដងអនុញ្ញាតឲ្យមកយឺតដោយឥតកាត់ប្រាក់ក្នុងមួយខែ (grace count)។ ចាប់ពីលើសពីនេះទៅ ថ្ងៃមកយឺតនីមួយៗនឹងត្រូវកាត់ប្រាក់ខែ តាមអត្រាដែលកំណត់ខាងក្រោម។",
+      lateGraceMinutesLabel: "ផ្តល់ឲ្យយឺតបាន (នាទី)",
+      lateGraceMinutesHint: (mins) =>
+        mins > 0
+          ? `បុគ្គលិកចូលធ្វើការក្រោយម៉ោងចាប់ផ្តើមវេនមិនលើសពី ${mins} នាទី នៅតែចាត់ទុកថាមកទាន់ម៉ោង។ វេននីមួយៗអាចកំណត់ខុសពីនេះបាននៅទំព័រ "វេនការងារ"។`
+          : 'បច្ចុប្បន្នគ្មានការអនុញ្ញាតឲ្យយឺតទេ — ចូលក្រោយម៉ោងចាប់ផ្តើមវេនតែ ១ នាទីក៏ចាត់ទុកជាមកយឺតដែរ។ វេននីមួយៗអាចកំណត់ខុសពីនេះបាននៅទំព័រ "វេនការងារ"។',
       lateGraceCountLabel: "ចំនួនដងអនុញ្ញាតឲ្យយឺត/ខែ",
       lateDeductionTypeLabel: "របៀបកាត់ប្រាក់",
       lateDeductionTypeFixed: "ចំនួនថេរ ($) ក្នុងមួយថ្ងៃ",
@@ -1435,6 +1456,8 @@ const LANG_RAW = {
       errPass: "Incorrect password",
       back: "Back",
       switchToAdmin: "Admin? Sign in here",
+      signingIn: "Verifying...",
+      welcomeSuccess: "Signed in!",
     },
     nav: {
       dashboard: "Dashboard",
@@ -1836,6 +1859,20 @@ const LANG_RAW = {
       rolePlaceholder: "e.g. Accountant",
       pinLabel: "PIN (used for Login)",
       pinRegenerate: "Regenerate",
+      pinKeepUnchanged: "Leave blank to keep the current PIN",
+      pinAutoNote:
+        'A starting PIN is generated automatically. Set a specific PIN afterward using "Reset PIN" once this employee is saved.',
+      pinResetBtn: "Reset PIN",
+      pinResetConfirmTitle: (name) => `Reset PIN for ${name}`,
+      pinResetDesc:
+        "For security, enter your own admin password to confirm this action.",
+      pinResetPasswordLabel: "Your admin password",
+      pinResetSubmit: "Confirm & set new PIN",
+      pinResetCancel: "Cancel",
+      pinResetSuccess: (pin) => `New PIN set: ${pin}`,
+      pinResetErrInvalidPassword: "Incorrect admin password",
+      pinResetErrForbidden: "You don't have permission to reset employee PINs",
+      pinResetErrGeneric: "Couldn't reset the PIN — please try again",
       status: "Status",
       branch: "Branch",
       branchNotSet: "Not set",
@@ -2212,6 +2249,11 @@ const LANG_RAW = {
       noThreshold: "Applies to all employees",
       latePolicyDesc:
         "Set how many times an employee can arrive late each month before it's deducted (grace count). Every late day beyond that grace count is deducted at the rate set below.",
+      lateGraceMinutesLabel: "Grace period (minutes)",
+      lateGraceMinutesHint: (mins) =>
+        mins > 0
+          ? `A check-in up to ${mins} minute(s) after the shift's start time still counts as on time. Individual shifts can override this on the Shifts page.`
+          : "No grace period is set — checking in even 1 minute after the shift's start time counts as late. Individual shifts can override this on the Shifts page.",
       lateGraceCountLabel: "Grace count (late days/month)",
       lateDeductionTypeLabel: "Deduction type",
       lateDeductionTypeFixed: "Fixed amount ($) per day",
@@ -4369,6 +4411,10 @@ const DEFAULT_PAYROLL_POLICY = {
   lateGraceCount: 3,
   lateDeductionType: "fixed",
   lateDeductionValue: 0,
+  // Minutes after a shift's start time a check-in is still allowed
+  // without being marked "late". 0 = no grace (matches the old, always-on
+  // behavior). A shift can override this with its own graceMinutes.
+  lateGraceMinutes: 0,
   // Unpaid Leave (UL) deduction: "fullDay" docks a full day's pay
   // (salary/WORKING_DAYS_PER_MONTH) per UL day — this is the original
   // behavior. "fixed" docks a flat $ amount per UL day; "percentDaily"
@@ -4759,21 +4805,42 @@ function shiftLabel(shift) {
 function isOvernightShift(shift) {
   return !!shift && shift.end <= shift.start;
 }
+// Effective grace period (minutes) for a shift: the shift's own override
+// if it has one set (0 is a valid override, distinct from "unset"), else
+// the company-wide default from payroll_policy.late_grace_minutes. Reads
+// both graceMinutes (mapped rows) and grace_minutes (raw Supabase rows,
+// e.g. the fresh re-fetch in SelfPunch.punchIn) so either shape works.
+function effectiveGraceMinutes(shift, companyGraceMinutes = 0) {
+  const shiftOverride = shift
+    ? (shift.graceMinutes ?? shift.grace_minutes)
+    : null;
+  return shiftOverride === null || shiftOverride === undefined
+    ? Number(companyGraceMinutes) || 0
+    : Number(shiftOverride) || 0;
+}
 // Determines whether a check-in time counts as late for a given shift.
 // Overnight shifts (e.g. 22:00–06:00) wrap past midnight, so a check-in is
-// only compared against the shift's start time, not the end.
-function isLateForShift(checkInTime, shift) {
+// only compared against the shift's start time, not the end. A grace
+// period (company-wide default, or a per-shift override) is added on top
+// of the shift's start time before the late/on-time cutoff is applied.
+function isLateForShift(checkInTime, shift, companyGraceMinutes = 0) {
   if (!shift) return checkInTime > "09:00"; // fallback when no shift assigned
-  return checkInTime > shift.start;
+  const grace = effectiveGraceMinutes(shift, companyGraceMinutes);
+  const deadline =
+    grace > 0 ? addMinutesToClock(shift.start, grace) : shift.start;
+  return checkInTime > deadline;
 }
-// Returns how many minutes past the shift's start time a check-in was, or
-// 0 if the check-in was on time or early. Used to show "late by X" detail.
-function lateMinutesForShift(checkInTime, shift) {
+// Returns how many minutes past the shift's (grace-adjusted) start time a
+// check-in was, or 0 if the check-in was within the grace period. Used to
+// show "late by X" detail.
+function lateMinutesForShift(checkInTime, shift, companyGraceMinutes = 0) {
   if (!checkInTime) return 0;
   const start = shift ? shift.start : "09:00";
-  if (checkInTime <= start) return 0;
+  const grace = effectiveGraceMinutes(shift, companyGraceMinutes);
+  const deadline = grace > 0 ? addMinutesToClock(start, grace) : start;
+  if (checkInTime <= deadline) return 0;
   const [ch, cm] = checkInTime.split(":").map(Number);
-  const [sh, sm] = start.split(":").map(Number);
+  const [sh, sm] = deadline.split(":").map(Number);
   return ch * 60 + cm - (sh * 60 + sm);
 }
 function formatLateDuration(mins, lang) {
@@ -6069,8 +6136,7 @@ function useSupabaseArray(
     window.dispatchEvent(new Event(pendingEventName));
   };
   const isNetworkIssue = (err) =>
-    !navigator.onLine ||
-    /fetch|network|load failed/i.test(err?.message || "");
+    !navigator.onLine || /fetch|network|load failed/i.test(err?.message || "");
   const [pendingCount, setPendingCount] = useState(
     () => Object.keys(readPending()).length,
   );
@@ -6155,7 +6221,6 @@ function useSupabaseArray(
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [table, cutoffDate, enabled]);
-
 
   // Live sync: without this, admin and staff only ever see what was on the
   // table at the moment their tab loaded — a staff check-in, an admin's
@@ -6311,7 +6376,11 @@ function useSupabaseArray(
         // stuck server-side. Only fires when something real changed
         // (toDelete/toUpsert non-empty) — not on every re-render — so
         // it stays a genuine confirmation rather than background noise.
-        if (!hadError && !hadNetworkIssue && (toDelete.length || toUpsert.length)) {
+        if (
+          !hadError &&
+          !hadNetworkIssue &&
+          (toDelete.length || toUpsert.length)
+        ) {
           pushToast(t.settings.saved, "success");
         } else if (hadNetworkIssue) {
           // Keep this distinct from the hard-error toast above — nothing
@@ -6493,8 +6562,7 @@ function useOfflinePendingCount(table) {
   const eventName = `wf-pending-changed:${table}`;
   const read = () => {
     try {
-      return Object.keys(JSON.parse(localStorage.getItem(key) || "{}"))
-        .length;
+      return Object.keys(JSON.parse(localStorage.getItem(key) || "{}")).length;
     } catch {
       return 0;
     }
@@ -6515,7 +6583,6 @@ function useOfflinePendingCount(table) {
   }, [table]);
   return count;
 }
-
 
 // payroll_paid is stored as one row per (employee, month) but the app
 // works with it as a flat map: { "<employeeId>-<YYYY-MM>": true }.
@@ -6836,6 +6903,8 @@ function usePayrollPolicy() {
             DEFAULT_PAYROLL_POLICY.minSalaryThreshold,
           lateGraceCount:
             data.late_grace_count ?? DEFAULT_PAYROLL_POLICY.lateGraceCount,
+          lateGraceMinutes:
+            data.late_grace_minutes ?? DEFAULT_PAYROLL_POLICY.lateGraceMinutes,
           lateDeductionType:
             data.late_deduction_type ??
             DEFAULT_PAYROLL_POLICY.lateDeductionType,
@@ -6881,6 +6950,7 @@ function usePayrollPolicy() {
           insurance_rate: next.insuranceRate,
           min_salary_threshold: next.minSalaryThreshold,
           late_grace_count: next.lateGraceCount,
+          late_grace_minutes: Number(next.lateGraceMinutes) || 0,
           late_deduction_type: next.lateDeductionType,
           late_deduction_value: next.lateDeductionValue,
           ul_deduction_type: next.ulDeductionType,
@@ -8916,6 +8986,45 @@ const LOGIN_CSS = `
   .wf-login-card { padding:30px 22px 24px; }
   .wf-login-dots { display:none; }
 }
+@keyframes wf-overlay-in { from { opacity:0; } to { opacity:1; } }
+@keyframes wf-spin-smooth { to { transform:rotate(360deg); } }
+@keyframes wf-check-pop {
+  0% { transform:scale(.4); opacity:0; }
+  55% { transform:scale(1.15); opacity:1; }
+  100% { transform:scale(1); opacity:1; }
+}
+@keyframes wf-check-ring {
+  0% { transform:scale(.7); opacity:.6; }
+  100% { transform:scale(1.5); opacity:0; }
+}
+.wf-login-form-body { transition: opacity .2s ease, filter .2s ease; }
+.wf-login-form-body-busy { opacity:.45; filter:saturate(.7); pointer-events:none; }
+.wf-login-overlay {
+  position:absolute; inset:0; z-index:6;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+  background:var(--wfl-card-bg); border-radius:22px;
+  animation: wf-overlay-in .22s ease both;
+}
+.wf-login-overlay-spinner-wrap { position:relative; width:46px; height:46px; display:flex; align-items:center; justify-content:center; }
+.wf-login-overlay-spinner {
+  width:46px; height:46px; border-radius:50%;
+  border:3px solid var(--wfl-divider);
+  animation: wf-spin-smooth .8s linear infinite;
+}
+.wf-login-overlay-spinner-emp { border-top-color:${T.gold}; border-right-color:${T.gold}; }
+.wf-login-overlay-spinner-adm { border-top-color:var(--wfl-accent); border-right-color:var(--wfl-accent); }
+.wf-login-overlay-check-wrap { position:relative; width:46px; height:46px; display:flex; align-items:center; justify-content:center; }
+.wf-login-overlay-check-ring {
+  position:absolute; inset:0; border-radius:50%; border:2px solid #22C55E;
+  animation: wf-check-ring .6s ease-out both;
+}
+.wf-login-overlay-check {
+  position:relative; width:46px; height:46px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(34,197,94,0.14); color:#22C55E;
+  animation: wf-check-pop .45s cubic-bezier(.34,1.56,.64,1) both;
+}
+.wf-login-overlay-text { font-size:13px; font-weight:600; color:var(--wfl-text-soft); letter-spacing:.01em; }
 `;
 function LoginCredit() {
   return (
@@ -8992,34 +9101,38 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
   const [showPin, setShowPin] = useState(false);
   const [remember, setRemember] = useState(!!rememberedCode);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  // "idle" | "submitting" | "success" — a distinct success beat (rather than
+  // jumping straight from spinner to dashboard) so the hand-off feels
+  // intentional instead of an abrupt cut.
+  const [status, setStatus] = useState("idle");
+  const loading = status !== "idle";
 
   const submit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 320));
-    const emp = employees.find(
-      (x) => x.code.trim().toLowerCase() === code.trim().toLowerCase(),
-    );
-    if (!emp) {
-      setError(L.errNoEmp);
-      setLoading(false);
-      return;
-    }
-    if (emp.status !== "active") {
-      setError(L.errInactive);
-      setLoading(false);
-      return;
-    }
-    if ((emp.pin || "") !== pin.trim()) {
-      setError(L.errPin);
-      setLoading(false);
-      return;
-    }
+    if (status !== "idle") return;
+    setStatus("submitting");
     setError("");
-    setLoading(false);
-    setRememberedCode(remember ? emp.code : "");
-    onLogin(emp.id);
+    try {
+      // Verified server-side (service-role key) so the browser never needs
+      // to hold every employee's PIN just to render this login screen —
+      // see the `verify-employee-pin` Edge Function.
+      const { data, error: fnError } = await supabase.functions.invoke(
+        "verify-employee-pin",
+        { body: { code: code.trim(), pin: pin.trim() } },
+      );
+      if (fnError || !data?.ok) {
+        if (data?.error === "inactive") setError(L.errInactive);
+        else setError(L.errPin);
+        setStatus("idle");
+        return;
+      }
+      setRememberedCode(remember ? code.trim() : "");
+      setStatus("success");
+      setTimeout(() => onLogin(data.employeeId), 550);
+    } catch {
+      setError(L.errPin);
+      setStatus("idle");
+    }
   };
 
   return (
@@ -9040,133 +9153,167 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
       </div>
       <div className="wf-login-card-wrap">
         <div className="wf-login-card">
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <div className="wf-login-logo">
-              {branding.logo ? (
-                <img
-                  src={branding.logo}
-                  alt={displayName}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
+          {status !== "idle" && (
+            <div className="wf-login-overlay">
+              {status === "submitting" ? (
+                <div className="wf-login-overlay-spinner-wrap">
+                  <div className="wf-login-overlay-spinner wf-login-overlay-spinner-emp" />
+                </div>
               ) : (
-                <span
-                  style={{
-                    fontWeight: 800,
-                    fontSize: 17,
-                    color: "var(--wfl-accent)",
-                    fontFamily: "'JetBrains Mono',monospace",
-                  }}
-                >
-                  {getInitials(displayName)}
-                </span>
+                <div className="wf-login-overlay-check-wrap">
+                  <div className="wf-login-overlay-check-ring" />
+                  <div className="wf-login-overlay-check">
+                    <Check size={22} strokeWidth={3} />
+                  </div>
+                </div>
               )}
-            </div>
-            <div className="wf-login-eyebrow">{displayName}</div>
-            <div className="wf-login-title">{L.employeePortal}</div>
-            <div className="wf-login-subtitle">{L.employeeSubtitle}</div>
-          </div>
-          <div className="wf-login-divider">
-            <div className="wf-login-divider-icon">
-              <ShieldCheck size={14} />
-            </div>
-          </div>
-          <form onSubmit={submit}>
-            <LoginField label={L.employeeId}>
-              <div className="wf-login-input-wrap">
-                <span className="wf-login-input-icon">
-                  <UserCircle2 size={17} />
-                </span>
-                <input
-                  className="wf-login-input"
-                  value={code}
-                  onChange={(e) => {
-                    setCode(e.target.value);
-                    setError("");
-                  }}
-                  placeholder={L.employeeIdPlaceholder}
-                  autoFocus
-                />
+              <div className="wf-login-overlay-text">
+                {status === "submitting" ? L.signingIn : L.welcomeSuccess}
               </div>
-            </LoginField>
-            <LoginField label={L.pin}>
-              <div className="wf-login-input-wrap">
-                <span className="wf-login-input-icon">
-                  <KeyRound size={17} />
-                </span>
-                <input
-                  className="wf-login-input wf-login-input-pw"
-                  value={pin}
-                  onChange={(e) => {
-                    setPin(e.target.value);
-                    setError("");
-                  }}
-                  placeholder={L.pinPlaceholder}
-                  type={showPin ? "text" : "password"}
-                  inputMode="numeric"
-                  maxLength={6}
-                />
+            </div>
+          )}
+          <div
+            className={`wf-login-form-body ${loading ? "wf-login-form-body-busy" : ""}`}
+          >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <div className="wf-login-logo">
+                {branding.logo ? (
+                  <img
+                    src={branding.logo}
+                    alt={displayName}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <span
+                    style={{
+                      fontWeight: 800,
+                      fontSize: 17,
+                      color: "var(--wfl-accent)",
+                      fontFamily: "'JetBrains Mono',monospace",
+                    }}
+                  >
+                    {getInitials(displayName)}
+                  </span>
+                )}
+              </div>
+              <div className="wf-login-eyebrow">{displayName}</div>
+              <div className="wf-login-title">{L.employeePortal}</div>
+              <div className="wf-login-subtitle">{L.employeeSubtitle}</div>
+            </div>
+            <div className="wf-login-divider">
+              <div className="wf-login-divider-icon">
+                <ShieldCheck size={14} />
+              </div>
+            </div>
+            <form onSubmit={submit}>
+              <LoginField label={L.employeeId}>
+                <div className="wf-login-input-wrap">
+                  <span className="wf-login-input-icon">
+                    <UserCircle2 size={17} />
+                  </span>
+                  <input
+                    className="wf-login-input"
+                    value={code}
+                    onChange={(e) => {
+                      setCode(e.target.value);
+                      setError("");
+                    }}
+                    placeholder={L.employeeIdPlaceholder}
+                    autoFocus
+                    disabled={loading}
+                  />
+                </div>
+              </LoginField>
+              <LoginField label={L.pin}>
+                <div className="wf-login-input-wrap">
+                  <span className="wf-login-input-icon">
+                    <KeyRound size={17} />
+                  </span>
+                  <input
+                    className="wf-login-input wf-login-input-pw"
+                    value={pin}
+                    onChange={(e) => {
+                      setPin(e.target.value);
+                      setError("");
+                    }}
+                    placeholder={L.pinPlaceholder}
+                    type={showPin ? "text" : "password"}
+                    inputMode="numeric"
+                    maxLength={6}
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    className="wf-login-input-toggle"
+                    onClick={() => setShowPin((v) => !v)}
+                    aria-label={showPin ? L.hidePassword : L.showPassword}
+                    title={showPin ? L.hidePassword : L.showPassword}
+                    disabled={loading}
+                  >
+                    {showPin ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </LoginField>
+              <div className="wf-login-row">
+                <label className="wf-login-checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={remember}
+                    onChange={(e) => setRemember(e.target.checked)}
+                    disabled={loading}
+                  />
+                  {L.rememberMe}
+                </label>
                 <button
                   type="button"
-                  className="wf-login-input-toggle"
-                  onClick={() => setShowPin((v) => !v)}
-                  aria-label={showPin ? L.hidePassword : L.showPassword}
-                  title={showPin ? L.hidePassword : L.showPassword}
+                  className="wf-login-link-btn"
+                  onClick={() => pushToast(L.contactAdminMsg, "info")}
+                  disabled={loading}
                 >
-                  {showPin ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {L.forgotPin}
                 </button>
               </div>
-            </LoginField>
-            <div className="wf-login-row">
-              <label className="wf-login-checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={remember}
-                  onChange={(e) => setRemember(e.target.checked)}
-                />
-                {L.rememberMe}
-              </label>
-              <button
-                type="button"
-                className="wf-login-link-btn"
-                onClick={() => pushToast(L.contactAdminMsg, "info")}
-              >
-                {L.forgotPin}
-              </button>
-            </div>
-            {error && (
-              <div className="wf-login-error">
-                <AlertCircle size={14} /> {error}
-              </div>
-            )}
-            <button
-              type="submit"
-              className="wf-login-btn wf-login-btn-emp"
-              disabled={loading}
-            >
-              {loading ? (
-                <Loader2
-                  size={16}
-                  style={{ animation: "spin 1s linear infinite" }}
-                />
-              ) : (
-                <LogIn size={16} />
+              {error && (
+                <div className="wf-login-error">
+                  <AlertCircle size={14} /> {error}
+                </div>
               )}
-              {loading ? "..." : L.submit}
-            </button>
-          </form>
-          <div className="wf-login-footer-note">
-            <ShieldCheck size={13} />
-            {L.secureLogin} • {L.authorizedOnly}
+              <button
+                type="submit"
+                className="wf-login-btn wf-login-btn-emp"
+                disabled={loading}
+              >
+                {status === "submitting" ? (
+                  <Loader2
+                    size={16}
+                    style={{ animation: "spin .8s linear infinite" }}
+                  />
+                ) : status === "success" ? (
+                  <Check size={16} strokeWidth={3} />
+                ) : (
+                  <LogIn size={16} />
+                )}
+                {status === "submitting"
+                  ? L.signingIn
+                  : status === "success"
+                    ? L.welcomeSuccess
+                    : L.submit}
+              </button>
+            </form>
+            <div className="wf-login-footer-note">
+              <ShieldCheck size={13} />
+              {L.secureLogin} • {L.authorizedOnly}
+            </div>
           </div>
         </div>
       </div>
@@ -9192,34 +9339,39 @@ function AdminLoginScreen({ admins, onLogin, go }) {
   const [showPass, setShowPass] = useState(false);
   const [remember, setRemember] = useState(!!rememberedUser);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  // "idle" | "submitting" | "success" — a distinct success beat (rather than
+  // jumping straight from spinner to dashboard) so the hand-off feels
+  // intentional instead of an abrupt cut.
+  const [status, setStatus] = useState("idle");
+  const loading = status !== "idle";
 
   const submit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 320));
-    const acct = admins.find(
-      (a) => a.username.trim().toLowerCase() === username.trim().toLowerCase(),
-    );
-    if (!acct) {
-      setError(L.errNoAdmin);
-      setLoading(false);
-      return;
-    }
-    if (acct.status === "inactive") {
-      setError(L.errInactive);
-      setLoading(false);
-      return;
-    }
-    if (acct.password !== adminPass) {
-      setError(L.errPass);
-      setLoading(false);
-      return;
-    }
+    if (status !== "idle") return;
+    setStatus("submitting");
     setError("");
-    setLoading(false);
-    setRememberedUser(remember ? acct.username : "");
-    onLogin(acct.id);
+    try {
+      // Verified server-side (service-role key) — see the
+      // `verify-admin-password` Edge Function. Admin credentials matter
+      // even more than employee PINs (payroll, PII, DB settings), so this
+      // never gets checked against a plaintext copy in the browser.
+      const { data, error: fnError } = await supabase.functions.invoke(
+        "verify-admin-password",
+        { body: { username: username.trim(), password: adminPass } },
+      );
+      if (fnError || !data?.ok) {
+        if (data?.error === "inactive") setError(L.errInactive);
+        else setError(L.errPass);
+        setStatus("idle");
+        return;
+      }
+      setRememberedUser(remember ? username.trim() : "");
+      setStatus("success");
+      setTimeout(() => onLogin(data.adminId), 550);
+    } catch {
+      setError(L.errPass);
+      setStatus("idle");
+    }
   };
 
   return (
@@ -9240,125 +9392,163 @@ function AdminLoginScreen({ admins, onLogin, go }) {
       </div>
       <div className="wf-login-card-wrap">
         <div className="wf-login-card">
-          <button className="wf-login-back-btn" onClick={() => go("employee")}>
-            <ArrowLeft size={14} /> {L.back}
-          </button>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <div className="wf-login-logo">
-              {branding.logo ? (
-                <img
-                  src={branding.logo}
-                  alt={displayName}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
+          {status !== "idle" && (
+            <div className="wf-login-overlay">
+              {status === "submitting" ? (
+                <div className="wf-login-overlay-spinner-wrap">
+                  <div className="wf-login-overlay-spinner wf-login-overlay-spinner-adm" />
+                </div>
               ) : (
-                <ShieldCheck size={26} color="var(--wfl-accent)" />
+                <div className="wf-login-overlay-check-wrap">
+                  <div className="wf-login-overlay-check-ring" />
+                  <div className="wf-login-overlay-check">
+                    <Check size={22} strokeWidth={3} />
+                  </div>
+                </div>
               )}
-            </div>
-            <div className="wf-login-eyebrow">{displayName}</div>
-            <div className="wf-login-title">{L.adminTitle}</div>
-            <div className="wf-login-subtitle">{L.adminSubtitle}</div>
-          </div>
-          <div className="wf-login-divider">
-            <div className="wf-login-divider-icon">
-              <ShieldCheck size={14} />
-            </div>
-          </div>
-          <form onSubmit={submit}>
-            <LoginField label={L.username}>
-              <div className="wf-login-input-wrap">
-                <span className="wf-login-input-icon">
-                  <UserCircle2 size={17} />
-                </span>
-                <input
-                  className="wf-login-input"
-                  value={username}
-                  onChange={(e) => {
-                    setUsername(e.target.value);
-                    setError("");
-                  }}
-                  placeholder={L.usernamePlaceholder}
-                  autoFocus
-                />
+              <div className="wf-login-overlay-text">
+                {status === "submitting" ? L.signingIn : L.welcomeSuccess}
               </div>
-            </LoginField>
-            <LoginField label={L.password}>
-              <div className="wf-login-input-wrap">
-                <span className="wf-login-input-icon">
-                  <Lock size={17} />
-                </span>
-                <input
-                  className="wf-login-input wf-login-input-pw"
-                  value={adminPass}
-                  onChange={(e) => {
-                    setAdminPass(e.target.value);
-                    setError("");
-                  }}
-                  placeholder={L.passwordPlaceholder}
-                  type={showPass ? "text" : "password"}
-                />
-                <button
-                  type="button"
-                  className="wf-login-input-toggle"
-                  onClick={() => setShowPass((v) => !v)}
-                  aria-label={showPass ? L.hidePassword : L.showPassword}
-                  title={showPass ? L.hidePassword : L.showPassword}
-                >
-                  {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </LoginField>
-            <div className="wf-login-row">
-              <label className="wf-login-checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={remember}
-                  onChange={(e) => setRemember(e.target.checked)}
-                />
-                {L.rememberMe}
-              </label>
-              <button
-                type="button"
-                className="wf-login-link-btn"
-                onClick={() => pushToast(L.contactAdminMsg, "info")}
-              >
-                {L.forgotPassword}
-              </button>
             </div>
-            {error && (
-              <div className="wf-login-error">
-                <AlertCircle size={14} /> {error}
-              </div>
-            )}
+          )}
+          <div
+            className={`wf-login-form-body ${loading ? "wf-login-form-body-busy" : ""}`}
+          >
             <button
-              type="submit"
-              className="wf-login-btn wf-login-btn-adm"
+              className="wf-login-back-btn"
+              onClick={() => go("employee")}
               disabled={loading}
             >
-              {loading ? (
-                <Loader2
-                  size={16}
-                  style={{ animation: "spin 1s linear infinite" }}
-                />
-              ) : (
-                <Lock size={16} />
-              )}
-              {loading ? "..." : L.adminSubmit}
+              <ArrowLeft size={14} /> {L.back}
             </button>
-          </form>
-          <div className="wf-login-footer-note">
-            <ShieldCheck size={13} />
-            {L.secureLogin} • {L.authorizedOnly}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <div className="wf-login-logo">
+                {branding.logo ? (
+                  <img
+                    src={branding.logo}
+                    alt={displayName}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <ShieldCheck size={26} color="var(--wfl-accent)" />
+                )}
+              </div>
+              <div className="wf-login-eyebrow">{displayName}</div>
+              <div className="wf-login-title">{L.adminTitle}</div>
+              <div className="wf-login-subtitle">{L.adminSubtitle}</div>
+            </div>
+            <div className="wf-login-divider">
+              <div className="wf-login-divider-icon">
+                <ShieldCheck size={14} />
+              </div>
+            </div>
+            <form onSubmit={submit}>
+              <LoginField label={L.username}>
+                <div className="wf-login-input-wrap">
+                  <span className="wf-login-input-icon">
+                    <UserCircle2 size={17} />
+                  </span>
+                  <input
+                    className="wf-login-input"
+                    value={username}
+                    onChange={(e) => {
+                      setUsername(e.target.value);
+                      setError("");
+                    }}
+                    placeholder={L.usernamePlaceholder}
+                    autoFocus
+                    disabled={loading}
+                  />
+                </div>
+              </LoginField>
+              <LoginField label={L.password}>
+                <div className="wf-login-input-wrap">
+                  <span className="wf-login-input-icon">
+                    <Lock size={17} />
+                  </span>
+                  <input
+                    className="wf-login-input wf-login-input-pw"
+                    value={adminPass}
+                    onChange={(e) => {
+                      setAdminPass(e.target.value);
+                      setError("");
+                    }}
+                    placeholder={L.passwordPlaceholder}
+                    type={showPass ? "text" : "password"}
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    className="wf-login-input-toggle"
+                    onClick={() => setShowPass((v) => !v)}
+                    aria-label={showPass ? L.hidePassword : L.showPassword}
+                    title={showPass ? L.hidePassword : L.showPassword}
+                    disabled={loading}
+                  >
+                    {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </LoginField>
+              <div className="wf-login-row">
+                <label className="wf-login-checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={remember}
+                    onChange={(e) => setRemember(e.target.checked)}
+                    disabled={loading}
+                  />
+                  {L.rememberMe}
+                </label>
+                <button
+                  type="button"
+                  className="wf-login-link-btn"
+                  onClick={() => pushToast(L.contactAdminMsg, "info")}
+                  disabled={loading}
+                >
+                  {L.forgotPassword}
+                </button>
+              </div>
+              {error && (
+                <div className="wf-login-error">
+                  <AlertCircle size={14} /> {error}
+                </div>
+              )}
+              <button
+                type="submit"
+                className="wf-login-btn wf-login-btn-adm"
+                disabled={loading}
+              >
+                {status === "submitting" ? (
+                  <Loader2
+                    size={16}
+                    style={{ animation: "spin .8s linear infinite" }}
+                  />
+                ) : status === "success" ? (
+                  <Check size={16} strokeWidth={3} />
+                ) : (
+                  <Lock size={16} />
+                )}
+                {status === "submitting"
+                  ? L.signingIn
+                  : status === "success"
+                    ? L.welcomeSuccess
+                    : L.adminSubmit}
+              </button>
+            </form>
+            <div className="wf-login-footer-note">
+              <ShieldCheck size={13} />
+              {L.secureLogin} • {L.authorizedOnly}
+            </div>
           </div>
         </div>
       </div>
@@ -11754,6 +11944,7 @@ function Dashboard({
               setAttendance={setAttendance}
               offices={offices}
               soundPreset={soundPreset}
+              companyGraceMinutes={payrollPolicy?.lateGraceMinutes || 0}
             />
           )}
 
@@ -11778,6 +11969,7 @@ function Dashboard({
                   setAttendance={setAttendance}
                   offices={offices}
                   soundPreset={soundPreset}
+                  companyGraceMinutes={payrollPolicy?.lateGraceMinutes || 0}
                 />
               )}
             </div>
@@ -12468,9 +12660,7 @@ function attendanceRecordsForMonth(emp, attendance, monthKey, todayStr) {
   if (!y || !m) return real;
   const daysInMonth = new Date(y, m, 0).getDate();
   const isCurrentMonth = monthKey === todayStr.slice(0, 7);
-  const lastDay = isCurrentMonth
-    ? Number(todayStr.slice(8, 10))
-    : daysInMonth;
+  const lastDay = isCurrentMonth ? Number(todayStr.slice(8, 10)) : daysInMonth;
   const synthetic = [];
   for (let day = 1; day <= lastDay; day++) {
     const dateStr = `${monthKey}-${String(day).padStart(2, "0")}`;
@@ -13119,6 +13309,7 @@ function EmployeeForm({
   departments,
   shifts,
   offices,
+  currentAdmin,
   onSave,
   onCancel,
 }) {
@@ -13126,7 +13317,6 @@ function EmployeeForm({
   const [f, setF] = useState(
     initial || {
       code: "",
-      pin: randomPin(),
       name: "",
       deptId: departments[0]?.id || "",
       shiftId: shifts[0]?.id || "",
@@ -13157,6 +13347,52 @@ function EmployeeForm({
     },
   );
   const [newOffDate, setNewOffDate] = useState("");
+  // Resetting an employee's PIN is deliberately its own action, completely
+  // separate from the regular "Save" button above: it calls the
+  // `admin-reset-employee-pin` Edge Function directly (service-role key)
+  // rather than going through the normal upsert path, because the
+  // `employees.pin` column was walled off from the client's own
+  // read/write grants (see the `employees_secure` view). It also
+  // re-verifies the *acting admin's own* password, since resetting
+  // someone else's login credential is sensitive enough to deserve a
+  // fresh confirmation rather than trusting whatever session state the
+  // browser happens to be holding.
+  const [resetPinOpen, setResetPinOpen] = useState(false);
+  const [resetPinPassword, setResetPinPassword] = useState("");
+  const [resetPinBusy, setResetPinBusy] = useState(false);
+  const [resetPinError, setResetPinError] = useState("");
+  const submitResetPin = async () => {
+    if (!initial?.id || !currentAdmin?.id || !resetPinPassword.trim()) return;
+    setResetPinBusy(true);
+    setResetPinError("");
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "admin-reset-employee-pin",
+        {
+          body: {
+            adminId: currentAdmin.id,
+            adminPassword: resetPinPassword,
+            employeeId: initial.id,
+          },
+        },
+      );
+      if (error || !data?.ok) {
+        if (data?.error === "invalid_credentials")
+          setResetPinError(t.emps.pinResetErrInvalidPassword);
+        else if (data?.error === "forbidden")
+          setResetPinError(t.emps.pinResetErrForbidden);
+        else setResetPinError(t.emps.pinResetErrGeneric);
+        return;
+      }
+      setResetPinOpen(false);
+      setResetPinPassword("");
+      pushToast(t.emps.pinResetSuccess(data.newPin), "success");
+    } catch {
+      setResetPinError(t.emps.pinResetErrGeneric);
+    } finally {
+      setResetPinBusy(false);
+    }
+  };
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   const toggleWeeklyOff = (dow) => {
     const cur = f.weeklyOff || [];
@@ -13205,25 +13441,80 @@ function EmployeeForm({
           />
         </Field>
       </div>
-      <Field label={t.emps.pinLabel}>
-        <div style={{ display: "flex", gap: 8 }}>
-          <Input
-            value={f.pin}
-            onChange={set("pin")}
-            placeholder="1234"
-            maxLength={6}
-            style={{ flex: 1 }}
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setF({ ...f, pin: randomPin() })}
-          >
-            <KeyRound size={13} /> {t.emps.pinRegenerate}
-          </Button>
-        </div>
-      </Field>
+      {initial ? (
+        <Field label={t.emps.pinLabel}>
+          {!resetPinOpen ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setResetPinOpen(true);
+                setResetPinError("");
+                setResetPinPassword("");
+              }}
+            >
+              <KeyRound size={13} /> {t.emps.pinResetBtn}
+            </Button>
+          ) : (
+            <div
+              style={{
+                border: `1px solid ${T.border}`,
+                borderRadius: 10,
+                padding: 12,
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+              }}
+            >
+              <div style={{ fontSize: 12.5, color: T.muted }}>
+                {t.emps.pinResetDesc}
+              </div>
+              <Input
+                type="password"
+                value={resetPinPassword}
+                onChange={(e) => setResetPinPassword(e.target.value)}
+                placeholder={t.emps.pinResetPasswordLabel}
+                autoFocus
+              />
+              {resetPinError && (
+                <div style={{ fontSize: 12.5, color: T.roseDark }}>
+                  {resetPinError}
+                </div>
+              )}
+              <div style={{ display: "flex", gap: 8 }}>
+                <Button
+                  type="button"
+                  size="sm"
+                  disabled={!resetPinPassword.trim() || resetPinBusy}
+                  onClick={submitResetPin}
+                >
+                  {resetPinBusy ? "…" : t.emps.pinResetSubmit}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={resetPinBusy}
+                  onClick={() => {
+                    setResetPinOpen(false);
+                    setResetPinPassword("");
+                    setResetPinError("");
+                  }}
+                >
+                  {t.emps.pinResetCancel}
+                </Button>
+              </div>
+            </div>
+          )}
+        </Field>
+      ) : (
+        <Field label={t.emps.pinLabel}>
+          <div style={{ fontSize: 12.5, color: T.muted }}>
+            {t.emps.pinAutoNote}
+          </div>
+        </Field>
+      )}
       <div className="wf-grid-2">
         <Field label={t.emps.dept}>
           <Select value={f.deptId} onChange={set("deptId")}>
@@ -13692,7 +13983,7 @@ function EmployeeForm({
         <Button
           variant="accent"
           onClick={() => onSave(f)}
-          disabled={!f.name || !f.code || !f.pin}
+          disabled={!f.name || !f.code}
         >
           {t.save}
         </Button>
@@ -13928,7 +14219,10 @@ function validateImportRows(
         ? {
             id: uid("e"),
             code,
-            pin: randomPin(),
+            // No `pin` here — see the note in Employees.save() above;
+            // the employees_secure DEFAULT assigns each imported row a
+            // starting PIN, and admins set a specific one afterward via
+            // "Reset PIN" per employee.
             name,
             deptId: dept?.id || "",
             shiftId: shift?.id || "",
@@ -14293,9 +14587,23 @@ function Employees({
         : null,
       messagesDisabled: !!data.messagesDisabled,
     };
-    if (modal.mode === "add")
+    // `pin` is never part of this payload, for either add or edit. The
+    // `employees` table/view the client reads and writes through no
+    // longer exposes that column at all (see the employees_secure view
+    // migration) — sending it here would make the whole upsert fail,
+    // not just the pin part. A brand-new employee gets its starting PIN
+    // from a database DEFAULT on employees_secure.pin instead; admins set
+    // a specific PIN afterward via the dedicated "Reset PIN" action on
+    // this form (admin-reset-employee-pin, service-role, re-auth
+    // required), and employees change their own via change-employee-pin.
+    delete clean.pin;
+    if (modal.mode === "add") {
       setEmployees([...employees, { ...clean, id: uid("e") }]);
-    else setEmployees(employees.map((e) => (e.id === clean.id ? clean : e)));
+    } else {
+      setEmployees(
+        employees.map((e) => (e.id === clean.id ? { ...e, ...clean } : e)),
+      );
+    }
     setModal(null);
   };
 
@@ -14461,17 +14769,6 @@ function Employees({
                 ✉ {e.email}
               </div>
               <div>☎ {e.phone}</div>
-              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                <Lock size={11} color={T.muted} />
-                <span
-                  style={{
-                    fontFamily: "'JetBrains Mono',monospace",
-                    color: T.muted,
-                  }}
-                >
-                  PIN: {e.pin || "—"}
-                </span>
-              </div>
               <div
                 style={{
                   fontWeight: 700,
@@ -14582,6 +14879,7 @@ function Employees({
             departments={departments}
             shifts={shifts}
             offices={offices}
+            currentAdmin={currentAdmin}
             onSave={save}
             onCancel={() => setModal(null)}
           />
@@ -15719,10 +16017,10 @@ function MyTrainings({ currentEmp, trainings }) {
 /* ---------------------------------------------------------------
    Shifts (admin-configurable work shifts, e.g. morning/afternoon/night)
 ----------------------------------------------------------------*/
-function ShiftForm({ initial, onSave, onCancel }) {
+function ShiftForm({ initial, onSave, onCancel, companyGraceMinutes = 0 }) {
   const { t, lang } = useLang();
   const [f, setF] = useState(
-    initial || { name: "", start: "06:00", end: "14:00" },
+    initial || { name: "", start: "06:00", end: "14:00", graceMinutes: "" },
   );
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   return (
@@ -15742,6 +16040,28 @@ function ShiftForm({ initial, onSave, onCancel }) {
           <TimePicker value={f.end} onChange={set("end")} />
         </Field>
       </div>
+      <Field label={t.sh.graceLabel}>
+        <Input
+          type="number"
+          step="1"
+          min="0"
+          placeholder={String(companyGraceMinutes || 0)}
+          value={f.graceMinutes ?? ""}
+          onChange={set("graceMinutes")}
+        />
+      </Field>
+      <p
+        style={{
+          fontSize: 11.5,
+          color: T.muted,
+          marginTop: -6,
+          marginBottom: 14,
+        }}
+      >
+        {lang === "km"
+          ? `ទុកទទេ ដើម្បីប្រើតម្លៃលំនាំដើមរបស់ក្រុមហ៊ុន (${companyGraceMinutes || 0} នាទី)។ ចូលធ្វើការក្រោយម៉ោងចាប់ផ្តើមវេន ក្នុងរយៈពេលនេះ នៅតែចាត់ទុកថាមកទាន់ម៉ោង។`
+          : `Leave blank to use the company default (${companyGraceMinutes || 0} min). A check-in within this many minutes after the shift start still counts as on time.`}
+      </p>
       {f.end <= f.start && f.start && f.end && (
         <p
           style={{
@@ -15779,14 +16099,30 @@ function ShiftForm({ initial, onSave, onCancel }) {
   );
 }
 
-function Shifts({ shifts, setShifts, employees, isSuperAdmin }) {
+function Shifts({
+  shifts,
+  setShifts,
+  employees,
+  isSuperAdmin,
+  companyGraceMinutes = 0,
+}) {
   const { t, lang } = useLang();
   const [modal, setModal] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
   const countIn = (id) => employees.filter((e) => e.shiftId === id).length;
   const save = (data) => {
-    if (modal.mode === "add") setShifts([...shifts, { ...data, id: uid("s") }]);
-    else setShifts(shifts.map((s) => (s.id === data.id ? data : s)));
+    // "" (left blank) means "use the company default" — kept as null so it
+    // stays distinct from an explicit 0-minute override.
+    const graceMinutes =
+      data.graceMinutes === "" ||
+      data.graceMinutes === null ||
+      data.graceMinutes === undefined
+        ? null
+        : Number(data.graceMinutes) || 0;
+    const clean = { ...data, graceMinutes };
+    if (modal.mode === "add")
+      setShifts([...shifts, { ...clean, id: uid("s") }]);
+    else setShifts(shifts.map((s) => (s.id === clean.id ? clean : s)));
     setModal(null);
   };
   return (
@@ -15898,6 +16234,7 @@ function Shifts({ shifts, setShifts, employees, isSuperAdmin }) {
             initial={modal.data}
             onSave={save}
             onCancel={() => setModal(null)}
+            companyGraceMinutes={companyGraceMinutes}
           />
         </Modal>
       )}
@@ -17039,6 +17376,7 @@ function SelfPunch({
   offices,
   soundPreset,
   compact,
+  companyGraceMinutes = 0,
 }) {
   const { t, lang } = useLang();
   const today = todayStr();
@@ -17151,7 +17489,9 @@ function SelfPunch({
       // If the re-fetch fails (offline, etc.), fall back to the shift
       // already in memory rather than blocking the punch.
     }
-    const status = isLateForShift(t, effectiveShift) ? "late" : "present";
+    const status = isLateForShift(t, effectiveShift, companyGraceMinutes)
+      ? "late"
+      : "present";
     setAttendance([
       ...attendance,
       {
@@ -18805,6 +19145,7 @@ function Attendance({
   holidays,
   overtimeRequests = [],
   soundPreset,
+  payrollPolicy,
 }) {
   const { t, lang } = useLang();
   const [date, setDate] = useState(todayStr());
@@ -18897,6 +19238,7 @@ function Attendance({
           setAttendance={setAttendance}
           offices={offices}
           soundPreset={soundPreset}
+          companyGraceMinutes={payrollPolicy?.lateGraceMinutes || 0}
         />
         <Card style={{ padding: 16 }}>
           <h3
@@ -19155,7 +19497,11 @@ function Attendance({
               const otHours = approvedOtHours(emp.id);
               const lateMins =
                 rec?.status === "late"
-                  ? lateMinutesForShift(rec.checkIn, shift)
+                  ? lateMinutesForShift(
+                      rec.checkIn,
+                      shift,
+                      payrollPolicy?.lateGraceMinutes || 0,
+                    )
                   : 0;
               const officeName =
                 rec?.checkInLoc?.officeName &&
@@ -21312,7 +21658,7 @@ function OvertimePolicySettings({ otPolicy, setOtPolicy }) {
 // Lets an admin configure the tax/insurance deduction percentages applied
 // to every payslip, instead of the rates being hardcoded in computePayroll.
 function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const [open, setOpen] = useState(false);
   const [f, setF] = useState(payrollPolicy);
   useEffect(() => setF(payrollPolicy), [payrollPolicy]);
@@ -21323,6 +21669,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
       insuranceRate: Number(f.insuranceRate) || 0,
       minSalaryThreshold: Number(f.minSalaryThreshold) || 0,
       lateGraceCount: Number(f.lateGraceCount) || 0,
+      lateGraceMinutes: Number(f.lateGraceMinutes) || 0,
       lateDeductionType: f.lateDeductionType || "fixed",
       lateDeductionValue: Number(f.lateDeductionValue) || 0,
       ulDeductionType: f.ulDeductionType || "fullDay",
@@ -21433,6 +21780,9 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
               : ""}
             {Number(payrollPolicy.lateDeductionValue) > 0
               ? ` · ${t.pay.lateBadgeShort(Number(payrollPolicy.lateGraceCount) || 0)}`
+              : ""}
+            {Number(payrollPolicy.lateGraceMinutes) > 0
+              ? ` · ${lang === "km" ? "ផ្តល់" : "grace"} ${payrollPolicy.lateGraceMinutes}${lang === "km" ? "នាទី" : "m"}`
               : ""}
             {` · ${t.pay.ulBadgeShort(payrollPolicy.ulDeductionType || "fullDay")}`}
           </span>
@@ -21580,6 +21930,21 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
             <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
               {t.pay.latePolicyDesc}
             </p>
+            <div style={{ marginBottom: 12 }}>
+              <Field label={t.pay.lateGraceMinutesLabel}>
+                <Input
+                  type="number"
+                  step="1"
+                  min="0"
+                  placeholder="0"
+                  value={f.lateGraceMinutes}
+                  onChange={set("lateGraceMinutes")}
+                />
+              </Field>
+              <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+                {t.pay.lateGraceMinutesHint(Number(f.lateGraceMinutes) || 0)}
+              </p>
+            </div>
             <div className="wf-grid-2">
               <Field label={t.pay.lateGraceCountLabel}>
                 <Input
@@ -26004,7 +26369,7 @@ function OnboardingOffboarding({
    superadmin (full access, incl. deleting records and managing other
    admin accounts) and manager (day-to-day HR work, no deletes).
 ----------------------------------------------------------------*/
-function AdminAccountForm({ initial, onSave, onCancel }) {
+function AdminAccountForm({ initial, onSave, onCancel, saving }) {
   const { t, lang } = useLang();
   const [f, setF] = useState(
     initial || {
@@ -26016,6 +26381,14 @@ function AdminAccountForm({ initial, onSave, onCancel }) {
     },
   );
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  // A real password (new admin, or a reset for an existing one) never
+  // travels through the generic admins upsert anymore — it goes through
+  // admin-reset-admin-password instead, which needs the *caller's own*
+  // current password to prove who's asking (same reasoning as the
+  // employee PIN reset flow). So whenever this form actually has a new
+  // password typed in, ask for that confirmation too; it's never sent
+  // anywhere except that one Edge Function call.
+  const needsConfirm = !!(f.password || "").trim();
   return (
     <div>
       <Field label={t.admAcc.fullName}>
@@ -26034,11 +26407,43 @@ function AdminAccountForm({ initial, onSave, onCancel }) {
       </Field>
       <Field label={t.admAcc.password}>
         <Input
-          value={f.password}
+          value={f.password || ""}
           onChange={set("password")}
-          placeholder="••••••••"
+          placeholder={initial ? "••••••••" : "••••••••"}
+          autoComplete="off"
         />
       </Field>
+      {initial && (
+        <p
+          style={{
+            fontSize: 11.5,
+            color: T.muted,
+            marginTop: -10,
+            marginBottom: 14,
+          }}
+        >
+          {lang === "km"
+            ? "ទុកទទេ ដើម្បីរក្សាពាក្យសម្ងាត់ដដែល"
+            : "Leave blank to keep the current password"}
+        </p>
+      )}
+      {needsConfirm && (
+        <Field
+          label={
+            lang === "km"
+              ? "ពាក្យសម្ងាត់របស់អ្នក (សម្រាប់បញ្ជាក់)"
+              : "Your password (to confirm)"
+          }
+        >
+          <Input
+            type="password"
+            value={f.confirmPassword || ""}
+            onChange={set("confirmPassword")}
+            placeholder="••••••••"
+            autoComplete="current-password"
+          />
+        </Field>
+      )}
       <Field label={t.admAcc.roleLabel}>
         <Select value={f.role} onChange={set("role")}>
           {ADMIN_RANKS.map((rank) => (
@@ -26071,15 +26476,21 @@ function AdminAccountForm({ initial, onSave, onCancel }) {
           borderTop: `1px solid ${T.lineSoft}`,
         }}
       >
-        <Button variant="ghost" onClick={onCancel}>
+        <Button variant="ghost" onClick={onCancel} disabled={saving}>
           {t.cancel}
         </Button>
         <Button
           variant="accent"
           onClick={() => onSave(f)}
-          disabled={!f.name || !f.username || !f.password}
+          disabled={
+            !f.name ||
+            !f.username ||
+            (!initial && !f.password) ||
+            (needsConfirm && !(f.confirmPassword || "").trim()) ||
+            saving
+          }
         >
-          {t.save}
+          {saving ? (lang === "km" ? "កំពុងរក្សាទុក..." : "Saving...") : t.save}
         </Button>
       </div>
     </div>
@@ -28492,13 +28903,34 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
   const [confirmDel, setConfirmDel] = useState(null);
   const [confirmToggle, setConfirmToggle] = useState(null);
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const superadminCount = admins.filter((a) => a.role === "superadmin").length;
   const activeSuperadminCount = admins.filter(
     (a) => a.role === "superadmin" && a.status !== "inactive",
   ).length;
 
-  const save = (data) => {
+  // Resolves once the target admin's row is actually readable back from
+  // the DB (not just optimistically in local state) — admin-reset-
+  // admin-password runs with the service-role key against the real
+  // table, so for a brand-new admin we have to wait out the generic
+  // upsert this component just triggered before that lookup can find
+  // the row. Polls briefly rather than a fixed sleep, since the upsert
+  // usually lands almost immediately but network conditions vary.
+  const waitForAdminRow = async (id, attempts = 6) => {
+    for (let i = 0; i < attempts; i++) {
+      const { data } = await supabase
+        .from("admins")
+        .select("id")
+        .eq("id", id)
+        .maybeSingle();
+      if (data) return true;
+      await new Promise((r) => setTimeout(r, 400));
+    }
+    return false;
+  };
+
+  const save = async (data) => {
     const dupe = admins.find(
       (a) =>
         a.username.trim().toLowerCase() ===
@@ -28509,10 +28941,74 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
       return;
     }
     setError("");
-    if (modal.mode === "add")
-      setAdmins([...admins, { ...data, id: uid("ad") }]);
-    else setAdmins(admins.map((a) => (a.id === data.id ? { ...data } : a)));
-    setModal(null);
+    const newPassword = (data.password || "").trim();
+    const confirmPassword = (data.confirmPassword || "").trim();
+    const clean = { ...data };
+    // Neither of these ever travels through the generic admins upsert —
+    // `admins` has no password column for the client to write to at all
+    // (see the useSupabaseArray toDb/fromDb strip), and confirmPassword
+    // only ever exists to authorize the Edge Function call below.
+    delete clean.password;
+    delete clean.confirmPassword;
+
+    const targetId = modal.mode === "add" ? uid("ad") : clean.id;
+    setSaving(true);
+    try {
+      if (modal.mode === "add") {
+        setAdmins([...admins, { ...clean, id: targetId }]);
+      } else {
+        setAdmins(
+          admins.map((a) => (a.id === targetId ? { ...a, ...clean } : a)),
+        );
+      }
+
+      if (newPassword) {
+        if (modal.mode === "add") {
+          const found = await waitForAdminRow(targetId);
+          if (!found) {
+            setError(
+              lang === "km"
+                ? "គណនីត្រូវបានបង្កើត ប៉ុន្តែកំណត់ពាក្យសម្ងាត់មិនទាន់ចប់ សូមព្យាយាម Reset password ម្តងទៀត"
+                : "Account created, but setting the password timed out — try resetting it again.",
+            );
+            return;
+          }
+        }
+        const { data: fnData, error: fnError } =
+          await supabase.functions.invoke("admin-reset-admin-password", {
+            body: {
+              callerId: currentAdminId,
+              callerPassword: confirmPassword,
+              targetAdminId: targetId,
+              newPassword,
+            },
+          });
+        if (fnError || !fnData?.ok) {
+          const code = fnData?.error;
+          setError(
+            code === "invalid_credentials"
+              ? lang === "km"
+                ? "ពាក្យសម្ងាត់របស់អ្នកមិនត្រឹមត្រូវទេ — ព័ត៌មានផ្សេងទៀតត្រូវបានរក្សាទុករួចហើយ"
+                : "Your password was incorrect — the other changes were still saved."
+              : code === "forbidden"
+                ? lang === "km"
+                  ? "មានតែ Superadmin ប៉ុណ្ណោះទើបអាចប្តូរពាក្យសម្ងាត់អ្នកគ្រប់គ្រងផ្សេង"
+                  : "Only a superadmin can reset another admin's password."
+                : code === "password_too_short"
+                  ? lang === "km"
+                    ? "ពាក្យសម្ងាត់ខ្លីពេក — ត្រូវការយ៉ាងតិច ៦ តួអក្សរ"
+                    : "Password is too short — must be at least 6 characters."
+                  : lang === "km"
+                    ? "កំណត់ពាក្យសម្ងាត់មិនបានសម្រេច — ព័ត៌មានផ្សេងទៀតត្រូវបានរក្សាទុករួចហើយ"
+                    : "Setting the password failed — the other changes were still saved.",
+          );
+          return;
+        }
+      }
+      setModal(null);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const askDelete = (a) => {
@@ -28725,6 +29221,7 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
             initial={modal.data}
             onSave={save}
             onCancel={() => setModal(null)}
+            saving={saving}
           />
         </Modal>
       )}
@@ -28856,6 +29353,7 @@ function MyProfile({
   });
   const [pinError, setPinError] = useState("");
   const [pinSaved, setPinSaved] = useState(false);
+  const [pinBusy, setPinBusy] = useState(false);
 
   const deptName =
     departments.find((d) => d.id === currentEmp.deptId)?.name || "—";
@@ -28912,28 +29410,61 @@ function MyProfile({
     setSaved(true);
   };
 
-  const savePin = () => {
+  // PIN changes are verified and written server-side by the
+  // `change-employee-pin` Edge Function (service-role key), not compared
+  // against a locally-cached `currentEmp.pin` — see that function's own
+  // comment for why. Only the format checks (length, confirmation match)
+  // stay client-side, since those don't need the real stored PIN.
+  const savePin = async () => {
     setPinSaved(false);
-    if ((currentEmp.pin || "") !== pinForm.current.trim()) {
-      setPinError(t.profile.pinWrongCurrent);
-      return;
-    }
-    if (!pinForm.next.trim() || pinForm.next.trim().length < 4) {
+    setPinError("");
+    const current = pinForm.current.trim();
+    const next = pinForm.next.trim();
+    const confirm = pinForm.confirm.trim();
+    if (!next || next.length < 4) {
       setPinError(t.profile.pinTooShort);
       return;
     }
-    if (pinForm.next.trim() !== pinForm.confirm.trim()) {
+    if (next !== confirm) {
       setPinError(t.profile.pinMismatch);
       return;
     }
-    setPinError("");
-    setEmployees(
-      employees.map((e) =>
-        e.id === currentEmp.id ? { ...e, pin: pinForm.next.trim() } : e,
-      ),
-    );
-    setPinForm({ current: "", next: "", confirm: "" });
-    setPinSaved(true);
+    setPinBusy(true);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "change-employee-pin",
+        {
+          body: {
+            employeeId: currentEmp.id,
+            currentPin: current,
+            newPin: next,
+          },
+        },
+      );
+      if (error || !data?.ok) {
+        const code = data?.error;
+        if (code === "wrong_current_pin")
+          setPinError(t.profile.pinWrongCurrent);
+        else if (code === "pin_too_short") setPinError(t.profile.pinTooShort);
+        else
+          setPinError(
+            `${t.settings.saveFailed} ${error?.message || code || ""}`.trim(),
+          );
+        return;
+      }
+      // The Edge Function already wrote the new PIN server-side (service-
+      // role key) — nothing here needs to touch local `employees` state.
+      // Login no longer checks a client-held `pin` either (see
+      // verify-employee-pin), and re-adding it to local state would just
+      // reintroduce the plaintext-PIN-in-the-browser exposure we removed
+      // from fromDb, plus fire a redundant anon-key write.
+      setPinForm({ current: "", next: "", confirm: "" });
+      setPinSaved(true);
+    } catch (err) {
+      setPinError(`${t.settings.saveFailed} ${err?.message || ""}`.trim());
+    } finally {
+      setPinBusy(false);
+    }
   };
 
   return (
@@ -29095,6 +29626,8 @@ function MyProfile({
             type="password"
             inputMode="numeric"
             maxLength={6}
+            autoComplete="off"
+            name="wf-current-pin"
             value={pinForm.current}
             onChange={(e) => {
               setPinForm({ ...pinForm, current: e.target.value });
@@ -29107,6 +29640,8 @@ function MyProfile({
             type="password"
             inputMode="numeric"
             maxLength={6}
+            autoComplete="off"
+            name="wf-new-pin"
             value={pinForm.next}
             onChange={(e) => {
               setPinForm({ ...pinForm, next: e.target.value });
@@ -29119,6 +29654,8 @@ function MyProfile({
             type="password"
             inputMode="numeric"
             maxLength={6}
+            autoComplete="off"
+            name="wf-confirm-pin"
             value={pinForm.confirm}
             onChange={(e) => {
               setPinForm({ ...pinForm, confirm: e.target.value });
@@ -29145,7 +29682,7 @@ function MyProfile({
             <CheckCircle2 size={14} /> {t.profile.pinChanged}
           </p>
         )}
-        <Button variant="accent" onClick={savePin}>
+        <Button variant="accent" onClick={savePin} disabled={pinBusy}>
           {t.profile.changePin}
         </Button>
       </Card>
@@ -34507,7 +35044,16 @@ function AppInner() {
       fromDb: (r) => ({
         id: r.id,
         code: r.code,
-        pin: r.pin,
+        // `pin` is deliberately NOT mapped here. Loading it into every
+        // session's `employees` array is exactly the exposure the
+        // verify-employee-pin / change-employee-pin Edge Functions were
+        // written to close (see their own comments) — anyone with
+        // devtools open on the (unauthenticated) login page could
+        // otherwise read every employee's PIN in plaintext. The few
+        // places that legitimately set a PIN (creating an employee,
+        // typing a new one in the edit form, or the employee's own
+        // "change PIN" screen) all write it without ever needing to
+        // read the existing value back into the browser first.
         name: r.name,
         deptId: r.dept_id,
         shiftId: r.shift_id,
@@ -34559,7 +35105,12 @@ function AppInner() {
       toDb: (r) => ({
         id: r.id,
         code: r.code,
-        pin: r.pin,
+        // `pin` is deliberately never sent here — the employees view this
+        // upserts against no longer exposes that column at all (see
+        // employees_secure). Resetting it goes through the dedicated
+        // admin-reset-employee-pin / change-employee-pin Edge Functions
+        // instead, both service-role, both bypassing this upsert path
+        // entirely.
         name: r.name,
         dept_id: r.deptId,
         shift_id: r.shiftId,
@@ -34614,6 +35165,30 @@ function AppInner() {
   const [shifts, setShifts, shReady] = useSupabaseArray("shifts", {
     audit: true,
     actorRef,
+    // graceMinutes: per-shift override (minutes) for how late a check-in
+    // can be before it's marked "late" — null means "use the company-wide
+    // default" (payroll_policy.late_grace_minutes), so it's kept distinct
+    // from an explicit 0-minute override. See isLateForShift.
+    fromDb: (r) => ({
+      id: r.id,
+      name: r.name,
+      start: r.start,
+      end: r.end,
+      graceMinutes:
+        r.grace_minutes === null || r.grace_minutes === undefined
+          ? null
+          : Number(r.grace_minutes),
+    }),
+    toDb: (r) => ({
+      id: r.id,
+      name: r.name,
+      start: r.start,
+      end: r.end,
+      grace_minutes:
+        r.graceMinutes === null || r.graceMinutes === undefined
+          ? null
+          : Number(r.graceMinutes),
+    }),
   });
   // One row per (employee, date) — which shift that employee is scheduled
   // to work on that specific day, on top of the shift *types* above. Not
@@ -34686,7 +35261,11 @@ function AppInner() {
       if (type === "create" && row.status === "late") {
         const emp = employees.find((e) => e.id === row.employeeId);
         const empShift = shifts.find((s) => s.id === emp?.shiftId);
-        const mins = lateMinutesForShift(row.checkIn, empShift);
+        const mins = lateMinutesForShift(
+          row.checkIn,
+          empShift,
+          payrollPolicy?.lateGraceMinutes || 0,
+        );
         const lateLabel = formatLateDuration(mins, "km"); // e.g. "មកយឺត 4 ម៉ោង 49 នាទី"
         return {
           userType: "admin",
@@ -35223,6 +35802,27 @@ function AppInner() {
   const [admins, setAdmins, adminsReady, adminsSaveError] = useSupabaseArray(
     "admins",
     {
+      // Strip `password` on the way in — same reasoning as employees.pin
+      // (see that fromDb's comment): admin login is verified server-side
+      // by verify-admin-password now, so nothing in the browser needs the
+      // real value. Resetting one (AdminAccountForm) writes a fresh value
+      // without ever reading the old one back first.
+      fromDb: (r) => {
+        const { password, ...rest } = r;
+        return rest;
+      },
+      // Strip `password` on the way out too — `admins` no longer has
+      // that column at all (see fromDb above), so an upsert that still
+      // carries it (e.g. AdminAccounts.save() keeping it when the admin
+      // typed a new one) fails the whole row with "Could not find the
+      // 'password' column of 'admins' in the schema cache", blocking
+      // even unrelated edits like status toggle / role change on that
+      // same row. Actually setting a new password has to go through
+      // admin-reset-admin-password instead, which writes admins_secure.
+      toDb: (r) => {
+        const { password, ...rest } = r;
+        return rest;
+      },
       audit: true,
       actorRef,
       entityLabel: (r) => r.name || r.username || r.id,
@@ -36319,6 +36919,7 @@ function AppInner() {
                   setShifts={setShifts}
                   employees={employees}
                   isSuperAdmin={isSuperAdmin || can("manageDepartments")}
+                  companyGraceMinutes={payrollPolicy?.lateGraceMinutes || 0}
                 />
               )}
               {page === "roster" &&
@@ -36389,6 +36990,7 @@ function AppInner() {
                     holidays={holidays}
                     overtimeRequests={overtimeRequests}
                     soundPreset={soundPolicy.preset}
+                    payrollPolicy={payrollPolicy}
                   />
                 )}
               {page === "holidays" && role === "admin" && (
