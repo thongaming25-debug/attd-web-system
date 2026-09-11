@@ -152,6 +152,8 @@ const LANG_RAW = {
       leave: "ច្បាប់ឈប់សម្រាក",
       overtime: "ការងារបន្ថែម (OT)",
       payroll: "ប្រាក់ខែ",
+      payrollAdj: "ប្រាក់ខ្ចី & រង្វាន់",
+      budget: "ផែនការថវិកា",
       performance: "ការវាយតម្លៃការងារ",
       attCorrection: "សំណើកែតម្រូវវត្តមាន",
       shiftSwap: "សំណើដូរវេន",
@@ -166,6 +168,7 @@ const LANG_RAW = {
       myLeave: "ច្បាប់ឈប់សម្រាករបស់ខ្ញុំ",
       myOvertime: "ការងារបន្ថែម (OT) របស់ខ្ញុំ",
       myPayroll: "ប្រាក់ខែរបស់ខ្ញុំ",
+      myPayrollAdj: "ប្រាក់ខ្ចី & រង្វាន់របស់ខ្ញុំ",
       myPerformance: "ការវាយតម្លៃការងាររបស់ខ្ញុំ",
       myTraining: "ការបណ្តុះបណ្តាល & សញ្ញាបត្ររបស់ខ្ញុំ",
       myDocuments: "ឯកសាររបស់ខ្ញុំ",
@@ -186,6 +189,7 @@ const LANG_RAW = {
       leave: "ស្នើសុំ និងតាមដានច្បាប់ឈប់សម្រាក",
       ot: "សំណើ និងកំណត់ត្រា OT",
       payroll: "មើលប្រាក់ខែ និងការទូទាត់",
+      payrollAdj: "ស្នើសុំប្រាក់ខ្ចី ឬមើលប្រាក់រង្វាន់របស់អ្នក",
       review: "ការវាយតម្លៃ និងមតិត្រឡប់",
       training: "ការបណ្តុះបណ្តាល និងសញ្ញាបត្ររបស់អ្នក",
       attcorr: "ស្នើសុំកែតម្រូវវត្តមាន",
@@ -607,6 +611,7 @@ const LANG_RAW = {
       startLabel: "ម៉ោងចូល",
       endLabel: "ម៉ោងចេញ",
       graceLabel: "ផ្តល់ (នាទី)",
+      breakLabel: "ម៉ោងសម្រាក (នាទី)",
       confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបវេននេះ?",
       noShift: "មិនទាន់មានវេនទេ",
       assignedEmp: "បុគ្គលិកប្រើវេននេះ",
@@ -1128,6 +1133,63 @@ const LANG_RAW = {
       noRequest: "មិនទាន់មានសំណើកែតម្រូវវត្តមានទេ",
       needOneField: "សូមបញ្ចូលម៉ោងចូល ឬម៉ោងចេញ យ៉ាងហោចណាស់មួយ",
     },
+    adj: {
+      pageTitle: "ប្រាក់ខ្ចី & ប្រាក់រង្វាន់",
+      addBtn: "ស្នើសុំប្រាក់ខ្ចី/រង្វាន់",
+      addBtnAdmin: "បន្ថែមប្រតិបត្តិការ",
+      addTitle: "បន្ថែមប្រតិបត្តិការប្រាក់ខែ",
+      editTitle: "កែប្រតិបត្តិការប្រាក់ខែ",
+      type: "ប្រភេទ",
+      typeAdvance: "ប្រាក់ខ្ចី/បុរេប្រទាន",
+      typeBonus: "ប្រាក់រង្វាន់",
+      typeCommission: "កម្រៃជើងសារ",
+      employee: "បុគ្គលិក",
+      amount: "ចំនួនទឹកប្រាក់ ($)",
+      amountPlaceholder: "0.00",
+      installments: "ចំនួនខែកាត់ដក",
+      installmentsHint:
+        "សម្រាប់ប្រាក់ខ្ចីតែប៉ុណ្ណោះ — ប្រាក់ខ្ចីនឹងកាត់ស្មើៗគ្នារាល់ខែ",
+      installmentAmount: "កាត់ប្រចាំខែ",
+      effectiveMonth: "ខែចាប់ផ្តើមអនុវត្ត",
+      reason: "មូលហេតុ / កំណត់ចំណាំ",
+      reasonPlaceholder:
+        "ឧ. ប្រាក់ខ្ចីសម្រាប់សុខភាព, រង្វាន់លើកទឹកចិត្តខែនេះ...",
+      status: "ស្ថានភាព",
+      approve: "អនុម័ត",
+      reject: "បដិសេធ",
+      approvedBy: "អនុម័តដោយ",
+      rejectedBy: "បដិសេធដោយ",
+      rejectTitle: "បដិសេធសំណើ",
+      rejectReason: "មូលហេតុបដិសេធ",
+      rejectReasonPlaceholder: "សូមបញ្ជាក់មូលហេតុបដិសេធ...",
+      rejectReasonRequired: "សូមបញ្ចូលមូលហេតុបដិសេធ",
+      confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបប្រតិបត្តិការនេះ?",
+      noRequest: "មិនទាន់មានប្រតិបត្តិការទេ",
+      remainingBalance: "នៅសល់ត្រូវកាត់",
+      fullyPaid: "កាត់ដកចប់ហើយ",
+      grantedByAdmin: "បង្កើតដោយអ្នកគ្រប់គ្រង (អនុម័តភ្លាម)",
+      monthOf: "ខែ",
+      of: "នៃ",
+    },
+    budget: {
+      pageTitle: "ផែនការថវិកាប្រាក់ខែ",
+      addBtn: "កំណត់ថវិកា",
+      addTitle: "កំណត់ថវិកាសម្រាប់នាយកដ្ឋាន",
+      editTitle: "កែថវិកា",
+      department: "នាយកដ្ឋាន",
+      month: "ខែ",
+      budgetedAmount: "ថវិកាកំណត់ ($)",
+      actualAmount: "ចំណាយពិតប្រាកដ ($)",
+      variance: "ភាពខុសគ្នា",
+      overBudget: "លើសថវិកា",
+      underBudget: "ក្រោមថវិកា",
+      onBudget: "ត្រឹមថវិកា",
+      note: "កំណត់ចំណាំ",
+      notePlaceholder: "ឧ. រួមទាំងផែនការជួលបុគ្គលិកថ្មី...",
+      confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបថវិកានេះ?",
+      noBudget: "មិនទាន់បានកំណត់ថវិកាសម្រាប់ខែនេះទេ",
+      employeeCount: "ចំនួនបុគ្គលិក",
+    },
     ss: {
       addBtn: "ស្នើសុំដូរវេន",
       date: "ថ្ងៃចង់ឱ្យប្តូរចូលជាធរមាន",
@@ -1472,6 +1534,8 @@ const LANG_RAW = {
       leave: "Leave Requests",
       overtime: "Overtime (OT)",
       payroll: "Payroll",
+      payrollAdj: "Advances & Bonuses",
+      budget: "Budget Planning",
       performance: "Performance Reviews",
       attCorrection: "Attendance Corrections",
       shiftSwap: "Shift Swap Requests",
@@ -1486,6 +1550,7 @@ const LANG_RAW = {
       myLeave: "My Leave",
       myOvertime: "My Overtime (OT)",
       myPayroll: "My Payroll",
+      myPayrollAdj: "My Advances & Bonuses",
       myPerformance: "My Performance Reviews",
       myTraining: "My Training & Certifications",
       myDocuments: "My Documents",
@@ -1506,6 +1571,7 @@ const LANG_RAW = {
       leave: "Request and track your leave",
       ot: "Overtime requests and records",
       payroll: "View salary and payments",
+      payrollAdj: "Request an advance or view your bonuses",
       review: "Reviews and feedback",
       training: "Your training and certificates",
       attcorr: "Request attendance corrections",
@@ -1929,6 +1995,7 @@ const LANG_RAW = {
       startLabel: "Start Time",
       endLabel: "End Time",
       graceLabel: "Grace (minutes)",
+      breakLabel: "Break (minutes)",
       confirmDel: "Are you sure you want to delete this shift?",
       noShift: "No shifts yet",
       assignedEmp: "Employees using this shift",
@@ -2449,6 +2516,63 @@ const LANG_RAW = {
       confirmDel: "Are you sure you want to delete this request?",
       noRequest: "No correction requests yet",
       needOneField: "Please enter at least a check-in or check-out time",
+    },
+    adj: {
+      pageTitle: "Advances & Bonuses",
+      addBtn: "Request Advance/Bonus",
+      addBtnAdmin: "Add Transaction",
+      addTitle: "Add Salary Transaction",
+      editTitle: "Edit Salary Transaction",
+      type: "Type",
+      typeAdvance: "Salary Advance/Loan",
+      typeBonus: "Bonus",
+      typeCommission: "Commission",
+      employee: "Employee",
+      amount: "Amount ($)",
+      amountPlaceholder: "0.00",
+      installments: "Deduct over (months)",
+      installmentsHint:
+        "Advances only — the amount is deducted in equal installments each month",
+      installmentAmount: "Monthly deduction",
+      effectiveMonth: "Starting month",
+      reason: "Reason / Note",
+      reasonPlaceholder:
+        "e.g. Advance for medical expense, this month's incentive...",
+      status: "Status",
+      approve: "Approve",
+      reject: "Reject",
+      approvedBy: "Approved by",
+      rejectedBy: "Rejected by",
+      rejectTitle: "Reject Request",
+      rejectReason: "Rejection Reason",
+      rejectReasonPlaceholder: "Please state the rejection reason...",
+      rejectReasonRequired: "Please enter a rejection reason",
+      confirmDel: "Are you sure you want to delete this transaction?",
+      noRequest: "No transactions yet",
+      remainingBalance: "Remaining balance",
+      fullyPaid: "Fully deducted",
+      grantedByAdmin: "Created by admin (auto-approved)",
+      monthOf: "Month",
+      of: "of",
+    },
+    budget: {
+      pageTitle: "Payroll Budget Planning",
+      addBtn: "Set Budget",
+      addTitle: "Set Department Budget",
+      editTitle: "Edit Budget",
+      department: "Department",
+      month: "Month",
+      budgetedAmount: "Budgeted Amount ($)",
+      actualAmount: "Actual Spend ($)",
+      variance: "Variance",
+      overBudget: "Over budget",
+      underBudget: "Under budget",
+      onBudget: "On budget",
+      note: "Note",
+      notePlaceholder: "e.g. Includes planned new hires...",
+      confirmDel: "Are you sure you want to delete this budget?",
+      noBudget: "No budget set for this month yet",
+      employeeCount: "Employees",
     },
     ss: {
       addBtn: "Request Shift Swap",
@@ -3699,6 +3823,7 @@ const EMPLOYEE_MODULES = [
   "leave",
   "ot",
   "payroll",
+  "payrollAdj",
   "review",
   "training",
   "attcorr",
@@ -3716,6 +3841,7 @@ const EMPLOYEE_MODULE_LABEL = {
     leave: "សំណើច្បាប់ឈប់សម្រាក",
     ot: "ម៉ោងបន្ថែម (OT)",
     payroll: "ប្រាក់ខែផ្ទាល់ខ្លួន",
+    payrollAdj: "ប្រាក់ខ្ចី & រង្វាន់",
     review: "ការវាយតម្លៃការងារ",
     training: "ការបណ្តុះបណ្តាល & សញ្ញាបត្រ",
     attcorr: "សំណើកែតម្រូវវត្តមាន",
@@ -3732,6 +3858,7 @@ const EMPLOYEE_MODULE_LABEL = {
     leave: "My Leave",
     ot: "My Overtime (OT)",
     payroll: "My Payroll",
+    payrollAdj: "Advances & Bonuses",
     review: "My Performance Reviews",
     training: "My Training & Certifications",
     attcorr: "Attendance Correction",
@@ -3767,6 +3894,7 @@ const DEFAULT_EMPLOYEE_MODULES = {
   leave: true,
   ot: true,
   payroll: true,
+  payrollAdj: true,
   review: true,
   training: true,
   attcorr: true,
@@ -4838,6 +4966,19 @@ function effectiveGraceMinutes(shift, companyGraceMinutes = 0) {
     ? Number(companyGraceMinutes) || 0
     : Number(shiftOverride) || 0;
 }
+// Same idea as effectiveGraceMinutes, but for the unpaid break
+// (lunch/rest) subtracted from worked hours and OT hours. A shift's
+// own breakMinutes override (0 is valid — e.g. a night shift with no
+// break) wins; otherwise falls back to the company-wide OT policy
+// default.
+function effectiveBreakMinutes(shift, companyBreakMinutes = 0) {
+  const shiftOverride = shift
+    ? (shift.breakMinutes ?? shift.break_minutes)
+    : null;
+  return shiftOverride === null || shiftOverride === undefined
+    ? Number(companyBreakMinutes) || 0
+    : Number(shiftOverride) || 0;
+}
 // Determines whether a check-in time counts as late for a given shift.
 // Overnight shifts (e.g. 22:00–06:00) wrap past midnight, so a check-in is
 // only compared against the shift's start time, not the end. A grace
@@ -5343,6 +5484,52 @@ function computeOvertimeForMonth(emp, overtimeRequests, mk, otPolicy) {
 // Computes payroll figures for one employee for a given month, factoring in
 // unpaid absences recorded in attendance and approved OT requests. Leave is
 // paid and does not deduct; OT pay is added on top of net salary.
+// Number of whole months between two "YYYY-MM" strings (to - from).
+// Negative if `to` is before `from`. Used to figure out which
+// installment number of a salary advance a given payroll month falls on.
+function monthKeyDiff(fromMk, toMk) {
+  if (!fromMk || !toMk) return 0;
+  const [fy, fm] = fromMk.split("-").map(Number);
+  const [ty, tm] = toMk.split("-").map(Number);
+  return (ty - fy) * 12 + (tm - fm);
+}
+// Rolls up every APPROVED salary_adjustments row (advances/loans and
+// bonuses/commissions — see SalaryAdjustments component) that affects a
+// given employee's pay for a given month `mk`. Bonuses/commissions land
+// entirely in their configured effectiveMonth; advances are spread in
+// equal installments starting at effectiveMonth, so this figures out
+// which installment (if any) falls in `mk` and how much of the original
+// amount is still outstanding going into that installment.
+function salaryAdjustmentEffect(employeeId, adjustments, mk) {
+  let bonusTotal = 0;
+  let advanceDeduction = 0;
+  const advanceDetails = [];
+  (adjustments || [])
+    .filter((a) => a.employeeId === employeeId && a.status === "approved")
+    .forEach((a) => {
+      if (!a.effectiveMonth) return;
+      const amount = Number(a.amount) || 0;
+      if (a.type === "bonus" || a.type === "commission") {
+        if (a.effectiveMonth === mk) bonusTotal += amount;
+      } else if (a.type === "advance") {
+        const installments = Math.max(1, Number(a.installments) || 1);
+        const perInstallment = amount / installments;
+        const idx = monthKeyDiff(a.effectiveMonth, mk); // 0-based
+        if (idx >= 0 && idx < installments) {
+          advanceDeduction += perInstallment;
+          advanceDetails.push({
+            id: a.id,
+            reason: a.reason,
+            installmentNo: idx + 1,
+            installments,
+            installmentAmount: perInstallment,
+            remainingAfter: amount - perInstallment * (idx + 1),
+          });
+        }
+      }
+    });
+  return { bonusTotal, advanceDeduction, advanceDetails };
+}
 function computePayroll(
   emp,
   attendance,
@@ -5350,12 +5537,14 @@ function computePayroll(
   overtimeRequests = [],
   otPolicy,
   payrollPolicy,
+  adjustments = [],
 ) {
   const policy = payrollPolicy || DEFAULT_PAYROLL_POLICY;
   const { absentDays, leaveDays, lateDays, unpaidLeaveDays } =
     monthAttendanceStats(attendance, emp.id, mk);
   const dailyRate = emp.salary / WORKING_DAYS_PER_MONTH;
   // Unauthorized absences always dock a full day's pay at the daily rate.
+
   const absenceDeduction = Math.min(emp.salary, absentDays * dailyRate);
   // Approved Unpaid Leave (UL) is docked per the UL policy in effect:
   // "fullDay" (default, same as before) docks a full day's pay per UL
@@ -5475,7 +5664,16 @@ function computePayroll(
     mk,
     otPolicy,
   );
-  const net = adjustedBase - tax - insurance + otPay - lateDeduction;
+  const { bonusTotal, advanceDeduction, advanceDetails } =
+    salaryAdjustmentEffect(emp.id, adjustments, mk);
+  const net =
+    adjustedBase -
+    tax -
+    insurance +
+    otPay -
+    lateDeduction +
+    bonusTotal -
+    advanceDeduction;
   return {
     absentDays,
     leaveDays,
@@ -5506,6 +5704,9 @@ function computePayroll(
     khmer,
     otHours,
     otPay,
+    bonusTotal,
+    advanceDeduction,
+    advanceDetails,
     net,
   };
 }
@@ -8651,8 +8852,24 @@ function parseHM(s) {
 function fmtHM(h, m) {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
-const TP_HOURS = Array.from({ length: 24 }, (_, i) => i);
+const TP_HOURS = Array.from({ length: 12 }, (_, i) => i + 1);
 const TP_MINUTES = Array.from({ length: 60 }, (_, i) => i);
+const TP_PERIODS = ["AM", "PM"];
+// 24h hour (0-23) -> { h12: 1-12, period: "AM"|"PM" }, for driving the
+// picker's selection state from a stored 24h value.
+function to12Hour(h24) {
+  const period = h24 >= 12 ? "PM" : "AM";
+  let h12 = h24 % 12;
+  if (h12 === 0) h12 = 12;
+  return { h12, period };
+}
+// { h12: 1-12, period } -> 24h hour (0-23), for converting the picker's
+// selection back to the 24h "HH:MM" value the rest of the app expects.
+function to24Hour(h12, period) {
+  let h = h12 % 12;
+  if (period === "PM") h += 12;
+  return h;
+}
 
 function TimePicker({ value, onChange, placeholder, style, disabled }) {
   const { t } = useLang();
@@ -8660,26 +8877,35 @@ function TimePicker({ value, onChange, placeholder, style, disabled }) {
   const wrapRef = useRef(null);
   const hourColRef = useRef(null);
   const minColRef = useRef(null);
+  const periodColRef = useRef(null);
   const parsed = parseHM(value);
+  const sel = parsed ? to12Hour(parsed.h) : to12Hour(9);
+  const selH12 = sel.h12;
+  const selPeriod = sel.period;
+  const selM = parsed ? parsed.m : 0;
   useCloseOnOutside(wrapRef, () => setOpen(false));
 
   useEffect(() => {
     if (!open) return;
-    const h = parsed ? parsed.h : 9;
-    const m = parsed ? parsed.m : 0;
     requestAnimationFrame(() => {
       hourColRef.current
-        ?.querySelector(`[data-v="${h}"]`)
+        ?.querySelector(`[data-v="${selH12}"]`)
         ?.scrollIntoView({ block: "center" });
       minColRef.current
-        ?.querySelector(`[data-v="${m}"]`)
+        ?.querySelector(`[data-v="${selM}"]`)
+        ?.scrollIntoView({ block: "center" });
+      periodColRef.current
+        ?.querySelector(`[data-v="${selPeriod}"]`)
         ?.scrollIntoView({ block: "center" });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const fire = (h, m) =>
-    onChange && onChange({ target: { value: fmtHM(h, m) } });
+  // h12 (1-12) + period ("AM"/"PM") + minute -> fires the 24h "HH:MM"
+  // string the rest of the app (attendance, shifts, etc.) expects.
+  const fire = (h12, period, m) =>
+    onChange &&
+    onChange({ target: { value: fmtHM(to24Hour(h12, period), m) } });
 
   return (
     <div className="wf-dp-wrap" ref={wrapRef} style={style}>
@@ -8691,7 +8917,7 @@ function TimePicker({ value, onChange, placeholder, style, disabled }) {
         style={disabled ? { opacity: 0.6, cursor: "not-allowed" } : undefined}
       >
         <span className={value ? "" : "wf-dp-placeholder"}>
-          {value || placeholder || t.timeLabel}
+          {value ? hhmm(value) : placeholder || t.timeLabel}
         </span>
         <Clock size={15} style={{ opacity: 0.55, flexShrink: 0 }} />
       </button>
@@ -8704,12 +8930,10 @@ function TimePicker({ value, onChange, placeholder, style, disabled }) {
                 <div
                   key={h}
                   data-v={h}
-                  className={`wf-tp-item${
-                    parsed && parsed.h === h ? " selected" : ""
-                  }`}
-                  onClick={() => fire(h, parsed ? parsed.m : 0)}
+                  className={`wf-tp-item${selH12 === h ? " selected" : ""}`}
+                  onClick={() => fire(h, selPeriod, selM)}
                 >
-                  {String(h).padStart(2, "0")}
+                  {h}
                 </div>
               ))}
               <div className="wf-tp-pad" />
@@ -8721,12 +8945,24 @@ function TimePicker({ value, onChange, placeholder, style, disabled }) {
                 <div
                   key={m}
                   data-v={m}
-                  className={`wf-tp-item${
-                    parsed && parsed.m === m ? " selected" : ""
-                  }`}
-                  onClick={() => fire(parsed ? parsed.h : 9, m)}
+                  className={`wf-tp-item${selM === m ? " selected" : ""}`}
+                  onClick={() => fire(selH12, selPeriod, m)}
                 >
                   {String(m).padStart(2, "0")}
+                </div>
+              ))}
+              <div className="wf-tp-pad" />
+            </div>
+            <div className="wf-tp-col" ref={periodColRef}>
+              <div className="wf-tp-pad" />
+              {TP_PERIODS.map((p) => (
+                <div
+                  key={p}
+                  data-v={p}
+                  className={`wf-tp-item${selPeriod === p ? " selected" : ""}`}
+                  onClick={() => fire(selH12, p, selM)}
+                >
+                  {p}
                 </div>
               ))}
               <div className="wf-tp-pad" />
@@ -8748,7 +8984,8 @@ function TimePicker({ value, onChange, placeholder, style, disabled }) {
               className="wf-dp-link"
               onClick={() => {
                 const now = new Date();
-                fire(now.getHours(), now.getMinutes());
+                const now12 = to12Hour(now.getHours());
+                fire(now12.h12, now12.period, now.getMinutes());
                 setOpen(false);
               }}
             >
@@ -10529,6 +10766,10 @@ function Dashboard({
         const workMins = workedMinutes(
           myTodayRecord?.checkIn,
           myTodayRecord?.checkOut,
+          effectiveBreakMinutes(
+            myShift,
+            otPolicy?.breakMinutes ?? DEFAULT_OT_POLICY.breakMinutes,
+          ),
         );
         const todayOtHours = (overtimeRequests || [])
           .filter(
@@ -16113,12 +16354,28 @@ function MyTrainings({ currentEmp, trainings }) {
 /* ---------------------------------------------------------------
    Shifts (admin-configurable work shifts, e.g. morning/afternoon/night)
 ----------------------------------------------------------------*/
-function ShiftForm({ initial, onSave, onCancel, companyGraceMinutes = 0 }) {
+function ShiftForm({
+  initial,
+  onSave,
+  onCancel,
+  companyGraceMinutes = 0,
+  companyBreakMinutes = 0,
+}) {
   const { t, lang } = useLang();
   const [f, setF] = useState(
-    initial || { name: "", start: "06:00", end: "14:00", graceMinutes: "" },
+    initial || {
+      name: "",
+      start: "06:00",
+      end: "14:00",
+      // Grace is now set explicitly per shift (no more company-wide
+      // default in Settings), so a brand new shift starts pre-filled
+      // with a sensible value instead of blank.
+      graceMinutes: companyGraceMinutes || 15,
+      breakMinutes: "",
+    },
   );
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const graceInvalid = f.graceMinutes === "" || f.graceMinutes === null;
   return (
     <div>
       <Field label={t.sh.nameLabel}>
@@ -16136,16 +16393,27 @@ function ShiftForm({ initial, onSave, onCancel, companyGraceMinutes = 0 }) {
           <TimePicker value={f.end} onChange={set("end")} />
         </Field>
       </div>
-      <Field label={t.sh.graceLabel}>
-        <Input
-          type="number"
-          step="1"
-          min="0"
-          placeholder={String(companyGraceMinutes || 0)}
-          value={f.graceMinutes ?? ""}
-          onChange={set("graceMinutes")}
-        />
-      </Field>
+      <div className="wf-grid-2">
+        <Field label={t.sh.graceLabel}>
+          <Input
+            type="number"
+            step="1"
+            min="0"
+            value={f.graceMinutes ?? ""}
+            onChange={set("graceMinutes")}
+          />
+        </Field>
+        <Field label={t.sh.breakLabel}>
+          <Input
+            type="number"
+            step="1"
+            min="0"
+            placeholder={String(companyBreakMinutes || 0)}
+            value={f.breakMinutes ?? ""}
+            onChange={set("breakMinutes")}
+          />
+        </Field>
+      </div>
       <p
         style={{
           fontSize: 11.5,
@@ -16155,8 +16423,8 @@ function ShiftForm({ initial, onSave, onCancel, companyGraceMinutes = 0 }) {
         }}
       >
         {lang === "km"
-          ? `ទុកទទេ ដើម្បីប្រើតម្លៃលំនាំដើមរបស់ក្រុមហ៊ុន (${companyGraceMinutes || 0} នាទី)។ ចូលធ្វើការក្រោយម៉ោងចាប់ផ្តើមវេន ក្នុងរយៈពេលនេះ នៅតែចាត់ទុកថាមកទាន់ម៉ោង។`
-          : `Leave blank to use the company default (${companyGraceMinutes || 0} min). A check-in within this many minutes after the shift start still counts as on time.`}
+          ? `ម៉ោងអនុគ្រោះ (Grace) ត្រូវកំណត់ដាច់ដោយឡែកសម្រាប់វេននេះ — ចូលធ្វើការក្រោយម៉ោងចាប់ផ្តើមវេន ក្នុងរយៈពេលនេះ នៅតែចាត់ទុកថាមកទាន់ម៉ោង។ ចំណែកម៉ោងសម្រាក បើទុកទទេ នឹងប្រើលំនាំដើមរបស់ក្រុមហ៊ុន (${companyBreakMinutes || 0} នាទី) ហើយនឹងកាត់ចេញពី Work Hours និង OT។`
+          : `Grace is now set per shift — a check-in within this many minutes after the shift start still counts as on time. Break is optional; leave it blank to use the company default (${companyBreakMinutes || 0} min), subtracted from Work Hours and OT.`}
       </p>
       {f.end <= f.start && f.start && f.end && (
         <p
@@ -16186,7 +16454,7 @@ function ShiftForm({ initial, onSave, onCancel, companyGraceMinutes = 0 }) {
         <Button
           variant="accent"
           onClick={() => onSave(f)}
-          disabled={!f.name || !f.start || !f.end}
+          disabled={!f.name || !f.start || !f.end || graceInvalid}
         >
           {t.save}
         </Button>
@@ -16201,6 +16469,7 @@ function Shifts({
   employees,
   isSuperAdmin,
   companyGraceMinutes = 0,
+  companyBreakMinutes = 0,
 }) {
   const { t, lang } = useLang();
   const [modal, setModal] = useState(null);
@@ -16215,7 +16484,13 @@ function Shifts({
       data.graceMinutes === undefined
         ? null
         : Number(data.graceMinutes) || 0;
-    const clean = { ...data, graceMinutes };
+    const breakMinutes =
+      data.breakMinutes === "" ||
+      data.breakMinutes === null ||
+      data.breakMinutes === undefined
+        ? null
+        : Number(data.breakMinutes) || 0;
+    const clean = { ...data, graceMinutes, breakMinutes };
     if (modal.mode === "add")
       setShifts([...shifts, { ...clean, id: uid("s") }]);
     else setShifts(shifts.map((s) => (s.id === clean.id ? clean : s)));
@@ -16331,6 +16606,7 @@ function Shifts({
             onSave={save}
             onCancel={() => setModal(null)}
             companyGraceMinutes={companyGraceMinutes}
+            companyBreakMinutes={companyBreakMinutes}
           />
         </Modal>
       )}
@@ -19212,13 +19488,18 @@ function Holidays({ holidays, setHolidays, isSuperAdmin }) {
 // Minutes an employee actually worked, from checkIn to checkOut. Handles
 // punches that cross midnight (checkOut earlier in the clock than checkIn)
 // by rolling the checkout time forward a day.
-function workedMinutes(checkIn, checkOut) {
+// Raw check-in→check-out duration minus the company's unpaid break
+// (otPolicy.breakMinutes, e.g. a 1-hour lunch) — this is what should
+// be shown/exported as "Work Hours" everywhere, not the raw clock
+// diff, since a shift like 8:00–17:00 is a 9-hour *span* but only 8
+// hours of actual paid work once the break in the middle is excluded.
+function workedMinutes(checkIn, checkOut, breakMinutes = 0) {
   if (!checkIn || !checkOut) return 0;
   const [ih, im] = checkIn.split(":").map(Number);
   const [oh, om] = checkOut.split(":").map(Number);
   let mins = oh * 60 + om - (ih * 60 + im);
   if (mins < 0) mins += 24 * 60;
-  return mins;
+  return Math.max(0, mins - (Number(breakMinutes) || 0));
 }
 function formatHM(mins) {
   if (!mins || mins <= 0) return "";
@@ -19242,6 +19523,7 @@ function Attendance({
   overtimeRequests = [],
   soundPreset,
   payrollPolicy,
+  otPolicy,
 }) {
   const { t, lang } = useLang();
   const [date, setDate] = useState(todayStr());
@@ -19541,7 +19823,15 @@ function Attendance({
                   t.status,
                 ],
                 rows.map(({ emp, rec }) => {
-                  const worked = workedMinutes(rec?.checkIn, rec?.checkOut);
+                  const empShift = shifts.find((s) => s.id === emp.shiftId);
+                  const worked = workedMinutes(
+                    rec?.checkIn,
+                    rec?.checkOut,
+                    effectiveBreakMinutes(
+                      empShift,
+                      otPolicy?.breakMinutes ?? DEFAULT_OT_POLICY.breakMinutes,
+                    ),
+                  );
                   return [
                     emp.name,
                     emp.code,
@@ -19589,7 +19879,14 @@ function Attendance({
           <tbody>
             {rows.map(({ emp, rec }) => {
               const shift = shiftOf(emp.shiftId);
-              const worked = workedMinutes(rec?.checkIn, rec?.checkOut);
+              const worked = workedMinutes(
+                rec?.checkIn,
+                rec?.checkOut,
+                effectiveBreakMinutes(
+                  shift,
+                  otPolicy?.breakMinutes ?? DEFAULT_OT_POLICY.breakMinutes,
+                ),
+              );
               const otHours = approvedOtHours(emp.id);
               const lateMins =
                 rec?.status === "late"
@@ -21877,9 +22174,6 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
             {Number(payrollPolicy.lateDeductionValue) > 0
               ? ` · ${t.pay.lateBadgeShort(Number(payrollPolicy.lateGraceCount) || 0)}`
               : ""}
-            {Number(payrollPolicy.lateGraceMinutes) > 0
-              ? ` · ${lang === "km" ? "ផ្តល់" : "grace"} ${payrollPolicy.lateGraceMinutes}${lang === "km" ? "នាទី" : "m"}`
-              : ""}
             {` · ${t.pay.ulBadgeShort(payrollPolicy.ulDeductionType || "fullDay")}`}
           </span>
         )}
@@ -22026,21 +22320,6 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
             <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
               {t.pay.latePolicyDesc}
             </p>
-            <div style={{ marginBottom: 12 }}>
-              <Field label={t.pay.lateGraceMinutesLabel}>
-                <Input
-                  type="number"
-                  step="1"
-                  min="0"
-                  placeholder="0"
-                  value={f.lateGraceMinutes}
-                  onChange={set("lateGraceMinutes")}
-                />
-              </Field>
-              <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
-                {t.pay.lateGraceMinutesHint(Number(f.lateGraceMinutes) || 0)}
-              </p>
-            </div>
             <div className="wf-grid-2">
               <Field label={t.pay.lateGraceCountLabel}>
                 <Input
@@ -32752,6 +33031,7 @@ function Payslip({
   overtimeRequests,
   otPolicy,
   payrollPolicy,
+  salaryAdjustments = [],
   onClose,
 }) {
   const { t, lang } = useLang();
@@ -32779,6 +33059,8 @@ function Payslip({
     khmer,
     otHours,
     otPay,
+    bonusTotal,
+    advanceDeduction,
     net,
   } = computePayroll(
     emp,
@@ -32787,6 +33069,7 @@ function Payslip({
     overtimeRequests,
     otPolicy,
     payrollPolicy,
+    salaryAdjustments,
   );
   const handleDownload = () => {
     const rows = [
@@ -32849,6 +33132,24 @@ function Payslip({
               label: `${t.pay.otPay} (${otHours} ${t.ot.hoursShort})`,
               value: fmtMoney(otPay),
               tone: "pos",
+            },
+          ]
+        : []),
+      ...(bonusTotal > 0
+        ? [
+            {
+              label: t.adj.typeBonus,
+              value: fmtMoney(bonusTotal),
+              tone: "pos",
+            },
+          ]
+        : []),
+      ...(advanceDeduction > 0
+        ? [
+            {
+              label: t.adj.typeAdvance,
+              value: fmtMoney(advanceDeduction),
+              tone: "neg",
             },
           ]
         : []),
@@ -33450,6 +33751,919 @@ function PayStatCard({ icon: Icon, tint, label, value }) {
     </div>
   );
 }
+/* ---------------------------------------------------------------
+   Salary Adjustments — advances/loans (deducted from pay over one or
+   more months in equal installments) and bonuses/commissions (added
+   to pay in full on a chosen month). Employees can request either;
+   admin-created rows are auto-approved. Approved rows feed straight
+   into computePayroll()/salaryAdjustmentEffect() above, so once a
+   request is approved it automatically shows up on the right
+   payslip(s) with no extra manual step.
+----------------------------------------------------------------*/
+function AdjRejectModal({ onCancel, onConfirm }) {
+  const { t } = useLang();
+  const [reason, setReason] = useState("");
+  const trimmed = reason.trim();
+  return (
+    <Modal title={t.adj.rejectTitle} onClose={onCancel} width={420}>
+      <Field label={t.adj.rejectReason}>
+        <textarea
+          className="wf-input"
+          rows={3}
+          style={{ resize: "vertical", fontFamily: "inherit" }}
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          placeholder={t.adj.rejectReasonPlaceholder}
+        />
+      </Field>
+      {reason !== "" && !trimmed && (
+        <p
+          style={{
+            fontSize: 12.5,
+            color: T.rose,
+            marginTop: -8,
+            marginBottom: 12,
+          }}
+        >
+          {t.adj.rejectReasonRequired}
+        </p>
+      )}
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+        <Button variant="ghost" onClick={onCancel}>
+          {t.cancel}
+        </Button>
+        <Button
+          variant="danger-solid"
+          disabled={!trimmed}
+          onClick={() => onConfirm(trimmed)}
+        >
+          {t.adj.reject}
+        </Button>
+      </div>
+    </Modal>
+  );
+}
+function AdjDecisionNote({ r, admins }) {
+  const { t } = useLang();
+  if (r.status !== "approved" && r.status !== "rejected") return null;
+  const decider = admins.find((a) => a.id === r.decidedById);
+  const name = r.decidedByName || decider?.name || "—";
+  return (
+    <div style={{ fontSize: 11.5, color: T.textSoft, marginTop: 3 }}>
+      {r.status === "approved" ? (
+        <span>
+          {t.adj.approvedBy} <strong>{name}</strong>
+        </span>
+      ) : (
+        <span style={{ color: T.rose }}>
+          {t.adj.rejectedBy} <strong>{name}</strong>
+          {r.decisionReason ? ` — ${r.decisionReason}` : ""}
+        </span>
+      )}
+    </div>
+  );
+}
+const ADJ_TYPES_EMPLOYEE = ["advance", "commission"];
+const ADJ_TYPES_ADMIN = ["advance", "bonus", "commission"];
+function adjTypeLabel(type, t) {
+  return (
+    {
+      advance: t.adj.typeAdvance,
+      bonus: t.adj.typeBonus,
+      commission: t.adj.typeCommission,
+    }[type] || type
+  );
+}
+function SalaryAdjustmentForm({
+  initial,
+  employees,
+  isAdmin,
+  onSave,
+  onCancel,
+}) {
+  const { t } = useLang();
+  const currentMk = monthKey();
+  const monthOptions = useMemo(() => {
+    const arr = [];
+    for (let d = -1; d <= 12; d++) arr.push(shiftMonthKey(currentMk, d));
+    return arr;
+  }, [currentMk]);
+  const [f, setF] = useState(
+    initial || {
+      employeeId: employees[0]?.id || "",
+      type: "advance",
+      amount: "",
+      installments: 1,
+      effectiveMonth: currentMk,
+      reason: "",
+    },
+  );
+  const set = (k) => (e) =>
+    setF({ ...f, [k]: typeof e === "string" ? e : e.target.value });
+  const typeOptions = isAdmin ? ADJ_TYPES_ADMIN : ADJ_TYPES_EMPLOYEE;
+  const isAdvance = f.type === "advance";
+  const amountNum = Number(f.amount) || 0;
+  const installmentsNum = Math.max(1, Number(f.installments) || 1);
+  const invalid = !f.employeeId || amountNum <= 0 || !f.effectiveMonth;
+  return (
+    <div>
+      {isAdmin && (
+        <Field label={t.adj.employee}>
+          <Select value={f.employeeId} onChange={set("employeeId")}>
+            {employees.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.name}
+              </option>
+            ))}
+          </Select>
+        </Field>
+      )}
+      <Field label={t.adj.type}>
+        <Select value={f.type} onChange={set("type")}>
+          {typeOptions.map((tp) => (
+            <option key={tp} value={tp}>
+              {adjTypeLabel(tp, t)}
+            </option>
+          ))}
+        </Select>
+      </Field>
+      <Field label={t.adj.amount}>
+        <Input
+          type="number"
+          min="0"
+          step="0.01"
+          value={f.amount}
+          onChange={set("amount")}
+          placeholder={t.adj.amountPlaceholder}
+        />
+      </Field>
+      {isAdvance && (
+        <Field label={t.adj.installments}>
+          <Input
+            type="number"
+            min="1"
+            step="1"
+            value={f.installments}
+            onChange={set("installments")}
+          />
+          <p style={{ fontSize: 11.5, color: T.muted, marginTop: 4 }}>
+            {t.adj.installmentsHint}
+            {amountNum > 0 && (
+              <>
+                {" — "}
+                {t.adj.installmentAmount}:{" "}
+                <strong>{fmtMoney(amountNum / installmentsNum)}</strong>/
+                {t.adj.monthOf}
+              </>
+            )}
+          </p>
+        </Field>
+      )}
+      <Field label={t.adj.effectiveMonth}>
+        <Select value={f.effectiveMonth} onChange={set("effectiveMonth")}>
+          {monthOptions.map((mk) => (
+            <option key={mk} value={mk}>
+              {monthLabel(mk)}
+            </option>
+          ))}
+        </Select>
+      </Field>
+      <Field label={t.adj.reason}>
+        <textarea
+          className="wf-input"
+          rows={3}
+          style={{ resize: "vertical", fontFamily: "inherit" }}
+          value={f.reason}
+          onChange={set("reason")}
+          placeholder={t.adj.reasonPlaceholder}
+        />
+      </Field>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          marginTop: 16,
+          paddingTop: 14,
+          borderTop: `1px solid ${T.lineSoft}`,
+        }}
+      >
+        <Button variant="ghost" onClick={onCancel}>
+          {t.cancel}
+        </Button>
+        <Button
+          variant="accent"
+          disabled={invalid}
+          onClick={() =>
+            onSave({
+              employeeId: f.employeeId,
+              type: f.type,
+              amount: amountNum,
+              installments: isAdvance ? installmentsNum : 1,
+              effectiveMonth: f.effectiveMonth,
+              reason: f.reason.trim(),
+            })
+          }
+        >
+          {t.save}
+        </Button>
+      </div>
+    </div>
+  );
+}
+function SalaryAdjustments({
+  role,
+  currentAdmin,
+  currentEmp,
+  employees,
+  admins,
+  adjustments,
+  setAdjustments,
+  canApprove,
+  isSuperAdmin,
+}) {
+  const { t } = useLang();
+  const [modal, setModal] = useState(false);
+  const [rejectFor, setRejectFor] = useState(null);
+  const [confirmDel, setConfirmDel] = useState(null);
+  const empOf = (id) => employees.find((e) => e.id === id);
+
+  const approve = (req) => {
+    setAdjustments(
+      adjustments.map((r) =>
+        r.id === req.id
+          ? {
+              ...r,
+              status: "approved",
+              decidedById: currentAdmin?.id || null,
+              decidedByName: currentAdmin?.name || "",
+              decisionReason: "",
+              reviewedAt: new Date().toISOString(),
+            }
+          : r,
+      ),
+    );
+  };
+  const reject = (req, reason) => {
+    setAdjustments(
+      adjustments.map((r) =>
+        r.id === req.id
+          ? {
+              ...r,
+              status: "rejected",
+              decidedById: currentAdmin?.id || null,
+              decidedByName: currentAdmin?.name || "",
+              decisionReason: reason,
+              reviewedAt: new Date().toISOString(),
+            }
+          : r,
+      ),
+    );
+    setRejectFor(null);
+  };
+  const submitEmployee = (f) => {
+    if (!currentEmp) return;
+    setAdjustments([
+      ...adjustments,
+      {
+        id: uid("adj"),
+        ...f,
+        employeeId: currentEmp.id,
+        status: "pending",
+        decidedById: null,
+        decidedByName: "",
+        decisionReason: "",
+        createdAt: new Date().toISOString(),
+        reviewedAt: null,
+      },
+    ]);
+    setModal(false);
+  };
+  const submitAdmin = (f) => {
+    setAdjustments([
+      ...adjustments,
+      {
+        id: uid("adj"),
+        ...f,
+        status: "approved",
+        decidedById: currentAdmin?.id || null,
+        decidedByName: currentAdmin?.name || "",
+        decisionReason: "",
+        createdAt: new Date().toISOString(),
+        reviewedAt: new Date().toISOString(),
+      },
+    ]);
+    setModal(false);
+  };
+
+  const renderRow = (r, showEmployee) => {
+    const emp = empOf(r.employeeId);
+    const perInstallment =
+      r.type === "advance"
+        ? (Number(r.amount) || 0) / Math.max(1, Number(r.installments) || 1)
+        : null;
+    return (
+      <tr key={r.id}>
+        {showEmployee && (
+          <td>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <Avatar name={emp?.name || "?"} photo={emp?.photo} size={30} />
+              <div>
+                <div style={{ fontWeight: 500, color: T.ink, fontSize: 13 }}>
+                  {emp?.name || "—"}
+                </div>
+                <div
+                  style={{
+                    fontSize: 10.5,
+                    color: T.muted,
+                    fontFamily: "'JetBrains Mono',monospace",
+                  }}
+                >
+                  {emp?.code}
+                </div>
+              </div>
+            </div>
+          </td>
+        )}
+        <td>{adjTypeLabel(r.type, t)}</td>
+        <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+          {fmtMoney(r.amount)}
+        </td>
+        <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+          {r.type === "advance"
+            ? `${fmtMoney(perInstallment)} × ${r.installments}`
+            : "—"}
+        </td>
+        <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+          {monthLabel(r.effectiveMonth)}
+        </td>
+        <td style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}>
+          {r.reason || "—"}
+        </td>
+        <td>
+          <StatusPill status={r.status} />
+          <AdjDecisionNote r={r} admins={admins} />
+        </td>
+        <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+          {role === "admin" &&
+            (r.status === "pending"
+              ? canApprove && (
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 6,
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <Button
+                      size="sm"
+                      variant="accent"
+                      onClick={() => approve(r)}
+                    >
+                      <ThumbsUp size={13} /> {t.adj.approve}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      onClick={() => setRejectFor(r)}
+                    >
+                      <ThumbsDown size={13} /> {t.adj.reject}
+                    </Button>
+                  </div>
+                )
+              : isSuperAdmin && (
+                  <button
+                    onClick={() => setConfirmDel(r)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: T.mutedLight,
+                    }}
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                ))}
+        </td>
+      </tr>
+    );
+  };
+
+  if (role !== "admin" && currentEmp) {
+    const mine = adjustments
+      .filter((r) => r.employeeId === currentEmp.id)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    return (
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: 16,
+          }}
+        >
+          <Button variant="accent" onClick={() => setModal(true)}>
+            <Plus size={15} /> {t.adj.addBtn}
+          </Button>
+        </div>
+        <Card style={{ overflowX: "auto" }}>
+          <table className="wf-table">
+            <thead>
+              <tr>
+                <th>{t.adj.type}</th>
+                <th>{t.adj.amount}</th>
+                <th>{t.adj.installmentAmount}</th>
+                <th>{t.adj.effectiveMonth}</th>
+                <th>{t.adj.reason}</th>
+                <th>{t.adj.status}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {mine.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={7}
+                    style={{
+                      textAlign: "center",
+                      color: T.muted,
+                      padding: "24px 0",
+                    }}
+                  >
+                    {t.adj.noRequest}
+                  </td>
+                </tr>
+              )}
+              {mine.map((r) => renderRow(r, false))}
+            </tbody>
+          </table>
+        </Card>
+        {modal && (
+          <Modal title={t.adj.addBtn} onClose={() => setModal(false)}>
+            <SalaryAdjustmentForm
+              employees={employees}
+              isAdmin={false}
+              onSave={submitEmployee}
+              onCancel={() => setModal(false)}
+            />
+          </Modal>
+        )}
+      </div>
+    );
+  }
+
+  const sorted = [...adjustments].sort((a, b) => {
+    if (a.status === "pending" && b.status !== "pending") return -1;
+    if (a.status !== "pending" && b.status === "pending") return 1;
+    return b.createdAt.localeCompare(a.createdAt);
+  });
+  return (
+    <div>
+      {canApprove && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: 16,
+          }}
+        >
+          <Button variant="accent" onClick={() => setModal(true)}>
+            <Plus size={15} /> {t.adj.addBtnAdmin}
+          </Button>
+        </div>
+      )}
+      <Card style={{ overflowX: "auto" }}>
+        <table className="wf-table">
+          <thead>
+            <tr>
+              <th>{t.employee}</th>
+              <th>{t.adj.type}</th>
+              <th>{t.adj.amount}</th>
+              <th>{t.adj.installmentAmount}</th>
+              <th>{t.adj.effectiveMonth}</th>
+              <th>{t.adj.reason}</th>
+              <th>{t.adj.status}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.length === 0 && (
+              <tr>
+                <td
+                  colSpan={8}
+                  style={{
+                    textAlign: "center",
+                    color: T.muted,
+                    padding: "24px 0",
+                  }}
+                >
+                  {t.adj.noRequest}
+                </td>
+              </tr>
+            )}
+            {sorted.map((r) => renderRow(r, true))}
+          </tbody>
+        </table>
+      </Card>
+      {modal && (
+        <Modal title={t.adj.addTitle} onClose={() => setModal(false)}>
+          <SalaryAdjustmentForm
+            employees={employees}
+            isAdmin
+            onSave={submitAdmin}
+            onCancel={() => setModal(false)}
+          />
+        </Modal>
+      )}
+      {rejectFor && (
+        <AdjRejectModal
+          onCancel={() => setRejectFor(null)}
+          onConfirm={(reason) => reject(rejectFor, reason)}
+        />
+      )}
+      {confirmDel && (
+        <ConfirmDialog
+          text={t.adj.confirmDel}
+          onCancel={() => setConfirmDel(null)}
+          onConfirm={() => {
+            setAdjustments(adjustments.filter((r) => r.id !== confirmDel.id));
+            setConfirmDel(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   Budget Planning — lets a superadmin set a monthly payroll budget
+   per department, then compares it against the actual computed net
+   payroll cost for that department/month (via computePayroll, so it
+   already reflects OT, deductions, and any approved salary
+   adjustments) so overspend shows up at a glance.
+----------------------------------------------------------------*/
+function BudgetForm({ initial, departments, monthOptions, onSave, onCancel }) {
+  const { t } = useLang();
+  const [f, setF] = useState(
+    initial || {
+      deptId: departments[0]?.id || "",
+      month: monthOptions[0],
+      budgetedAmount: "",
+      note: "",
+    },
+  );
+  const set = (k) => (e) =>
+    setF({ ...f, [k]: typeof e === "string" ? e : e.target.value });
+  const invalid = !f.deptId || !f.month || Number(f.budgetedAmount) <= 0;
+  return (
+    <div>
+      <Field label={t.budget.department}>
+        <Select value={f.deptId} onChange={set("deptId")}>
+          {departments.map((d) => (
+            <option key={d.id} value={d.id}>
+              {d.name}
+            </option>
+          ))}
+        </Select>
+      </Field>
+      <Field label={t.budget.month}>
+        <Select value={f.month} onChange={set("month")}>
+          {monthOptions.map((mk) => (
+            <option key={mk} value={mk}>
+              {monthLabel(mk)}
+            </option>
+          ))}
+        </Select>
+      </Field>
+      <Field label={t.budget.budgetedAmount}>
+        <Input
+          type="number"
+          min="0"
+          step="0.01"
+          value={f.budgetedAmount}
+          onChange={set("budgetedAmount")}
+        />
+      </Field>
+      <Field label={t.budget.note}>
+        <textarea
+          className="wf-input"
+          rows={2}
+          style={{ resize: "vertical", fontFamily: "inherit" }}
+          value={f.note}
+          onChange={set("note")}
+          placeholder={t.budget.notePlaceholder}
+        />
+      </Field>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 8,
+          marginTop: 16,
+          paddingTop: 14,
+          borderTop: `1px solid ${T.lineSoft}`,
+        }}
+      >
+        <Button variant="ghost" onClick={onCancel}>
+          {t.cancel}
+        </Button>
+        <Button
+          variant="accent"
+          disabled={invalid}
+          onClick={() =>
+            onSave({
+              deptId: f.deptId,
+              month: f.month,
+              budgetedAmount: Number(f.budgetedAmount) || 0,
+              note: f.note.trim(),
+            })
+          }
+        >
+          {t.save}
+        </Button>
+      </div>
+    </div>
+  );
+}
+function BudgetPlanning({
+  departments,
+  employees,
+  attendance,
+  overtimeRequests,
+  otPolicy,
+  payrollPolicy,
+  salaryAdjustments,
+  departmentBudgets,
+  setDepartmentBudgets,
+  isSuperAdmin,
+}) {
+  const { t } = useLang();
+  const currentMk = monthKey();
+  const monthOptions = useMemo(() => {
+    const arr = [];
+    for (let d = 0; d >= -11; d--) arr.push(shiftMonthKey(currentMk, d));
+    return arr;
+  }, [currentMk]);
+  const [mk, setMk] = useState(currentMk);
+  const [modal, setModal] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [confirmDel, setConfirmDel] = useState(null);
+
+  const activeEmployees = employees.filter((e) => e.status === "active");
+  const rows = departments.map((d) => {
+    const deptEmployees = activeEmployees.filter((e) => e.deptId === d.id);
+    const actual = deptEmployees.reduce(
+      (sum, e) =>
+        sum +
+        computePayroll(
+          e,
+          attendance,
+          mk,
+          overtimeRequests,
+          otPolicy,
+          payrollPolicy,
+          salaryAdjustments,
+        ).net,
+      0,
+    );
+    const budget = departmentBudgets.find(
+      (b) => b.deptId === d.id && b.month === mk,
+    );
+    const budgeted = budget ? Number(budget.budgetedAmount) || 0 : null;
+    const variance = budgeted === null ? null : actual - budgeted;
+    return { dept: d, count: deptEmployees.length, actual, budget, variance };
+  });
+  const totalBudgeted = rows.reduce(
+    (s, r) => s + (r.budget ? Number(r.budget.budgetedAmount) || 0 : 0),
+    0,
+  );
+  const totalActual = rows.reduce((s, r) => s + r.actual, 0);
+
+  const save = (f) => {
+    const existing = departmentBudgets.find(
+      (b) => b.deptId === f.deptId && b.month === f.month,
+    );
+    if (existing) {
+      setDepartmentBudgets(
+        departmentBudgets.map((b) =>
+          b.id === existing.id ? { ...b, ...f } : b,
+        ),
+      );
+    } else {
+      setDepartmentBudgets([
+        ...departmentBudgets,
+        { id: uid("bud"), ...f, createdAt: new Date().toISOString() },
+      ]);
+    }
+    setModal(false);
+    setEditing(null);
+  };
+
+  return (
+    <div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16,
+          flexWrap: "wrap",
+          gap: 10,
+        }}
+      >
+        <Select
+          value={mk}
+          onChange={(e) => setMk(e.target.value)}
+          style={{ width: 180 }}
+        >
+          {monthOptions.map((m) => (
+            <option key={m} value={m}>
+              {monthLabel(m)}
+            </option>
+          ))}
+        </Select>
+        {isSuperAdmin && (
+          <Button
+            variant="accent"
+            onClick={() => {
+              setEditing(null);
+              setModal(true);
+            }}
+          >
+            <Plus size={15} /> {t.budget.addBtn}
+          </Button>
+        )}
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))",
+          gap: 12,
+          marginBottom: 16,
+        }}
+      >
+        <PayStatCard
+          icon={DollarSign}
+          tint="violet"
+          label={t.budget.budgetedAmount}
+          value={fmtMoney(totalBudgeted)}
+        />
+        <PayStatCard
+          icon={Wallet}
+          tint="blue"
+          label={t.budget.actualAmount}
+          value={fmtMoney(totalActual)}
+        />
+        <PayStatCard
+          icon={totalActual > totalBudgeted ? TrendingUp : TrendingDown}
+          tint={totalActual > totalBudgeted ? "rose" : "forest"}
+          label={t.budget.variance}
+          value={fmtMoney(Math.abs(totalActual - totalBudgeted))}
+        />
+      </div>
+
+      <Card style={{ overflowX: "auto" }}>
+        <table className="wf-table">
+          <thead>
+            <tr>
+              <th>{t.budget.department}</th>
+              <th>{t.budget.employeeCount}</th>
+              <th>{t.budget.budgetedAmount}</th>
+              <th>{t.budget.actualAmount}</th>
+              <th>{t.budget.variance}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.length === 0 && (
+              <tr>
+                <td
+                  colSpan={6}
+                  style={{
+                    textAlign: "center",
+                    color: T.muted,
+                    padding: "24px 0",
+                  }}
+                >
+                  {t.budget.noBudget}
+                </td>
+              </tr>
+            )}
+            {rows.map((r) => (
+              <tr key={r.dept.id}>
+                <td style={{ fontWeight: 500, color: T.ink }}>{r.dept.name}</td>
+                <td>{r.count}</td>
+                <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                  {r.budget ? fmtMoney(r.budget.budgetedAmount) : "—"}
+                </td>
+                <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
+                  {fmtMoney(r.actual)}
+                </td>
+                <td
+                  style={{
+                    fontFamily: "'JetBrains Mono',monospace",
+                    color:
+                      r.variance === null
+                        ? T.muted
+                        : r.variance > 0
+                          ? T.rose
+                          : T.forestText,
+                    fontWeight: 600,
+                  }}
+                >
+                  {r.variance === null
+                    ? "—"
+                    : `${r.variance > 0 ? "+" : ""}${fmtMoney(r.variance)}`}
+                </td>
+                <td style={{ textAlign: "right" }}>
+                  {isSuperAdmin && (
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 8,
+                        justifyContent: "flex-end",
+                      }}
+                    >
+                      <button
+                        onClick={() => {
+                          setEditing(
+                            r.budget || {
+                              deptId: r.dept.id,
+                              month: mk,
+                              budgetedAmount: "",
+                              note: "",
+                            },
+                          );
+                          setModal(true);
+                        }}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          color: T.mutedLight,
+                        }}
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      {r.budget && (
+                        <button
+                          onClick={() => setConfirmDel(r.budget)}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            color: T.mutedLight,
+                          }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Card>
+
+      {modal && (
+        <Modal
+          title={editing ? t.budget.editTitle : t.budget.addTitle}
+          onClose={() => {
+            setModal(false);
+            setEditing(null);
+          }}
+        >
+          <BudgetForm
+            initial={editing}
+            departments={departments}
+            monthOptions={monthOptions}
+            onSave={save}
+            onCancel={() => {
+              setModal(false);
+              setEditing(null);
+            }}
+          />
+        </Modal>
+      )}
+      {confirmDel && (
+        <ConfirmDialog
+          text={t.budget.confirmDel}
+          onCancel={() => setConfirmDel(null)}
+          onConfirm={() => {
+            setDepartmentBudgets(
+              departmentBudgets.filter((b) => b.id !== confirmDel.id),
+            );
+            setConfirmDel(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
 function Payroll({
   role,
   currentEmp,
@@ -33461,6 +34675,7 @@ function Payroll({
   otPolicy,
   payrollPolicy,
   setPayrollPolicy,
+  salaryAdjustments = [],
 }) {
   const { t, lang } = useLang();
   const { branding } = useBranding();
@@ -33492,6 +34707,7 @@ function Payroll({
       overtimeRequests,
       otPolicy,
       payrollPolicy,
+      salaryAdjustments,
     );
     const myDeductions =
       myPayroll.tax +
@@ -33605,6 +34821,7 @@ function Payroll({
                 overtimeRequests,
                 otPolicy,
                 payrollPolicy,
+                salaryAdjustments,
               );
               const ded =
                 p.tax +
@@ -33828,6 +35045,7 @@ function Payroll({
             overtimeRequests={overtimeRequests}
             otPolicy={otPolicy}
             payrollPolicy={payrollPolicy}
+            salaryAdjustments={salaryAdjustments}
             onClose={() => setSlipFor(null)}
           />
         )}
@@ -33871,6 +35089,7 @@ function Payroll({
         overtimeRequests,
         otPolicy,
         payrollPolicy,
+        salaryAdjustments,
       ).net,
     0,
   );
@@ -33883,6 +35102,7 @@ function Payroll({
       overtimeRequests,
       otPolicy,
       payrollPolicy,
+      salaryAdjustments,
     );
     return (
       sum +
@@ -33968,6 +35188,7 @@ function Payroll({
                       overtimeRequests,
                       otPolicy,
                       payrollPolicy,
+                      salaryAdjustments,
                     );
                     return [
                       e.name,
@@ -34000,6 +35221,7 @@ function Payroll({
                       overtimeRequests,
                       otPolicy,
                       payrollPolicy,
+                      salaryAdjustments,
                     );
                     return [
                       e.name,
@@ -34170,6 +35392,8 @@ function Payroll({
                 lateDeduction,
                 absenceDeduction,
                 unpaidLeaveDeduction,
+                bonusTotal,
+                advanceDeduction,
               } = computePayroll(
                 e,
                 attendance,
@@ -34177,6 +35401,7 @@ function Payroll({
                 overtimeRequests,
                 otPolicy,
                 payrollPolicy,
+                salaryAdjustments,
               );
               const deductionsTotal =
                 tax +
@@ -34345,6 +35570,7 @@ function Payroll({
           overtimeRequests={overtimeRequests}
           otPolicy={otPolicy}
           payrollPolicy={payrollPolicy}
+          salaryAdjustments={salaryAdjustments}
           onClose={() => setSlipFor(null)}
         />
       )}
@@ -34725,6 +35951,18 @@ function buildNavAdmin(n) {
       permission: "approveRequests",
     },
     { id: "payroll", label: n.payroll, icon: Wallet },
+    {
+      id: "payrollAdj",
+      label: n.payrollAdj,
+      icon: Receipt,
+      permission: "managePayroll",
+    },
+    {
+      id: "budget",
+      label: n.budget,
+      icon: DollarSign,
+      permission: "managePayroll",
+    },
     { id: "review", label: n.performance, icon: Star },
     { id: "training", label: n.training, icon: GraduationCap },
     {
@@ -34812,6 +36050,8 @@ const NAV_GROUP_MAP = {
   leave: "hr",
   ot: "hr",
   payroll: "hr",
+  payrollAdj: "hr",
+  budget: "hr",
   review: "hr",
   attcorr: "hr",
   shiftswap: "hr",
@@ -34866,6 +36106,12 @@ function buildNavEmployee(n, enabledModules, navDesc) {
       { id: "leave", label: n.myLeave, icon: CalendarDays, desc: d.leave },
       { id: "ot", label: n.myOvertime, icon: Timer, desc: d.ot },
       { id: "payroll", label: n.myPayroll, icon: Wallet, desc: d.payroll },
+      {
+        id: "payrollAdj",
+        label: n.myPayrollAdj,
+        icon: Receipt,
+        desc: d.payrollAdj,
+      },
       { id: "review", label: n.myPerformance, icon: Star, desc: d.review },
       {
         id: "training",
@@ -34933,6 +36179,71 @@ function buildBottomNavEmployee(n, enabledModules) {
     { id: "leave", label: n.myLeave, icon: CalendarDays },
     { id: "payroll", label: n.myPayroll, icon: Wallet },
   ].filter((item) => item.id === "dashboard" || enabled[item.id] !== false);
+}
+
+// Minutes of grace AFTER a shift's end time before a day with no
+// attendance row at all gets auto-recorded as "absent". Mirrors the
+// LATE_GRACE_MINUTES idea (grace after shift START, for the "missed
+// clock-in" notification) but applied at the other end of the shift —
+// once this much time has passed the shift start's end with nobody
+// having checked in at all, it's not just late anymore, it's a no-show.
+const ABSENT_AUTO_MARK_GRACE_MINUTES = 60;
+// How many days back to scan for un-marked no-shows each time this
+// runs. 35 comfortably covers the current + previous payroll month
+// without scanning someone's whole employment history every time.
+const ABSENT_AUTO_MARK_DAYS_BACK = 35;
+// Builds one synthetic {status:"absent"} attendance row for every
+// (active, shift-assigned) employee × day in the scan window that has
+// NO attendance row yet (present/late/absent/leave/unpaid — any real
+// row already means it's accounted for) and whose shift has been over
+// for more than the grace period — so a same-day check-in that just
+// hasn't happened *yet* is never prematurely marked. Skips employees
+// without a shift, overnight shifts (start/end crossing midnight is
+// its own can of worms — same exclusion the missed-clock-in notice
+// already uses), days before the employee joined, and their
+// scheduled days off. Callers merge the result into the real
+// `attendance` array; once merged, those dates count as "covered" so
+// re-running this is idempotent — it only ever adds what's missing.
+function computeAutoAbsentRecords(
+  employees,
+  shifts,
+  attendance,
+  todayD,
+  nowStr,
+) {
+  const today = todayD;
+  const covered = new Set(attendance.map((a) => `${a.employeeId}|${a.date}`));
+  const out = [];
+  employees
+    .filter((e) => e.status === "active" && e.shiftId)
+    .forEach((emp) => {
+      const shift = shifts.find((s) => s.id === emp.shiftId);
+      if (!shift || isOvernightShift(shift)) return;
+      const cutoffToday = addMinutesToClock(
+        shift.end,
+        ABSENT_AUTO_MARK_GRACE_MINUTES,
+      );
+      for (let offset = 0; offset < ABSENT_AUTO_MARK_DAYS_BACK; offset++) {
+        const d = new Date();
+        d.setDate(d.getDate() - offset);
+        const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        if (emp.joined && dateStr < emp.joined) continue;
+        if (isDayOff(emp, dateStr)) continue;
+        if (covered.has(`${emp.id}|${dateStr}`)) continue;
+        if (dateStr === today && nowStr < cutoffToday) continue; // shift not over yet
+        out.push({
+          id: uid("att"),
+          employeeId: emp.id,
+          date: dateStr,
+          checkIn: null,
+          checkOut: null,
+          status: "absent",
+          checkInLoc: null,
+          checkOutLoc: null,
+        });
+      }
+    });
+  return out;
 }
 
 function AppInner() {
@@ -35274,6 +36585,10 @@ function AppInner() {
         r.grace_minutes === null || r.grace_minutes === undefined
           ? null
           : Number(r.grace_minutes),
+      breakMinutes:
+        r.break_minutes === null || r.break_minutes === undefined
+          ? null
+          : Number(r.break_minutes),
     }),
     toDb: (r) => ({
       id: r.id,
@@ -35284,6 +36599,10 @@ function AppInner() {
         r.graceMinutes === null || r.graceMinutes === undefined
           ? null
           : Number(r.graceMinutes),
+      break_minutes:
+        r.breakMinutes === null || r.breakMinutes === undefined
+          ? null
+          : Number(r.breakMinutes),
     }),
   });
   // One row per (employee, date) — which shift that employee is scheduled
@@ -35706,6 +37025,99 @@ function AppInner() {
         }
         return null;
       },
+    });
+  const [salaryAdjustments, setSalaryAdjustments, adjReady] = useSupabaseArray(
+    "salary_adjustments",
+    {
+      fromDb: (r) => ({
+        id: r.id,
+        employeeId: r.employee_id,
+        type: r.type,
+        amount: r.amount,
+        installments: r.installments,
+        effectiveMonth: r.effective_month,
+        reason: r.reason,
+        status: r.status,
+        decidedById: r.decided_by_id,
+        decidedByName: r.decided_by_name,
+        decisionReason: r.decision_reason,
+        createdAt: r.created_at,
+        reviewedAt: r.reviewed_at,
+      }),
+      toDb: (r) => ({
+        id: r.id,
+        employee_id: r.employeeId,
+        type: r.type,
+        amount: r.amount,
+        installments: r.installments,
+        effective_month: r.effectiveMonth,
+        reason: r.reason,
+        status: r.status,
+        decided_by_id: r.decidedById,
+        decided_by_name: r.decidedByName,
+        decision_reason: r.decisionReason,
+        created_at: r.createdAt,
+        reviewed_at: r.reviewedAt,
+      }),
+      audit: true,
+      actorRef,
+      entityLabel: (r) => `${r.type || "?"} · ${r.employeeId || "?"}`,
+      notify: ({ type, row, old }) => {
+        if (type === "create" && row.status === "pending") {
+          const emp = employees.find((e) => e.id === row.employeeId);
+          return {
+            userType: "admin",
+            title: "សំណើប្រាក់ខ្ចី/រង្វាន់ថ្មី",
+            body: `${emp?.name || "?"} (${emp?.code || row.employeeId}) បានស្នើសុំ ${adjTypeLabel(row.type, LANG[lang] || LANG.km)} ${fmtMoney(row.amount)}`,
+            page: "payrollAdj",
+            portal: "admin",
+            tag: `adj-req-${row.id}`,
+            entityId: row.id,
+          };
+        }
+        if (
+          type === "update" &&
+          old?.status !== row.status &&
+          (row.status === "approved" || row.status === "rejected")
+        ) {
+          return {
+            userType: "employee",
+            userId: row.employeeId,
+            title:
+              row.status === "approved"
+                ? "សំណើប្រាក់ខ្ចី/រង្វាន់របស់អ្នកត្រូវបានអនុម័ត"
+                : "សំណើប្រាក់ខ្ចី/រង្វាន់របស់អ្នកត្រូវបានបដិសេធ",
+            body: fmtMoney(row.amount),
+            page: "payrollAdj",
+            portal: "employee",
+            tag: `adj-dec-${row.id}`,
+          };
+        }
+        return null;
+      },
+    },
+  );
+  const [departmentBudgets, setDepartmentBudgets, budgetReady] =
+    useSupabaseArray("department_budgets", {
+      fromDb: (r) => ({
+        id: r.id,
+        deptId: r.department_id,
+        month: r.month,
+        budgetedAmount: r.budgeted_amount,
+        note: r.note,
+        createdAt: r.created_at,
+      }),
+      toDb: (r) => ({
+        id: r.id,
+        department_id: r.deptId,
+        month: r.month,
+        budgeted_amount: r.budgetedAmount,
+        note: r.note,
+        created_at: r.createdAt,
+      }),
+      audit: true,
+      actorRef,
+      entityLabel: (r) => `${r.month || "?"} · ${r.deptId || "?"}`,
     });
   const [shiftSwapRequests, setShiftSwapRequests, ssReady] = useSupabaseArray(
     "shift_swap_requests",
@@ -36176,6 +37588,37 @@ function AppInner() {
         : sessionEmployee || null;
   const currentEmp =
     role && role !== "admin" ? employees.find((e) => e.id === role) : null;
+  // Runs on every admin session (not employee sessions, so a regular
+  // employee's browser tab is never the one silently writing other
+  // people's attendance rows) once the employees/shifts/attendance
+  // tables have loaded, then again every 5 minutes so a no-show that
+  // crosses the grace-period cutoff *while* an admin has the tab open
+  // gets caught without needing a manual refresh. Reads the latest
+  // employees/shifts via the functional setAttendance updater (see
+  // useSupabaseArray above) so it's never working off a stale
+  // closure, and only ever adds rows for days that are still
+  // uncovered — safe to run repeatedly.
+  useEffect(() => {
+    if (role !== "admin" || !eReady || !shReady || !aReady) return;
+    const run = () => {
+      const today = todayStr();
+      const now = timeNow();
+      setAttendance((prev) => {
+        const extra = computeAutoAbsentRecords(
+          employees,
+          shifts,
+          prev,
+          today,
+          now,
+        );
+        return extra.length ? [...prev, ...extra] : prev;
+      });
+    };
+    run();
+    const id = setInterval(run, 5 * 60 * 1000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [role, eReady, shReady, aReady, employees, shifts]);
   // Single source of truth for "can this session use Messages/Call" —
   // admin side checks the rank permission matrix (superadmin always
   // passes), employee side checks the company-wide module toggle AND
@@ -37071,6 +38514,9 @@ function AppInner() {
                   employees={employees}
                   isSuperAdmin={isSuperAdmin || can("manageDepartments")}
                   companyGraceMinutes={payrollPolicy?.lateGraceMinutes || 0}
+                  companyBreakMinutes={
+                    otPolicy?.breakMinutes ?? DEFAULT_OT_POLICY.breakMinutes
+                  }
                 />
               )}
               {page === "roster" &&
@@ -37142,6 +38588,7 @@ function AppInner() {
                     overtimeRequests={overtimeRequests}
                     soundPreset={soundPolicy.preset}
                     payrollPolicy={payrollPolicy}
+                    otPolicy={otPolicy}
                   />
                 )}
               {page === "holidays" && role === "admin" && (
@@ -37199,8 +38646,37 @@ function AppInner() {
                     otPolicy={otPolicy}
                     payrollPolicy={payrollPolicy}
                     setPayrollPolicy={setPayrollPolicy}
+                    salaryAdjustments={salaryAdjustments}
                   />
                 )}
+              {page === "payrollAdj" &&
+                (role === "admin" || moduleEnabled("payrollAdj")) && (
+                  <SalaryAdjustments
+                    role={role}
+                    currentAdmin={currentAdmin}
+                    currentEmp={currentEmp}
+                    employees={employees}
+                    admins={admins}
+                    adjustments={salaryAdjustments}
+                    setAdjustments={setSalaryAdjustments}
+                    isSuperAdmin={isSuperAdmin || can("managePayroll")}
+                    canApprove={isSuperAdmin || can("managePayroll")}
+                  />
+                )}
+              {page === "budget" && role === "admin" && (
+                <BudgetPlanning
+                  departments={departments}
+                  employees={employees}
+                  attendance={attendance}
+                  overtimeRequests={overtimeRequests}
+                  otPolicy={otPolicy}
+                  payrollPolicy={payrollPolicy}
+                  salaryAdjustments={salaryAdjustments}
+                  departmentBudgets={departmentBudgets}
+                  setDepartmentBudgets={setDepartmentBudgets}
+                  isSuperAdmin={isSuperAdmin || can("managePayroll")}
+                />
+              )}
               {page === "review" &&
                 (role === "admin" || moduleEnabled("review")) && (
                   <PerformanceReviews
