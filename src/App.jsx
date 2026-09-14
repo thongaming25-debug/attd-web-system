@@ -25,6 +25,7 @@ import {
   Trash2,
   X,
   CalendarDays,
+  Calendar,
   Search,
   AlertCircle,
   Info,
@@ -182,6 +183,7 @@ const LANG_RAW = {
       analytics: "វិភាគទិន្នន័យ",
       rolePerms: "សិទ្ធិតួនាទី",
       reports: "មជ្ឈមណ្ឌលរបាយការណ៍",
+      calendar: "ប្រតិទិន",
     },
     navDesc: {
       announcements: "ព័ត៌មាន និងសេចក្តីប្រកាសរបស់ក្រុមហ៊ុន",
@@ -204,9 +206,10 @@ const LANG_RAW = {
       main: "ទំព័រដើម",
       people: "បុគ្គលិក",
       attendance: "វេន & វត្តមាន",
+      payroll: "ប្រាក់ខែ & ហិរញ្ញវត្ថុ",
+      development: "អភិវឌ្ឍន៍",
       communication: "ការទាក់ទង",
-      hr: "គ្រប់គ្រងធនធានមនុស្ស",
-      learning: "ការសិក្សា",
+      reports: "របាយការណ៍",
       system: "ប្រព័ន្ធ",
     },
     searchMenu: "ស្វែងរកម៉ឺនុយ...",
@@ -269,6 +272,17 @@ const LANG_RAW = {
       recruitmentDesc: "បេក្ខជនទាំងអស់ដែលដាក់ពាក្យក្នុងចន្លោះកាលបរិច្ឆេទ",
       training: "របាយការណ៍ការបណ្តុះបណ្តាល",
       trainingDesc: "វគ្គបណ្តុះបណ្តាលទាំងអស់ក្នុងចន្លោះកាលបរិច្ឆេទ",
+    },
+    calendar: {
+      title: "ប្រតិទិន",
+      subtitle: "ថ្ងៃឈប់សម្រាក ច្បាប់ឈប់សម្រាកដែលបានអនុម័ត និងវគ្គបណ្តុះបណ្តាល",
+      today: "ថ្ងៃនេះ",
+      holiday: "ថ្ងៃឈប់សម្រាក",
+      onLeave: "ច្បាប់ឈប់សម្រាក",
+      training: "ការបណ្តុះបណ្តាល",
+      noEvents: "គ្មានព្រឹត្តិការណ៍នៅថ្ងៃនេះទេ",
+      peopleOnLeave: (n) => `${n} នាក់ឈប់សម្រាក`,
+      selectDay: "ចុចលើកាលបរិច្ឆេទណាមួយ ដើម្បីមើលលម្អិត",
     },
     dash: {
       welcome: "សូមអញ្ជើញ",
@@ -336,6 +350,14 @@ const LANG_RAW = {
       statLeaveDays: "ថ្ងៃឈប់សម្រាកខែនេះ",
       statOtHours: "ម៉ោង OT ខែនេះ",
       statTrainingsProgress: "ការបណ្តុះបណ្តាលកំពុងដំណើរការ",
+      actionCenterTitle: "មជ្ឈមណ្ឌលសកម្មភាព HR",
+      actionRequiredLabel: "ថ្ងៃនេះ Admin/HR ត្រូវធ្វើអ្វីខ្លះ?",
+      allCaughtUp: "គ្មានកិច្ចការត្រូវធ្វើទេពេលនេះ 🎉",
+      leaveReqPending: (n) => `${n} សំណើសុំច្បាប់ឈប់សម្រាកកំពុងរង់ចាំ`,
+      otReqPending: (n) => `${n} សំណើ OT កំពុងរង់ចាំ`,
+      docsExpiringSoonCount: (n) => `${n} ឯកសារ/កិច្ចសន្យាជិតផុតកំណត់`,
+      attCorrPending: (n) => `${n} សំណើកែតម្រូវវត្តមានកំពុងរង់ចាំ`,
+      onboardingActiveCount: (n) => `${n} បុគ្គលិកកំពុងចាប់ផ្តើមការងារ`,
     },
     analytics: {
       title: "វិភាគទិន្នន័យ",
@@ -1593,6 +1615,7 @@ const LANG_RAW = {
       analytics: "Analytics",
       rolePerms: "Roles & Permissions",
       reports: "Reports Center",
+      calendar: "Calendar",
     },
     navDesc: {
       announcements: "Company updates and news",
@@ -1615,9 +1638,10 @@ const LANG_RAW = {
       main: "Main",
       people: "People",
       attendance: "Time & Attendance",
+      payroll: "Payroll & Finance",
+      development: "Development",
       communication: "Communication",
-      hr: "HR Management",
-      learning: "Learning",
+      reports: "Reports",
       system: "System",
     },
     searchMenu: "Search menu...",
@@ -1679,6 +1703,17 @@ const LANG_RAW = {
       recruitmentDesc: "All candidates who applied within the date range",
       training: "Training Report",
       trainingDesc: "All training courses within the date range",
+    },
+    calendar: {
+      title: "Calendar",
+      subtitle: "Holidays, approved leave, and training sessions",
+      today: "Today",
+      holiday: "Holiday",
+      onLeave: "On Leave",
+      training: "Training",
+      noEvents: "No events on this day",
+      peopleOnLeave: (n) => `${n} on leave`,
+      selectDay: "Click a date to see details",
     },
     dash: {
       welcome: "Welcome",
@@ -1746,6 +1781,17 @@ const LANG_RAW = {
       statLeaveDays: "Leave Days This Month",
       statOtHours: "OT Hours This Month",
       statTrainingsProgress: "Trainings In Progress",
+      actionCenterTitle: "HR Action Center",
+      actionRequiredLabel: "What needs your attention today?",
+      allCaughtUp: "You're all caught up 🎉",
+      leaveReqPending: (n) => `${n} leave request${n === 1 ? "" : "s"} pending`,
+      otReqPending: (n) => `${n} OT request${n === 1 ? "" : "s"} pending`,
+      docsExpiringSoonCount: (n) =>
+        `${n} document${n === 1 ? "" : "s"} expiring soon`,
+      attCorrPending: (n) =>
+        `${n} attendance correction${n === 1 ? "" : "s"} pending`,
+      onboardingActiveCount: (n) =>
+        `${n} employee${n === 1 ? "" : "s"} onboarding`,
     },
     analytics: {
       title: "Analytics",
@@ -2995,6 +3041,7 @@ const LANG_RAW = {
       analytics: "数据分析",
       rolePerms: "角色权限",
       reports: "报表中心",
+      calendar: "日历",
     },
     navDesc: {
       announcements: "公司最新消息与公告",
@@ -3016,9 +3063,10 @@ const LANG_RAW = {
       main: "主页",
       people: "人员",
       attendance: "班次与考勤",
+      payroll: "薪资与财务",
+      development: "发展",
       communication: "沟通",
-      hr: "人力资源管理",
-      learning: "培训",
+      reports: "报表",
       system: "系统",
     },
     searchMenu: "搜索菜单...",
@@ -3078,6 +3126,17 @@ const LANG_RAW = {
       recruitmentDesc: "该日期范围内申请的所有候选人",
       training: "培训报表",
       trainingDesc: "该日期范围内的所有培训课程",
+    },
+    calendar: {
+      title: "日历",
+      subtitle: "假期、已批准的请假和培训课程",
+      today: "今天",
+      holiday: "假期",
+      onLeave: "请假",
+      training: "培训",
+      noEvents: "这一天没有事件",
+      peopleOnLeave: (n) => `${n} 人请假`,
+      selectDay: "点击某一天查看详情",
     },
     dash: {
       welcome: "欢迎",
@@ -4154,7 +4213,7 @@ body{background:var(--wf-paper);}
   --wf-glass-border:rgba(255,255,255,0.09); --wf-glass-highlight:rgba(255,255,255,0.07);
 }
 .wf-root{display:flex;width:100%;height:100vh;height:100dvh;min-height:640px;max-height:100vh;max-height:100dvh;background:${T.paper};font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.text};position:relative;overflow:hidden;border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,0.02),0 16px 40px -18px rgba(5,8,16,0.35);border:1px solid ${T.line};transition:background .15s ease,color .15s ease;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
-.wf-sidebar{background:${T.card};color:${T.ink};width:246px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid ${T.line};transition:transform .25s cubic-bezier(.4,0,.2,1),background .15s ease,color .15s ease;}
+.wf-sidebar{background:${T.card};color:${T.ink};width:276px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid ${T.line};transition:transform .25s cubic-bezier(.4,0,.2,1),background .15s ease,color .15s ease;}
 .wf-sidebar-inner{display:flex;flex-direction:column;height:100%;}
 .wf-logo-badge{width:32px;height:32px;border-radius:7px;background:${T.gold};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#1A1300;font-family:'JetBrains Mono',monospace;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);}
 .wf-nav-eyebrow{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${T.muted};padding:4px 14px 8px;}
@@ -4169,6 +4228,7 @@ body{background:var(--wf-paper);}
 .wf-dark .wf-sidebar-search input{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.08);color:#fff;}
 .wf-nav-empty{padding:14px 10px;font-size:12px;color:${T.muted};text-align:center;}
 .wf-nav-item{position:relative;width:100%;display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:500;background:transparent;color:${T.ink};border:none;cursor:pointer;text-align:left;transition:background .15s ease,color .15s ease;}
+.wf-nav-item .wf-nav-label{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .wf-nav-item:hover{background:${T.lineSoft};color:${T.ink};}
 .wf-nav-item.active{background:${T.blue}17;color:${T.blue};font-weight:600;}
 .wf-nav-item.active::before{content:"";position:absolute;left:-1px;top:6px;bottom:6px;width:3px;border-radius:3px;background:${T.blue};}
@@ -8547,7 +8607,56 @@ function DatePicker({ value, onChange, placeholder, style, disabled }) {
   const selected = parseYMD(value);
   const [cursor, setCursor] = useState(() => selected || new Date());
   const wrapRef = useRef(null);
+  const popRef = useRef(null);
+  // Popover is portaled to document.body (see popPos below) rather than
+  // living inside .wf-dp-wrap, so outside-clicks still close it (the
+  // portal's onMouseDown stopPropagation keeps inside-clicks from ever
+  // reaching this document listener) while its own layout no longer sits
+  // inside whatever scrollable modal/form contains the field.
   useCloseOnOutside(wrapRef, () => setOpen(false));
+
+  // Anchors the calendar to the trigger button using fixed viewport
+  // coordinates instead of `position:absolute` inside the field's own
+  // flow. Previously the popup was laid out right inside the scrollable
+  // modal body, so opening it near the bottom of a long form suddenly
+  // grew that container's scrollable height — which is what made the
+  // modal appear to "jump"/scroll on its own and made the popup hard to
+  // reach. Rendering it as a fixed-position portal (same pattern as
+  // Modal/Drawer above) removes it from that layout entirely; we just
+  // recompute its screen position on open/scroll/resize instead.
+  const [popPos, setPopPos] = useState(null);
+  const positionPop = useCallback(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const popH = popRef.current?.offsetHeight || 336;
+    const spaceBelow = window.innerHeight - r.bottom;
+    const spaceAbove = r.top;
+    // Open upward if not enough space below AND there's more space above
+    const openUp = spaceBelow < popH + 10 && spaceAbove > spaceBelow;
+    const left = Math.min(Math.max(8, r.left), window.innerWidth - 264 - 8);
+    // Use consistent smaller gap for better visual alignment in modals
+    const gap = 4;
+    setPopPos({
+      left,
+      top: openUp ? r.top - gap : r.bottom + gap,
+      minWidth: r.width,
+      openUp,
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    positionPop();
+    // Capture-phase so scrolling *any* ancestor (e.g. the modal body),
+    // not just the window, keeps the popover correctly anchored.
+    window.addEventListener("scroll", positionPop, true);
+    window.addEventListener("resize", positionPop);
+    return () => {
+      window.removeEventListener("scroll", positionPop, true);
+      window.removeEventListener("resize", positionPop);
+    };
+  }, [open, positionPop]);
 
   useEffect(() => {
     if (open) setCursor(selected || new Date());
@@ -8604,76 +8713,90 @@ function DatePicker({ value, onChange, placeholder, style, disabled }) {
         </span>
         <CalendarDays size={15} style={{ opacity: 0.55, flexShrink: 0 }} />
       </button>
-      {open && !disabled && (
-        <div className="wf-dp-pop" onMouseDown={(e) => e.stopPropagation()}>
-          <div className="wf-dp-head">
-            <button
-              type="button"
-              className="wf-dp-nav"
-              onClick={() => setCursor(new Date(year, month - 1, 1))}
-            >
-              <ChevronLeft size={15} />
-            </button>
-            <span className="wf-dp-title">{monthTitle}</span>
-            <button
-              type="button"
-              className="wf-dp-nav"
-              onClick={() => setCursor(new Date(year, month + 1, 1))}
-            >
-              <ChevronRight size={15} />
-            </button>
-          </div>
-          <div className="wf-dp-grid">
-            {DP_DOW.map((w, i) => (
-              <div className="wf-dp-dow" key={i}>
-                {w}
-              </div>
-            ))}
-            {cells.map((c, i) => {
-              const ymd = fmtYMD(c.date);
-              const isSel = value && ymd === value;
-              const isToday = ymd === today;
-              return (
-                <button
-                  type="button"
-                  key={i}
-                  className={`wf-dp-day${c.outside ? " outside" : ""}${
-                    isToday ? " today" : ""
-                  }${isSel ? " selected" : ""}`}
-                  onClick={() => {
-                    fire(c.date);
-                    setOpen(false);
-                  }}
-                >
-                  {c.day}
-                </button>
-              );
-            })}
-          </div>
-          <div className="wf-dp-foot">
-            <button
-              type="button"
-              className="wf-dp-link"
-              onClick={() => {
-                onChange && onChange({ target: { value: "" } });
-                setOpen(false);
-              }}
-            >
-              {t.clear}
-            </button>
-            <button
-              type="button"
-              className="wf-dp-link"
-              onClick={() => {
-                fire(new Date());
-                setOpen(false);
-              }}
-            >
-              {t.today}
-            </button>
-          </div>
-        </div>
-      )}
+      {open &&
+        !disabled &&
+        popPos &&
+        createPortal(
+          <div
+            ref={popRef}
+            className="wf-dp-pop"
+            onMouseDown={(e) => e.stopPropagation()}
+            style={{
+              position: "fixed",
+              top: popPos.top,
+              left: popPos.left,
+              minWidth: Math.max(264, popPos.minWidth),
+            }}
+          >
+            <div className="wf-dp-head">
+              <button
+                type="button"
+                className="wf-dp-nav"
+                onClick={() => setCursor(new Date(year, month - 1, 1))}
+              >
+                <ChevronLeft size={15} />
+              </button>
+              <span className="wf-dp-title">{monthTitle}</span>
+              <button
+                type="button"
+                className="wf-dp-nav"
+                onClick={() => setCursor(new Date(year, month + 1, 1))}
+              >
+                <ChevronRight size={15} />
+              </button>
+            </div>
+            <div className="wf-dp-grid">
+              {DP_DOW.map((w, i) => (
+                <div className="wf-dp-dow" key={i}>
+                  {w}
+                </div>
+              ))}
+              {cells.map((c, i) => {
+                const ymd = fmtYMD(c.date);
+                const isSel = value && ymd === value;
+                const isToday = ymd === today;
+                return (
+                  <button
+                    type="button"
+                    key={i}
+                    className={`wf-dp-day${c.outside ? " outside" : ""}${
+                      isToday ? " today" : ""
+                    }${isSel ? " selected" : ""}`}
+                    onClick={() => {
+                      fire(c.date);
+                      setOpen(false);
+                    }}
+                  >
+                    {c.day}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="wf-dp-foot">
+              <button
+                type="button"
+                className="wf-dp-link"
+                onClick={() => {
+                  onChange && onChange({ target: { value: "" } });
+                  setOpen(false);
+                }}
+              >
+                {t.clear}
+              </button>
+              <button
+                type="button"
+                className="wf-dp-link"
+                onClick={() => {
+                  fire(new Date());
+                  setOpen(false);
+                }}
+              >
+                {t.today}
+              </button>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
@@ -10385,6 +10508,162 @@ function DashQuickAction({ icon: Icon, tint, label, onClick }) {
     </button>
   );
 }
+// HR Action Center — a single at-a-glance card that rolls up every
+// "needs a decision" item scattered across the admin's other pages
+// (pending leave/OT/attendance-correction requests, documents about to
+// expire, employees mid-onboarding) so nothing gets missed without
+// having to open each page separately. Rows are ordered by urgency
+// (rose = needs a decision, gold = time-sensitive but not blocking,
+// blue = informational) rather than grouped by category, and each row
+// deep-links straight into the filtered page instead of just a generic
+// "view all", per the redesign discussed on the Dashboard.
+function HrActionCenter({ items, t, setPage }) {
+  const { theme } = useTheme();
+  const TONE = {
+    rose: { dot: T.rose, bg: T.roseSoft },
+    gold: { dot: T.gold, bg: T.goldSoft },
+    blue: {
+      dot: T.blue,
+      bg: theme === "dark" ? "rgba(91,141,239,0.16)" : "#EAF1FE",
+    },
+  };
+  return (
+    <Card style={{ padding: 0, marginBottom: 22, overflow: "hidden" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          padding: "16px 18px",
+          borderBottom: `1px solid ${T.lineSoft}`,
+        }}
+      >
+        <span
+          style={{
+            width: 34,
+            height: 34,
+            borderRadius: 9,
+            background: T.goldSoft,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          <Bell size={17} color={T.goldText} />
+        </span>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: 14.5, fontWeight: 700, color: T.ink }}>
+            {t.dash.actionCenterTitle}
+          </div>
+          <div style={{ fontSize: 12, color: T.textSoft, marginTop: 1 }}>
+            {t.dash.actionRequiredLabel}
+          </div>
+        </div>
+        {items.length > 0 && (
+          <span
+            style={{
+              marginLeft: "auto",
+              fontSize: 12,
+              fontWeight: 700,
+              color: T.roseDark || T.rose,
+              background: T.roseSoft,
+              borderRadius: 999,
+              padding: "3px 10px",
+              flexShrink: 0,
+            }}
+          >
+            {items.reduce((s, it) => s + it.count, 0)}
+          </span>
+        )}
+      </div>
+      {items.length === 0 ? (
+        <div
+          style={{
+            padding: "22px 18px",
+            textAlign: "center",
+            color: T.textSoft,
+            fontSize: 13,
+          }}
+        >
+          {t.dash.allCaughtUp}
+        </div>
+      ) : (
+        <div>
+          {items.map((it) => {
+            const tone = TONE[it.tone] || TONE.blue;
+            const Icon = it.icon;
+            return (
+              <button
+                key={it.key}
+                type="button"
+                onClick={() => setPage && setPage(it.linkTo)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  width: "100%",
+                  textAlign: "left",
+                  padding: "12px 18px",
+                  background: "transparent",
+                  border: "none",
+                  borderBottom: `1px solid ${T.lineSoft}`,
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.background = T.paper)
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.background = "transparent")
+                }
+              >
+                <span
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 999,
+                    background: tone.dot,
+                    flexShrink: 0,
+                  }}
+                />
+                <span
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 8,
+                    background: tone.bg,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <Icon size={15} color={tone.dot} />
+                </span>
+                <span
+                  style={{
+                    fontSize: 13,
+                    color: T.ink,
+                    flex: 1,
+                    minWidth: 0,
+                  }}
+                >
+                  {it.label}
+                </span>
+                <ChevronRight
+                  size={15}
+                  color={T.muted}
+                  style={{ flexShrink: 0 }}
+                />
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </Card>
+  );
+}
+
 function Dashboard({
   employees,
   departments,
@@ -10405,6 +10684,9 @@ function Dashboard({
   overtimeRequests,
   otPolicy,
   payrollPolicy,
+  attendanceCorrections = [],
+  documents = [],
+  onboardingTasks = [],
 }) {
   const { t, lang } = useLang();
   const { theme } = useTheme();
@@ -10522,6 +10804,81 @@ function Dashboard({
   const pendingRows = payrollRows.filter((r) => !r.paid);
   const pendingNetPayroll = pendingRows.reduce((s, r) => s + r.net, 0);
   const totalOtCost = payrollRows.reduce((s, r) => s + r.otPay, 0);
+
+  // ---- HR Action Center — rolled-up "needs a decision" items ----
+  const actionItems = useMemo(() => {
+    if (role !== "admin") return [];
+    const pendingLeave = leaveRequests.filter(
+      (r) => r.status === "pending",
+    ).length;
+    const pendingOt = (overtimeRequests || []).filter(
+      (r) => r.status === "pending",
+    ).length;
+    const pendingAttCorr = (attendanceCorrections || []).filter(
+      (r) => r.status === "pending",
+    ).length;
+    const docsExpiring = (documents || []).filter((d) => {
+      const info = getDocExpiryInfo(d.expiryDate);
+      return info && (info.status === "soon" || info.status === "expired");
+    }).length;
+    const onboardingActive = new Set(
+      (onboardingTasks || [])
+        .filter((tk) => tk.type === "onboarding" && !tk.done)
+        .map((tk) => tk.employeeId),
+    ).size;
+    const items = [
+      pendingLeave > 0 && {
+        key: "leave",
+        icon: CalendarDays,
+        tone: "rose",
+        count: pendingLeave,
+        label: t.dash.leaveReqPending(pendingLeave),
+        linkTo: "leave",
+      },
+      pendingOt > 0 && {
+        key: "ot",
+        icon: Timer,
+        tone: "rose",
+        count: pendingOt,
+        label: t.dash.otReqPending(pendingOt),
+        linkTo: "ot",
+      },
+      pendingAttCorr > 0 && {
+        key: "attcorr",
+        icon: AlertCircle,
+        tone: "rose",
+        count: pendingAttCorr,
+        label: t.dash.attCorrPending(pendingAttCorr),
+        linkTo: "attcorr",
+      },
+      docsExpiring > 0 && {
+        key: "docExpiry",
+        icon: FileText,
+        tone: "gold",
+        count: docsExpiring,
+        label: t.dash.docsExpiringSoonCount(docsExpiring),
+        linkTo: "docExpiry",
+      },
+      onboardingActive > 0 && {
+        key: "onboarding",
+        icon: UserPlus,
+        tone: "blue",
+        count: onboardingActive,
+        label: t.dash.onboardingActiveCount(onboardingActive),
+        linkTo: "onboarding",
+      },
+    ].filter(Boolean);
+    const toneRank = { rose: 0, gold: 1, blue: 2 };
+    return items.sort((a, b) => toneRank[a.tone] - toneRank[b.tone]);
+  }, [
+    role,
+    leaveRequests,
+    overtimeRequests,
+    attendanceCorrections,
+    documents,
+    onboardingTasks,
+    t,
+  ]);
 
   const deptCounts = departments
     .map((d) => ({
@@ -11349,6 +11706,7 @@ function Dashboard({
 
       {role === "admin" ? (
         <>
+          <HrActionCenter items={actionItems} t={t} setPage={setPage} />
           <div
             style={{
               display: "grid",
@@ -36328,6 +36686,7 @@ function buildNavAdmin(n) {
   return withNavAccents([
     { id: "dashboard", label: n.dashboard, icon: LayoutDashboard },
     { id: "analytics", label: n.analytics, icon: BarChart3 },
+    { id: "calendar", label: n.calendar, icon: Calendar },
     { id: "reports", label: n.reports, icon: FileSpreadsheet },
     { id: "announcements", label: n.announcements, icon: Megaphone },
     { id: "employees", label: n.employees, icon: Users },
@@ -36433,37 +36792,39 @@ const NAV_GROUP_ORDER = [
   "main",
   "people",
   "attendance",
+  "payroll",
+  "development",
   "communication",
-  "hr",
-  "learning",
+  "reports",
   "system",
 ];
 const NAV_GROUP_MAP = {
   dashboard: "main",
   analytics: "main",
-  reports: "main",
-  announcements: "main",
+  calendar: "main",
   employees: "people",
   departments: "people",
   recruitment: "people",
   onboarding: "people",
+  attendance: "attendance",
   shifts: "attendance",
   roster: "attendance",
-  attendance: "attendance",
+  leave: "attendance",
+  ot: "attendance",
+  attcorr: "attendance",
+  shiftswap: "attendance",
+  holidays: "attendance",
+  payroll: "payroll",
+  payrollAdj: "payroll",
+  budget: "payroll",
+  review: "development",
+  training: "development",
+  announcements: "communication",
   messages: "communication",
-  holidays: "hr",
-  leave: "hr",
-  ot: "hr",
-  payroll: "hr",
-  payrollAdj: "hr",
-  budget: "hr",
-  review: "hr",
-  attcorr: "hr",
-  shiftswap: "hr",
-  assets: "hr",
-  docExpiry: "hr",
-  documents: "hr",
-  training: "learning",
+  reports: "reports",
+  assets: "system",
+  documents: "system",
+  docExpiry: "system",
   admins: "system",
   rolePerms: "system",
   audits: "system",
@@ -37173,6 +37534,383 @@ function ReportsCenter({
           >
             {t.reports.goToPayroll} <ChevronRight size={14} />
           </Button>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// Company-wide month calendar: holidays (everyone), approved leave spans,
+// and training start dates. Admins see everyone's leave/training; a
+// non-admin viewer (if this is ever wired into the employee nav later)
+// would only see their own — scoped via the isAdmin check below rather
+// than assuming role="admin" always, so it degrades safely either way.
+function CalendarPage({
+  role,
+  currentEmp,
+  employees,
+  holidays,
+  leaveRequests,
+  trainings,
+}) {
+  const { t, lang } = useLang();
+  const isAdmin = role === "admin";
+  const locale = lang === "km" ? "km-KH" : lang === "zh" ? "zh-CN" : "en-US";
+  const isMobile = useIsMobile();
+
+  const [cursor, setCursor] = useState(() => new Date());
+  const [selectedDate, setSelectedDate] = useState(() => todayStr());
+
+  const empName = (id) => employees?.find((e) => e.id === id)?.name || "—";
+
+  const year = cursor.getFullYear();
+  const month = cursor.getMonth();
+  const cells = useMemo(() => buildCalendarCells(year, month), [year, month]);
+  const monthTitle = useMemo(() => {
+    try {
+      return new Intl.DateTimeFormat(locale, {
+        year: "numeric",
+        month: "long",
+      }).format(new Date(year, month, 1));
+    } catch {
+      return `${year}-${month + 1}`;
+    }
+  }, [year, month, locale]);
+  const today = todayStr();
+
+  const holidaysByDate = useMemo(() => {
+    const m = new Map();
+    (holidays || []).forEach((h) => {
+      if (!h.date) return;
+      if (!m.has(h.date)) m.set(h.date, []);
+      m.get(h.date).push(h);
+    });
+    return m;
+  }, [holidays]);
+
+  const leaveSpans = useMemo(
+    () =>
+      (leaveRequests || []).filter(
+        (r) =>
+          r.status === "approved" &&
+          (isAdmin || r.employeeId === currentEmp?.id),
+      ),
+    [leaveRequests, isAdmin, currentEmp],
+  );
+
+  const trainingsByDate = useMemo(() => {
+    const m = new Map();
+    (trainings || [])
+      .filter((r) => isAdmin || r.employeeId === currentEmp?.id)
+      .forEach((r) => {
+        if (!r.startDate) return;
+        if (!m.has(r.startDate)) m.set(r.startDate, []);
+        m.get(r.startDate).push(r);
+      });
+    return m;
+  }, [trainings, isAdmin, currentEmp]);
+
+  const leaveForDate = (ymd) =>
+    leaveSpans.filter((r) => r.startDate <= ymd && ymd <= r.endDate);
+
+  const selectedHolidays = holidaysByDate.get(selectedDate) || [];
+  const selectedLeave = leaveForDate(selectedDate);
+  const selectedTrainings = trainingsByDate.get(selectedDate) || [];
+  const hasSelectedEvents =
+    selectedHolidays.length > 0 ||
+    selectedLeave.length > 0 ||
+    selectedTrainings.length > 0;
+
+  return (
+    <div>
+      <div style={{ marginBottom: 18 }}>
+        <h1
+          style={{
+            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+            fontWeight: 700,
+            fontSize: 22,
+            color: T.ink,
+            margin: 0,
+          }}
+        >
+          {t.calendar.title}
+        </h1>
+        <p style={{ color: T.textSoft, fontSize: 13, margin: "4px 0 0" }}>
+          {t.calendar.subtitle}
+        </p>
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: isMobile
+            ? "1fr"
+            : "minmax(0,1.6fr) minmax(260px,1fr)",
+          gap: 18,
+          alignItems: "start",
+        }}
+        className="wf-calendar-layout"
+      >
+        <Card style={{ padding: 18 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 14,
+            }}
+          >
+            <button
+              type="button"
+              className="wf-dp-nav"
+              onClick={() => setCursor(new Date(year, month - 1, 1))}
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontWeight: 700, fontSize: 15, color: T.ink }}>
+                {monthTitle}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setCursor(new Date());
+                  setSelectedDate(today);
+                }}
+              >
+                {t.calendar.today}
+              </Button>
+            </div>
+            <button
+              type="button"
+              className="wf-dp-nav"
+              onClick={() => setCursor(new Date(year, month + 1, 1))}
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+
+          <div
+            className="wf-dp-grid wf-dp-grid-range"
+            style={{ marginBottom: 4 }}
+          >
+            {DP_DOW.map((w, i) => (
+              <div className="wf-dp-dow" key={i}>
+                {w}
+              </div>
+            ))}
+            {cells.map((c, i) => {
+              const ymd = fmtYMD(c.date);
+              const dayHolidays = holidaysByDate.get(ymd) || [];
+              const dayLeave = leaveForDate(ymd);
+              const dayTrainings = trainingsByDate.get(ymd) || [];
+              const isToday = ymd === today;
+              const isSelected = ymd === selectedDate;
+              return (
+                <button
+                  type="button"
+                  key={i}
+                  onClick={() => setSelectedDate(ymd)}
+                  className={`wf-dp-day${c.outside ? " outside" : ""}${
+                    isToday ? " today" : ""
+                  }${isSelected ? " selected" : ""}`}
+                  style={{
+                    height: 52,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "flex-start",
+                    paddingTop: 6,
+                    gap: 3,
+                  }}
+                >
+                  <span className="wf-dp-day-num">{c.day}</span>
+                  {(dayHolidays.length > 0 ||
+                    dayLeave.length > 0 ||
+                    dayTrainings.length > 0) && (
+                    <span style={{ display: "flex", gap: 2 }}>
+                      {dayHolidays.length > 0 && (
+                        <span
+                          style={{
+                            width: 5,
+                            height: 5,
+                            borderRadius: "50%",
+                            background: T.gold,
+                            display: "inline-block",
+                          }}
+                        />
+                      )}
+                      {dayLeave.length > 0 && (
+                        <span
+                          style={{
+                            width: 5,
+                            height: 5,
+                            borderRadius: "50%",
+                            background: T.blue,
+                            display: "inline-block",
+                          }}
+                        />
+                      )}
+                      {dayTrainings.length > 0 && (
+                        <span
+                          style={{
+                            width: 5,
+                            height: 5,
+                            borderRadius: "50%",
+                            background: T.forest,
+                            display: "inline-block",
+                          }}
+                        />
+                      )}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          <div style={{ display: "flex", gap: 16, marginTop: 14 }}>
+            {[
+              { color: T.gold, label: t.calendar.holiday },
+              { color: T.blue, label: t.calendar.onLeave },
+              { color: T.forest, label: t.calendar.training },
+            ].map((l) => (
+              <div
+                key={l.label}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontSize: 11.5,
+                  color: T.muted,
+                }}
+              >
+                <span
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: "50%",
+                    background: l.color,
+                    display: "inline-block",
+                  }}
+                />
+                {l.label}
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card style={{ padding: 18 }}>
+          <div
+            style={{
+              fontWeight: 700,
+              fontSize: 14,
+              color: T.ink,
+              marginBottom: 4,
+            }}
+          >
+            {new Date(selectedDate + "T00:00:00").toLocaleDateString(locale, {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </div>
+          {!hasSelectedEvents ? (
+            <p style={{ fontSize: 12.5, color: T.muted, marginTop: 10 }}>
+              {t.calendar.noEvents}
+            </p>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+                marginTop: 12,
+              }}
+            >
+              {selectedHolidays.map((h) => (
+                <div
+                  key={h.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    fontSize: 13,
+                    color: T.ink,
+                  }}
+                >
+                  <span
+                    style={{
+                      width: 7,
+                      height: 7,
+                      borderRadius: "50%",
+                      background: T.gold,
+                      flexShrink: 0,
+                    }}
+                  />
+                  {h.name}
+                </div>
+              ))}
+              {selectedLeave.length > 0 && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 8,
+                    fontSize: 13,
+                    color: T.ink,
+                  }}
+                >
+                  <span
+                    style={{
+                      width: 7,
+                      height: 7,
+                      borderRadius: "50%",
+                      background: T.blue,
+                      flexShrink: 0,
+                      marginTop: 5,
+                    }}
+                  />
+                  <div>
+                    <div>{t.calendar.peopleOnLeave(selectedLeave.length)}</div>
+                    <div
+                      style={{ color: T.muted, fontSize: 11.5, marginTop: 2 }}
+                    >
+                      {selectedLeave
+                        .map((r) => empName(r.employeeId))
+                        .join(", ")}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {selectedTrainings.map((r) => (
+                <div
+                  key={r.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    fontSize: 13,
+                    color: T.ink,
+                  }}
+                >
+                  <span
+                    style={{
+                      width: 7,
+                      height: 7,
+                      borderRadius: "50%",
+                      background: T.forest,
+                      flexShrink: 0,
+                    }}
+                  />
+                  {r.courseName}
+                  {isAdmin ? ` · ${empName(r.employeeId)}` : ""}
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
       </div>
     </div>
@@ -39064,7 +39802,7 @@ function AppInner() {
                                   }
                                 : isActive
                                   ? { background: T.blue, color: "#fff" }
-                                  : { background: accent + "26", color: accent }
+                                  : { background: accent + "40", color: accent }
                             }
                           >
                             <n.icon size={17} />
@@ -39397,6 +40135,9 @@ function AppInner() {
                   overtimeRequests={overtimeRequests}
                   otPolicy={otPolicy}
                   payrollPolicy={payrollPolicy}
+                  attendanceCorrections={attendanceCorrections}
+                  documents={documents}
+                  onboardingTasks={onboardingTasks}
                 />
               )}
               {page === "analytics" && role === "admin" && (
@@ -39407,6 +40148,16 @@ function AppInner() {
                   overtimeRequests={overtimeRequests}
                   otPolicy={otPolicy}
                   payrollPolicy={payrollPolicy}
+                />
+              )}
+              {page === "calendar" && role === "admin" && (
+                <CalendarPage
+                  role={role}
+                  currentEmp={currentEmp}
+                  employees={employees}
+                  holidays={holidays}
+                  leaveRequests={leaveRequests}
+                  trainings={trainings}
                 />
               )}
               {page === "reports" && role === "admin" && (
