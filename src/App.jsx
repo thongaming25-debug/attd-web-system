@@ -181,6 +181,7 @@ const LANG_RAW = {
       loginActivity: "សកម្មភាពចូលគណនី",
       analytics: "វិភាគទិន្នន័យ",
       rolePerms: "សិទ្ធិតួនាទី",
+      reports: "មជ្ឈមណ្ឌលរបាយការណ៍",
     },
     navDesc: {
       announcements: "ព័ត៌មាន និងសេចក្តីប្រកាសរបស់ក្រុមហ៊ុន",
@@ -241,6 +242,34 @@ const LANG_RAW = {
       "សូមអនុញ្ញាត pop-up សម្រាប់គេហទំព័រនេះ ដើម្បីទាញយកបញ្ជីប្រាក់ខែ",
     popupBlockedBadge:
       "សូមអនុញ្ញាត pop-up សម្រាប់គេហទំព័រនេះ ដើម្បីបោះពុម្ពកាតសម្គាល់",
+    reports: {
+      title: "មជ្ឈមណ្ឌលរបាយការណ៍",
+      subtitle: "ជ្រើសរើសចន្លោះកាលបរិច្ឆេទ ហើយទាញយករបាយការណ៍ជា Excel ឬ PDF",
+      from: "ពីថ្ងៃ",
+      to: "ដល់ថ្ងៃ",
+      employee: "បុគ្គលិក",
+      allEmployees: "បុគ្គលិកទាំងអស់",
+      exportExcel: "Excel",
+      exportPdf: "PDF",
+      noData: "គ្មានទិន្នន័យសម្រាប់ចន្លោះកាលបរិច្ឆេទដែលបានជ្រើសទេ",
+      rows: (n) => `${n} ជួរ`,
+      attendance: "របាយការណ៍វត្តមាន",
+      attendanceDesc: "កំណត់ត្រាចូល-ចេញការងាររបស់បុគ្គលិកគ្រប់រូប",
+      payroll: "របាយការណ៍ប្រាក់ខែ",
+      payrollDesc:
+        "ដើម្បីភាពត្រឹមត្រូវ សូមចូលទៅកាន់ទំព័រប្រាក់ខែ ដើម្បីទាញយករបាយការណ៍តាមខែ",
+      goToPayroll: "ចូលទៅទំព័រប្រាក់ខែ",
+      leave: "របាយការណ៍ច្បាប់ឈប់សម្រាក",
+      leaveDesc: "សំណើច្បាប់ឈប់សម្រាកទាំងអស់ក្នុងចន្លោះកាលបរិច្ឆេទ",
+      ot: "របាយការណ៍ការងារបន្ថែម (OT)",
+      otDesc: "សំណើការងារបន្ថែម (OT) ទាំងអស់ក្នុងចន្លោះកាលបរិច្ឆេទ",
+      employees: "របាយការណ៍បញ្ជីបុគ្គលិក",
+      employeesDesc: "ព័ត៌មានលម្អិតរបស់បុគ្គលិកទាំងអស់បច្ចុប្បន្ន",
+      recruitment: "របាយការណ៍ការជ្រើសរើសបុគ្គលិក",
+      recruitmentDesc: "បេក្ខជនទាំងអស់ដែលដាក់ពាក្យក្នុងចន្លោះកាលបរិច្ឆេទ",
+      training: "របាយការណ៍ការបណ្តុះបណ្តាល",
+      trainingDesc: "វគ្គបណ្តុះបណ្តាលទាំងអស់ក្នុងចន្លោះកាលបរិច្ឆេទ",
+    },
     dash: {
       welcome: "សូមអញ្ជើញ",
       totalEmp: "បុគ្គលិកសរុប",
@@ -1563,6 +1592,7 @@ const LANG_RAW = {
       loginActivity: "Login Activity",
       analytics: "Analytics",
       rolePerms: "Roles & Permissions",
+      reports: "Reports Center",
     },
     navDesc: {
       announcements: "Company updates and news",
@@ -1622,6 +1652,34 @@ const LANG_RAW = {
     popupBlockedPayslip:
       "Please allow pop-ups for this site to download the payslip",
     popupBlockedBadge: "Please allow pop-ups for this site to print the badge",
+    reports: {
+      title: "Reports Center",
+      subtitle: "Pick a date range and export reports as Excel or PDF",
+      from: "From",
+      to: "To",
+      employee: "Employee",
+      allEmployees: "All employees",
+      exportExcel: "Excel",
+      exportPdf: "PDF",
+      noData: "No data in the selected date range",
+      rows: (n) => `${n} row${n === 1 ? "" : "s"}`,
+      attendance: "Attendance Report",
+      attendanceDesc: "Check-in/out records for every employee",
+      payroll: "Payroll Report",
+      payrollDesc:
+        "For accuracy, open the Payroll page to export a month-by-month report",
+      goToPayroll: "Go to Payroll",
+      leave: "Leave Report",
+      leaveDesc: "All leave requests within the date range",
+      ot: "Overtime (OT) Report",
+      otDesc: "All OT requests within the date range",
+      employees: "Employee Directory Report",
+      employeesDesc: "Full details of all current employees",
+      recruitment: "Recruitment Report",
+      recruitmentDesc: "All candidates who applied within the date range",
+      training: "Training Report",
+      trainingDesc: "All training courses within the date range",
+    },
     dash: {
       welcome: "Welcome",
       totalEmp: "Total Employees",
@@ -2936,6 +2994,7 @@ const LANG_RAW = {
       loginActivity: "登录记录",
       analytics: "数据分析",
       rolePerms: "角色权限",
+      reports: "报表中心",
     },
     navDesc: {
       announcements: "公司最新消息与公告",
@@ -2993,6 +3052,33 @@ const LANG_RAW = {
     popupBlockedTitle: "浏览器已阻止弹出窗口",
     popupBlockedPayslip: "请允许此网站的弹出窗口，以下载工资单",
     popupBlockedBadge: "请允许此网站的弹出窗口，以打印工作证",
+    reports: {
+      title: "报表中心",
+      subtitle: "选择日期范围，导出 Excel 或 PDF 报表",
+      from: "从",
+      to: "到",
+      employee: "员工",
+      allEmployees: "所有员工",
+      exportExcel: "Excel",
+      exportPdf: "PDF",
+      noData: "所选日期范围内没有数据",
+      rows: (n) => `${n} 行`,
+      attendance: "考勤报表",
+      attendanceDesc: "所有员工的上下班打卡记录",
+      payroll: "薪资报表",
+      payrollDesc: "为确保准确，请前往薪资页面按月导出报表",
+      goToPayroll: "前往薪资页面",
+      leave: "请假报表",
+      leaveDesc: "该日期范围内的所有请假申请",
+      ot: "加班报表",
+      otDesc: "该日期范围内的所有加班申请",
+      employees: "员工名录报表",
+      employeesDesc: "所有在职员工的详细信息",
+      recruitment: "招聘报表",
+      recruitmentDesc: "该日期范围内申请的所有候选人",
+      training: "培训报表",
+      trainingDesc: "该日期范围内的所有培训课程",
+    },
     dash: {
       welcome: "欢迎",
       totalEmp: "员工总数",
@@ -4115,7 +4201,7 @@ body{background:var(--wf-paper);}
 .wf-stat-solid-value{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;position:relative;line-height:1;}
 .wf-stat-solid-label{font-size:13px;font-weight:600;margin-top:6px;position:relative;}
 @media (prefers-reduced-motion:reduce){.wf-stat-solid,.wf-stat-solid-icon{transition:none;}}
-.wf-stat-pastel{position:relative;overflow:hidden;border-radius:14px;padding:20px 18px;min-height:132px;cursor:default;font-family:'Poppins','Noto Sans Khmer',sans-serif;transition:transform .18s cubic-bezier(.4,0,.2,1),box-shadow .18s cubic-bezier(.4,0,.2,1);}
+.wf-stat-pastel{position:relative;overflow:hidden;border-radius:14px;padding:20px 18px;min-height:132px;cursor:default;font-family:'Kantumruy Pro','Noto Sans Khmer',sans-serif;transition:transform .18s cubic-bezier(.4,0,.2,1),box-shadow .18s cubic-bezier(.4,0,.2,1);}
 .wf-stat-pastel:hover{transform:translateY(-3px);box-shadow:0 10px 22px -12px rgba(5,8,16,0.25);}
 .wf-stat-pastel-clickable{cursor:pointer;}
 .wf-stat-pastel-clickable:focus-visible{outline:2px solid ${T.gold};outline-offset:2px;}
@@ -4158,7 +4244,7 @@ body{background:var(--wf-paper);}
 .wf-dp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .wf-dp-nav{background:none;border:none;cursor:pointer;color:${T.muted};display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:6px;transition:background .12s ease,color .12s ease;flex-shrink:0;}
 .wf-dp-nav:hover{background:${T.tableHeadBg};color:${T.ink};}
-.wf-dp-title{font-size:13px;font-weight:700;color:${T.ink};font-family:'Sora','Noto Sans Khmer',sans-serif;}
+.wf-dp-title{font-size:13px;font-weight:700;color:${T.ink};font-family:'Kantumruy Pro','Noto Sans Khmer',sans-serif;}
 .wf-dp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
 .wf-dp-dow{font-size:10px;font-weight:700;color:${T.muted};text-align:center;padding:4px 0;text-transform:uppercase;}
 .wf-dp-day{position:relative;font-size:12.5px;text-align:center;padding:7px 0;border-radius:6px;cursor:pointer;color:${T.text};background:none;border:1px solid transparent;transition:background .12s ease,color .12s ease;}
@@ -4238,7 +4324,7 @@ body{background:var(--wf-paper);}
 .wf-apps-tile-desc{font-size:10.5px;font-weight:500;color:${T.muted};line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .wf-apps-tile:disabled{cursor:default;}
 .wf-apps-tile:disabled:hover{border-color:${T.line};box-shadow:none;}
-.wf-punch-clock{font-size:34px;font-weight:700;font-family:'Poppins','Noto Sans Khmer',sans-serif;color:${T.ink};font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
+.wf-punch-clock{font-size:34px;font-weight:700;font-family:'Kantumruy Pro','Noto Sans Khmer',sans-serif;color:${T.ink};font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
 .wf-menu-btn{display:none;background:none;border:none;color:${T.ink};cursor:pointer;padding:4px;}
 .wf-overlay-scrim{display:none;}
 .wf-content::-webkit-scrollbar,.wf-sidebar nav::-webkit-scrollbar,.wf-modal::-webkit-scrollbar{width:8px;}
@@ -4467,7 +4553,7 @@ function useGlobalStyle() {
       link.id = "wf-fonts";
       link.rel = "stylesheet";
       link.href =
-        "https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Khmer:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap";
+        "https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&family=Noto+Sans+Khmer:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap";
       document.head.appendChild(link);
     }
   }, []);
@@ -8241,7 +8327,7 @@ function Modal({ title, onClose, children, width = 480 }) {
         <div className="wf-modal-head">
           <h3
             style={{
-              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+              fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
               fontWeight: 600,
               color: T.ink,
               flex: 1,
@@ -8312,7 +8398,7 @@ function Drawer({ title, onClose, children, width = 440 }) {
         >
           <h3
             style={{
-              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+              fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
               fontWeight: 600,
               fontSize: 16,
               color: T.ink,
@@ -9158,8 +9244,8 @@ const LOGIN_CSS = `
   color:var(--wfl-text-softer); margin-top:14px;
 }
 .wf-login-title {
-  font-family:'Sora','Noto Sans Khmer',sans-serif;
-  font-weight:800; font-size:22px; color:var(--wfl-text); margin-top:4px; text-align:center;
+  font-family:'Kantumruy Pro','Noto Sans Khmer',sans-serif;
+  font-weight:700; font-size:22px; color:var(--wfl-text); margin-top:4px; text-align:center;
 }
 .wf-login-subtitle { font-size:13px; color:var(--wfl-text-soft); margin-top:6px; text-align:center; }
 .wf-login-divider { display:flex; align-items:center; gap:10px; margin:22px 0 18px; }
@@ -9453,7 +9539,7 @@ function EmployeeLoginScreen({ employees, onLogin, go }) {
                 ) : (
                   <span
                     style={{
-                      fontWeight: 800,
+                      fontWeight: 700,
                       fontSize: 17,
                       color: "var(--wfl-accent)",
                       fontFamily: "'JetBrains Mono',monospace",
@@ -9859,7 +9945,7 @@ function printOfficeQrPage(office, title, scanHint, branding) {
     *{box-sizing:border-box;}
     html,body{margin:0;padding:0;}
     body{
-      font-family:'Noto Sans Khmer','Sora',sans-serif;
+      font-family:'Noto Sans Khmer','Kantumruy Pro',sans-serif;
       width:148mm;min-height:210mm;
       display:flex;flex-direction:column;align-items:center;
       background:#fff;color:#0A0F1A;
@@ -9875,7 +9961,7 @@ function printOfficeQrPage(office, title, scanHint, branding) {
     .logo-fallback{
       background:#1FA26B;color:#fff;font-weight:700;font-size:16px;
       display:flex;align-items:center;justify-content:center;
-      font-family:'Sora',sans-serif;
+      font-family:'Kantumruy Pro',sans-serif;
     }
     .brand{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;
       color:#8A93A8;margin-bottom:6px;font-weight:600;}
@@ -10331,7 +10417,31 @@ function Dashboard({
     const id = setInterval(() => setLiveClock(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
-  const today = todayStr();
+  // Admin can click the date badge above the dashboard to pick a past (or
+  // future) day — every "today"-based stat below (present/working now/etc.)
+  // is derived from `today`, so picking a date re-renders the whole
+  // dashboard as of that day. Defaults to the real today.
+  const [selectedDate, setSelectedDate] = useState(() => todayStr());
+  const [dateOpen, setDateOpen] = useState(false);
+  const [dateCursor, setDateCursor] = useState(
+    () => parseYMD(selectedDate) || new Date(),
+  );
+  const dateWrapRef = useRef(null);
+  useCloseOnOutside(dateWrapRef, () => setDateOpen(false));
+  useEffect(() => {
+    if (dateOpen) setDateCursor(parseYMD(selectedDate) || new Date());
+  }, [dateOpen, selectedDate]);
+  const today = selectedDate;
+  const realTodayStr = todayStr();
+  const dpLocale = lang === "km" ? "km-KH" : lang === "zh" ? "zh-CN" : "en-US";
+  const isViewingToday = selectedDate === realTodayStr;
+  const selectedDateLabel = (
+    parseYMD(selectedDate) || new Date()
+  ).toLocaleDateString(dpLocale, { month: "short", day: "numeric" });
+  // Small " · <date>" suffix appended to labels that literally say
+  // "Today"/"Now" when the admin has picked a different day, so the
+  // numbers below don't look like they're still describing today.
+  const dateSuffix = isViewingToday ? "" : ` · ${selectedDateLabel}`;
   // "Working now" = checked in today, not checked out yet, and not on
   // leave/absent. Driven straight off the `attendance` array, which is
   // kept live via the shared Supabase realtime channel (see
@@ -10504,7 +10614,7 @@ function Dashboard({
             linkTo: "departments",
           },
           {
-            label: t.dash.presentToday,
+            label: `${t.dash.presentToday}${dateSuffix}`,
             value: presentToday,
             sub: `${rate}% ${t.dash.attendRate}`,
             icon: Clock,
@@ -10733,7 +10843,7 @@ function Dashboard({
       >
         <h3
           style={{
-            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
             fontWeight: 600,
             color: T.ink,
             fontSize: 14,
@@ -10888,6 +10998,48 @@ function Dashboard({
   // like the Analytics page does, instead of being boxed in at 1280px.
   const dashboardWrapStyle = undefined;
 
+  // Calendar grid for the dashboard date-picker popover (mirrors the
+  // shared DatePicker component's math, but keeps the trigger styled as
+  // the original header pill instead of a wf-dp-trigger input box).
+  const dpYear = dateCursor.getFullYear();
+  const dpMonth = dateCursor.getMonth();
+  const dpFirstDow = new Date(dpYear, dpMonth, 1).getDay();
+  const dpDaysInMonth = new Date(dpYear, dpMonth + 1, 0).getDate();
+  const dpDaysInPrevMonth = new Date(dpYear, dpMonth, 0).getDate();
+  const dpTotalCells = Math.ceil((dpFirstDow + dpDaysInMonth) / 7) * 7;
+  const dpCells = [];
+  for (let i = 0; i < dpFirstDow; i++) {
+    const day = dpDaysInPrevMonth - dpFirstDow + 1 + i;
+    dpCells.push({
+      day,
+      outside: true,
+      date: new Date(dpYear, dpMonth - 1, day),
+    });
+  }
+  for (let d = 1; d <= dpDaysInMonth; d++) {
+    dpCells.push({
+      day: d,
+      outside: false,
+      date: new Date(dpYear, dpMonth, d),
+    });
+  }
+  let dpNextDay = 1;
+  while (dpCells.length < dpTotalCells) {
+    dpCells.push({
+      day: dpNextDay,
+      outside: true,
+      date: new Date(dpYear, dpMonth + 1, dpNextDay),
+    });
+    dpNextDay++;
+  }
+  let dpMonthTitle = `${dpYear}-${dpMonth + 1}`;
+  try {
+    dpMonthTitle = new Intl.DateTimeFormat(
+      lang === "km" ? "km-KH" : lang === "zh" ? "zh-CN" : "en-US",
+      { year: "numeric", month: "long" },
+    ).format(dateCursor);
+  } catch {}
+
   return (
     <div style={dashboardWrapStyle}>
       {role === "admin" ? (
@@ -10904,7 +11056,7 @@ function Dashboard({
           <div>
             <h2
               style={{
-                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                 fontWeight: 700,
                 fontSize: 24,
                 color: T.ink,
@@ -10920,26 +11072,117 @@ function Dashboard({
             </p>
           </div>
           <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              border: `1px solid ${T.lineSoft}`,
-              borderRadius: 10,
-              padding: "9px 14px",
-              fontSize: 12.5,
-              color: T.ink,
-              fontFamily: "'JetBrains Mono',monospace",
-              background: T.card,
-            }}
+            ref={dateWrapRef}
+            style={{ position: "relative", display: "inline-block" }}
           >
-            <CalendarDays size={14} color={T.muted} />
-            {new Date().toLocaleDateString(lang === "en" ? "en-US" : "km-KH", {
-              weekday: "short",
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })}
+            <button
+              type="button"
+              onClick={() => setDateOpen((o) => !o)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                border: `1px solid ${dateOpen ? T.gold : T.lineSoft}`,
+                borderRadius: 10,
+                padding: "9px 14px",
+                fontSize: 12.5,
+                color: T.ink,
+                fontFamily: "'JetBrains Mono',monospace",
+                background: T.card,
+                cursor: "pointer",
+                boxShadow: dateOpen
+                  ? "0 0 0 3px rgba(240,168,59,0.16)"
+                  : "none",
+              }}
+            >
+              <CalendarDays size={14} color={T.muted} />
+              {parseYMD(selectedDate).toLocaleDateString(dpLocale, {
+                weekday: "short",
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+              {selectedDate !== realTodayStr && (
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: "50%",
+                    background: T.gold,
+                    display: "inline-block",
+                    marginLeft: 2,
+                  }}
+                />
+              )}
+            </button>
+            {dateOpen && (
+              <div
+                className="wf-dp-pop"
+                onMouseDown={(e) => e.stopPropagation()}
+                style={{ right: 0, left: "auto" }}
+              >
+                <div className="wf-dp-head">
+                  <button
+                    type="button"
+                    className="wf-dp-nav"
+                    onClick={() =>
+                      setDateCursor(new Date(dpYear, dpMonth - 1, 1))
+                    }
+                  >
+                    <ChevronLeft size={15} />
+                  </button>
+                  <span className="wf-dp-title">{dpMonthTitle}</span>
+                  <button
+                    type="button"
+                    className="wf-dp-nav"
+                    onClick={() =>
+                      setDateCursor(new Date(dpYear, dpMonth + 1, 1))
+                    }
+                  >
+                    <ChevronRight size={15} />
+                  </button>
+                </div>
+                <div className="wf-dp-grid">
+                  {DP_DOW.map((w, i) => (
+                    <div className="wf-dp-dow" key={i}>
+                      {w}
+                    </div>
+                  ))}
+                  {dpCells.map((c, i) => {
+                    const ymd = fmtYMD(c.date);
+                    const isSel = ymd === selectedDate;
+                    const isToday = ymd === realTodayStr;
+                    return (
+                      <button
+                        type="button"
+                        key={i}
+                        className={`wf-dp-day${c.outside ? " outside" : ""}${
+                          isToday ? " today" : ""
+                        }${isSel ? " selected" : ""}`}
+                        onClick={() => {
+                          setSelectedDate(ymd);
+                          setDateOpen(false);
+                        }}
+                      >
+                        {c.day}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="wf-dp-foot">
+                  <button
+                    type="button"
+                    className="wf-dp-link"
+                    onClick={() => {
+                      setSelectedDate(realTodayStr);
+                      setDateOpen(false);
+                    }}
+                  >
+                    {t.today}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       ) : (
@@ -10950,7 +11193,7 @@ function Dashboard({
             </p>
             <h2
               style={{
-                fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                 fontSize: 20,
                 fontWeight: 700,
                 marginTop: 2,
@@ -10968,7 +11211,7 @@ function Dashboard({
                 color: T.textSoft,
                 fontSize: 11.5,
                 marginTop: 4,
-                fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
               }}
             >
               {t.dash.haveGreatDay}
@@ -11009,7 +11252,7 @@ function Dashboard({
                 </p>
                 <h2
                   style={{
-                    fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
+                    fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                     fontSize: 21,
                     fontWeight: 700,
                     marginTop: 4,
@@ -11032,7 +11275,7 @@ function Dashboard({
                     color: "rgba(255,255,255,0.85)",
                     fontSize: 11.5,
                     marginTop: 4,
-                    fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
+                    fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                   }}
                 >
                   {t.dash.haveGreatShift}
@@ -11062,7 +11305,8 @@ function Dashboard({
                     style={{
                       fontSize: 21,
                       fontWeight: 700,
-                      fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
+                      fontFamily:
+                        "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                       fontVariantNumeric: "tabular-nums",
                     }}
                   >
@@ -11089,7 +11333,8 @@ function Dashboard({
                         fontSize: 13.5,
                         fontWeight: 700,
                         marginTop: 2,
-                        fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
+                        fontFamily:
+                          "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                       }}
                     >
                       {hhmm(myShift.start)} – {hhmm(myShift.end)}
@@ -11167,7 +11412,7 @@ function Dashboard({
                 key: "present",
                 icon: CheckCircle2,
                 tint: "forest",
-                label: t.dash.presentToday,
+                label: `${t.dash.presentToday}${dateSuffix}`,
                 value: presentToday,
                 sub: `${rate}% ${t.dash.attendRate}`,
                 linkTo: "attendance",
@@ -11288,7 +11533,7 @@ function Dashboard({
               >
                 <h3
                   style={{
-                    fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                    fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                     fontWeight: 600,
                     color: T.ink,
                     fontSize: 14,
@@ -11363,7 +11608,7 @@ function Dashboard({
             <Card style={{ padding: 18 }}>
               <h3
                 style={{
-                  fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                  fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                   fontWeight: 600,
                   color: T.ink,
                   fontSize: 14,
@@ -11382,6 +11627,7 @@ function Dashboard({
                   }}
                 >
                   {t.dash.noAttend}
+                  {dateSuffix}
                 </p>
               ) : (
                 <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
@@ -11455,7 +11701,7 @@ function Dashboard({
             <Card style={{ padding: 18 }}>
               <h3
                 style={{
-                  fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                  fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                   fontWeight: 600,
                   color: T.ink,
                   fontSize: 14,
@@ -11494,7 +11740,7 @@ function Dashboard({
           <Card style={{ padding: 18, marginBottom: 22 }}>
             <h3
               style={{
-                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                 fontWeight: 600,
                 color: T.ink,
                 fontSize: 14,
@@ -11611,7 +11857,7 @@ function Dashboard({
               >
                 <h3
                   style={{
-                    fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                    fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                     fontWeight: 600,
                     color: T.ink,
                     fontSize: 14,
@@ -11631,6 +11877,7 @@ function Dashboard({
                     }}
                   />
                   {t.dash.workingNow}
+                  {dateSuffix}
                 </h3>
                 <span
                   style={{
@@ -11652,6 +11899,7 @@ function Dashboard({
                   }}
                 >
                   {t.dash.noOneWorkingNow}
+                  {dateSuffix}
                 </p>
               ) : (
                 <div
@@ -11767,7 +12015,7 @@ function Dashboard({
               >
                 <h3
                   style={{
-                    fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                    fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                     fontWeight: 600,
                     color: T.ink,
                     fontSize: 14,
@@ -11882,7 +12130,7 @@ function Dashboard({
               >
                 <h3
                   style={{
-                    fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                    fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                     fontWeight: 600,
                     color: T.ink,
                     fontSize: 14,
@@ -11977,7 +12225,7 @@ function Dashboard({
               >
                 <h3
                   style={{
-                    fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                    fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                     fontWeight: 600,
                     color: T.ink,
                     fontSize: 14,
@@ -12058,7 +12306,7 @@ function Dashboard({
               <div>
                 <h3
                   style={{
-                    fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                    fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                     fontWeight: 600,
                     color: T.ink,
                     fontSize: 14,
@@ -12346,7 +12594,8 @@ function Dashboard({
                 >
                   <h3
                     style={{
-                      fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                      fontFamily:
+                        "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                       fontWeight: 600,
                       color: T.ink,
                       fontSize: 14,
@@ -12936,7 +13185,7 @@ function ChartCard({ title, subtitle, children, noData, noDataLabel }) {
     <Card style={{ padding: 18 }}>
       <h3
         style={{
-          fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+          fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
           fontWeight: 600,
           color: T.ink,
           fontSize: 14,
@@ -13245,7 +13494,7 @@ function AnalyticsPage({
           <div>
             <h2
               style={{
-                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                 fontSize: 20,
                 fontWeight: 600,
                 display: "flex",
@@ -13446,7 +13695,7 @@ function AnalyticsPage({
             <div>
               <h3
                 style={{
-                  fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                  fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                   fontWeight: 600,
                   color: T.ink,
                   fontSize: 14,
@@ -13497,7 +13746,7 @@ function AnalyticsPage({
             <div>
               <h3
                 style={{
-                  fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                  fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                   fontWeight: 600,
                   color: T.ink,
                   fontSize: 14,
@@ -13539,7 +13788,7 @@ function AnalyticsPage({
       <Card id="wf-analytics-dept-summary" style={{ padding: 18 }}>
         <h3
           style={{
-            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
             fontWeight: 600,
             color: T.ink,
             fontSize: 14,
@@ -17117,7 +17366,7 @@ function Roster({
         <Card style={{ padding: 16, marginBottom: 16 }}>
           <h3
             style={{
-              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+              fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
               fontWeight: 600,
               color: T.ink,
               marginBottom: 12,
@@ -17916,7 +18165,7 @@ function SelfPunch({
       {!compact && (
         <h3
           style={{
-            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
             fontWeight: 700,
             fontSize: 14,
             color: T.ink,
@@ -18401,7 +18650,7 @@ function SelfPunch({
           style={{
             fontSize: 13,
             color: T.textSoft,
-            fontFamily: "'Poppins','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
             textAlign: "center",
           }}
         >
@@ -18637,7 +18886,7 @@ function KioskDisplay({ officeId, offices, branding }) {
           <MapPin size={40} color="#8A93A8" style={{ marginBottom: 14 }} />
           <h1
             style={{
-              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+              fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
               fontSize: 19,
               fontWeight: 600,
               marginBottom: 8,
@@ -18700,7 +18949,7 @@ function KioskDisplay({ officeId, offices, branding }) {
               color: "#fff",
               fontWeight: 700,
               fontSize: 18,
-              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+              fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
             }}
           >
             {brandName}
@@ -18723,7 +18972,7 @@ function KioskDisplay({ officeId, offices, branding }) {
         <h1
           style={{
             color: "#fff",
-            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
             fontSize: 21,
             fontWeight: 600,
             marginBottom: 26,
@@ -19621,7 +19870,7 @@ function Attendance({
         <Card style={{ padding: 16 }}>
           <h3
             style={{
-              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+              fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
               fontWeight: 600,
               color: T.ink,
               marginBottom: 12,
@@ -19985,7 +20234,8 @@ function Attendance({
                             fontSize: 10.5,
                             color:
                               rec.status === "late" ? T.goldText : T.forest,
-                            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                            fontFamily:
+                              "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                           }}
                         >
                           {rec.status === "late"
@@ -20009,7 +20259,8 @@ function Attendance({
                             style={{
                               fontSize: 10.5,
                               color: T.blue,
-                              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                              fontFamily:
+                                "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                             }}
                           >
                             {t.att.otPrefix}
@@ -20611,7 +20862,7 @@ function LeaveRequests({
               style={{
                 fontSize: 22,
                 fontWeight: 700,
-                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                 color: bal.remaining <= 0 ? T.rose : T.forestText,
               }}
             >
@@ -20650,7 +20901,7 @@ function LeaveRequests({
               style={{
                 fontSize: 22,
                 fontWeight: 700,
-                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                 color: sickBal.remaining <= 0 ? T.rose : T.blue,
               }}
             >
@@ -22507,7 +22758,7 @@ function OtStatCard({ icon: Icon, tint, label, value, sub }) {
         style={{
           fontSize: 21,
           fontWeight: 700,
-          fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+          fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
           color: T.ink,
         }}
       >
@@ -26927,7 +27178,7 @@ function RolePermissionsPage({ rolePermissions, setRolePermissions }) {
       <Card style={{ padding: 20, marginBottom: 18 }}>
         <h2
           style={{
-            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
             fontSize: 18,
             fontWeight: 600,
             color: T.ink,
@@ -26989,7 +27240,7 @@ function RolePermissionsPage({ rolePermissions, setRolePermissions }) {
       <Card style={{ padding: 20, marginBottom: 18 }}>
         <h2
           style={{
-            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
             fontSize: 18,
             fontWeight: 600,
             color: T.ink,
@@ -29981,7 +30232,7 @@ function MyProfile({
       <Card style={{ padding: 20 }}>
         <h3
           style={{
-            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
             fontWeight: 600,
             color: T.ink,
             marginBottom: 4,
@@ -30195,7 +30446,7 @@ function AppearanceCard() {
     <Card style={{ padding: 20 }}>
       <h3
         style={{
-          fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+          fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
           fontWeight: 600,
           color: T.ink,
           marginBottom: 4,
@@ -30371,7 +30622,7 @@ function SettingsNum({ n, tint = "violet", title, desc }) {
       <div style={{ minWidth: 0 }}>
         <h3
           style={{
-            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
             fontWeight: 700,
             color: T.ink,
             fontSize: 14.5,
@@ -31063,7 +31314,7 @@ function AdminSettings({
                 flexShrink: 0,
                 color: "#fff",
                 fontWeight: 700,
-                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
               }}
             >
               {brandForm.logo ? (
@@ -31381,7 +31632,7 @@ function AuditLogPage() {
         <div>
           <h2
             style={{
-              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+              fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
               fontSize: 18,
               fontWeight: 600,
               color: T.ink,
@@ -31981,7 +32232,7 @@ function LoginActivityPage({
         <div>
           <h2
             style={{
-              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+              fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
               fontSize: 18,
               fontWeight: 600,
               color: T.ink,
@@ -32411,6 +32662,89 @@ async function exportPayrollXlsx({
   URL.revokeObjectURL(url);
 }
 
+// Generic version of exportPayrollXlsx for the Reports Center: same
+// bold-header/zebra-row styling, but no totals row/currency assumptions
+// baked in — just a title, a subtitle (e.g. the date range), and a plain
+// column/row table. Used for Attendance/Leave/OT/Employee/Recruitment/
+// Training reports.
+async function exportReportXlsx({ filename, title, subtitle, columns, rows }) {
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "Workforce Suite";
+  wb.created = new Date();
+  const ws = wb.addWorksheet("Report", {
+    views: [{ state: "frozen", ySplit: 4 }],
+  });
+
+  const colCount = columns.length;
+  const lastColLetter = String.fromCharCode(64 + colCount);
+
+  ws.mergeCells(`A1:${lastColLetter}1`);
+  const titleCell = ws.getCell("A1");
+  titleCell.value = title;
+  titleCell.font = { bold: true, size: 14, color: { argb: "FF12203D" } };
+  titleCell.alignment = { horizontal: "center", vertical: "middle" };
+  ws.getRow(1).height = 26;
+
+  if (subtitle) {
+    ws.mergeCells(`A2:${lastColLetter}2`);
+    const subCell = ws.getCell("A2");
+    subCell.value = subtitle;
+    subCell.font = { italic: true, size: 11, color: { argb: "FF6B7280" } };
+    subCell.alignment = { horizontal: "center" };
+  }
+
+  ws.addRow([]); // spacer, row 3
+
+  const headerRow = ws.addRow(columns);
+  headerRow.eachCell((cell) => {
+    cell.font = { bold: true, color: { argb: "FFFFFFFF" }, size: 11 };
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF12203D" },
+    };
+    cell.alignment = { horizontal: "center", vertical: "middle" };
+    cell.border = {
+      top: { style: "thin", color: { argb: "FF0B1730" } },
+      bottom: { style: "thin", color: { argb: "FF0B1730" } },
+    };
+  });
+  headerRow.height = 20;
+
+  rows.forEach((r, i) => {
+    const row = ws.addRow(r);
+    const zebra = i % 2 === 1;
+    row.eachCell((cell) => {
+      cell.alignment = { horizontal: "left" };
+      if (zebra) {
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFF4F6F9" },
+        };
+      }
+      cell.border = { bottom: { style: "hair", color: { argb: "FFE3E7EE" } } };
+    });
+  });
+
+  columns.forEach((_, i) => {
+    ws.getColumn(i + 1).width = 18;
+  });
+
+  const buffer = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 function escapeHtml(s) {
   return String(s ?? "").replace(
     /[&<>"']/g,
@@ -32545,6 +32879,75 @@ function printPayslip({
   win.focus();
   // Give the new document a moment to lay out (esp. any logo image)
   // before invoking print, so nothing is cut off blank.
+  setTimeout(() => {
+    win.print();
+  }, 350);
+}
+
+// Generic tabular print-to-PDF for the Reports Center. Opens a clean,
+// print-ready table in a new window; the admin picks "Save as PDF" in
+// the browser's print dialog. Deliberately reuses this pattern instead
+// of adding a PDF-generation library.
+function printReportPdf({ title, subtitle, columns, rows, onPopupBlocked }) {
+  const win = window.open("", "_blank", "width=900,height=700");
+  if (!win) {
+    onPopupBlocked?.();
+    return;
+  }
+  const theadHtml = columns.map((c) => `<th>${escapeHtml(c)}</th>`).join("");
+  const rowsHtml = rows
+    .map(
+      (r) => `<tr>${r.map((v) => `<td>${escapeHtml(v)}</td>`).join("")}</tr>`,
+    )
+    .join("");
+  const generatedOn = new Date().toLocaleString();
+  const html = `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>${escapeHtml(title)}</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    padding: 28px;
+    color: #12203D;
+  }
+  h1 { font-size: 18px; margin: 0 0 2px; }
+  .sub { font-size: 12px; color: #6B7280; margin: 0 0 18px; }
+  table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+  th, td {
+    padding: 7px 9px;
+    border-bottom: 1px solid #E3E7EE;
+    text-align: left;
+    white-space: nowrap;
+  }
+  th {
+    background: #12203D;
+    color: #fff;
+    font-weight: 700;
+  }
+  tr:nth-child(even) td { background: #F4F6F9; }
+  .footer { margin-top: 18px; font-size: 10.5px; color: #9AA3AF; }
+  @media print {
+    body { padding: 0; }
+  }
+</style>
+</head>
+<body>
+  <h1>${escapeHtml(title)}</h1>
+  ${subtitle ? `<p class="sub">${escapeHtml(subtitle)}</p>` : ""}
+  <table>
+    <thead><tr>${theadHtml}</tr></thead>
+    <tbody>${rowsHtml}</tbody>
+  </table>
+  <div class="footer">Generated on ${escapeHtml(generatedOn)}</div>
+</body>
+</html>`;
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+  win.focus();
   setTimeout(() => {
     win.print();
   }, 350);
@@ -33183,7 +33586,7 @@ function Payslip({
               gap: 8,
               color: T.forest,
               fontWeight: 700,
-              fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+              fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
             }}
           >
             <Receipt size={20} /> {t.nav.myPayroll}
@@ -34743,7 +35146,7 @@ function Payroll({
           <div style={{ padding: "22px 24px", position: "relative" }}>
             <h2
               style={{
-                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                 fontWeight: 700,
                 fontSize: 19,
                 color: T.ink,
@@ -34799,7 +35202,7 @@ function Payroll({
           >
             <h3
               style={{
-                fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                 fontWeight: 600,
                 fontSize: 15,
                 color: T.ink,
@@ -35723,7 +36126,7 @@ function MoreAppsPage({
       >
         <h2
           style={{
-            fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
             fontSize: 19,
             fontWeight: 700,
             color: T.ink,
@@ -35925,6 +36328,7 @@ function buildNavAdmin(n) {
   return withNavAccents([
     { id: "dashboard", label: n.dashboard, icon: LayoutDashboard },
     { id: "analytics", label: n.analytics, icon: BarChart3 },
+    { id: "reports", label: n.reports, icon: FileSpreadsheet },
     { id: "announcements", label: n.announcements, icon: Megaphone },
     { id: "employees", label: n.employees, icon: Users },
     { id: "departments", label: n.departments, icon: Building2 },
@@ -36037,6 +36441,7 @@ const NAV_GROUP_ORDER = [
 const NAV_GROUP_MAP = {
   dashboard: "main",
   analytics: "main",
+  reports: "main",
   announcements: "main",
   employees: "people",
   departments: "people",
@@ -36244,6 +36649,534 @@ function computeAutoAbsentRecords(
       }
     });
   return out;
+}
+
+// One place for admins to pull cross-module reports for a date range,
+// instead of hunting down the per-page CSV button on each of Attendance/
+// Leave/OT/Employees/Recruitment/Training separately. Each card exports
+// a real, formatted .xlsx (via exportReportXlsx/ExcelJS) or opens a
+// print-ready page the admin can "Save as PDF" from (printReportPdf) —
+// deliberately NOT plain CSV, since the whole point is a nicer, single
+// hub. Payroll is intentionally NOT recomputed here: net pay involves
+// attendance-derived hours, OT, deductions and adjustments that the
+// Payroll page already gets right, so duplicating that math here risked
+// silently drifting out of sync — this just links straight to it.
+function ReportsCenter({
+  employees,
+  departments,
+  shifts,
+  attendance,
+  leaveRequests,
+  overtimeRequests,
+  trainings,
+  candidates,
+  jobPostings,
+  otPolicy,
+  setPage,
+  setVisitedPages,
+}) {
+  const { t, lang } = useLang();
+
+  // Recruitment data (candidates/jobPostings) is lazy-loaded — only
+  // fetched once the admin has actually opened the Recruitment page (see
+  // AppInner's visitedPages). Reports Center needs it too, so mark it
+  // visited on mount just like opening Recruitment directly would.
+  useEffect(() => {
+    if (typeof setVisitedPages === "function") {
+      setVisitedPages((v) => (v.recruitment ? v : { ...v, recruitment: true }));
+    }
+  }, [setVisitedPages]);
+
+  const empOf = (id) => employees?.find((e) => e.id === id);
+  const empName = (id) => empOf(id)?.name || "—";
+  const deptName = (id) => departments?.find((d) => d.id === id)?.name || "—";
+  const shiftOf = (id) => shifts?.find((s) => s.id === id);
+  const jobTitle = (id) => jobPostings?.find((j) => j.id === id)?.title || "—";
+  const statusMap = getStatusMap(lang);
+  const leaveTypeLabel = getLeaveTypeLabel(lang);
+
+  const monthStart = `${todayStr().slice(0, 7)}-01`;
+  const [range, setRange] = useState({ from: monthStart, to: todayStr() });
+  const inRange = (d) => !!d && d >= range.from && d <= range.to;
+  const rangeSubtitle = `${range.from} → ${range.to}`;
+
+  // Empty string = all employees. When set, every employee-linked report
+  // (Attendance/Leave/OT/Training, plus the directory itself) narrows to
+  // just this one person. Recruitment candidates aren't existing
+  // employees, so this filter doesn't apply to that card.
+  const [empFilter, setEmpFilter] = useState("");
+  const matchesEmp = (employeeId) => !empFilter || employeeId === empFilter;
+  const sortedEmployees = useMemo(
+    () =>
+      (employees || [])
+        .slice()
+        .sort((a, b) => (a.name || "").localeCompare(b.name || "")),
+    [employees],
+  );
+
+  const attendanceRows = useMemo(
+    () =>
+      (attendance || [])
+        .filter((a) => inRange(a.date) && matchesEmp(a.employeeId))
+        .sort((a, b) => a.date.localeCompare(b.date))
+        .map((a) => {
+          const emp = empOf(a.employeeId);
+          const empShift = shiftOf(emp?.shiftId);
+          const worked = workedMinutes(
+            a.checkIn,
+            a.checkOut,
+            effectiveBreakMinutes(
+              empShift,
+              otPolicy?.breakMinutes ?? DEFAULT_OT_POLICY.breakMinutes,
+            ),
+          );
+          return [
+            emp?.name || "—",
+            emp?.code || "",
+            deptName(emp?.deptId),
+            a.date,
+            a.checkIn || "",
+            a.checkOut || "",
+            worked ? formatHM(worked) : "",
+            statusMap[a.status]?.label || a.status || "",
+          ];
+        }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      attendance,
+      employees,
+      departments,
+      shifts,
+      otPolicy,
+      range.from,
+      range.to,
+      empFilter,
+    ],
+  );
+
+  const leaveRows = useMemo(
+    () =>
+      (leaveRequests || [])
+        .filter(
+          (r) =>
+            r.startDate <= range.to &&
+            r.endDate >= range.from &&
+            matchesEmp(r.employeeId),
+        )
+        .sort((a, b) => (a.startDate || "").localeCompare(b.startDate || ""))
+        .map((r) => [
+          empName(r.employeeId),
+          leaveTypeLabel[r.type] || r.type || "",
+          r.startDate || "",
+          r.endDate || "",
+          statusMap[r.status]?.label || r.status || "",
+          r.reason || "",
+        ]),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [leaveRequests, employees, range.from, range.to, empFilter],
+  );
+
+  const otRows = useMemo(
+    () =>
+      (overtimeRequests || [])
+        .filter((r) => inRange(r.date) && matchesEmp(r.employeeId))
+        .sort((a, b) => (a.date || "").localeCompare(b.date || ""))
+        .map((r) => [
+          empName(r.employeeId),
+          r.date || "",
+          fmtOtHM(r.hours),
+          statusMap[r.status]?.label || r.status || "",
+          r.reason || "",
+        ]),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [overtimeRequests, employees, range.from, range.to, empFilter],
+  );
+
+  const employeeRows = useMemo(
+    () =>
+      (employees || [])
+        .filter((e) => matchesEmp(e.id))
+        .slice()
+        .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
+        .map((e) => [
+          e.name || "",
+          e.code || "",
+          deptName(e.deptId),
+          e.role || "",
+          shiftLabel(shiftOf(e.shiftId)),
+          e.phone || "",
+          e.email || "",
+          e.joined || "",
+          statusMap[e.status]?.label || e.status || "",
+        ]),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [employees, departments, shifts, empFilter],
+  );
+
+  const recruitmentRows = useMemo(
+    () =>
+      (candidates || [])
+        .filter((c) => inRange(c.appliedDate))
+        .sort((a, b) =>
+          (a.appliedDate || "").localeCompare(b.appliedDate || ""),
+        )
+        .map((c) => [
+          c.name || "",
+          jobTitle(c.jobPostingId),
+          c.phone || "",
+          c.email || "",
+          t.recruit ? stageLabel(c.stage, t) : c.stage || "",
+          c.appliedDate || "",
+        ]),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [candidates, jobPostings, range.from, range.to],
+  );
+
+  const trainingRows = useMemo(
+    () =>
+      (trainings || [])
+        .filter((r) => inRange(r.startDate) && matchesEmp(r.employeeId))
+        .sort((a, b) => (a.startDate || "").localeCompare(b.startDate || ""))
+        .map((r) => [
+          empName(r.employeeId),
+          r.courseName || "",
+          r.provider || "",
+          r.category || "",
+          t.training?.[TRAINING_STATUS_LABEL_KEY[r.status]] || r.status || "",
+          r.startDate || "",
+          r.completionDate || "",
+        ]),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [trainings, employees, range.from, range.to, empFilter],
+  );
+
+  const empFileSuffix = empFilter
+    ? `-${(empName(empFilter) || "employee")
+        .toLowerCase()
+        .replace(/\s+/g, "-")}`
+    : "";
+
+  const cards = [
+    {
+      key: "attendance",
+      icon: Clock,
+      accent: T.gold,
+      title: t.reports.attendance,
+      desc: t.reports.attendanceDesc,
+      rows: attendanceRows,
+      columns: [
+        t.employee || "Employee",
+        t.emps?.code || "Code",
+        t.emps?.dept || "Department",
+        t.att?.date || "Date",
+        t.att?.inTime || "In",
+        t.att?.outTime || "Out",
+        t.att?.workHours || "Worked",
+        t.status || "Status",
+      ],
+      filename: `attendance-report-${range.from}_to_${range.to}${empFileSuffix}`,
+    },
+    {
+      key: "leave",
+      icon: CalendarDays,
+      accent: T.blue,
+      title: t.reports.leave,
+      desc: t.reports.leaveDesc,
+      rows: leaveRows,
+      columns: [
+        t.employee || "Employee",
+        t.lv?.type || "Type",
+        t.lv?.startDate || "Start",
+        t.lv?.endDate || "End",
+        t.status || "Status",
+        t.lv?.reason || "Reason",
+      ],
+      filename: `leave-report-${range.from}_to_${range.to}${empFileSuffix}`,
+    },
+    {
+      key: "ot",
+      icon: Timer,
+      accent: T.forest,
+      title: t.reports.ot,
+      desc: t.reports.otDesc,
+      rows: otRows,
+      columns: [
+        t.employee || "Employee",
+        t.ot?.date || "Date",
+        t.ot?.hours || "Hours",
+        t.status || "Status",
+        t.ot?.reason || "Reason",
+      ],
+      filename: `ot-report-${range.from}_to_${range.to}${empFileSuffix}`,
+    },
+    {
+      key: "employees",
+      icon: Users,
+      accent: T.rose,
+      title: t.reports.employees,
+      desc: t.reports.employeesDesc,
+      rows: employeeRows,
+      columns: [
+        t.emps?.name || "Name",
+        t.emps?.code || "Code",
+        t.emps?.dept || "Department",
+        t.emps?.role || "Role",
+        t.emps?.shift || "Shift",
+        t.emps?.phone || "Phone",
+        t.emps?.email || "Email",
+        t.emps?.joined || "Joined",
+        t.status || "Status",
+      ],
+      filename: `employee-directory-${todayStr()}${empFileSuffix}`,
+      noRangeFilter: true,
+    },
+    {
+      key: "recruitment",
+      icon: Briefcase,
+      accent: T.blue,
+      title: t.reports.recruitment,
+      desc: t.reports.recruitmentDesc,
+      rows: recruitmentRows,
+      columns: [
+        t.recruit?.name || t.emps?.name || "Name",
+        t.recruit?.job || "Job",
+        t.emps?.phone || "Phone",
+        t.emps?.email || "Email",
+        t.recruit?.stage || "Stage",
+        t.recruit?.appliedDate || "Applied",
+      ],
+      filename: `recruitment-report-${range.from}_to_${range.to}`,
+      noEmpFilter: true,
+    },
+    {
+      key: "training",
+      icon: GraduationCap,
+      accent: T.gold,
+      title: t.reports.training,
+      desc: t.reports.trainingDesc,
+      rows: trainingRows,
+      columns: [
+        t.employee || "Employee",
+        t.training?.courseName || "Course",
+        t.training?.provider || "Provider",
+        t.training?.category || "Category",
+        t.status || "Status",
+        t.training?.startDate || "Start",
+        t.training?.completionDate || "Completed",
+      ],
+      filename: `training-report-${range.from}_to_${range.to}${empFileSuffix}`,
+    },
+  ];
+
+  // Combines the active date range and employee filter into one subtitle
+  // string, honoring each card's noRangeFilter/noEmpFilter flags (the
+  // Employee Directory card ignores the date range; Recruitment ignores
+  // the employee filter since candidates aren't employees yet).
+  const subtitleFor = (c) => {
+    const parts = [];
+    if (!c.noRangeFilter) parts.push(rangeSubtitle);
+    if (empFilter && !c.noEmpFilter) parts.push(empName(empFilter));
+    return parts.length ? parts.join(" · ") : undefined;
+  };
+
+  return (
+    <div>
+      <div style={{ marginBottom: 18 }}>
+        <h1
+          style={{
+            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+            fontWeight: 700,
+            fontSize: 22,
+            color: T.ink,
+            margin: 0,
+          }}
+        >
+          {t.reports.title}
+        </h1>
+        <p style={{ color: T.textSoft, fontSize: 13, margin: "4px 0 0" }}>
+          {t.reports.subtitle}
+        </p>
+      </div>
+
+      <Card
+        style={{
+          padding: 14,
+          marginBottom: 18,
+          display: "flex",
+          alignItems: "flex-end",
+          gap: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <DateRangePicker
+          startValue={range.from}
+          endValue={range.to}
+          onChangeStart={(e) =>
+            setRange((r) => ({ ...r, from: e.target.value }))
+          }
+          onChangeEnd={(e) => setRange((r) => ({ ...r, to: e.target.value }))}
+          startLabel={t.reports.from}
+          endLabel={t.reports.to}
+        />
+        <div>
+          <span
+            className="wf-field-label"
+            style={{ display: "block", marginBottom: 4 }}
+          >
+            {t.reports.employee}
+          </span>
+          <Select
+            value={empFilter}
+            onChange={(e) => setEmpFilter(e.target.value)}
+            style={{ minWidth: 190 }}
+          >
+            <option value="">{t.reports.allEmployees}</option>
+            {sortedEmployees.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.name}
+                {e.code ? ` (${e.code})` : ""}
+              </option>
+            ))}
+          </Select>
+        </div>
+      </Card>
+
+      <div
+        className="wf-grid"
+        style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px,1fr))" }}
+      >
+        {cards.map((c) => (
+          <Card key={c.key} accent={c.accent} style={{ padding: 18 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 10,
+                marginBottom: 8,
+              }}
+            >
+              <div
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: 9,
+                  background: `${c.accent}1a`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <c.icon size={17} color={c.accent} />
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontWeight: 700, fontSize: 14, color: T.ink }}>
+                  {c.title}
+                </div>
+                <div style={{ fontSize: 11.5, color: T.muted, marginTop: 2 }}>
+                  {c.desc}
+                </div>
+              </div>
+            </div>
+            <div
+              style={{
+                fontSize: 11,
+                color: T.muted,
+                fontFamily: "'JetBrains Mono',monospace",
+                marginBottom: 12,
+              }}
+            >
+              {(() => {
+                const sub = subtitleFor(c);
+                return sub
+                  ? `${t.reports.rows(c.rows.length)} · ${sub}`
+                  : t.reports.rows(c.rows.length);
+              })()}
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={c.rows.length === 0}
+                onClick={() =>
+                  exportReportXlsx({
+                    filename: `${c.filename}.xlsx`,
+                    title: c.title,
+                    subtitle: subtitleFor(c),
+                    columns: c.columns,
+                    rows: c.rows,
+                  })
+                }
+              >
+                <FileSpreadsheet size={14} /> {t.reports.exportExcel}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={c.rows.length === 0}
+                onClick={() =>
+                  printReportPdf({
+                    title: c.title,
+                    subtitle: subtitleFor(c),
+                    columns: c.columns,
+                    rows: c.rows,
+                  })
+                }
+              >
+                <Printer size={14} /> {t.reports.exportPdf}
+              </Button>
+            </div>
+            {c.rows.length === 0 && !c.noRangeFilter && (
+              <div style={{ fontSize: 11.5, color: T.muted, marginTop: 8 }}>
+                {t.reports.noData}
+              </div>
+            )}
+          </Card>
+        ))}
+
+        <Card style={{ padding: 18 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 10,
+              marginBottom: 8,
+            }}
+          >
+            <div
+              style={{
+                width: 34,
+                height: 34,
+                borderRadius: 9,
+                background: `${T.forest}1a`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <Wallet size={17} color={T.forest} />
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontWeight: 700, fontSize: 14, color: T.ink }}>
+                {t.reports.payroll}
+              </div>
+              <div style={{ fontSize: 11.5, color: T.muted, marginTop: 2 }}>
+                {t.reports.payrollDesc}
+              </div>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => typeof setPage === "function" && setPage("payroll")}
+          >
+            {t.reports.goToPayroll} <ChevronRight size={14} />
+          </Button>
+        </Card>
+      </div>
+    </div>
+  );
 }
 
 function AppInner() {
@@ -38062,7 +38995,7 @@ function AppInner() {
                 style={{
                   fontWeight: 600,
                   fontSize: 15,
-                  fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                  fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
@@ -38303,7 +39236,7 @@ function AppInner() {
               </div>
               <h1
                 style={{
-                  fontFamily: "'Sora','Noto Sans Khmer',sans-serif",
+                  fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
                   fontWeight: 700,
                   color: T.ink,
                   fontSize: 16,
@@ -38474,6 +39407,22 @@ function AppInner() {
                   overtimeRequests={overtimeRequests}
                   otPolicy={otPolicy}
                   payrollPolicy={payrollPolicy}
+                />
+              )}
+              {page === "reports" && role === "admin" && (
+                <ReportsCenter
+                  employees={employees}
+                  departments={departments}
+                  shifts={shifts}
+                  attendance={attendance}
+                  leaveRequests={leaveRequests}
+                  overtimeRequests={overtimeRequests}
+                  trainings={trainings}
+                  candidates={candidates}
+                  jobPostings={jobPostings}
+                  otPolicy={otPolicy}
+                  setPage={setPage}
+                  setVisitedPages={setVisitedPages}
                 />
               )}
               {page === "announcements" &&
