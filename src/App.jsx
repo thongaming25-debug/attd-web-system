@@ -4393,10 +4393,6 @@ body{background:var(--wf-paper);}
    cards (today's attendance breakdown + announcements) are hidden on
    phones entirely rather than just reflowed. */
 .wf-desktop-only-card{display:none;}
-.wf-skel-shell{display:flex;min-height:100vh;min-height:100dvh;background:${T.paper};}
-.wf-skel-side{width:220px;flex-shrink:0;padding:18px;display:flex;flex-direction:column;gap:10px;border-right:1px solid ${T.lineSoft};}
-.wf-skel-main{flex:1;min-width:0;padding:22px;}
-.wf-skel-bottombar{display:none;}
 .wf-apps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
 .wf-apps-tile{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:9px;background:${T.card};border:1px solid ${T.line};border-radius:16px;padding:18px 6px;cursor:pointer;text-align:center;transition:transform .12s ease,box-shadow .15s ease,border-color .15s ease;}
 .wf-apps-tile:hover{border-color:${T.gold};box-shadow:0 4px 14px rgba(5,8,16,0.06);}
@@ -4554,17 +4550,6 @@ body{background:var(--wf-paper);}
      horizontal overflow/cut-off. Stack them full-width instead, so
      each card reads top-to-bottom like the rest of the mobile page. */
   .wf-dash-charts-row{grid-template-columns:1fr !important;}
-  /* Loading skeleton: the desktop shape (fixed 220px sidebar rail +
-     content column) squeezed the sidebar into a sliver and left the
-     rest of a phone screen blank/empty instead of filling it — on
-     phones, drop the sidebar column entirely and stack full-width
-     blocks instead, plus a bottom-tab-bar placeholder so the shape
-     actually matches what mobile is about to load into. */
-  .wf-skel-side{display:none;}
-  .wf-skel-shell{flex-direction:column;}
-  .wf-skel-main{padding:16px;padding-bottom:70px;width:100%;}
-  .wf-skel-bottombar{display:flex;position:fixed;left:0;right:0;bottom:0;gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:${T.headerBg};border-top:1px solid ${T.lineSoft};}
-  .wf-skel-bottombar > div{flex:1;height:34px;border-radius:9px;}
 }
 @media (min-width:821px){
   /* Employee dashboard laid out like a "left: punch card, right:
@@ -40818,11 +40803,17 @@ function AppInner() {
         </div>
       );
     }
-    // Shape-of-the-app skeleton (sidebar rail + topbar + card grid)
-    // instead of a bare spinner on a blank page — it gives the person
-    // something to look at that already resembles where they're headed,
-    // so the first load reads as "loading the dashboard" rather than
-    // "nothing has happened yet". Pure CSS shimmer, no extra libs.
+    // Shape-of-the-app skeleton — reuses the REAL .wf-root/.wf-sidebar/
+    // .wf-header/.wf-content/.wf-bottomnav shell (same classes the actual
+    // logged-in layout below renders into) instead of a separate hand-sized
+    // .wf-skel-* box. That means: same 276px sidebar, same sticky header,
+    // same full-height content column, same responsive breakpoint that
+    // hides the sidebar and shows the bottom tab bar on phones — so the
+    // loading shape always matches wherever the real layout goes, on
+    // desktop and mobile alike, with no risk of the two drifting apart.
+    // It also fills the whole content column (stat row + a 3-column
+    // charts row, sized like the real dashboard) instead of a couple of
+    // short blocks that leave the rest of the screen blank.
     const shimmer = {
       background:
         "linear-gradient(90deg, var(--wf-line-soft) 25%, var(--wf-line) 37%, var(--wf-line-soft) 63%)",
@@ -40831,41 +40822,182 @@ function AppInner() {
       borderRadius: 8,
     };
     return (
-      <div className="wf-skel-shell">
-        <div className="wf-skel-side">
-          <div
-            style={{ ...shimmer, height: 28, width: "70%", marginBottom: 14 }}
-          />
-          {Array.from({ length: 7 }).map((_, i) => (
+      <div className="wf-root">
+        <aside className="wf-sidebar">
+          <div className="wf-sidebar-inner">
+            <div
+              style={{
+                padding: "18px 18px",
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                borderBottom: "1px solid rgba(255,255,255,0.1)",
+              }}
+            >
+              <div
+                style={{
+                  ...shimmer,
+                  width: 34,
+                  height: 34,
+                  borderRadius: 10,
+                  flexShrink: 0,
+                }}
+              />
+              <div style={{ ...shimmer, height: 14, width: "55%" }} />
+            </div>
+            <div className="wf-sidebar-search">
+              <div style={{ ...shimmer, height: 32, borderRadius: 9 }} />
+            </div>
+            <nav className="wf-sidebar-nav">
+              <div
+                style={{
+                  ...shimmer,
+                  height: 9,
+                  width: "35%",
+                  margin: "6px 8px 10px",
+                }}
+              />
+              {Array.from({ length: 9 }).map((_, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: "8px 10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      ...shimmer,
+                      width: 30,
+                      height: 30,
+                      borderRadius: 9,
+                      flexShrink: 0,
+                    }}
+                  />
+                  <div
+                    style={{
+                      ...shimmer,
+                      height: 11,
+                      width: `${72 - (i % 4) * 11}%`,
+                    }}
+                  />
+                </div>
+              ))}
+            </nav>
+            <div
+              style={{
+                padding: 12,
+                borderTop: "1px solid rgba(255,255,255,0.1)",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "9px 10px",
+                  marginBottom: 8,
+                }}
+              >
+                <div
+                  style={{
+                    ...shimmer,
+                    width: 34,
+                    height: 34,
+                    borderRadius: "50%",
+                    flexShrink: 0,
+                  }}
+                />
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div
+                    style={{
+                      ...shimmer,
+                      height: 11,
+                      width: "65%",
+                      marginBottom: 5,
+                    }}
+                  />
+                  <div style={{ ...shimmer, height: 9, width: "40%" }} />
+                </div>
+              </div>
+              <div style={{ ...shimmer, height: 34, borderRadius: 10 }} />
+            </div>
+          </div>
+        </aside>
+
+        <div className="wf-main">
+          <header className="wf-header">
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div
+                style={{ ...shimmer, height: 9, width: 90, marginBottom: 6 }}
+              />
+              <div style={{ ...shimmer, height: 16, width: 170 }} />
+            </div>
+            <div
+              style={{
+                marginLeft: "auto",
+                flexShrink: 0,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <div
+                style={{ ...shimmer, height: 26, width: 74, borderRadius: 8 }}
+              />
+              <div
+                style={{ ...shimmer, height: 26, width: 58, borderRadius: 8 }}
+              />
+            </div>
+          </header>
+          <div className="wf-content wf-content-bnpad">
+            <div
+              style={{ ...shimmer, height: 20, width: 220, marginBottom: 18 }}
+            />
+            <div className="wf-dash-stats" style={{ marginBottom: 16 }}>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} style={{ ...shimmer, height: 84 }} />
+              ))}
+            </div>
+            <div
+              className="wf-dash-charts-row"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1.5fr 1.1fr 0.9fr",
+                gap: 16,
+                marginBottom: 16,
+              }}
+            >
+              <div style={{ ...shimmer, height: 260 }} />
+              <div style={{ ...shimmer, height: 260 }} />
+              <div style={{ ...shimmer, height: 260 }} />
+            </div>
+            <div style={{ ...shimmer, height: 160 }} />
+          </div>
+        </div>
+
+        <nav className="wf-bottomnav">
+          {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              style={{ ...shimmer, height: 16, width: `${85 - (i % 3) * 12}%` }}
-            />
+              style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 4,
+                padding: "6px 2px",
+              }}
+            >
+              <div
+                style={{ ...shimmer, width: 22, height: 22, borderRadius: 7 }}
+              />
+              <div style={{ ...shimmer, width: "55%", height: 7 }} />
+            </div>
           ))}
-        </div>
-        <div className="wf-skel-main">
-          <div
-            style={{ ...shimmer, height: 22, width: 200, marginBottom: 20 }}
-          />
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-              gap: 14,
-              marginBottom: 20,
-            }}
-          >
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} style={{ ...shimmer, height: 70 }} />
-            ))}
-          </div>
-          <div style={{ ...shimmer, height: 220 }} />
-        </div>
-        <div className="wf-skel-bottombar">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} style={shimmer} />
-          ))}
-        </div>
+        </nav>
         <style>
           {
             "@keyframes wfShimmer{0%{background-position:100% 50%}100%{background-position:0% 50%}}"
