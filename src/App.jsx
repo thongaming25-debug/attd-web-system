@@ -1401,6 +1401,11 @@ const LANG_RAW = {
       fontLarge: "ធំ",
       saved: "បានរក្សាទុកដោយជោគជ័យ",
       saveFailed: "រក្សាទុកមិនបានសម្រេច៖",
+      created: "បានបង្កើតដោយជោគជ័យ",
+      updated: "បានធ្វើបច្ចុប្បន្នភាពដោយជោគជ័យ",
+      deleted: "បានលុបដោយជោគជ័យ",
+      approved: "បានយល់ព្រមដោយជោគជ័យ",
+      rejected: "បានបដិសេធដោយជោគជ័យ",
       nameRequired: "សូមបញ្ចូលឈ្មោះ",
       brandingTitle: "ម៉ាកយីហោក្រុមហ៊ុន",
       brandingDesc:
@@ -2839,6 +2844,11 @@ const LANG_RAW = {
       fontLarge: "Large",
       saved: "Saved successfully",
       saveFailed: "Save failed:",
+      created: "Created successfully",
+      updated: "Updated successfully",
+      deleted: "Deleted successfully",
+      approved: "Approved successfully",
+      rejected: "Rejected successfully",
       nameRequired: "Please enter a name",
       brandingTitle: "Company Branding",
       brandingDesc:
@@ -3328,6 +3338,11 @@ const LANG_RAW = {
       fontLarge: "大",
       saved: "保存成功",
       saveFailed: "保存失败：",
+      created: "创建成功",
+      updated: "更新成功",
+      deleted: "删除成功",
+      approved: "已批准",
+      rejected: "已拒绝",
       nameRequired: "请输入姓名",
       brandingTitle: "公司品牌",
       brandingDesc: "设置自定义公司名称和标志，以替换默认名称和标志",
@@ -6665,7 +6680,7 @@ function useSupabaseArray(
   }, [table, ready]);
 
   const setValue = useCallback(
-    (nextOrUpdater) => {
+    (nextOrUpdater, options) => {
       const prev = prevRef.current;
       const next =
         typeof nextOrUpdater === "function"
@@ -6686,6 +6701,23 @@ function useSupabaseArray(
           updatedRows.push({ row: r, old });
       });
       const toUpsert = [...createdRows, ...updatedRows.map((u) => u.row)];
+      // The success toast defaults to naming what actually happened
+      // (Created/Updated/Deleted) instead of one blanket "Saved
+      // successfully" for every action — a caller that knows the more
+      // precise verb (e.g. "Approved", "Rejected") can override it via
+      // options.toastMessage; see the approve/reject handlers that pass
+      // one. Falls back to the generic "saved" message when a single
+      // call mixes kinds (e.g. a bulk edit that both adds and removes
+      // rows) since no single verb covers that case.
+      const defaultToastMessage =
+        options?.toastMessage ||
+        (toDelete.length && !toUpsert.length
+          ? t.settings.deleted
+          : createdRows.length && !updatedRows.length && !toDelete.length
+            ? t.settings.created
+            : updatedRows.length && !createdRows.length && !toDelete.length
+              ? t.settings.updated
+              : t.settings.saved);
 
       setSaveError(null);
       (async () => {
@@ -6755,7 +6787,7 @@ function useSupabaseArray(
           !hadNetworkIssue &&
           (toDelete.length || toUpsert.length)
         ) {
-          pushToast(t.settings.saved, "success");
+          pushToast(defaultToastMessage, "success");
         } else if (hadNetworkIssue) {
           // Keep this distinct from the hard-error toast above — nothing
           // is actually wrong, the change is just held locally until the
@@ -22363,6 +22395,7 @@ function LeaveRequests({
             }
           : r,
       ),
+      { toastMessage: t.settings.approved },
     );
     applyLeaveToAttendance(req);
   };
@@ -22381,6 +22414,7 @@ function LeaveRequests({
             }
           : r,
       ),
+      { toastMessage: t.settings.rejected },
     );
     setRejectFor(null);
   };
@@ -24516,6 +24550,7 @@ function OvertimeRequests({
             }
           : r,
       ),
+      { toastMessage: t.settings.approved },
     );
   };
   const reject = (req, reason) => {
@@ -24533,6 +24568,7 @@ function OvertimeRequests({
             }
           : r,
       ),
+      { toastMessage: t.settings.rejected },
     );
     setRejectFor(null);
   };
@@ -25472,6 +25508,7 @@ function AttendanceCorrections({
             }
           : r,
       ),
+      { toastMessage: t.settings.approved },
     );
     // Upsert the attendance record for that employee/date, same as a
     // manual admin edit would — the requested times become the record.
@@ -25513,6 +25550,7 @@ function AttendanceCorrections({
             }
           : r,
       ),
+      { toastMessage: t.settings.rejected },
     );
     setRejectFor(null);
   };
@@ -25989,6 +26027,7 @@ function ShiftSwapRequests({
             }
           : r,
       ),
+      { toastMessage: t.settings.approved },
     );
     if (req.toShiftId) {
       setEmployees(
@@ -26012,6 +26051,7 @@ function ShiftSwapRequests({
             }
           : r,
       ),
+      { toastMessage: t.settings.rejected },
     );
     setRejectFor(null);
   };
@@ -36024,6 +36064,7 @@ function SalaryAdjustments({
             }
           : r,
       ),
+      { toastMessage: t.settings.approved },
     );
   };
   const reject = (req, reason) => {
@@ -36040,6 +36081,7 @@ function SalaryAdjustments({
             }
           : r,
       ),
+      { toastMessage: t.settings.rejected },
     );
     setRejectFor(null);
   };
