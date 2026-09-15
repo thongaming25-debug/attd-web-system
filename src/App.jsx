@@ -15,6 +15,8 @@ import {
   Users,
   Check,
   UserPlus,
+  User,
+  Mail,
   Building2,
   Clock,
   Wallet,
@@ -8631,15 +8633,11 @@ function DatePicker({ value, onChange, placeholder, style, disabled }) {
     const r = el.getBoundingClientRect();
     const popH = popRef.current?.offsetHeight || 336;
     const spaceBelow = window.innerHeight - r.bottom;
-    const spaceAbove = r.top;
-    // Open upward if not enough space below AND there's more space above
-    const openUp = spaceBelow < popH + 10 && spaceAbove > spaceBelow;
+    const openUp = spaceBelow < popH + 10 && r.top > spaceBelow;
     const left = Math.min(Math.max(8, r.left), window.innerWidth - 264 - 8);
-    // Use consistent smaller gap for better visual alignment in modals
-    const gap = 4;
     setPopPos({
       left,
-      top: openUp ? r.top - gap : r.bottom + gap,
+      top: openUp ? r.top - 6 : r.bottom + 6,
       minWidth: r.width,
       openUp,
     });
@@ -8726,6 +8724,7 @@ function DatePicker({ value, onChange, placeholder, style, disabled }) {
               top: popPos.top,
               left: popPos.left,
               minWidth: Math.max(264, popPos.minWidth),
+              transform: popPos.openUp ? "translateY(-100%)" : "none",
             }}
           >
             <div className="wf-dp-head">
@@ -15458,6 +15457,8 @@ function ImportEmployeesModal({
 }
 
 function Employees({
+  page,
+  setPage,
   employees,
   departments,
   shifts,
@@ -15467,6 +15468,15 @@ function Employees({
   currentAdmin,
   documents,
   setDocuments,
+  attendance = [],
+  leaveRequests = [],
+  performanceReviews = [],
+  trainings = [],
+  assets = [],
+  overtimeRequests = [],
+  otPolicy,
+  payrollPolicy,
+  salaryAdjustments = [],
 }) {
   const { t, lang } = useLang();
   const { branding } = useBranding();
@@ -15478,6 +15488,17 @@ function Employees({
   const [branchFilter, setBranchFilter] = useState("");
   const [badgePopupBlocked, setBadgePopupBlocked] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  // The selected employee (if any) lives in the URL itself
+  // (`#/admin/employees/<id>`) rather than in local component state, so
+  // that refreshing the page — or sharing/bookmarking the link — keeps
+  // Profile 360° open on the same employee instead of bouncing back to
+  // the employees list. See usePortalRoute()/setPage in AppInner.
+  const selectedEmployeeId = page?.startsWith("employees/")
+    ? page.slice("employees/".length)
+    : null;
+  const showProfile360 = !!selectedEmployeeId;
+  const openProfile360 = (id) => setPage && setPage(`employees/${id}`);
+  const closeProfile360 = () => setPage && setPage("employees");
   const filtered = useMemo(
     () =>
       employees.filter(
@@ -15550,6 +15571,50 @@ function Employees({
     }
     setModal(null);
   };
+
+  if (showProfile360 && selectedEmployeeId) {
+    return (
+      <>
+        <EmployeeProfile360
+          employeeId={selectedEmployeeId}
+          employees={employees}
+          departments={departments}
+          shifts={shifts}
+          offices={offices}
+          documents={documents}
+          attendance={attendance}
+          leaveRequests={leaveRequests}
+          performanceReviews={performanceReviews}
+          trainings={trainings}
+          assets={assets}
+          overtimeRequests={overtimeRequests}
+          otPolicy={otPolicy}
+          payrollPolicy={payrollPolicy}
+          salaryAdjustments={salaryAdjustments}
+          onBack={closeProfile360}
+          onEdit={(emp) => {
+            setModal({ mode: "edit", data: emp });
+          }}
+        />
+        {modal && (
+          <Modal
+            title={modal.mode === "add" ? t.emps.addTitle : t.emps.editTitle}
+            onClose={() => setModal(null)}
+          >
+            <EmployeeForm
+              initial={modal.data}
+              departments={departments}
+              shifts={shifts}
+              offices={offices}
+              currentAdmin={currentAdmin}
+              onSave={save}
+              onCancel={() => setModal(null)}
+            />
+          </Modal>
+        )}
+      </>
+    );
+  }
 
   return (
     <div>
@@ -15658,7 +15723,15 @@ function Employees({
                 marginBottom: 12,
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  cursor: "pointer",
+                }}
+                onClick={() => openProfile360(e.id)}
+              >
                 <Avatar name={e.name} photo={e.photo} />
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontWeight: 600, color: T.ink, fontSize: 13 }}>
@@ -15887,6 +15960,1119 @@ function Employees({
 /* ---------------------------------------------------------------
    Departments
 ----------------------------------------------------------------*/
+// ==================== EmployeeProfile360 Component ====================
+function EmployeeProfile360({
+  employeeId,
+  employees = [],
+  departments = [],
+  shifts = [],
+  offices = [],
+  documents = [],
+  attendance = [],
+  leaveRequests = [],
+  performanceReviews = [],
+  trainings = [],
+  assets = [],
+  overtimeRequests = [],
+  otPolicy,
+  payrollPolicy,
+  salaryAdjustments = [],
+  onBack = () => {},
+  onEdit = () => {},
+}) {
+  const { t, lang } = useLang();
+  const { theme } = useTheme();
+  const [activeTab, setActiveTab] = useState("overview");
+
+  const employee = useMemo(
+    () => employees.find((e) => e.id === employeeId),
+    [employeeId, employees],
+  );
+
+  const pastel = (key) => EMP_PASTEL[theme === "dark" ? "dark" : "light"][key];
+
+  if (!employee) {
+    return (
+      <div
+        style={{
+          padding: 40,
+          textAlign: "center",
+          color: T.muted,
+          fontSize: 13,
+        }}
+      >
+        {t.noResults}
+      </div>
+    );
+  }
+
+  const dept = departments.find((d) => d.id === employee.deptId);
+  const shiftInfo = shifts.find((s) => s.id === employee.shiftId);
+  const office = offices.find((o) => o.id === employee.officeId);
+  const mk = monthKey();
+
+  // Real current-month attendance stats (includes implicit absences for
+  // scheduled work days with no logged record, same logic the Analytics
+  // and Payroll pages use).
+  const attendanceRecs = useMemo(
+    () => attendanceRecordsForMonth(employee, attendance, mk, todayStr()),
+    [employee, attendance, mk],
+  );
+  const presentDaysCount = attendanceRecs.filter(
+    (a) => a.status === "present",
+  ).length;
+  const lateDaysCount = attendanceRecs.filter(
+    (a) => a.status === "late",
+  ).length;
+  const absentDaysCount = attendanceRecs.filter(
+    (a) => a.status === "absent",
+  ).length;
+  const attendanceRateLabel = attendanceRecs.length
+    ? `${Math.round(((presentDaysCount + lateDaysCount) / attendanceRecs.length) * 100)}%`
+    : "—";
+
+  // Real current-month payroll breakdown, reusing the same computePayroll
+  // engine the Payroll page uses.
+  const payrollCalc = useMemo(
+    () =>
+      computePayroll(
+        employee,
+        attendance,
+        mk,
+        overtimeRequests,
+        otPolicy,
+        payrollPolicy,
+        salaryAdjustments,
+      ),
+    [
+      employee,
+      attendance,
+      mk,
+      overtimeRequests,
+      otPolicy,
+      payrollPolicy,
+      salaryAdjustments,
+    ],
+  );
+
+  const empLeaveRequests = useMemo(
+    () =>
+      leaveRequests
+        .filter((r) => r.employeeId === employee.id)
+        .sort((a, b) => (a.startDate < b.startDate ? 1 : -1)),
+    [leaveRequests, employee],
+  );
+  const empPerformanceReviews = useMemo(
+    () =>
+      performanceReviews
+        .filter((r) => r.employeeId === employee.id)
+        .sort((a, b) => (a.period < b.period ? 1 : -1)),
+    [performanceReviews, employee],
+  );
+  const empDocuments = useMemo(
+    () => documents.filter((d) => d.employeeId === employee.id),
+    [documents, employee],
+  );
+  const empTrainings = useMemo(
+    () => trainings.filter((tr) => tr.employeeId === employee.id),
+    [trainings, employee],
+  );
+  const empAssets = useMemo(
+    () => assets.filter((a) => a.assignedTo === employee.id),
+    [assets, employee],
+  );
+
+  // Recent activity: real edits/changes recorded against this employee's
+  // own record in the audit log (superadmin-only table; fetched lazily
+  // only once the Activity tab is opened).
+  const [activityLogs, setActivityLogs] = useState(null);
+  const [activityLoading, setActivityLoading] = useState(false);
+  useEffect(() => {
+    if (activeTab !== "activity" || activityLogs !== null) return;
+    let cancelled = false;
+    setActivityLoading(true);
+    supabase
+      .from("audit_logs")
+      .select("*")
+      .eq("entity_table", "employees")
+      .eq("entity_id", String(employee.id))
+      .order("created_at", { ascending: false })
+      .limit(30)
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) {
+          console.error("[profile360] failed to load activity:", error.message);
+          setActivityLogs([]);
+        } else {
+          setActivityLogs(data || []);
+        }
+        setActivityLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, activityLogs, employee.id]);
+
+  const tenureLabel = (() => {
+    if (!employee.joined) return "—";
+    const start = new Date(employee.joined);
+    if (Number.isNaN(start.getTime())) return "—";
+    const now = new Date();
+    let months =
+      (now.getFullYear() - start.getFullYear()) * 12 +
+      (now.getMonth() - start.getMonth());
+    if (now.getDate() < start.getDate()) months -= 1;
+    months = Math.max(0, months);
+    const years = Math.floor(months / 12);
+    const remMonths = months % 12;
+    if (years > 0)
+      return remMonths > 0 ? `${years}y ${remMonths}m` : `${years}y`;
+    if (months > 0) return `${months}mo`;
+    const days = Math.max(0, Math.round((now - start) / 86400000));
+    return `${days}d`;
+  })();
+
+  const TAB_CONFIG = [
+    { id: "overview", label: "Overview", icon: User },
+    { id: "attendance", label: "Attendance", icon: Calendar },
+    { id: "leave", label: "Leave", icon: FileText },
+    { id: "payroll", label: "Payroll", icon: DollarSign },
+    { id: "performance", label: "Performance", icon: BarChart3 },
+    { id: "documents", label: "Documents", icon: FileText },
+    { id: "training", label: "Training", icon: GraduationCap },
+    { id: "assets", label: "Assets", icon: Package },
+    { id: "activity", label: "Activity", icon: History },
+  ];
+
+  return (
+    <div>
+      {/* Header row */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          marginBottom: 16,
+        }}
+      >
+        <button
+          type="button"
+          onClick={onBack}
+          style={{
+            background: "none",
+            border: `1px solid ${T.line}`,
+            cursor: "pointer",
+            padding: 8,
+            display: "flex",
+            alignItems: "center",
+            color: T.ink,
+            borderRadius: 8,
+          }}
+        >
+          <ArrowLeft size={17} />
+        </button>
+        <h1 style={{ margin: 0, fontSize: 19, fontWeight: 700, color: T.ink }}>
+          Profile 360°
+        </h1>
+        <div style={{ flex: 1 }} />
+        <Button variant="accent" onClick={() => onEdit(employee)}>
+          <Pencil size={14} /> {t.edit}
+        </Button>
+      </div>
+
+      {/* Profile header card */}
+      <Card style={{ padding: 20, marginBottom: 16 }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 18,
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <Avatar name={employee.name} photo={employee.photo} size={68} />
+          <div style={{ flex: 1, minWidth: 220 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                flexWrap: "wrap",
+                marginBottom: 3,
+              }}
+            >
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: T.ink,
+                }}
+              >
+                {employee.name}
+              </h2>
+              <StatusPill status={employee.status} />
+            </div>
+            <div
+              style={{
+                fontSize: 12.5,
+                color: T.muted,
+                fontFamily: "'JetBrains Mono',monospace",
+                marginBottom: 14,
+              }}
+            >
+              {employee.code} · {employee.role}
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+                gap: 14,
+              }}
+            >
+              <MetaItem
+                icon={Building2}
+                label={t.emps.dept}
+                value={dept?.name || "—"}
+              />
+              <MetaItem
+                icon={Clock}
+                label={t.emps.shift}
+                value={shiftLabel(shiftInfo)}
+              />
+              <MetaItem
+                icon={MapPin}
+                label={t.emps.branch}
+                value={office?.name || "—"}
+              />
+              {employee.email && (
+                <MetaItem
+                  icon={Mail}
+                  label={t.emps.email}
+                  value={employee.email}
+                />
+              )}
+              {employee.phone && (
+                <MetaItem
+                  icon={Phone}
+                  label={t.emps.phone}
+                  value={employee.phone}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Tab navigation */}
+      <div
+        style={{
+          display: "flex",
+          gap: 4,
+          background: T.paper,
+          border: `1px solid ${T.line}`,
+          borderRadius: 10,
+          padding: 4,
+          marginBottom: 16,
+          overflowX: "auto",
+        }}
+      >
+        {TAB_CONFIG.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                background: isActive ? T.blue : "transparent",
+                border: "none",
+                cursor: "pointer",
+                padding: "8px 14px",
+                borderRadius: 7,
+                display: "flex",
+                alignItems: "center",
+                gap: 7,
+                fontSize: 12.5,
+                fontWeight: isActive ? 600 : 500,
+                color: isActive ? "#fff" : T.textSoft,
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+                transition: "background .15s ease, color .15s ease",
+              }}
+            >
+              <Icon size={14} />
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Tab content */}
+      {activeTab === "overview" && (
+        <>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+              gap: 12,
+              marginBottom: 16,
+            }}
+          >
+            <QuickStat
+              icon={CalendarDays}
+              label="Leave Balance"
+              value={`${employee.annualLeaveDays || 0} days`}
+              colorKey="blue"
+              pastel={pastel}
+            />
+            <QuickStat
+              icon={History}
+              label="Tenure"
+              value={tenureLabel}
+              colorKey="gold"
+              pastel={pastel}
+            />
+            <QuickStat
+              icon={CheckCircle2}
+              label="Attendance"
+              value={attendanceRateLabel}
+              colorKey="forest"
+              pastel={pastel}
+            />
+          </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: 16,
+            }}
+          >
+            <SectionCard
+              icon={User}
+              title="Personal Information"
+              colorKey="blue"
+              pastel={pastel}
+            >
+              <InfoRow label="Full Name" value={employee.name} />
+              <InfoRow label="Employee ID" value={employee.code} />
+              <InfoRow label={t.emps.email} value={employee.email || "—"} />
+              <InfoRow label={t.emps.phone} value={employee.phone || "—"} />
+              <InfoRow label="Date of Birth" value={employee.dob || "—"} />
+            </SectionCard>
+            <SectionCard
+              icon={Briefcase}
+              title="Employment Details"
+              colorKey="gold"
+              pastel={pastel}
+            >
+              <InfoRow label={t.emps.dept} value={dept?.name || "—"} />
+              <InfoRow label="Position" value={employee.role} />
+              <InfoRow label={t.emps.joined} value={employee.joined || "—"} />
+              <InfoRow
+                label={t.emps.status}
+                value={
+                  employee.status === "active" ? t.emps.active : t.emps.inactive
+                }
+              />
+              <InfoRow label="Salary (USD)" value={fmtMoney(employee.salary)} />
+            </SectionCard>
+            <SectionCard
+              icon={CalendarDays}
+              title="Leave Summary"
+              colorKey="forest"
+              pastel={pastel}
+            >
+              <InfoRow
+                label={t.emps.annualLeaveDaysLabel}
+                value={`${employee.annualLeaveDays || 0} days`}
+              />
+              <InfoRow
+                label={t.emps.sickLeaveDaysLabel}
+                value={`${employee.sickLeaveDays || 0} days`}
+              />
+              <InfoRow
+                label="Carry Over"
+                value={`${employee.leaveCarryOver || 0} days`}
+              />
+            </SectionCard>
+            <SectionCard
+              icon={Users}
+              title="Dependents"
+              colorKey="rose"
+              pastel={pastel}
+            >
+              <InfoRow
+                label={t.emps.dependentsLabel}
+                value={employee.dependents || 0}
+              />
+            </SectionCard>
+          </div>
+        </>
+      )}
+      {activeTab === "attendance" && (
+        <Card style={{ padding: 20 }}>
+          <h3
+            style={{
+              margin: "0 0 16px 0",
+              fontSize: 14.5,
+              fontWeight: 700,
+              color: T.ink,
+            }}
+          >
+            Attendance Statistics — {mk}
+          </h3>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+              gap: 12,
+            }}
+          >
+            <StatBox label="Present Days" value={presentDaysCount} />
+            <StatBox label="Absent Days" value={absentDaysCount} />
+            <StatBox label="Late Arrivals" value={lateDaysCount} />
+            <StatBox label="Attendance Rate" value={attendanceRateLabel} />
+          </div>
+        </Card>
+      )}
+
+      {activeTab === "leave" && (
+        <Card style={{ padding: 20 }}>
+          <h3
+            style={{
+              margin: "0 0 14px 0",
+              fontSize: 14.5,
+              fontWeight: 700,
+              color: T.ink,
+            }}
+          >
+            Leave Requests
+          </h3>
+          {empLeaveRequests.length === 0 ? (
+            <EmptyTabState text="No leave requests recorded for this employee yet." />
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {empLeaveRequests.map((r) => (
+                <div
+                  key={r.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    padding: "10px 12px",
+                    background: T.paper,
+                    border: `1px solid ${T.lineSoft}`,
+                    borderRadius: 9,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <div style={{ minWidth: 0 }}>
+                    <div
+                      style={{ fontSize: 13, fontWeight: 600, color: T.ink }}
+                    >
+                      {getLeaveTypeLabel(lang)[r.type] || r.type}
+                    </div>
+                    <div
+                      style={{ fontSize: 11.5, color: T.muted, marginTop: 2 }}
+                    >
+                      {r.startDate} → {r.endDate}
+                      {r.reason ? ` · ${r.reason}` : ""}
+                    </div>
+                  </div>
+                  <ApprovalPill status={r.status} />
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
+
+      {activeTab === "payroll" && (
+        <Card style={{ padding: 20 }}>
+          <h3
+            style={{
+              margin: "0 0 14px 0",
+              fontSize: 14.5,
+              fontWeight: 700,
+              color: T.ink,
+            }}
+          >
+            Payroll — {mk}
+          </h3>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+              gap: 12,
+              marginBottom: 14,
+            }}
+          >
+            <StatBox label="Base Salary" value={fmtMoney(employee.salary)} />
+            <StatBox
+              label="Deductions"
+              value={fmtMoney(
+                payrollCalc.absenceDeduction +
+                  payrollCalc.unpaidLeaveDeduction +
+                  payrollCalc.lateDeduction +
+                  payrollCalc.tax +
+                  payrollCalc.insurance,
+              )}
+            />
+            <StatBox label="OT Pay" value={fmtMoney(payrollCalc.otPay)} />
+            <StatBox label="Net Pay" value={fmtMoney(payrollCalc.net)} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+            <InfoRow label="Tax" value={fmtMoney(payrollCalc.tax)} />
+            <InfoRow
+              label="Insurance (NSSF)"
+              value={fmtMoney(payrollCalc.insurance)}
+            />
+            <InfoRow
+              label="Absence Deduction"
+              value={fmtMoney(payrollCalc.absenceDeduction)}
+            />
+            <InfoRow
+              label="Late Deduction"
+              value={fmtMoney(payrollCalc.lateDeduction)}
+            />
+            <InfoRow label="Bonus" value={fmtMoney(payrollCalc.bonusTotal)} />
+            <InfoRow
+              label="Advance Deduction"
+              value={fmtMoney(payrollCalc.advanceDeduction)}
+            />
+          </div>
+        </Card>
+      )}
+
+      {activeTab === "performance" && (
+        <Card style={{ padding: 20 }}>
+          <h3
+            style={{
+              margin: "0 0 14px 0",
+              fontSize: 14.5,
+              fontWeight: 700,
+              color: T.ink,
+            }}
+          >
+            Performance Reviews
+          </h3>
+          {empPerformanceReviews.length === 0 ? (
+            <EmptyTabState text="No performance reviews recorded for this employee yet." />
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {empPerformanceReviews.map((r) => (
+                <div
+                  key={r.id}
+                  style={{
+                    padding: "12px",
+                    background: T.paper,
+                    border: `1px solid ${T.lineSoft}`,
+                    borderRadius: 9,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      marginBottom: 6,
+                    }}
+                  >
+                    <span
+                      style={{ fontSize: 13, fontWeight: 600, color: T.ink }}
+                    >
+                      {r.period}
+                    </span>
+                    <span
+                      style={{ fontSize: 13, fontWeight: 700, color: T.gold }}
+                    >
+                      {r.rating ? `★ ${r.rating}` : "—"}
+                    </span>
+                  </div>
+                  {r.strengths && (
+                    <div
+                      style={{
+                        fontSize: 12,
+                        color: T.textSoft,
+                        marginBottom: 3,
+                      }}
+                    >
+                      <strong style={{ color: T.ink }}>Strengths:</strong>{" "}
+                      {r.strengths}
+                    </div>
+                  )}
+                  {r.improvements && (
+                    <div style={{ fontSize: 12, color: T.textSoft }}>
+                      <strong style={{ color: T.ink }}>Improvements:</strong>{" "}
+                      {r.improvements}
+                    </div>
+                  )}
+                  {r.reviewedByName && (
+                    <div style={{ fontSize: 11, color: T.muted, marginTop: 6 }}>
+                      Reviewed by {r.reviewedByName}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
+
+      {activeTab === "documents" && (
+        <Card style={{ padding: 20 }}>
+          <h3
+            style={{
+              margin: "0 0 14px 0",
+              fontSize: 14.5,
+              fontWeight: 700,
+              color: T.ink,
+            }}
+          >
+            Documents
+          </h3>
+          {empDocuments.length === 0 ? (
+            <EmptyTabState text="No documents uploaded for this employee yet." />
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {empDocuments.map((d) => (
+                <a
+                  key={d.id}
+                  href={d.dataUrl || undefined}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: "10px 12px",
+                    background: T.paper,
+                    border: `1px solid ${T.lineSoft}`,
+                    borderRadius: 9,
+                    textDecoration: "none",
+                    color: "inherit",
+                  }}
+                >
+                  <FileText
+                    size={16}
+                    style={{ color: T.muted, flexShrink: 0 }}
+                  />
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: T.ink,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {d.fileName || "Untitled"}
+                    </div>
+                    <div style={{ fontSize: 11, color: T.muted }}>
+                      {d.category || "—"}
+                      {d.expiryDate ? ` · Expires ${d.expiryDate}` : ""}
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
+
+      {activeTab === "training" && (
+        <Card style={{ padding: 20 }}>
+          <h3
+            style={{
+              margin: "0 0 14px 0",
+              fontSize: 14.5,
+              fontWeight: 700,
+              color: T.ink,
+            }}
+          >
+            Training & Certifications
+          </h3>
+          {empTrainings.length === 0 ? (
+            <EmptyTabState text="No training records for this employee yet." />
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {empTrainings.map((tr) => (
+                <div
+                  key={tr.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    padding: "10px 12px",
+                    background: T.paper,
+                    border: `1px solid ${T.lineSoft}`,
+                    borderRadius: 9,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <div style={{ minWidth: 0 }}>
+                    <div
+                      style={{ fontSize: 13, fontWeight: 600, color: T.ink }}
+                    >
+                      {tr.courseName}
+                    </div>
+                    <div
+                      style={{ fontSize: 11.5, color: T.muted, marginTop: 2 }}
+                    >
+                      {tr.provider ? `${tr.provider} · ` : ""}
+                      {tr.completionDate || tr.startDate || "—"}
+                    </div>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      padding: "3px 10px",
+                      borderRadius: 999,
+                      background: T.lineSoft,
+                      color: T.textSoft,
+                      textTransform: "capitalize",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {tr.status || "—"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
+
+      {activeTab === "assets" && (
+        <Card style={{ padding: 20 }}>
+          <h3
+            style={{
+              margin: "0 0 14px 0",
+              fontSize: 14.5,
+              fontWeight: 700,
+              color: T.ink,
+            }}
+          >
+            Assigned Assets
+          </h3>
+          {empAssets.length === 0 ? (
+            <EmptyTabState text="No assets assigned to this employee yet." />
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {empAssets.map((a) => (
+                <div
+                  key={a.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    padding: "10px 12px",
+                    background: T.paper,
+                    border: `1px solid ${T.lineSoft}`,
+                    borderRadius: 9,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      minWidth: 0,
+                    }}
+                  >
+                    <Package
+                      size={16}
+                      style={{ color: T.muted, flexShrink: 0 }}
+                    />
+                    <div style={{ minWidth: 0 }}>
+                      <div
+                        style={{ fontSize: 13, fontWeight: 600, color: T.ink }}
+                      >
+                        {a.name}
+                      </div>
+                      <div
+                        style={{ fontSize: 11.5, color: T.muted, marginTop: 2 }}
+                      >
+                        {a.category ? `${a.category} · ` : ""}
+                        {a.serial || "—"}
+                      </div>
+                    </div>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      padding: "3px 10px",
+                      borderRadius: 999,
+                      background: T.lineSoft,
+                      color: T.textSoft,
+                      textTransform: "capitalize",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {a.status || "—"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
+
+      {activeTab === "activity" && (
+        <Card style={{ padding: 20 }}>
+          <h3
+            style={{
+              margin: "0 0 14px 0",
+              fontSize: 14.5,
+              fontWeight: 700,
+              color: T.ink,
+            }}
+          >
+            Recent Activity
+          </h3>
+          {activityLoading || activityLogs === null ? (
+            <p style={{ color: T.muted, fontSize: 13, margin: 0 }}>Loading…</p>
+          ) : activityLogs.length === 0 ? (
+            <EmptyTabState text="No recorded changes to this employee's record yet." />
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {activityLogs.map((log) => (
+                <div
+                  key={log.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    padding: "10px 12px",
+                    background: T.paper,
+                    border: `1px solid ${T.lineSoft}`,
+                    borderRadius: 9,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <div style={{ minWidth: 0 }}>
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: T.ink,
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {log.action}
+                      {log.actor_name ? ` · ${log.actor_name}` : ""}
+                    </div>
+                    <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>
+                      {fmtAuditTime(log.created_at)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
+    </div>
+  );
+}
+
+function EmptyTabState({ text }) {
+  return (
+    <p
+      style={{
+        color: T.muted,
+        fontSize: 13,
+        margin: 0,
+        textAlign: "center",
+        padding: "20px 0",
+      }}
+    >
+      {text}
+    </p>
+  );
+}
+
+function ApprovalPill({ status }) {
+  const TONE = {
+    pending: { bg: T.goldSoft, fg: T.goldText },
+    approved: { bg: T.forestSoft, fg: T.forestText },
+    rejected: { bg: T.roseSoft, fg: T.roseDark },
+  };
+  const tone = TONE[status] || { bg: T.lineSoft, fg: T.textSoft };
+  return (
+    <span
+      style={{
+        fontSize: 11,
+        fontWeight: 700,
+        padding: "3px 10px",
+        borderRadius: 999,
+        background: tone.bg,
+        color: tone.fg,
+        textTransform: "capitalize",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {status || "—"}
+    </span>
+  );
+}
+
+function MetaItem({ icon: Icon, label, value }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 10,
+        alignItems: "flex-start",
+        minWidth: 0,
+      }}
+    >
+      <Icon size={15} style={{ color: T.muted, flexShrink: 0, marginTop: 2 }} />
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontSize: 11, color: T.muted }}>{label}</div>
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: T.ink,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {value}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function QuickStat({ icon: Icon, label, value, colorKey, pastel }) {
+  const p = pastel(colorKey);
+  return (
+    <Card
+      style={{ padding: 14, display: "flex", alignItems: "center", gap: 12 }}
+    >
+      <span
+        style={{
+          width: 38,
+          height: 38,
+          borderRadius: 10,
+          background: p.bg,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        <Icon size={18} color={p.text} strokeWidth={2} />
+      </span>
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontSize: 11.5, color: T.muted, fontWeight: 500 }}>
+          {label}
+        </div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: T.ink }}>
+          {value}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function SectionCard({ icon: Icon, title, colorKey, pastel, children }) {
+  const p = pastel(colorKey);
+  return (
+    <Card style={{ padding: 16 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          marginBottom: 14,
+        }}
+      >
+        <span
+          style={{
+            width: 30,
+            height: 30,
+            borderRadius: 8,
+            background: p.bg,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          <Icon size={15} color={p.text} strokeWidth={2} />
+        </span>
+        <h3
+          style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: T.ink }}
+        >
+          {title}
+        </h3>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
+        {children}
+      </div>
+    </Card>
+  );
+}
+
+function InfoRow({ label, value }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        gap: 12,
+        paddingBottom: 9,
+        borderBottom: `1px solid ${T.lineSoft}`,
+      }}
+    >
+      <span style={{ fontSize: 12, color: T.muted }}>{label}</span>
+      <span
+        style={{
+          fontSize: 12.5,
+          fontWeight: 600,
+          color: T.ink,
+          textAlign: "right",
+        }}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function StatBox({ label, value }) {
+  return (
+    <div
+      style={{
+        background: T.paper,
+        border: `1px solid ${T.lineSoft}`,
+        padding: 12,
+        borderRadius: 9,
+        textAlign: "center",
+      }}
+    >
+      <div style={{ fontSize: 11.5, color: T.muted, marginBottom: 4 }}>
+        {label}
+      </div>
+      <div style={{ fontSize: 19, fontWeight: 700, color: T.ink }}>{value}</div>
+    </div>
+  );
+}
+
 function DeptForm({ initial, onSave, onCancel }) {
   const { t, lang } = useLang();
   const [f, setF] = useState(initial || { name: "", code: "", desc: "" });
@@ -39449,7 +40635,11 @@ function AppInner() {
   }, [loggedIn, role, currentAdmin?.status, currentEmp?.status]);
 
   useEffect(() => {
-    if (loggedIn && !nav.find((n) => n.id === page)) setPage("dashboard");
+    if (
+      loggedIn &&
+      !nav.find((n) => n.id === page || page?.startsWith(n.id + "/"))
+    )
+      setPage("dashboard");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role]);
 
@@ -39780,7 +40970,8 @@ function AppInner() {
                     </div>
                     {items.map((n) => {
                       const accent = n.accent || T.blue;
-                      const isActive = page === n.id;
+                      const isActive =
+                        page === n.id || page?.startsWith(n.id + "/");
                       return (
                         <button
                           key={n.id}
@@ -39984,7 +41175,10 @@ function AppInner() {
                   whiteSpace: "nowrap",
                 }}
               >
-                {nav.find((n) => n.id === page)?.label}
+                {
+                  nav.find((n) => n.id === page || page?.startsWith(n.id + "/"))
+                    ?.label
+                }
               </h1>
             </div>
             <div
@@ -40100,7 +41294,7 @@ function AppInner() {
                   <AlertCircle size={16} /> {t.dash.noEmpWarn}
                 </div>
               )}
-            <div key={page} className="wf-page-enter">
+            <div key={page?.split("/")[0] || page} className="wf-page-enter">
               {page === "moreApps" && (
                 <MoreAppsPage
                   nav={nav}
@@ -40186,19 +41380,31 @@ function AppInner() {
                     isSuperAdmin={isSuperAdmin || can("manageAnnouncements")}
                   />
                 )}
-              {page === "employees" && role === "admin" && (
-                <Employees
-                  employees={employees}
-                  departments={departments}
-                  shifts={shifts}
-                  offices={offices}
-                  setEmployees={setEmployees}
-                  isSuperAdmin={isSuperAdmin || can("manageEmployees")}
-                  currentAdmin={currentAdmin}
-                  documents={documents}
-                  setDocuments={setDocuments}
-                />
-              )}
+              {(page === "employees" || page?.startsWith("employees/")) &&
+                role === "admin" && (
+                  <Employees
+                    page={page}
+                    setPage={setPage}
+                    employees={employees}
+                    departments={departments}
+                    shifts={shifts}
+                    offices={offices}
+                    setEmployees={setEmployees}
+                    isSuperAdmin={isSuperAdmin || can("manageEmployees")}
+                    currentAdmin={currentAdmin}
+                    documents={documents}
+                    setDocuments={setDocuments}
+                    attendance={attendance}
+                    leaveRequests={leaveRequests}
+                    performanceReviews={performanceReviews}
+                    trainings={trainings}
+                    assets={assets}
+                    overtimeRequests={overtimeRequests}
+                    otPolicy={otPolicy}
+                    payrollPolicy={payrollPolicy}
+                    salaryAdjustments={salaryAdjustments}
+                  />
+                )}
               {page === "departments" && role === "admin" && (
                 <Departments
                   departments={departments}
@@ -40514,7 +41720,7 @@ function AppInner() {
               {bottomNav.map((n) => (
                 <button
                   key={n.id}
-                  className={`wf-bottomnav-item ${page === n.id ? "active" : ""}`}
+                  className={`wf-bottomnav-item ${page === n.id || page?.startsWith(n.id + "/") ? "active" : ""}`}
                   onClick={() => setPage(n.id)}
                 >
                   <span className="wf-bnav-icon-wrap">
