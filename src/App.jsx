@@ -64,6 +64,7 @@ import {
   Download,
   Eye,
   EyeOff,
+  ArrowRight,
   Star,
   Megaphone,
   FileText,
@@ -3731,7 +3732,11 @@ const T = {
   gold: "var(--wf-gold)",
   goldSoft: "var(--wf-gold-soft)",
   goldText: "var(--wf-gold-text)",
-  rose: "#E5637A",
+  // Same red used for the call-reject button below, so "danger" reads as
+  // one consistent, unmistakably-red color everywhere — delete buttons,
+  // sign-out, error toasts, overdue/negative balances, etc. — rather
+  // than the softer pink it used to be.
+  rose: "#E5484D",
   roseDark: "var(--wf-rose-dark)",
   roseSoft: "var(--wf-rose-soft)",
   blue: "#5B8DEF",
@@ -4195,22 +4200,22 @@ body{background:var(--wf-paper);}
   --wf-gold:#F0A83B;
   --wf-ink:#10141C; --wf-ink-dark:#050810; --wf-paper:#F3F4F7; --wf-card:#FFFFFF;
   --wf-forest-soft:#E4F5EC; --wf-forest-text:#127449; --wf-gold-soft:#FCF0DC; --wf-gold-text:#9A6212;
-  --wf-rose-dark:#B23752; --wf-rose-soft:#FBEAEE; --wf-line:#E2E5EB; --wf-line-soft:#EAECF1;
+  --wf-rose-dark:#C42B2F; --wf-rose-soft:#FCE8E8; --wf-line:#E2E5EB; --wf-line-soft:#EAECF1;
   --wf-muted:#767E8F; --wf-muted-light:#A7ADBB; --wf-text-soft:#3C4250;
   --wf-input-border:#D6DAE2; --wf-input-bg:#FAFBFC; --wf-field-label:#5B6274;
-  --wf-table-head-bg:#F6F7F9; --wf-divider:#ECEEF2; --wf-danger-border:#F0C7D0;
-  --wf-danger-hover-bg:#FBEEF1; --wf-header-bg:rgba(255,255,255,0.85);
+  --wf-table-head-bg:#F6F7F9; --wf-divider:#ECEEF2; --wf-danger-border:#F1C4C4;
+  --wf-danger-hover-bg:#FDECEC; --wf-header-bg:rgba(255,255,255,0.85);
   --wf-glass-card:rgba(255,255,255,0.55); --wf-glass-header:rgba(255,255,255,0.55);
   --wf-glass-border:rgba(255,255,255,0.45); --wf-glass-highlight:rgba(255,255,255,0.35);
 }
 .wf-dark{
   --wf-ink:#EEF1F6; --wf-ink-dark:#AEB6C7; --wf-paper:#0A0E1A; --wf-card:#141A2B;
   --wf-forest-soft:#0E2A20; --wf-forest-text:#3FD996;
-  --wf-rose-dark:#F0879B; --wf-rose-soft:#2C151B; --wf-line:#262E45; --wf-line-soft:#1C2338;
+  --wf-rose-dark:#FF6369; --wf-rose-soft:#2E1315; --wf-line:#262E45; --wf-line-soft:#1C2338;
   --wf-muted:#818AA3; --wf-muted-light:#4C5670; --wf-text-soft:#C4CADC;
   --wf-input-border:#2A3249; --wf-input-bg:#111627; --wf-field-label:#9AA3BC;
-  --wf-table-head-bg:#111627; --wf-divider:#1E2438; --wf-danger-border:#3D1D26;
-  --wf-danger-hover-bg:#20121A; --wf-header-bg:rgba(10,14,26,0.82);
+  --wf-table-head-bg:#111627; --wf-divider:#1E2438; --wf-danger-border:#3D1E1E;
+  --wf-danger-hover-bg:#241213; --wf-header-bg:rgba(10,14,26,0.82);
   --wf-glass-card:rgba(24,30,48,0.55); --wf-glass-header:rgba(12,16,29,0.6);
   --wf-glass-border:rgba(255,255,255,0.09); --wf-glass-highlight:rgba(255,255,255,0.07);
 }
@@ -7994,7 +7999,7 @@ function Pagination({ page, pageCount, setPage, total, rangeStart, rangeEnd }) {
 }
 const NOTIF_TONE = {
   gold: "#F0A83B",
-  rose: "#E5637A",
+  rose: "#E5484D",
   forest: "#1FA26B",
   blue: "#5B8DEF",
 };
@@ -9282,13 +9287,25 @@ const LOGIN_CSS = `
   --wfl-accent: #5B8DEF;
   --wfl-accent-dark: #3F68D8;
   --wfl-logo-bg: #1A2338;
+  --wfl-wave-a: rgba(91,141,239,0.16);
+  --wfl-wave-b: rgba(91,141,239,0.24);
+  --wfl-bubble: rgba(91,141,239,0.22);
+  --wfl-logo-grad-a: rgba(91,141,239,0.28);
+  --wfl-logo-grad-b: rgba(63,104,216,0.38);
 }
 .wf-login-root.wf-login-light {
-  /* light theme tokens — clean/standard look */
-  --wfl-bg: linear-gradient(160deg, #eef2fb 0%, #f7f9fc 55%, #eef1f8 100%);
+  /* light theme tokens — soft sky-blue wash, matches the reference mock */
+  --wfl-bg:
+    radial-gradient(900px 620px at 12% -8%, rgba(255,255,255,0.95), transparent 60%),
+    linear-gradient(165deg, #eaf1ff 0%, #f4f8ff 45%, #ffffff 100%);
   --wfl-blob-a: rgba(91,141,239,0.24);
   --wfl-blob-b: rgba(91,141,239,0.16);
   --wfl-dot-color: rgba(15,23,42,0.14);
+  --wfl-wave-a: rgba(120,164,250,0.32);
+  --wfl-wave-b: rgba(61,124,244,0.5);
+  --wfl-bubble: rgba(120,164,250,0.4);
+  --wfl-logo-grad-a: #DCEAFF;
+  --wfl-logo-grad-b: #BFD9FF;
   --wfl-card-bg: #ffffff;
   --wfl-card-border: rgba(15,23,42,0.06);
   --wfl-card-shadow: 0 20px 50px rgba(15,23,42,0.10), 0 4px 14px rgba(15,23,42,0.05);
@@ -9333,6 +9350,36 @@ const LOGIN_CSS = `
 }
 .wf-login-dots-tl { top:6%; left:5%; }
 .wf-login-dots-br { bottom:6%; right:5%; }
+@keyframes wf-wave-slide { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+@keyframes wf-bubble-float {
+  0%,100% { transform:translate(0,0) scale(1); }
+  50% { transform:translate(10px,-14px) scale(1.03); }
+}
+.wf-login-waves {
+  position:absolute; left:0; right:0; bottom:-2px; z-index:0; pointer-events:none;
+  overflow:hidden; height:46%; min-height:230px;
+}
+.wf-login-wave-track {
+  position:absolute; bottom:-2px; left:0; width:200%; height:100%; display:flex;
+  will-change:transform;
+}
+.wf-login-wave-track svg { width:50%; height:100%; flex-shrink:0; display:block; }
+.wf-login-wave-back { animation: wf-wave-slide 32s linear infinite; }
+.wf-login-wave-front { animation: wf-wave-slide 20s linear infinite reverse; }
+.wf-login-bubble {
+  position:absolute; z-index:0; pointer-events:none; border-radius:50%;
+  will-change:transform; animation: wf-bubble-float 9s ease-in-out infinite;
+}
+.wf-login-bubble-lg {
+  width:300px; height:300px; right:-70px; bottom:2%;
+  background: radial-gradient(circle at 32% 28%, var(--wfl-bubble), transparent 72%);
+}
+.wf-login-bubble-sm {
+  width:120px; height:120px; left:7%; top:12%; animation-duration:13s;
+  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.7), transparent 72%);
+}
+.wf-login-root.wf-login-light .wf-login-bubble-sm { opacity:.9; }
+.wf-login-root:not(.wf-login-light) .wf-login-bubble-sm { display:none; }
 .wf-login-card-wrap {
   position:relative; z-index:2;
   width:100%; max-width:420px;
@@ -9516,6 +9563,14 @@ function useLoginStyle() {
 // Soft, slowly-drifting gradient blobs + a faint dot-grid in two corners —
 // a calmer, "standard" backdrop (no neon glow / spinning border) behind
 // the login card. Purely decorative (CSS animation only, no JS ticking).
+// A slow drifting wave band pinned to the bottom of the screen (two
+// identical copies per layer, translated -50% in a linear loop, so the
+// seam is invisible) plus a couple of soft floating light bubbles —
+// pure CSS/SVG animation, no JS ticking.
+const WAVE_PATH_BACK =
+  "M0,110 C120,150 240,60 360,85 C480,110 600,40 720,80 L720,240 L0,240 Z";
+const WAVE_PATH_FRONT =
+  "M0,150 C110,95 230,185 360,140 C490,95 610,165 720,120 L720,240 L0,240 Z";
 function LoginBackground() {
   return (
     <>
@@ -9524,7 +9579,26 @@ function LoginBackground() {
         <div className="wf-login-blob wf-login-blob-br" />
       </div>
       <div className="wf-login-dots wf-login-dots-tl" />
-      <div className="wf-login-dots wf-login-dots-br" />
+      <div className="wf-login-bubble wf-login-bubble-sm" />
+      <div className="wf-login-waves">
+        <div className="wf-login-wave-track wf-login-wave-back">
+          <svg viewBox="0 0 720 240" preserveAspectRatio="none">
+            <path d={WAVE_PATH_BACK} style={{ fill: "var(--wfl-wave-a)" }} />
+          </svg>
+          <svg viewBox="0 0 720 240" preserveAspectRatio="none">
+            <path d={WAVE_PATH_BACK} style={{ fill: "var(--wfl-wave-a)" }} />
+          </svg>
+        </div>
+        <div className="wf-login-wave-track wf-login-wave-front">
+          <svg viewBox="0 0 720 240" preserveAspectRatio="none">
+            <path d={WAVE_PATH_FRONT} style={{ fill: "var(--wfl-wave-b)" }} />
+          </svg>
+          <svg viewBox="0 0 720 240" preserveAspectRatio="none">
+            <path d={WAVE_PATH_FRONT} style={{ fill: "var(--wfl-wave-b)" }} />
+          </svg>
+        </div>
+      </div>
+      <div className="wf-login-bubble wf-login-bubble-lg" />
     </>
   );
 }
@@ -9893,7 +9967,13 @@ function AdminLoginScreen({ admins, onLogin, go }) {
                 alignItems: "center",
               }}
             >
-              <div className="wf-login-logo">
+              <div
+                className="wf-login-logo"
+                style={{
+                  background:
+                    "linear-gradient(135deg, var(--wfl-logo-grad-a), var(--wfl-logo-grad-b))",
+                }}
+              >
                 {branding.logo ? (
                   <img
                     src={branding.logo}
@@ -9905,17 +9985,11 @@ function AdminLoginScreen({ admins, onLogin, go }) {
                     }}
                   />
                 ) : (
-                  <ShieldCheck size={26} color="var(--wfl-accent)" />
+                  <User size={26} color="var(--wfl-accent-dark)" />
                 )}
               </div>
-              <div className="wf-login-eyebrow">{displayName}</div>
               <div className="wf-login-title">{L.adminTitle}</div>
               <div className="wf-login-subtitle">{L.adminSubtitle}</div>
-            </div>
-            <div className="wf-login-divider">
-              <div className="wf-login-divider-icon">
-                <ShieldCheck size={14} />
-              </div>
             </div>
             <form onSubmit={submit}>
               <LoginField label={L.username}>
@@ -10001,17 +10075,18 @@ function AdminLoginScreen({ admins, onLogin, go }) {
                 ) : status === "success" ? (
                   <Check size={16} strokeWidth={3} />
                 ) : (
-                  <Lock size={16} />
+                  <LogIn size={16} />
                 )}
                 {status === "submitting"
                   ? L.signingIn
                   : status === "success"
                     ? L.welcomeSuccess
                     : L.adminSubmit}
+                {status === "idle" && <ArrowRight size={16} />}
               </button>
             </form>
             <div className="wf-login-footer-note">
-              <ShieldCheck size={13} />
+              <Lock size={12} />
               {L.secureLogin} • {L.authorizedOnly}
             </div>
           </div>
@@ -26862,7 +26937,7 @@ function getDocExpiryInfo(expiryDate) {
   return { status: "valid", daysLeft };
 }
 const DOC_EXPIRY_COLOR = {
-  expired: { bg: "var(--wf-rose-soft)", fg: "#E5637A" },
+  expired: { bg: "var(--wf-rose-soft)", fg: "#E5484D" },
   soon: { bg: "var(--wf-gold-soft)", fg: "#F0A83B" },
   valid: { bg: "var(--wf-forest-soft)", fg: "var(--wf-forest-text)" },
 };
@@ -39107,6 +39182,18 @@ function AppInner() {
   useGlobalStyle();
   const { t, lang } = useLang();
   const [branding, setBranding, brandingReady] = useBrandingSettings();
+  // Memoized so the BrandingContext value keeps the same identity across
+  // renders that don't actually change branding. Without this, every
+  // keystroke anywhere in the app (any input whose state lives in
+  // AppInner — which is most of them) re-creates this object, and since
+  // AppInner re-renders on every such keystroke, every one of the many
+  // components that call useBranding() would re-render too, even ones
+  // with nothing to do with what's being typed. That's the main source
+  // of the "typing feels sticky/laggy" feeling across the app.
+  const brandingCtxValue = useMemo(
+    () => ({ branding, setBranding }),
+    [branding, setBranding],
+  );
   const brandDisplayName = branding.name?.trim() || t.appName;
   const { theme, glassEffect, toggleTheme } = useTheme();
   // Shows a styled AlertDialog (instead of window.alert) when this
@@ -40763,7 +40850,7 @@ function AppInner() {
   if (!loggedIn) {
     if (portal === "admin")
       return (
-        <BrandingContext.Provider value={{ branding, setBranding }}>
+        <BrandingContext.Provider value={brandingCtxValue}>
           <AdminLoginScreen
             admins={admins}
             onLogin={(id) => {
@@ -40795,7 +40882,7 @@ function AppInner() {
         </BrandingContext.Provider>
       );
     return (
-      <BrandingContext.Provider value={{ branding, setBranding }}>
+      <BrandingContext.Provider value={brandingCtxValue}>
         <EmployeeLoginScreen
           employees={employees}
           onLogin={(id) => {
@@ -40882,7 +40969,7 @@ function AppInner() {
   };
 
   return (
-    <BrandingContext.Provider value={{ branding, setBranding }}>
+    <BrandingContext.Provider value={brandingCtxValue}>
       <div
         className={`wf-root wf-app-enter ${theme === "dark" ? "wf-dark" : ""} ${
           glassEffect ? "wf-glass" : ""
@@ -41932,21 +42019,31 @@ export default function App() {
     const zoom = { small: "0.92", medium: "1", large: "1.1" }[fontScale] || "1";
     document.documentElement.style.zoom = zoom;
   }, [fontScale]);
+  // Same reasoning as brandingCtxValue in AppInner: keep these two
+  // provider values referentially stable across renders that don't
+  // change lang/theme themselves, so their many consumers don't
+  // re-render on unrelated state changes.
+  const langCtxValue = useMemo(
+    () => ({ lang, t, setLang }),
+    [lang, t, setLang],
+  );
+  const themeCtxValue = useMemo(
+    () => ({
+      theme,
+      setTheme,
+      toggleTheme,
+      primaryColor,
+      setPrimaryColor,
+      fontScale,
+      setFontScale,
+      glassEffect,
+      setGlassEffect,
+    }),
+    [theme, primaryColor, fontScale, glassEffect],
+  );
   return (
-    <LangContext.Provider value={{ lang, t, setLang }}>
-      <ThemeContext.Provider
-        value={{
-          theme,
-          setTheme,
-          toggleTheme,
-          primaryColor,
-          setPrimaryColor,
-          fontScale,
-          setFontScale,
-          glassEffect,
-          setGlassEffect,
-        }}
-      >
+    <LangContext.Provider value={langCtxValue}>
+      <ThemeContext.Provider value={themeCtxValue}>
         <AppInner />
         <ToastHost />
       </ThemeContext.Provider>
