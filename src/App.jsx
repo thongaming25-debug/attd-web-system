@@ -886,6 +886,30 @@ const LANG_RAW = {
       perPage: (n) => `${n} ក្នុងមួយទំព័រ`,
       tabAll: "សំណើទាំងអស់",
       searchPlaceholderMine: "ស្វែងរកប្រភេទ ឬមូលហេតុច្បាប់...",
+      durationType: "ប្រភេទរយៈពេល",
+      durationTypeDay: "ថ្ងៃ",
+      durationTypeHalfDay: "កន្លះថ្ងៃ",
+      durationTypeHourly: "ម៉ោង",
+      halfDayMorning: "ព្រឹក",
+      halfDayAfternoon: "រសៀល",
+      startTime: "ម៉ោងចាប់ផ្តើម",
+      endTime: "ម៉ោងបញ្ចប់",
+      timeRangeInvalid: "ម៉ោងបញ្ចប់ត្រូវតែក្រោយម៉ោងចាប់ផ្តើម",
+      totalDuration: "រយៈពេលសរុប",
+      halfDay: "កន្លះថ្ងៃ",
+      hoursShort: (n) => `${n} ម៉ោង`,
+      attachment: "ឯកសារភ្ជាប់",
+      attachmentAdd: "ភ្ជាប់ឯកសារ",
+      attachmentTooLarge: "ឯកសារធំពេក (កំណត់ 4MB)",
+      remainingHours: (n) => `នៅសល់ ${n} ម៉ោង`,
+      leaveBalance: "សមតុល្យច្បាប់",
+      approversInformation: "ព័ត៌មានអ្នកអនុម័ត",
+      canApproveCount: (n) => `1 ក្នុងចំណោម ${n} អាចអនុម័ត`,
+      noApprovers: "មិនទាន់មានអ្នកគ្រប់គ្រងណាមានសិទ្ធិអនុម័តទេ",
+      cancelRequest: "ដកសំណើ",
+      cancelRequestConfirm:
+        "តើអ្នកប្រាកដទេថាចង់ដកសំណើនេះ? សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ",
+      detailTitle: "ព័ត៌មានលម្អិត",
     },
     ot: {
       addBtn: "សុំ OT ថ្មី",
@@ -2329,6 +2353,30 @@ const LANG_RAW = {
       perPage: (n) => `${n} per page`,
       tabAll: "All Requests",
       searchPlaceholderMine: "Search leave type or reason...",
+      durationType: "Duration Type",
+      durationTypeDay: "Day",
+      durationTypeHalfDay: "Half Day",
+      durationTypeHourly: "Hourly",
+      halfDayMorning: "Morning",
+      halfDayAfternoon: "Afternoon",
+      startTime: "Start Time",
+      endTime: "End Time",
+      timeRangeInvalid: "End time must be after start time",
+      totalDuration: "Total Duration",
+      halfDay: "Half Day",
+      hoursShort: (n) => `${n}h`,
+      attachment: "Attachment",
+      attachmentAdd: "Add attachment",
+      attachmentTooLarge: "File is too large (4MB limit)",
+      remainingHours: (n) => `${n} hours remaining`,
+      leaveBalance: "Leave Balance",
+      approversInformation: "Approvers Information",
+      canApproveCount: (n) => `1 of ${n} can approve`,
+      noApprovers: "No admin currently has approval rights",
+      cancelRequest: "Cancel Request",
+      cancelRequestConfirm:
+        "Are you sure you want to cancel this request? This can't be undone.",
+      detailTitle: "Detail",
     },
     ot: {
       addBtn: "New OT Request",
@@ -4956,6 +5004,14 @@ function usedLeaveDaysByType(employeeId, leaveRequests, type, year) {
         r.status === "approved",
     )
     .reduce((sum, r) => {
+      // Hourly requests are a single fractional day (e.g. a 4-hour request
+      // is 0.5) rather than a calendar range, so they're counted directly
+      // instead of walking dateRange().
+      if (r.durationType === "hourly") {
+        return r.startDate && r.startDate.slice(0, 4) === String(y)
+          ? sum + leaveDurationDays(r)
+          : sum;
+      }
       const days = dateRange(r.startDate, r.endDate).filter(
         (d) => d.slice(0, 4) === String(y),
       );
@@ -7887,8 +7943,47 @@ function dateRange(start, end) {
 }
 // Number of calendar days a leave request spans, inclusive. Falls back to
 // 1 if the dates are missing/invalid so the UI never shows "0 days".
+// Hourly requests (durationType "hourly") instead resolve to a fraction of
+// a standard 8-hour workday — e.g. a 4-hour request comes out to 0.5, so
+// every place that already renders `t.lv.durationDays(leaveDurationDays(r))`
+// (tables, balances) automatically shows "0.5 days" without needing its
+// own hourly branch.
+const STANDARD_WORKDAY_HOURS = 8;
+// Fixed clock times used when an employee picks the "Half Day" quick
+// option instead of typing custom hours — morning/afternoon each span 4
+// hours (with the implied 12:00–13:00 lunch break), so both resolve to
+// exactly 0.5 of STANDARD_WORKDAY_HOURS. These requests are stored on
+// disk as ordinary durationType:"hourly" rows with these times, so every
+// existing hourly code path (balances, tables, detail view) handles them
+// with no extra branching.
+const HALF_DAY_TIMES = {
+  morning: ["08:00", "12:00"],
+  afternoon: ["13:00", "17:00"],
+};
+function leaveHoursBetween(startTime, endTime) {
+  if (!startTime || !endTime) return 0;
+  const [sh, sm] = startTime.split(":").map(Number);
+  const [eh, em] = endTime.split(":").map(Number);
+  if ([sh, sm, eh, em].some((n) => Number.isNaN(n))) return 0;
+  const mins = eh * 60 + em - (sh * 60 + sm);
+  return mins > 0 ? mins / 60 : 0;
+}
 function leaveDurationDays(r) {
+  if (r?.durationType === "hourly") {
+    const hours = leaveHoursBetween(r.startTime, r.endTime);
+    if (hours > 0) return +(hours / STANDARD_WORKDAY_HOURS).toFixed(2);
+    return 0;
+  }
   return dateRange(r.startDate, r.endDate).length || 1;
+}
+// Admins eligible to approve/reject a leave request — superadmin always
+// qualifies, everyone else needs the "approveRequests" permission on their
+// role. Any one of them acting resolves the request (OR, not unanimous),
+// so this list is exactly the set the "Approvers Information" panel shows.
+function eligibleLeaveApprovers(admins, rolePermissionsMap) {
+  return (admins || []).filter((a) =>
+    canDo(a, rolePermissionsMap, "approveRequests"),
+  );
 }
 // Small color dot shown next to each leave type in the requests table —
 // purely a visual grouping aid, not tied to status semantics.
@@ -22319,15 +22414,45 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
   const { t, lang } = useLang();
   const [f, setF] = useState({
     type: "annual",
+    durationType: "day",
     startDate: todayStr(),
     endDate: todayStr(),
+    startTime: "08:00",
+    endTime: "17:00",
+    halfPeriod: "morning",
     reason: "",
+    attachment: null,
   });
+  const [attachError, setAttachError] = useState("");
+  const [attachBusy, setAttachBusy] = useState(false);
+  const fileInputRef = useRef(null);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
-  const invalidRange = f.endDate < f.startDate;
-  const requestedDays = invalidRange
-    ? 0
-    : dateRange(f.startDate, f.endDate).length;
+  const isHourly = f.durationType === "hourly";
+  // "Half Day" is a UI-only shortcut — under the hood it's saved as an
+  // hourly request with fixed morning/afternoon clock times (see
+  // HALF_DAY_TIMES), so employees don't have to type times themselves
+  // just to take a morning or afternoon off.
+  const isHalfDay = f.durationType === "halfDay";
+  const halfTimes = HALF_DAY_TIMES[f.halfPeriod] || HALF_DAY_TIMES.morning;
+  const invalidRange = !isHourly && !isHalfDay && f.endDate < f.startDate;
+  const invalidTimeRange =
+    isHourly && leaveHoursBetween(f.startTime, f.endTime) <= 0;
+  const requestedDays = isHalfDay
+    ? 0.5
+    : isHourly
+      ? leaveDurationDays({
+          durationType: "hourly",
+          startTime: f.startTime,
+          endTime: f.endTime,
+        })
+      : invalidRange
+        ? 0
+        : dateRange(f.startDate, f.endDate).length;
+  const requestedHours = isHalfDay
+    ? leaveHoursBetween(halfTimes[0], halfTimes[1])
+    : isHourly
+      ? leaveHoursBetween(f.startTime, f.endTime)
+      : 0;
   // remaining can be a plain number (legacy annual-only balance) or an
   // { annual, sick } object — normalize so both shapes keep working.
   const remainingForType =
@@ -22342,6 +22467,33 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
     (f.type === "annual" || f.type === "sick") &&
     typeof remainingForType === "number" &&
     requestedDays > remainingForType;
+  const durationLabel =
+    requestedDays === 0.5 ? t.lv.halfDay : t.lv.durationDays(requestedDays);
+  const onAttachFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAttachError("");
+    if (file.size > MAX_DOC_BYTES) {
+      setAttachError(t.lv.attachmentTooLarge);
+      e.target.value = "";
+      return;
+    }
+    setAttachBusy(true);
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      setF((cur) => ({
+        ...cur,
+        attachment: {
+          fileName: file.name,
+          mimeType: file.type || "application/octet-stream",
+          dataUrl,
+        },
+      }));
+    } finally {
+      setAttachBusy(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
   return (
     <div>
       <Field label={t.lv.type}>
@@ -22388,15 +22540,134 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
           {t.lv.remainingSick(remainingForType)}
         </p>
       )}
-      <DateRangePicker
-        startValue={f.startDate}
-        endValue={f.endDate}
-        onChangeStart={set("startDate")}
-        onChangeEnd={set("endDate")}
-        startLabel={t.lv.startDate}
-        endLabel={t.lv.endDate}
-        style={{ marginBottom: 14 }}
-      />
+      <Field label={t.lv.durationType}>
+        <div style={{ display: "flex", gap: 8 }}>
+          {["day", "halfDay", "hourly"].map((dt) => (
+            <button
+              key={dt}
+              type="button"
+              onClick={() =>
+                setF({
+                  ...f,
+                  durationType: dt,
+                  endDate: dt !== "day" ? f.startDate : f.endDate,
+                  halfPeriod: f.halfPeriod || "morning",
+                })
+              }
+              style={{
+                flex: 1,
+                padding: "10px 0",
+                borderRadius: 10,
+                border: `1px solid ${f.durationType === dt ? T.forest : T.lineSoft}`,
+                background: f.durationType === dt ? T.forest : T.paper,
+                color: f.durationType === dt ? "#fff" : T.textSoft,
+                fontWeight: 600,
+                fontSize: 13,
+                cursor: "pointer",
+              }}
+            >
+              {dt === "day"
+                ? t.lv.durationTypeDay
+                : dt === "halfDay"
+                  ? t.lv.durationTypeHalfDay
+                  : t.lv.durationTypeHourly}
+            </button>
+          ))}
+        </div>
+      </Field>
+      {isHourly ? (
+        <>
+          <Field label={t.lv.startDate}>
+            <DatePicker
+              value={f.startDate}
+              onChange={(e) =>
+                setF({
+                  ...f,
+                  startDate: e.target.value,
+                  endDate: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <div className="wf-grid-2">
+            <Field label={t.lv.startTime}>
+              <TimePicker
+                value={f.startTime}
+                onChange={(e) => setF({ ...f, startTime: e.target.value })}
+              />
+            </Field>
+            <Field label={t.lv.endTime}>
+              <TimePicker
+                value={f.endTime}
+                onChange={(e) => setF({ ...f, endTime: e.target.value })}
+              />
+            </Field>
+          </div>
+          {invalidTimeRange && (
+            <p
+              style={{
+                fontSize: 12.5,
+                color: T.rose,
+                marginTop: -8,
+                marginBottom: 12,
+              }}
+            >
+              {t.lv.timeRangeInvalid}
+            </p>
+          )}
+        </>
+      ) : isHalfDay ? (
+        <>
+          <Field label={t.lv.startDate}>
+            <DatePicker
+              value={f.startDate}
+              onChange={(e) =>
+                setF({
+                  ...f,
+                  startDate: e.target.value,
+                  endDate: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <Field label={t.lv.durationTypeHalfDay}>
+            <div style={{ display: "flex", gap: 8 }}>
+              {["morning", "afternoon"].map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setF({ ...f, halfPeriod: p })}
+                  style={{
+                    flex: 1,
+                    padding: "10px 0",
+                    borderRadius: 10,
+                    border: `1px solid ${f.halfPeriod === p ? T.forest : T.lineSoft}`,
+                    background: f.halfPeriod === p ? T.forest : T.paper,
+                    color: f.halfPeriod === p ? "#fff" : T.textSoft,
+                    fontWeight: 600,
+                    fontSize: 13,
+                    cursor: "pointer",
+                  }}
+                >
+                  {p === "morning"
+                    ? t.lv.halfDayMorning
+                    : t.lv.halfDayAfternoon}
+                </button>
+              ))}
+            </div>
+          </Field>
+        </>
+      ) : (
+        <DateRangePicker
+          startValue={f.startDate}
+          endValue={f.endDate}
+          onChangeStart={set("startDate")}
+          onChangeEnd={set("endDate")}
+          startLabel={t.lv.startDate}
+          endLabel={t.lv.endDate}
+          style={{ marginBottom: 14 }}
+        />
+      )}
       {invalidRange && (
         <p
           style={{
@@ -22408,6 +22679,33 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
         >
           {t.lv.endDate + " " + t.lv.startDate}
         </p>
+      )}
+      {!invalidRange && !invalidTimeRange && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "10px 14px",
+            background: T.forestSoft || T.paper,
+            border: `1px solid ${T.lineSoft}`,
+            borderRadius: 10,
+            marginBottom: 14,
+          }}
+        >
+          <span style={{ fontSize: 12.5, fontWeight: 600, color: T.ink }}>
+            {t.lv.totalDuration}
+          </span>
+          <span
+            style={{ fontSize: 13.5, fontWeight: 700, color: T.forestText }}
+          >
+            {isHourly
+              ? `${t.lv.hoursShort(requestedHours)} · ${durationLabel}`
+              : isHalfDay
+                ? `${f.halfPeriod === "afternoon" ? t.lv.halfDayAfternoon : t.lv.halfDayMorning} · ${durationLabel}`
+                : durationLabel}
+          </span>
+        </div>
       )}
       {overQuota && (
         <p
@@ -22428,6 +22726,77 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
           )}
         </p>
       )}
+      <Field label={t.lv.attachment}>
+        <input
+          ref={fileInputRef}
+          type="file"
+          style={{ display: "none" }}
+          onChange={onAttachFile}
+        />
+        {f.attachment ? (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 8,
+              padding: "8px 12px",
+              background: T.paper,
+              border: `1px solid ${T.lineSoft}`,
+              borderRadius: 9,
+              fontSize: 12.5,
+              color: T.textSoft,
+            }}
+          >
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                minWidth: 0,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              <Paperclip size={13} /> {f.attachment.fileName}
+            </span>
+            <button
+              type="button"
+              onClick={() => setF({ ...f, attachment: null })}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: T.mutedLight,
+                flexShrink: 0,
+              }}
+            >
+              <X size={14} />
+            </button>
+          </div>
+        ) : (
+          <Button
+            variant="ghost"
+            type="button"
+            disabled={attachBusy}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {attachBusy ? (
+              <Loader2
+                size={14}
+                style={{ animation: "spin 1s linear infinite" }}
+              />
+            ) : (
+              <Paperclip size={14} />
+            )}{" "}
+            {t.lv.attachmentAdd}
+          </Button>
+        )}
+        {attachError && (
+          <span style={{ fontSize: 12, color: T.rose }}>{attachError}</span>
+        )}
+      </Field>
       <Field label={t.lv.reason}>
         <textarea
           className="wf-input"
@@ -22454,7 +22823,12 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
         <Button
           variant="accent"
           onClick={() => onSave(f)}
-          disabled={invalidRange || !f.startDate || !f.endDate}
+          disabled={
+            invalidRange ||
+            invalidTimeRange ||
+            !f.startDate ||
+            (!isHourly && !isHalfDay && !f.endDate)
+          }
         >
           {t.lv.submit}
         </Button>
@@ -22485,6 +22859,109 @@ function LeaveDecisionNote({ r, admins }) {
           {r.decisionReason ? ` — ${r.decisionReason}` : ""}
         </span>
       )}
+    </div>
+  );
+}
+
+// "Approvers Information" — every admin currently allowed to approve or
+// reject leave (superadmin, or anyone with the approveRequests
+// permission). It's an OR list, not a unanimous one: whichever admin
+// acts first resolves the whole request, matching the single
+// decidedById the rest of the app already stores — so this panel is
+// purely a read of who's eligible plus that one decision, no new
+// backend workflow required.
+function LeaveApproversPanel({ request, approvers, t, lang }) {
+  if (!approvers || approvers.length === 0) {
+    return (
+      <div style={{ fontSize: 12.5, color: T.muted, padding: "6px 0" }}>
+        {t.lv.noApprovers}
+      </div>
+    );
+  }
+  const statusFor = (admin) => {
+    if (request.status === "approved" && request.decidedById === admin.id)
+      return "approved";
+    if (request.status === "rejected" && request.decidedById === admin.id)
+      return "rejected";
+    return "pending";
+  };
+  return (
+    <div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 10,
+        }}
+      >
+        <span style={{ fontSize: 13, fontWeight: 700, color: T.ink }}>
+          {t.lv.approversInformation}
+        </span>
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            color: T.forestText,
+            background: T.forestSoft,
+            padding: "3px 9px",
+            borderRadius: 999,
+            flexShrink: 0,
+          }}
+        >
+          {t.lv.canApproveCount(approvers.length)}
+        </span>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        {approvers.map((a, i) => (
+          <div key={a.id}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "9px 10px",
+                background: T.paper,
+                border: `1px solid ${T.lineSoft}`,
+                borderRadius: 10,
+              }}
+            >
+              <Avatar name={a.name} photo={a.photo} size={32} />
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: T.ink,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {a.name}
+                </div>
+                <div style={{ fontSize: 11, color: T.muted }}>
+                  {adminRoleLabel(a.role, lang)}
+                </div>
+              </div>
+              <StatusPill status={statusFor(a)} />
+            </div>
+            {i < approvers.length - 1 && (
+              <div
+                style={{
+                  textAlign: "center",
+                  fontSize: 10.5,
+                  fontWeight: 700,
+                  color: T.mutedLight,
+                  padding: "3px 0",
+                }}
+              >
+                {lang === "en" ? "OR" : "ឬ"}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -22533,6 +23010,297 @@ function LeaveRejectModal({ onCancel, onConfirm }) {
   );
 }
 
+// Shared detail card — used by both the employee's own "My Leave" list and
+// the admin table's "View" button, so the two portals always show the
+// exact same shape (leave type + status, duration, date/time, balance,
+// reason, attachment, and the approvers list) instead of two views
+// drifting apart. Admin-only actions (Approve/Reject) and the
+// employee-only "Cancel Request" action are both optional props, so the
+// same component renders correctly for either audience.
+function LeaveDetailModal({
+  request,
+  employee,
+  admins,
+  approvers,
+  remainingDays,
+  onClose,
+  canApprove,
+  onApprove,
+  onReject,
+  canCancelOwn,
+  onCancelOwn,
+}) {
+  const { t, lang } = useLang();
+  const isHourly = request.durationType === "hourly";
+  const days = leaveDurationDays(request);
+  const hours = isHourly
+    ? leaveHoursBetween(request.startTime, request.endTime)
+    : 0;
+  const durationWords = days === 0.5 ? t.lv.halfDay : t.lv.durationDays(days);
+  const boxStyle = {
+    padding: "10px 12px",
+    background: T.paper,
+    border: `1px solid ${T.lineSoft}`,
+    borderRadius: 10,
+  };
+  const labelStyle = {
+    fontSize: 10.5,
+    color: T.muted,
+    marginBottom: 3,
+    fontWeight: 700,
+    textTransform: "uppercase",
+    letterSpacing: ".03em",
+  };
+  return (
+    <Modal title={t.lv.detailTitle} onClose={onClose} width={460}>
+      <div>
+        {employee && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              marginBottom: 16,
+            }}
+          >
+            <Avatar name={employee.name} photo={employee.photo} size={36} />
+            <div>
+              <div style={{ fontWeight: 600, color: T.ink, fontSize: 14 }}>
+                {employee.name}
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: T.muted,
+                  fontFamily: "'JetBrains Mono',monospace",
+                }}
+              >
+                {employee.code}
+              </div>
+            </div>
+          </div>
+        )}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            ...boxStyle,
+            marginBottom: 12,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: LEAVE_TYPE_DOT[request.type] || T.muted,
+              }}
+            />
+            <span style={{ fontSize: 14, fontWeight: 700, color: T.ink }}>
+              {getLeaveTypeLabel(lang)[request.type] || request.type}
+            </span>
+          </div>
+          <StatusPill status={request.status} />
+        </div>
+        <div className="wf-grid-2" style={{ marginBottom: 12 }}>
+          <div style={boxStyle}>
+            <div style={labelStyle}>{t.lv.totalDuration}</div>
+            <div style={{ fontSize: 14.5, fontWeight: 700, color: T.ink }}>
+              {durationWords}
+            </div>
+          </div>
+          <div style={boxStyle}>
+            <div style={labelStyle}>{t.lv.durationType}</div>
+            <div style={{ fontSize: 14.5, fontWeight: 700, color: T.ink }}>
+              {isHourly ? t.lv.durationTypeHourly : t.lv.durationTypeDay}
+            </div>
+          </div>
+        </div>
+        <div style={{ ...boxStyle, marginBottom: 12 }}>
+          <div style={labelStyle}>{request.startDate}</div>
+          {isHourly ? (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <div>
+                <div style={{ fontSize: 10.5, color: T.muted }}>
+                  {t.lv.startTime}
+                </div>
+                <div
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 700,
+                    color: T.forestText,
+                    fontFamily: "'JetBrains Mono',monospace",
+                  }}
+                >
+                  {request.startTime}
+                </div>
+              </div>
+              <div
+                style={{ fontSize: 11, fontWeight: 700, color: T.mutedLight }}
+              >
+                {t.lv.hoursShort(hours)}
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: 10.5, color: T.muted }}>
+                  {t.lv.endTime}
+                </div>
+                <div
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 700,
+                    color: T.forestText,
+                    fontFamily: "'JetBrains Mono',monospace",
+                  }}
+                >
+                  {request.endTime}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <div>
+                <div style={{ fontSize: 10.5, color: T.muted }}>
+                  {t.lv.fromShort}
+                </div>
+                <div
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: T.ink,
+                    fontFamily: "'JetBrains Mono',monospace",
+                  }}
+                >
+                  {request.startDate}
+                </div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: 10.5, color: T.muted }}>
+                  {t.lv.toShort}
+                </div>
+                <div
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: T.ink,
+                    fontFamily: "'JetBrains Mono',monospace",
+                  }}
+                >
+                  {request.endDate}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+        {typeof remainingDays === "number" && (
+          <div style={{ marginBottom: 12 }}>
+            <div style={labelStyle}>{t.lv.leaveBalance}</div>
+            <div style={boxStyle}>
+              <div style={{ fontSize: 10.5, color: T.muted, marginBottom: 2 }}>
+                {lang === "en" ? "Remaining" : "នៅសល់"}
+              </div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: T.ink }}>
+                {isHourly
+                  ? t.lv.remainingHours(
+                      Math.round(remainingDays * STANDARD_WORKDAY_HOURS),
+                    )
+                  : t.lv.remainingDays(remainingDays)}
+              </div>
+            </div>
+          </div>
+        )}
+        <div style={{ marginBottom: 12 }}>
+          <div style={labelStyle}>{t.lv.reason}</div>
+          <div style={{ ...boxStyle, fontSize: 13, color: T.textSoft }}>
+            {request.reason || "—"}
+          </div>
+        </div>
+        {request.attachment && (
+          <div style={{ marginBottom: 12 }}>
+            <div style={labelStyle}>{t.lv.attachment}</div>
+            <a
+              href={request.attachment.dataUrl}
+              download={request.attachment.fileName}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                ...boxStyle,
+                fontSize: 12.5,
+                color: T.forestText,
+                textDecoration: "none",
+              }}
+            >
+              <Paperclip size={13} />
+              <span
+                style={{
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {request.attachment.fileName}
+              </span>
+              <Download size={13} style={{ marginLeft: "auto" }} />
+            </a>
+          </div>
+        )}
+        <div style={{ marginBottom: 8 }}>
+          <LeaveApproversPanel
+            request={request}
+            approvers={approvers}
+            t={t}
+            lang={lang}
+          />
+        </div>
+        <LeaveDecisionNote r={request} admins={admins} />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 8,
+            marginTop: 14,
+            paddingTop: 14,
+            borderTop: `1px solid ${T.lineSoft}`,
+          }}
+        >
+          {canCancelOwn && (
+            <Button variant="danger" onClick={onCancelOwn}>
+              {t.lv.cancelRequest}
+            </Button>
+          )}
+          {canApprove && request.status === "pending" && (
+            <>
+              <Button variant="danger" onClick={onReject}>
+                {t.lv.reject}
+              </Button>
+              <Button variant="accent" onClick={onApprove}>
+                {t.lv.approve}
+              </Button>
+            </>
+          )}
+          <Button variant="ghost" onClick={onClose}>
+            {t.cancel}
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
 function LeaveRequests({
   role,
   currentAdmin,
@@ -22540,6 +23308,7 @@ function LeaveRequests({
   employees,
   setEmployees,
   admins,
+  rolePermissionsMap,
   leaveRequests,
   setLeaveRequests,
   attendance,
@@ -22553,6 +23322,7 @@ function LeaveRequests({
   const [modal, setModal] = useState(false);
   const [rejectFor, setRejectFor] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
+  const [confirmCancelOwn, setConfirmCancelOwn] = useState(null);
   const [confirmRollover, setConfirmRollover] = useState(false);
   const [confirmResetCarry, setConfirmResetCarry] = useState(false);
   const [query, setQuery] = useState("");
@@ -22563,6 +23333,27 @@ function LeaveRequests({
   const [viewFor, setViewFor] = useState(null);
   const empOf = (id) => employees.find((e) => e.id === id);
   const accrualMode = leavePolicy?.annualLeaveAccrualMode || "monthly";
+  const approvers = useMemo(
+    () => eligibleLeaveApprovers(admins, rolePermissionsMap),
+    [admins, rolePermissionsMap],
+  );
+  const cancelOwnRequest = (req) => {
+    setLeaveRequests(leaveRequests.filter((r) => r.id !== req.id));
+    setConfirmCancelOwn(null);
+    setViewFor(null);
+  };
+  // Remaining balance for whichever leave type a given request is — only
+  // annual/sick are quota-tracked, everything else (unpaid/other) has no
+  // balance to show.
+  const remainingForRequestType = (emp, req) => {
+    if (!emp || !req) return undefined;
+    if (req.type === "annual")
+      return annualLeaveBalance(emp, leaveRequests, null, accrualMode)
+        .remaining;
+    if (req.type === "sick")
+      return sickLeaveBalance(emp, leaveRequests).remaining;
+    return undefined;
+  };
 
   // Year-end rollover: takes each active employee's remaining annual
   // leave balance for `fromYear` and stores it as their carry-over for
@@ -22684,14 +23475,26 @@ function LeaveRequests({
 
   const submit = (f) => {
     if (!currentEmp) return;
+    // "Half Day" is a form-only convenience: it's persisted as an hourly
+    // request using the fixed morning/afternoon clock times, so every
+    // other leave code path (balances, tables, approvals) only ever has
+    // to know about "day" and "hourly" — see HALF_DAY_TIMES.
+    const isHalfDay = f.durationType === "halfDay";
+    const halfTimes = HALF_DAY_TIMES[f.halfPeriod] || HALF_DAY_TIMES.morning;
+    const savedDurationType = isHalfDay ? "hourly" : f.durationType || "day";
+    const usesTimes = savedDurationType === "hourly";
     setLeaveRequests([
       ...leaveRequests,
       {
         id: uid("lr"),
         employeeId: currentEmp.id,
         type: f.type,
+        durationType: savedDurationType,
         startDate: f.startDate,
-        endDate: f.endDate,
+        endDate: usesTimes ? f.startDate : f.endDate,
+        startTime: usesTimes ? (isHalfDay ? halfTimes[0] : f.startTime) : "",
+        endTime: usesTimes ? (isHalfDay ? halfTimes[1] : f.endTime) : "",
+        attachment: f.attachment || null,
         reason: f.reason.trim(),
         status: "pending",
         createdAt: new Date().toISOString(),
@@ -22933,13 +23736,14 @@ function LeaveRequests({
                 <th>{t.lv.reason}</th>
                 <th>{t.status}</th>
                 <th>{t.lv.appliedOn}</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
               {pg.pageItems.length === 0 && (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={8}
                     style={{
                       textAlign: "center",
                       color: T.muted,
@@ -22994,6 +23798,15 @@ function LeaveRequests({
                       <div style={{ fontSize: 10.5, color: T.muted }}>
                         {applied.time}
                       </div>
+                    </td>
+                    <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setViewFor(r)}
+                      >
+                        <Eye size={13} /> {t.lv.view}
+                      </Button>
                     </td>
                   </tr>
                 );
@@ -23082,6 +23895,25 @@ function LeaveRequests({
               onCancel={() => setModal(false)}
             />
           </Drawer>
+        )}
+        {viewFor && (
+          <LeaveDetailModal
+            request={viewFor}
+            employee={currentEmp}
+            admins={admins}
+            approvers={approvers}
+            remainingDays={remainingForRequestType(currentEmp, viewFor)}
+            onClose={() => setViewFor(null)}
+            canCancelOwn={viewFor.status === "pending"}
+            onCancelOwn={() => setConfirmCancelOwn(viewFor)}
+          />
+        )}
+        {confirmCancelOwn && (
+          <ConfirmDialog
+            text={t.lv.cancelRequestConfirm}
+            onCancel={() => setConfirmCancelOwn(null)}
+            onConfirm={() => cancelOwnRequest(confirmCancelOwn)}
+          />
         )}
       </div>
     );
@@ -23674,103 +24506,26 @@ function LeaveRequests({
         )}
       </Card>
       {viewFor && (
-        <Modal
-          title={t.lv.modalTitle}
+        <LeaveDetailModal
+          request={viewFor}
+          employee={empOf(viewFor.employeeId)}
+          admins={admins}
+          approvers={approvers}
+          remainingDays={remainingForRequestType(
+            empOf(viewFor.employeeId),
+            viewFor,
+          )}
           onClose={() => setViewFor(null)}
-          width={440}
-        >
-          {(() => {
-            const emp = empOf(viewFor.employeeId);
-            return (
-              <div>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    marginBottom: 16,
-                  }}
-                >
-                  <Avatar
-                    name={emp?.name || "?"}
-                    photo={emp?.photo}
-                    size={36}
-                  />
-                  <div>
-                    <div
-                      style={{ fontWeight: 600, color: T.ink, fontSize: 14 }}
-                    >
-                      {emp?.name || "—"}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 11,
-                        color: T.muted,
-                        fontFamily: "'JetBrains Mono',monospace",
-                      }}
-                    >
-                      {emp?.code}
-                    </div>
-                  </div>
-                </div>
-                <Field label={t.lv.type}>
-                  <div style={{ fontSize: 13, color: T.ink }}>
-                    {getLeaveTypeLabel(lang)[viewFor.type] || viewFor.type}
-                  </div>
-                </Field>
-                <div style={{ display: "flex", gap: 12 }}>
-                  <div style={{ flex: 1 }}>
-                    <Field label={t.lv.fromShort}>
-                      <div
-                        style={{
-                          fontFamily: "'JetBrains Mono',monospace",
-                          fontSize: 13,
-                        }}
-                      >
-                        {viewFor.startDate}
-                      </div>
-                    </Field>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <Field label={t.lv.toShort}>
-                      <div
-                        style={{
-                          fontFamily: "'JetBrains Mono',monospace",
-                          fontSize: 13,
-                        }}
-                      >
-                        {viewFor.endDate}
-                      </div>
-                    </Field>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <Field label={t.lv.duration}>
-                      <div style={{ fontSize: 13, color: T.ink }}>
-                        {t.lv.durationDays(leaveDurationDays(viewFor))}
-                      </div>
-                    </Field>
-                  </div>
-                </div>
-                <Field label={t.lv.reason}>
-                  <div style={{ fontSize: 13, color: T.textSoft }}>
-                    {viewFor.reason || "—"}
-                  </div>
-                </Field>
-                <Field label={t.status}>
-                  <div>
-                    <StatusPill status={viewFor.status} />
-                    <LeaveDecisionNote r={viewFor} admins={admins} />
-                  </div>
-                </Field>
-                <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                  <Button variant="ghost" onClick={() => setViewFor(null)}>
-                    {t.cancel}
-                  </Button>
-                </div>
-              </div>
-            );
-          })()}
-        </Modal>
+          canApprove={canApprove}
+          onApprove={() => {
+            approve(viewFor);
+            setViewFor(null);
+          }}
+          onReject={() => {
+            setRejectFor(viewFor);
+            setViewFor(null);
+          }}
+        />
       )}
       {rejectFor && (
         <LeaveRejectModal
@@ -39950,8 +40705,12 @@ function AppInner() {
         id: r.id,
         employeeId: r.employee_id,
         type: r.type,
+        durationType: r.duration_type,
         startDate: r.start_date,
         endDate: r.end_date,
+        startTime: r.start_time,
+        endTime: r.end_time,
+        attachment: r.attachment,
         reason: r.reason,
         status: r.status,
         createdAt: r.created_at,
@@ -39965,8 +40724,12 @@ function AppInner() {
         id: r.id,
         employee_id: r.employeeId,
         type: r.type,
+        duration_type: r.durationType,
         start_date: r.startDate,
         end_date: r.endDate,
+        start_time: r.startTime || null,
+        end_time: r.endTime || null,
+        attachment: r.attachment || null,
         reason: r.reason,
         status: r.status,
         created_at: r.createdAt,
@@ -42052,6 +42815,7 @@ function AppInner() {
                     employees={employees}
                     setEmployees={setEmployees}
                     admins={admins}
+                    rolePermissionsMap={rolePermissionsMap}
                     leaveRequests={leaveRequests}
                     setLeaveRequests={setLeaveRequests}
                     attendance={attendance}
