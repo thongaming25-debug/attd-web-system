@@ -909,7 +909,8 @@ const LANG_RAW = {
       cancelRequest: "ដកសំណើ",
       cancelRequestConfirm:
         "តើអ្នកប្រាកដទេថាចង់ដកសំណើនេះ? សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ",
-      detailTitle: "ព័ត៌មានលម្អិត",
+      detailTitle: "លម្អិត",
+      detailSubtitle: "ព័ត៌មានសំណើច្បាប់ឈប់សម្រាក",
     },
     ot: {
       addBtn: "សុំ OT ថ្មី",
@@ -2377,6 +2378,7 @@ const LANG_RAW = {
       cancelRequestConfirm:
         "Are you sure you want to cancel this request? This can't be undone.",
       detailTitle: "Detail",
+      detailSubtitle: "Leave Request Information",
     },
     ot: {
       addBtn: "New OT Request",
@@ -3605,7 +3607,7 @@ function LangToggle({ variant = "dark" }) {
           border: `1px solid ${isDark ? "rgba(255,255,255,0.18)" : T.line}`,
           borderRadius: 8,
           color: isDark ? "#fff" : T.ink,
-          fontSize: 12,
+          fontSize: 13,
           fontWeight: 600,
           padding: "5px 10px",
           cursor: "pointer",
@@ -3655,7 +3657,7 @@ function LangToggle({ variant = "dark" }) {
                 border: "none",
                 borderRadius: 7,
                 color: T.ink,
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: o.code === lang ? 700 : 500,
                 padding: "7px 10px",
                 cursor: "pointer",
@@ -3723,7 +3725,7 @@ function HeaderClock() {
           alignItems: "center",
           gap: 7,
           fontFamily: "'JetBrains Mono',monospace",
-          fontSize: 13,
+          fontSize: 14,
           fontWeight: 600,
           color: T.ink,
           padding: "9px 14px",
@@ -3746,7 +3748,7 @@ function HeaderClock() {
         alignItems: "baseline",
         gap: 5,
         fontFamily: "'JetBrains Mono',monospace",
-        fontSize: 13,
+        fontSize: 14,
         fontWeight: 600,
         color: T.text,
         padding: "5px 10px",
@@ -3766,7 +3768,7 @@ function HeaderClock() {
         }}
       />
       {hh}:{mm}
-      <span style={{ color: T.muted, fontSize: 11 }}>{ss}</span>
+      <span style={{ color: T.muted, fontSize: 12 }}>{ss}</span>
     </div>
   );
 }
@@ -4268,7 +4270,7 @@ body{background:var(--wf-paper);}
   --wf-ink:#10141C; --wf-ink-dark:#050810; --wf-paper:#F3F4F7; --wf-card:#FFFFFF;
   --wf-forest-soft:#E4F5EC; --wf-forest-text:#127449; --wf-gold-soft:#FCF0DC; --wf-gold-text:#9A6212;
   --wf-rose-dark:#C42B2F; --wf-rose-soft:#FCE8E8; --wf-line:#E2E5EB; --wf-line-soft:#EAECF1;
-  --wf-muted:#767E8F; --wf-muted-light:#A7ADBB; --wf-text-soft:#3C4250;
+  --wf-muted:#767E8F; --wf-muted-light:#8A91A1; --wf-text-soft:#3C4250;
   --wf-input-border:#D6DAE2; --wf-input-bg:#FAFBFC; --wf-field-label:#5B6274;
   --wf-table-head-bg:#F6F7F9; --wf-divider:#ECEEF2; --wf-danger-border:#F1C4C4;
   --wf-danger-hover-bg:#FDECEC; --wf-header-bg:rgba(255,255,255,0.85);
@@ -4286,22 +4288,23 @@ body{background:var(--wf-paper);}
   --wf-glass-card:rgba(24,30,48,0.55); --wf-glass-header:rgba(12,16,29,0.6);
   --wf-glass-border:rgba(255,255,255,0.09); --wf-glass-highlight:rgba(255,255,255,0.07);
 }
-.wf-root{display:flex;width:100%;height:100vh;height:100dvh;min-height:640px;max-height:100vh;max-height:100dvh;background:${T.paper};font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.text};position:relative;overflow:hidden;border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,0.02),0 16px 40px -18px rgba(5,8,16,0.35);border:1px solid ${T.line};transition:background .15s ease,color .15s ease;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
+.wf-root{display:flex;width:100%;height:100vh;height:100dvh;min-height:640px;max-height:100vh;max-height:100dvh;background:${T.paper};font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.text};position:relative;overflow:hidden;border-radius:10px;box-shadow:0 1px 0 rgba(0,0,0,0.02),0 16px 40px -18px rgba(5,8,16,0.35);border:1px solid ${T.line};transition:background .15s ease,color .15s ease;line-height:1.6;}
+.wf-root button,.wf-root input,.wf-root textarea,.wf-root select,.wf-root optgroup{font-family:inherit;}
 .wf-sidebar{background:${T.card};color:${T.ink};width:276px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid ${T.line};transition:transform .25s cubic-bezier(.4,0,.2,1),background .15s ease,color .15s ease;}
 .wf-sidebar-inner{display:flex;flex-direction:column;height:100%;}
-.wf-logo-badge{width:32px;height:32px;border-radius:7px;background:${T.gold};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#1A1300;font-family:'JetBrains Mono',monospace;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);}
-.wf-nav-eyebrow{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${T.muted};padding:4px 14px 8px;}
+.wf-logo-badge{width:32px;height:32px;border-radius:7px;background:${T.gold};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#1A1300;font-family:'JetBrains Mono',monospace;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);}
+.wf-nav-eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${T.muted};padding:4px 14px 8px;}
 .wf-sidebar-nav{flex:1;min-height:0;overflow-y:auto;padding:14px 10px;display:flex;flex-direction:column;gap:3px;}
 .wf-nav-group{display:flex;flex-direction:column;gap:3px;}
 .wf-nav-group + .wf-nav-group{margin-top:10px;}
 .wf-sidebar-search{position:relative;margin:2px 4px 12px;flex-shrink:0;}
-.wf-sidebar-search input{width:100%;box-sizing:border-box;padding:8px 10px 8px 32px;border-radius:9px;border:1px solid ${T.line};background:${T.paper};color:${T.ink};font-size:12.5px;font-family:inherit;outline:none;transition:border-color .15s ease,background .15s ease;}
+.wf-sidebar-search input{width:100%;box-sizing:border-box;padding:8px 10px 8px 32px;border-radius:9px;border:1px solid ${T.line};background:${T.paper};color:${T.ink};font-size:13.5px;font-family:inherit;outline:none;transition:border-color .15s ease,background .15s ease;}
 .wf-sidebar-search input:focus{border-color:${T.blue};}
 .wf-sidebar-search input::placeholder{color:${T.mutedLight};}
 .wf-sidebar-search svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:${T.mutedLight};pointer-events:none;}
 .wf-dark .wf-sidebar-search input{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.08);color:#fff;}
-.wf-nav-empty{padding:14px 10px;font-size:12px;color:${T.muted};text-align:center;}
-.wf-nav-item{position:relative;width:100%;display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:13.5px;font-weight:500;background:transparent;color:${T.ink};border:none;cursor:pointer;text-align:left;transition:background .15s ease,color .15s ease;}
+.wf-nav-empty{padding:14px 10px;font-size:13px;color:${T.muted};text-align:center;}
+.wf-nav-item{position:relative;width:100%;display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:14.5px;font-weight:500;background:transparent;color:${T.ink};border:none;cursor:pointer;text-align:left;transition:background .15s ease,color .15s ease;}
 .wf-nav-item .wf-nav-label{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .wf-nav-item:hover{background:${T.lineSoft};color:${T.ink};}
 .wf-nav-item.active{background:${T.blue}17;color:${T.blue};font-weight:600;}
@@ -4333,9 +4336,9 @@ body{background:var(--wf-paper);}
 .wf-stat-solid-icon{position:absolute;right:10px;bottom:8px;opacity:.22;transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .25s ease;}
 .wf-stat-solid:hover .wf-stat-solid-icon{transform:scale(1.12) rotate(-4deg);opacity:.3;}
 .wf-stat-solid-value{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;position:relative;line-height:1;}
-.wf-stat-solid-label{font-size:13px;font-weight:600;margin-top:6px;position:relative;}
+.wf-stat-solid-label{font-size:14px;font-weight:600;margin-top:6px;position:relative;}
 @media (prefers-reduced-motion:reduce){.wf-stat-solid,.wf-stat-solid-icon{transition:none;}}
-.wf-stat-pastel{position:relative;overflow:hidden;border-radius:14px;padding:20px 18px;min-height:132px;cursor:default;font-family:'Kantumruy Pro','Noto Sans Khmer',sans-serif;transition:transform .18s cubic-bezier(.4,0,.2,1),box-shadow .18s cubic-bezier(.4,0,.2,1);}
+.wf-stat-pastel{position:relative;overflow:hidden;border-radius:14px;padding:20px 18px;min-height:132px;cursor:default;font-family:'Inter','Noto Sans Khmer',sans-serif;transition:transform .18s cubic-bezier(.4,0,.2,1),box-shadow .18s cubic-bezier(.4,0,.2,1);}
 .wf-stat-pastel:hover{transform:translateY(-3px);box-shadow:0 10px 22px -12px rgba(5,8,16,0.25);}
 .wf-stat-pastel-clickable{cursor:pointer;}
 .wf-stat-pastel-clickable:focus-visible{outline:2px solid ${T.gold};outline-offset:2px;}
@@ -4344,13 +4347,13 @@ body{background:var(--wf-paper);}
 .wf-stat-pastel-chevron{position:absolute;top:14px;right:14px;width:24px;height:24px;border-radius:999px;background:rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;transition:transform .18s cubic-bezier(.4,0,.2,1);}
 .wf-stat-pastel-clickable:hover .wf-stat-pastel-chevron{transform:translateX(2px);}
 .wf-stat-pastel-title{font-size:19px;font-weight:700;position:relative;line-height:1.28;padding-right:24px;}
-.wf-stat-pastel-label{font-size:12.5px;font-weight:500;margin-top:5px;position:relative;}
-.wf-stat-pastel-sub{font-size:11.5px;font-weight:500;margin-top:2px;position:relative;opacity:.75;}
+.wf-stat-pastel-label{font-size:13.5px;font-weight:500;margin-top:5px;position:relative;}
+.wf-stat-pastel-sub{font-size:12.5px;font-weight:500;margin-top:2px;position:relative;opacity:.75;}
 @media (prefers-reduced-motion:reduce){.wf-stat-pastel,.wf-stat-pastel-icon,.wf-stat-pastel-chevron{transition:none;}}
-.wf-btn{display:inline-flex;align-items:center;gap:6px;font-weight:600;border-radius:7px;font-size:13px;padding:9px 15px;border:1px solid transparent;cursor:pointer;transition:background .15s ease,transform .1s ease,box-shadow .15s ease;}
+.wf-btn{display:inline-flex;align-items:center;gap:6px;font-weight:600;border-radius:7px;font-size:14px;padding:9px 15px;border:1px solid transparent;cursor:pointer;transition:background .15s ease,transform .1s ease,box-shadow .15s ease;}
 .wf-btn:active:not(:disabled){transform:scale(.97);}
 .wf-btn:disabled{opacity:.5;cursor:not-allowed;}
-.wf-btn-sm{padding:6px 10px;font-size:12px;}
+.wf-btn-sm{padding:6px 10px;font-size:13px;}
 .wf-btn-primary{background:${T.gold};color:var(--wf-gold-fg,#1A1300);box-shadow:0 1px 2px rgba(0,0,0,0.15);}
 .wf-btn-primary:hover:not(:disabled){filter:brightness(.92);}
 .wf-btn-accent{position:relative;overflow:hidden;background:${T.gold};color:var(--wf-gold-fg,#1A1300);box-shadow:0 3px 12px rgba(0,0,0,0.18);}
@@ -4368,9 +4371,9 @@ body{background:var(--wf-paper);}
 .wf-btn-danger-solid:hover:not(:disabled){background:${T.roseDark};}
 .wf-input{width:100%;padding:9px 12px;border-radius:7px;border:1px solid ${T.inputBorder};font-size:16px;background:${T.inputBg};color:${T.text};outline:none;font-family:inherit;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
 .wf-input:focus{border-color:${T.gold};box-shadow:0 0 0 3px rgba(240,168,59,0.16);}
-.wf-field-label{display:block;font-size:11px;font-weight:700;color:${T.fieldLabel};margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;}
+.wf-field-label{display:block;font-size:12px;font-weight:700;color:${T.fieldLabel};margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;}
 .wf-dp-wrap{position:relative;display:inline-block;width:100%;}
-.wf-dp-trigger{width:100%;padding:9px 12px;border-radius:7px;border:1px solid ${T.inputBorder};font-size:13px;background:${T.inputBg};color:${T.text};outline:none;font-family:inherit;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;text-align:left;}
+.wf-dp-trigger{width:100%;padding:9px 12px;border-radius:7px;border:1px solid ${T.inputBorder};font-size:14px;background:${T.inputBg};color:${T.text};outline:none;font-family:inherit;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;text-align:left;}
 .wf-dp-trigger:hover{border-color:${T.gold};}
 .wf-dp-trigger.open{border-color:${T.gold};box-shadow:0 0 0 3px rgba(240,168,59,0.16);}
 .wf-dp-placeholder{color:${T.muted};}
@@ -4378,17 +4381,17 @@ body{background:var(--wf-paper);}
 .wf-dp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .wf-dp-nav{background:none;border:none;cursor:pointer;color:${T.muted};display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:6px;transition:background .12s ease,color .12s ease;flex-shrink:0;}
 .wf-dp-nav:hover{background:${T.tableHeadBg};color:${T.ink};}
-.wf-dp-title{font-size:13px;font-weight:700;color:${T.ink};font-family:'Kantumruy Pro','Noto Sans Khmer',sans-serif;}
+.wf-dp-title{font-size:14px;font-weight:700;color:${T.ink};font-family:'Inter','Noto Sans Khmer',sans-serif;}
 .wf-dp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
-.wf-dp-dow{font-size:10px;font-weight:700;color:${T.muted};text-align:center;padding:4px 0;text-transform:uppercase;}
-.wf-dp-day{position:relative;font-size:12.5px;text-align:center;padding:7px 0;border-radius:6px;cursor:pointer;color:${T.text};background:none;border:1px solid transparent;transition:background .12s ease,color .12s ease;}
+.wf-dp-dow{font-size:11px;font-weight:700;color:${T.muted};text-align:center;padding:4px 0;text-transform:uppercase;}
+.wf-dp-day{position:relative;font-size:13.5px;text-align:center;padding:7px 0;border-radius:6px;cursor:pointer;color:${T.text};background:none;border:1px solid transparent;transition:background .12s ease,color .12s ease;}
 .wf-dp-day:hover{background:${T.tableHeadBg};}
 .wf-dp-day.outside{color:${T.mutedLight};}
 .wf-dp-day.today{border-color:${T.gold};font-weight:700;}
 .wf-dp-day.selected{background:${T.gold};color:#1A1300;font-weight:700;}
 .wf-dp-day.selected:hover{background:#D89430;}
 .wf-dp-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid ${T.lineSoft};}
-.wf-dp-link{background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:${T.forestText};padding:2px 4px;border-radius:6px;}
+.wf-dp-link{background:none;border:none;cursor:pointer;font-size:13px;font-weight:600;color:${T.forestText};padding:2px 4px;border-radius:6px;}
 .wf-dp-link:hover{background:${T.forestSoft};}
 .wf-dr-triggers{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .wf-dp-pop-wide{width:520px;max-width:calc(100vw - 64px);padding:14px;}
@@ -4418,7 +4421,7 @@ body{background:var(--wf-paper);}
 .wf-tp-col{width:50px;height:168px;overflow-y:auto;scroll-snap-type:y mandatory;border-radius:8px;background:${T.tableHeadBg};scrollbar-width:none;}
 .wf-tp-col::-webkit-scrollbar{width:0;height:0;}
 .wf-tp-pad{height:68px;flex-shrink:0;scroll-snap-align:none;}
-.wf-tp-item{scroll-snap-align:center;text-align:center;padding:8px 0;font-size:13px;font-family:'JetBrains Mono',monospace;color:${T.text};cursor:pointer;border-radius:6px;transition:background .12s ease,color .12s ease;}
+.wf-tp-item{scroll-snap-align:center;text-align:center;padding:8px 0;font-size:14px;font-family:'JetBrains Mono',monospace;color:${T.text};cursor:pointer;border-radius:6px;transition:background .12s ease,color .12s ease;}
 .wf-tp-item:hover{background:${T.line};}
 .wf-tp-item.selected{background:${T.gold};color:#1A1300;font-weight:700;}
 .wf-tp-sep{font-weight:700;color:${T.muted};padding-bottom:2px;}
@@ -4427,15 +4430,15 @@ body{background:var(--wf-paper);}
 .wf-modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid ${T.lineSoft};position:sticky;top:0;z-index:5;background:${T.card};border-radius:11px 11px 0 0;}
 .wf-drawer-panel{position:fixed;top:0;right:0;height:100vh;height:100dvh;background:${T.card};box-shadow:-12px 0 32px rgba(15,23,42,0.18);display:flex;flex-direction:column;transition:transform 240ms ease;}
 .wf-avatar{border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;flex-shrink:0;}
-.wf-badge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.02em;white-space:nowrap;}
-.wf-table{width:100%;min-width:640px;font-size:13px;border-collapse:collapse;}
-.wf-table th{text-align:left;font-size:10.5px;color:${T.muted};text-transform:uppercase;padding:11px 16px;background:${T.tableHeadBg};border-bottom:1px solid ${T.lineSoft};font-weight:700;letter-spacing:.05em;font-family:'JetBrains Mono',monospace;}
+.wf-badge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700;letter-spacing:.02em;white-space:nowrap;}
+.wf-table{width:100%;min-width:640px;font-size:14px;border-collapse:collapse;}
+.wf-table th{text-align:left;font-size:11.5px;color:${T.muted};padding:11px 16px;background:${T.tableHeadBg};border-bottom:1px solid ${T.lineSoft};font-weight:700;letter-spacing:.02em;font-family:inherit;}
 .wf-table td{padding:10px 16px;border-bottom:1px solid ${T.lineSoft};}
 .wf-table tr:last-child td{border-bottom:none;}
 .wf-table tbody tr{transition:background .12s ease;}
 .wf-table tbody tr:hover{background:${T.tableHeadBg};}
 .wf-grid{display:grid;gap:16px;}
-.wf-emp-linkbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:11.5px;font-weight:600;color:${T.textSoft};padding:6px 4px;border-radius:6px;transition:background .15s ease,color .15s ease;white-space:nowrap;}
+.wf-emp-linkbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600;color:${T.textSoft};padding:6px 4px;border-radius:6px;transition:background .15s ease,color .15s ease;white-space:nowrap;}
 .wf-emp-linkbtn:hover{background:${T.tableHeadBg};color:${T.ink};}
 .wf-dash-stats{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));}
 /* Employee dashboard — desktop/tablet only two-column layout (see the
@@ -4450,11 +4453,11 @@ body{background:var(--wf-paper);}
 .wf-apps-tile:hover{border-color:${T.gold};box-shadow:0 4px 14px rgba(5,8,16,0.06);}
 .wf-apps-tile:active{transform:scale(.96);}
 .wf-apps-tile-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.wf-apps-tile-label{font-size:12px;font-weight:600;color:${T.ink};line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.wf-apps-tile-desc{font-size:10.5px;font-weight:500;color:${T.muted};line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.wf-apps-tile-label{font-size:13px;font-weight:600;color:${T.ink};line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.wf-apps-tile-desc{font-size:11.5px;font-weight:500;color:${T.muted};line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .wf-apps-tile:disabled{cursor:default;}
 .wf-apps-tile:disabled:hover{border-color:${T.line};box-shadow:none;}
-.wf-punch-clock{font-size:34px;font-weight:700;font-family:'Kantumruy Pro','Noto Sans Khmer',sans-serif;color:${T.ink};font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
+.wf-punch-clock{font-size:34px;font-weight:700;font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.ink};font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
 .wf-menu-btn{display:none;background:none;border:none;color:${T.ink};cursor:pointer;padding:4px;}
 .wf-overlay-scrim{display:none;}
 .wf-content::-webkit-scrollbar,.wf-sidebar nav::-webkit-scrollbar,.wf-modal::-webkit-scrollbar{width:8px;}
@@ -4474,7 +4477,7 @@ body{background:var(--wf-paper);}
 .wf-bottomnav.wf-bottomnav-hidden{display:none !important;}
 .wf-role-badge{white-space:nowrap;flex-shrink:0;}
 .wf-bottomnav{display:none;position:absolute;left:0;right:0;bottom:0;z-index:45;background:${T.headerBg};backdrop-filter:blur(10px);border-top:1px solid ${T.lineSoft};align-items:stretch;justify-content:space-around;padding:5px 2px calc(5px + env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(5,8,16,0.08);}
-.wf-bottomnav-item{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;color:${T.muted};padding:5px 2px 4px;border-radius:9px;font-size:10px;font-weight:600;transition:color .15s ease;}
+.wf-bottomnav-item{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;color:${T.muted};padding:5px 2px 4px;border-radius:9px;font-size:11px;font-weight:600;transition:color .15s ease;}
 .wf-bottomnav-item span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .wf-bottomnav-item.active{color:${T.goldText};}
 .wf-bnav-icon-wrap{width:38px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:background .15s ease;}
@@ -4570,7 +4573,7 @@ body{background:var(--wf-paper);}
   .wf-sidebar-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 8px;padding:18px 14px 14px;align-content:start;}
   .wf-sidebar-nav .wf-nav-group{display:contents;}
   .wf-sidebar-nav .wf-nav-eyebrow{grid-column:1/-1;padding:0 2px 6px;}
-  .wf-sidebar-nav .wf-nav-item{flex-direction:column;gap:7px;padding:10px 2px;border-radius:14px;text-align:center;font-size:10.5px;line-height:1.25;}
+  .wf-sidebar-nav .wf-nav-item{flex-direction:column;gap:7px;padding:10px 2px;border-radius:14px;text-align:center;font-size:11.5px;line-height:1.25;}
   .wf-sidebar-nav .wf-nav-item.active{background:${T.blue}17;}
   .wf-dark .wf-sidebar-nav .wf-nav-item.active{background:rgba(255,255,255,0.07);}
   .wf-sidebar-nav .wf-nav-chevron,.wf-sidebar-nav .wf-nav-dot{display:none;}
@@ -4592,8 +4595,8 @@ body{background:var(--wf-paper);}
      long one. */
   .wf-stat-pastel{min-height:92px !important;padding:13px 14px !important;}
   .wf-stat-pastel-title{font-size:16px !important;padding-right:20px !important;}
-  .wf-stat-pastel-label{font-size:11px !important;}
-  .wf-stat-pastel-sub{font-size:10.5px !important;}
+  .wf-stat-pastel-label{font-size:12px !important;}
+  .wf-stat-pastel-sub{font-size:11.5px !important;}
   .wf-stat-pastel-icon{width:30px !important;height:30px !important;}
   .wf-stat-pastel-chevron{width:20px !important;height:20px !important;top:10px !important;right:10px !important;}
   /* The "Attendance Overview / Employees by Department / Quick Actions"
@@ -4627,7 +4630,7 @@ body{background:var(--wf-paper);}
 .wf-chat-item:hover{background:${T.paper};}
 .wf-chat-item.active{background:${T.forestSoft};}
 .wf-chat-bubble-row{padding:2px 14px;}
-.wf-chat-bubble{max-width:100%;padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.5;overflow-wrap:break-word;word-break:normal;white-space:pre-wrap;}
+.wf-chat-bubble{max-width:100%;padding:9px 13px;border-radius:14px;font-size:14px;line-height:1.5;overflow-wrap:break-word;word-break:normal;white-space:pre-wrap;}
 .wf-chat-back-btn{display:none;background:none;border:none;cursor:pointer;color:${T.ink};padding:6px;align-items:center;}
 .wf-callscreen{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:space-between;background:radial-gradient(circle at 50% 18%,#243158 0%,#0a0e1a 72%);color:#fff;padding:max(28px,env(safe-area-inset-top)) 24px max(32px,env(safe-area-inset-bottom));animation:wf-fade .22s ease;}
 .wf-callscreen-ring{position:absolute;top:50%;left:50%;border-radius:50%;border:2px solid rgba(255,255,255,0.25);transform:translate(-50%,-50%);animation:wf-pulse-ring 2.4s ease-out infinite;}
@@ -4642,21 +4645,21 @@ body{background:var(--wf-paper);}
 .wf-callbtn-circle.wf-callbtn-reject{background:#e5484d;}
 .wf-callbtn-circle.wf-callbtn-secondary{background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.22);box-shadow:none;}
 .wf-callbtn-circle.wf-callbtn-secondary.wf-callbtn-active{background:#fff;color:#0a0e1a;}
-.wf-callbtn-label{font-size:12.5px;color:rgba(255,255,255,0.75);font-weight:600;}
+.wf-callbtn-label{font-size:13.5px;color:rgba(255,255,255,0.75);font-weight:600;}
 .wf-roster-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
-.wf-roster-dow{font-size:11px;font-weight:700;color:${T.muted};text-align:center;padding:4px 0;text-transform:uppercase;}
+.wf-roster-dow{font-size:12px;font-weight:700;color:${T.muted};text-align:center;padding:4px 0;text-transform:uppercase;}
 .wf-roster-cell{position:relative;min-height:88px;border:1px solid ${T.lineSoft};border-radius:10px;padding:6px;cursor:pointer;background:${T.card};display:flex;flex-direction:column;gap:4px;transition:background .12s ease,border-color .12s ease;}
 .wf-roster-cell:hover{background:${T.paper};border-color:${T.line};}
 .wf-roster-cell.outside{opacity:.4;}
 .wf-roster-cell.today{border-color:${T.gold};}
-.wf-roster-daynum{font-size:12px;font-weight:700;color:${T.ink};}
-.wf-roster-pill{font-size:10.5px;font-weight:600;padding:2px 6px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.wf-roster-more{font-size:10px;color:${T.muted};font-weight:600;}
+.wf-roster-daynum{font-size:13px;font-weight:700;color:${T.ink};}
+.wf-roster-pill{font-size:11.5px;font-weight:600;padding:2px 6px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wf-roster-more{font-size:11px;color:${T.muted};font-weight:600;}
 @media (max-width:640px){
   .wf-roster-grid{gap:4px;}
   .wf-roster-cell{min-height:64px;padding:4px;}
-  .wf-roster-dow{font-size:9.5px;}
-  .wf-roster-pill{font-size:9px;padding:1px 4px;}
+  .wf-roster-dow{font-size:10.5px;}
+  .wf-roster-pill{font-size:10px;padding:1px 4px;}
 }
 `;
 function useGlobalStyle() {
@@ -4672,7 +4675,7 @@ function useGlobalStyle() {
       link.id = "wf-fonts";
       link.rel = "stylesheet";
       link.href =
-        "https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&family=Noto+Sans+Khmer:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap";
+        "https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap";
       document.head.appendChild(link);
     }
   }, []);
@@ -6094,7 +6097,7 @@ function ToastHost() {
               width: "100%",
               padding: "12px 14px",
               borderRadius: 12,
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 500,
               color: T.text,
               lineHeight: 1.45,
@@ -8099,7 +8102,7 @@ function Pagination({ page, pageCount, setPage, total, rangeStart, rangeEnd }) {
         flexWrap: "wrap",
         gap: 10,
         marginTop: 14,
-        fontSize: 12.5,
+        fontSize: 13.5,
         color: T.muted,
       }}
     >
@@ -8118,7 +8121,7 @@ function Pagination({ page, pageCount, setPage, total, rangeStart, rangeEnd }) {
         </Button>
         <span
           style={{
-            fontSize: 12.5,
+            fontSize: 13.5,
             color: T.ink,
             padding: "0 6px",
             fontFamily: "'JetBrains Mono',monospace",
@@ -8307,7 +8310,7 @@ function NotificationBell({
               borderRadius: 999,
               background: T.rose,
               color: "#fff",
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: 700,
               display: "flex",
               alignItems: "center",
@@ -8344,7 +8347,7 @@ function NotificationBell({
               borderBottom: `1px solid ${T.lineSoft}`,
             }}
           >
-            <span style={{ fontWeight: 700, fontSize: 13, color: T.ink }}>
+            <span style={{ fontWeight: 700, fontSize: 14, color: T.ink }}>
               {t.notifications}
             </span>
             {notifications.length > 0 && (
@@ -8355,7 +8358,7 @@ function NotificationBell({
                   border: "none",
                   cursor: "pointer",
                   color: T.forest,
-                  fontSize: 11.5,
+                  fontSize: 12.5,
                   fontWeight: 600,
                 }}
               >
@@ -8369,7 +8372,7 @@ function NotificationBell({
                 padding: "28px 14px",
                 textAlign: "center",
                 color: T.muted,
-                fontSize: 12.5,
+                fontSize: 13.5,
               }}
             >
               {t.noNotif}
@@ -8409,13 +8412,13 @@ function NotificationBell({
                   />
                   <span style={{ minWidth: 0 }}>
                     <div
-                      style={{ fontSize: 12.5, fontWeight: 600, color: T.ink }}
+                      style={{ fontSize: 13.5, fontWeight: 600, color: T.ink }}
                     >
                       {n.title}
                     </div>
                     <div
                       style={{
-                        fontSize: 12,
+                        fontSize: 13,
                         color: T.textSoft,
                         marginTop: 2,
                         overflow: "hidden",
@@ -8429,7 +8432,7 @@ function NotificationBell({
                     </div>
                     <div
                       style={{
-                        fontSize: 10.5,
+                        fontSize: 11.5,
                         color: T.mutedLight,
                         marginTop: 3,
                       }}
@@ -8509,7 +8512,7 @@ function ChatQuickAccess({ role, currentEmp, messages, setPage }) {
             borderRadius: 999,
             background: T.rose,
             color: "#fff",
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: 700,
             display: "flex",
             alignItems: "center",
@@ -8524,7 +8527,14 @@ function ChatQuickAccess({ role, currentEmp, messages, setPage }) {
     </button>
   );
 }
-function Modal({ title, onClose, children, width = 480 }) {
+function Modal({
+  title,
+  subtitle,
+  icon: HeadIcon,
+  onClose,
+  children,
+  width = 480,
+}) {
   return createPortal(
     <div
       className="wf-modal-overlay"
@@ -8534,16 +8544,39 @@ function Modal({ title, onClose, children, width = 480 }) {
     >
       <div className="wf-modal" style={{ maxWidth: width }}>
         <div className="wf-modal-head">
-          <h3
-            style={{
-              fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
-              fontWeight: 600,
-              color: T.ink,
-              flex: 1,
-            }}
-          >
-            {title}
-          </h3>
+          {HeadIcon && (
+            <div
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: 10,
+                background: "rgba(91,141,239,.12)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+                marginRight: 12,
+              }}
+            >
+              <HeadIcon size={18} color={T.blue} />
+            </div>
+          )}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <h3
+              style={{
+                fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
+                fontWeight: 600,
+                color: T.ink,
+              }}
+            >
+              {title}
+            </h3>
+            {subtitle && (
+              <div style={{ fontSize: 13, color: T.muted, marginTop: 2 }}>
+                {subtitle}
+              </div>
+            )}
+          </div>
           <button
             onClick={onClose}
             style={{
@@ -8740,7 +8773,7 @@ function PhotoViewerModal({ src, alt, onClose }) {
             style={{
               minWidth: 46,
               textAlign: "center",
-              fontSize: 12.5,
+              fontSize: 13.5,
               fontWeight: 600,
               color: "#fff",
               fontFamily: "'JetBrains Mono',monospace",
@@ -8840,7 +8873,7 @@ function Drawer({ title, onClose, children, width = 440 }) {
         >
           <h3
             style={{
-              fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+              fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
               fontWeight: 600,
               fontSize: 16,
               color: T.ink,
@@ -8887,7 +8920,7 @@ function LoginActConfirmDialog({
     <Modal title={title || t.confirmDelete} onClose={onCancel} width={400}>
       <p
         style={{
-          fontSize: 13.5,
+          fontSize: 14.5,
           color: T.ink,
           margin: "0 0 20px",
           lineHeight: 1.5,
@@ -8917,7 +8950,7 @@ function LoginActAlertDialog({ title, message, closeLabel, onClose }) {
     <Modal title={title || t.appName} onClose={onClose} width={400}>
       <p
         style={{
-          fontSize: 13.5,
+          fontSize: 14.5,
           color: T.ink,
           margin: "0 0 20px",
           lineHeight: 1.5,
@@ -9604,7 +9637,7 @@ function ConfirmDialog({
   const ConfirmIcon = icon || Trash2;
   return (
     <Modal title={title || t.confirmDelete} onClose={onCancel} width={380}>
-      <p style={{ fontSize: 14, color: T.textSoft, marginBottom: 20 }}>
+      <p style={{ fontSize: 14.5, color: T.textSoft, marginBottom: 20 }}>
         {text}
       </p>
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
@@ -9773,7 +9806,7 @@ const LOGIN_CSS = `
 .wf-login-back-btn {
   display:flex; align-items:center; gap:6px;
   background:none; border:none; cursor:pointer;
-  color:var(--wfl-text-soft); font-size:12.5px; font-weight:600;
+  color:var(--wfl-text-soft); font-size:13.5px; font-weight:600;
   margin-bottom:18px; padding:0; font-family:inherit;
 }
 .wf-login-logo {
@@ -9784,14 +9817,14 @@ const LOGIN_CSS = `
   overflow:hidden; flex-shrink:0;
 }
 .wf-login-eyebrow {
-  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
   color:var(--wfl-text-softer); margin-top:14px;
 }
 .wf-login-title {
-  font-family:'Kantumruy Pro','Noto Sans Khmer',sans-serif;
+  font-family:'Inter','Noto Sans Khmer',sans-serif;
   font-weight:700; font-size:22px; color:var(--wfl-text); margin-top:4px; text-align:center;
 }
-.wf-login-subtitle { font-size:13px; color:var(--wfl-text-soft); margin-top:6px; text-align:center; }
+.wf-login-subtitle { font-size:14px; color:var(--wfl-text-soft); margin-top:6px; text-align:center; }
 .wf-login-divider { display:flex; align-items:center; gap:10px; margin:22px 0 18px; }
 .wf-login-divider::before,.wf-login-divider::after { content:''; flex:1; height:1px; background:var(--wfl-divider); }
 .wf-login-divider-icon {
@@ -9806,7 +9839,7 @@ const LOGIN_CSS = `
 }
 .wf-login-input {
   width:100%; padding:12.5px 14px 12.5px 40px; border-radius:11px;
-  border:1.5px solid var(--wfl-input-border); font-size:14px;
+  border:1.5px solid var(--wfl-input-border); font-size:14.5px;
   background:var(--wfl-input-bg); color:var(--wfl-text); outline:none;
   font-family:inherit; transition:border-color .2s ease, box-shadow .2s ease, background .2s ease;
   box-sizing:border-box;
@@ -9822,12 +9855,12 @@ const LOGIN_CSS = `
   background:none; border:none; cursor:pointer; color:var(--wfl-input-icon); padding:2px;
 }
 .wf-login-row { display:flex; align-items:center; justify-content:space-between; margin:2px 0 20px; gap:10px; }
-.wf-login-checkbox-label { display:flex; align-items:center; gap:7px; font-size:13px; color:var(--wfl-text-soft); cursor:pointer; user-select:none; }
+.wf-login-checkbox-label { display:flex; align-items:center; gap:7px; font-size:14px; color:var(--wfl-text-soft); cursor:pointer; user-select:none; }
 .wf-login-checkbox-label input { accent-color:var(--wfl-accent); width:15px; height:15px; cursor:pointer; }
-.wf-login-link-btn { background:none; border:none; padding:0; cursor:pointer; font-size:13px; font-weight:600; color:var(--wfl-link); font-family:inherit; }
+.wf-login-link-btn { background:none; border:none; padding:0; cursor:pointer; font-size:14px; font-weight:600; color:var(--wfl-link); font-family:inherit; }
 .wf-login-btn {
   width:100%; padding:14px; border:none; border-radius:12px;
-  font-size:15px; font-weight:700; cursor:pointer; display:flex;
+  font-size:15.5px; font-weight:700; cursor:pointer; display:flex;
   align-items:center; justify-content:center; gap:8px;
   font-family:inherit; transition:transform .15s ease, box-shadow .2s ease, filter .2s ease;
 }
@@ -9846,27 +9879,27 @@ const LOGIN_CSS = `
 }
 .wf-login-btn-adm:hover { box-shadow:0 10px 26px rgba(61,124,244,0.4); filter:brightness(1.03); }
 .wf-login-error {
-  display:flex; align-items:center; gap:7px; font-size:12.5px;
+  display:flex; align-items:center; gap:7px; font-size:13.5px;
   color:#C0334A; background:rgba(229,99,122,0.12); border-radius:8px;
   padding:9px 12px; margin-bottom:14px; border:1px solid rgba(229,99,122,0.25);
 }
 .wf-login-root.wf-login-light .wf-login-error { color:#B3273F; }
 .wf-login-demo {
   margin-top:18px; padding:11px 14px; background:var(--wfl-demo-bg);
-  border-radius:8px; font-size:11px; color:var(--wfl-demo-text);
+  border-radius:8px; font-size:12px; color:var(--wfl-demo-text);
   line-height:1.7; border:1px solid var(--wfl-demo-border);
 }
 .wf-login-footer-note {
   margin-top:22px; padding-top:16px; border-top:1px solid var(--wfl-divider);
   display:flex; align-items:center; justify-content:center; gap:6px;
-  font-size:11.5px; color:var(--wfl-text-softer); text-align:center;
+  font-size:12.5px; color:var(--wfl-text-softer); text-align:center;
 }
 .wf-login-credit {
   margin-top:18px; display:flex; align-items:center; justify-content:center; gap:7px;
-  font-size:12px; font-weight:500; color:var(--wfl-credit-text); text-align:center;
+  font-size:13px; font-weight:500; color:var(--wfl-credit-text); text-align:center;
   animation: wf-credit-in .5s ease .1s both;
 }
-.wf-login-credit .wf-login-credit-ver { font-weight:700; color:var(--wfl-text-soft); font-family:'JetBrains Mono',monospace; font-size:11px; }
+.wf-login-credit .wf-login-credit-ver { font-weight:700; color:var(--wfl-text-soft); font-family:'JetBrains Mono',monospace; font-size:12px; }
 .wf-login-credit .wf-login-credit-dot { width:3px; height:3px; border-radius:50%; background:var(--wfl-text-softer); flex-shrink:0; }
 .wf-login-credit .wf-login-credit-name { color:var(--wfl-credit-name); font-weight:700; }
 @media (max-width: 480px) {
@@ -9911,7 +9944,7 @@ const LOGIN_CSS = `
   background:rgba(34,197,94,0.14); color:#22C55E;
   animation: wf-check-pop .45s cubic-bezier(.34,1.56,.64,1) both;
 }
-.wf-login-overlay-text { font-size:13px; font-weight:600; color:var(--wfl-text-soft); letter-spacing:.01em; }
+.wf-login-overlay-text { font-size:14px; font-weight:600; color:var(--wfl-text-soft); letter-spacing:.01em; }
 `;
 function LoginCredit() {
   return (
@@ -9983,7 +10016,7 @@ function LoginField({ label, children }) {
     <div style={{ marginBottom: 16 }}>
       <div
         style={{
-          fontSize: 11.5,
+          fontSize: 12.5,
           fontWeight: 700,
           color: "var(--wfl-text-softer)",
           marginBottom: 7,
@@ -10517,7 +10550,7 @@ function printOfficeQrPage(office, title, scanHint, branding) {
     *{box-sizing:border-box;}
     html,body{margin:0;padding:0;}
     body{
-      font-family:'Noto Sans Khmer','Kantumruy Pro',sans-serif;
+      font-family:'Inter','Noto Sans Khmer',sans-serif;
       width:148mm;min-height:210mm;
       display:flex;flex-direction:column;align-items:center;
       background:#fff;color:#0A0F1A;
@@ -10533,9 +10566,9 @@ function printOfficeQrPage(office, title, scanHint, branding) {
     .logo-fallback{
       background:#1FA26B;color:#fff;font-weight:700;font-size:16px;
       display:flex;align-items:center;justify-content:center;
-      font-family:'Kantumruy Pro',sans-serif;
+      font-family:'Inter','Noto Sans Khmer',sans-serif;
     }
-    .brand{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;
+    .brand{font-size:13px;letter-spacing:1.5px;text-transform:uppercase;
       color:#8A93A8;margin-bottom:6px;font-weight:600;}
     .office{font-size:22px;font-weight:700;margin:0;}
     .card{
@@ -10549,10 +10582,10 @@ function printOfficeQrPage(office, title, scanHint, branding) {
     }
     .badge{
       margin-top:10px;display:flex;align-items:center;gap:6px;
-      color:#1FA26B;font-size:12.5px;font-weight:600;
+      color:#1FA26B;font-size:13.5px;font-weight:600;
     }
     .dot{width:7px;height:7px;border-radius:50%;background:#1FA26B;}
-    .footer{margin-top:auto;padding:18px 0 26px;font-size:10.5px;
+    .footer{margin-top:auto;padding:18px 0 26px;font-size:11.5px;
       color:#A9B4C7;letter-spacing:0.5px;}
   </style></head><body>
     <div class="band">
@@ -10597,7 +10630,7 @@ function QrModal({ url, data, title, desc, onClose, footer }) {
         >
           <img src={qrSrc} alt="QR code" width={220} height={220} />
         </div>
-        <p style={{ fontSize: 12, color: T.muted, textAlign: "center" }}>
+        <p style={{ fontSize: 13, color: T.muted, textAlign: "center" }}>
           {desc || t2.qr.desc}
         </p>
         {footer}
@@ -10665,12 +10698,12 @@ function EmployeeLinkCard({ variant = "card" }) {
           <Store size={18} color={T.forestText} />
         </div>
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 12, color: T.muted }}>
+          <div style={{ fontSize: 13, color: T.muted }}>
             {t.dash.empPortalLink}
           </div>
           <div
             style={{
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 600,
               color: T.ink,
               fontFamily: "'JetBrains Mono',monospace",
@@ -10787,7 +10820,7 @@ function DashLineChart({ labels, seriesA, seriesB, height = 220 }) {
         style={{
           display: "flex",
           justifyContent: "space-between",
-          fontSize: 10.5,
+          fontSize: 11.5,
           color: T.muted,
           padding: "0 2px",
         }}
@@ -10808,7 +10841,7 @@ function DashLineChart({ labels, seriesA, seriesB, height = 220 }) {
             borderRadius: 10,
             padding: "8px 12px",
             boxShadow: "0 8px 20px -10px rgba(5,8,16,0.25)",
-            fontSize: 11.5,
+            fontSize: 12.5,
             pointerEvents: "none",
             whiteSpace: "nowrap",
           }}
@@ -10907,7 +10940,7 @@ function DashDonut({
           {centerValue}
         </div>
         {centerLabel && (
-          <div style={{ fontSize: 10.5, color: T.muted }}>{centerLabel}</div>
+          <div style={{ fontSize: 11.5, color: T.muted }}>{centerLabel}</div>
         )}
       </div>
     </div>
@@ -10945,7 +10978,7 @@ function DashQuickAction({ icon: Icon, tint, label, onClick }) {
         padding: "11px 12px",
         background: bg,
         color: fg,
-        fontSize: 12.5,
+        fontSize: 13.5,
         fontWeight: 600,
         cursor: "pointer",
         textAlign: "left",
@@ -11002,10 +11035,10 @@ function HrActionCenter({ items, t, setPage }) {
           <Bell size={17} color={T.goldText} />
         </span>
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 14.5, fontWeight: 700, color: T.ink }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: T.ink }}>
             {t.dash.actionCenterTitle}
           </div>
-          <div style={{ fontSize: 12, color: T.textSoft, marginTop: 1 }}>
+          <div style={{ fontSize: 13, color: T.textSoft, marginTop: 1 }}>
             {t.dash.actionRequiredLabel}
           </div>
         </div>
@@ -11013,7 +11046,7 @@ function HrActionCenter({ items, t, setPage }) {
           <span
             style={{
               marginLeft: "auto",
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: 700,
               color: T.roseDark || T.rose,
               background: T.roseSoft,
@@ -11032,7 +11065,7 @@ function HrActionCenter({ items, t, setPage }) {
             padding: "22px 18px",
             textAlign: "center",
             color: T.textSoft,
-            fontSize: 13,
+            fontSize: 14,
           }}
         >
           {t.dash.allCaughtUp}
@@ -11091,7 +11124,7 @@ function HrActionCenter({ items, t, setPage }) {
                 </span>
                 <span
                   style={{
-                    fontSize: 13,
+                    fontSize: 14,
                     color: T.ink,
                     flex: 1,
                     minWidth: 0,
@@ -11532,7 +11565,7 @@ function Dashboard({
                 <div
                   style={{
                     position: "relative",
-                    fontSize: 11.5,
+                    fontSize: 12.5,
                     fontWeight: 500,
                     marginTop: 4,
                     opacity: 0.85,
@@ -11596,7 +11629,7 @@ function Dashboard({
             <div style={{ minWidth: 0, flex: 1, textAlign: "left" }}>
               <div
                 style={{
-                  fontSize: 13.5,
+                  fontSize: 14.5,
                   fontWeight: 700,
                   color: pastel.text,
                   lineHeight: 1.3,
@@ -11609,7 +11642,7 @@ function Dashboard({
               </div>
               <div
                 style={{
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: 500,
                   color: isMobile ? pastel.text : T.textSoft,
                   opacity: isMobile ? 0.8 : 1,
@@ -11649,10 +11682,10 @@ function Dashboard({
       >
         <h3
           style={{
-            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
             fontWeight: 600,
             color: T.ink,
-            fontSize: 14,
+            fontSize: 14.5,
           }}
         >
           {t.dash.recentAttend}
@@ -11665,7 +11698,7 @@ function Dashboard({
               display: "flex",
               alignItems: "center",
               gap: 2,
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: 600,
               color: T.forestText,
               background: "none",
@@ -11759,12 +11792,12 @@ function Dashboard({
                     <m.icon size={15} />
                   </span>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 10.5, color: T.muted }}>
+                    <div style={{ fontSize: 11.5, color: T.muted }}>
                       {m.label}
                     </div>
                     <div
                       style={{
-                        fontSize: 14,
+                        fontSize: 14.5,
                         fontWeight: 700,
                         color: T.ink,
                         fontFamily: "'JetBrains Mono',monospace",
@@ -11779,7 +11812,7 @@ function Dashboard({
             {!myTodayRecord && (
               <p
                 style={{
-                  fontSize: 12.5,
+                  fontSize: 13.5,
                   color: T.muted,
                   textAlign: "center",
                   marginTop: 16,
@@ -11862,7 +11895,7 @@ function Dashboard({
           <div>
             <h2
               style={{
-                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                 fontWeight: 700,
                 fontSize: 24,
                 color: T.ink,
@@ -11871,7 +11904,7 @@ function Dashboard({
             >
               {t.nav.dashboard}
             </h2>
-            <p style={{ fontSize: 13, color: T.textSoft }}>
+            <p style={{ fontSize: 14, color: T.textSoft }}>
               {t.dash.welcomeBack(
                 currentAdmin?.name || currentAdmin?.username || "",
               )}
@@ -11891,7 +11924,7 @@ function Dashboard({
                 border: `1px solid ${dateOpen ? T.gold : T.lineSoft}`,
                 borderRadius: 10,
                 padding: "9px 14px",
-                fontSize: 12.5,
+                fontSize: 13.5,
                 color: T.ink,
                 fontFamily: "'JetBrains Mono',monospace",
                 background: T.card,
@@ -11994,12 +12027,12 @@ function Dashboard({
       ) : (
         <>
           <div style={{ marginBottom: 14 }}>
-            <p style={{ color: T.textSoft, fontSize: 12 }}>
+            <p style={{ color: T.textSoft, fontSize: 13 }}>
               {t.dash.greetingHello}
             </p>
             <h2
               style={{
-                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                 fontSize: 20,
                 fontWeight: 700,
                 marginTop: 2,
@@ -12015,9 +12048,9 @@ function Dashboard({
             <p
               style={{
                 color: T.textSoft,
-                fontSize: 11.5,
+                fontSize: 12.5,
                 marginTop: 4,
-                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
               }}
             >
               {t.dash.haveGreatDay}
@@ -12048,7 +12081,7 @@ function Dashboard({
                 <p
                   style={{
                     color: "rgba(255,255,255,0.85)",
-                    fontSize: 11.5,
+                    fontSize: 12.5,
                     fontWeight: 600,
                     textTransform: "uppercase",
                     letterSpacing: ".04em",
@@ -12058,7 +12091,7 @@ function Dashboard({
                 </p>
                 <h2
                   style={{
-                    fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                    fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                     fontSize: 21,
                     fontWeight: 700,
                     marginTop: 4,
@@ -12079,9 +12112,9 @@ function Dashboard({
                 <p
                   style={{
                     color: "rgba(255,255,255,0.85)",
-                    fontSize: 11.5,
+                    fontSize: 12.5,
                     marginTop: 4,
-                    fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                    fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                   }}
                 >
                   {t.dash.haveGreatShift}
@@ -12091,7 +12124,7 @@ function Dashboard({
                 <p
                   style={{
                     color: "rgba(255,255,255,0.85)",
-                    fontSize: 11.5,
+                    fontSize: 12.5,
                     fontWeight: 600,
                     textTransform: "uppercase",
                     letterSpacing: ".04em",
@@ -12111,8 +12144,7 @@ function Dashboard({
                     style={{
                       fontSize: 21,
                       fontWeight: 700,
-                      fontFamily:
-                        "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                      fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                       fontVariantNumeric: "tabular-nums",
                     }}
                   >
@@ -12125,7 +12157,7 @@ function Dashboard({
                     <p
                       style={{
                         color: "rgba(255,255,255,0.85)",
-                        fontSize: 11.5,
+                        fontSize: 12.5,
                         fontWeight: 600,
                         textTransform: "uppercase",
                         letterSpacing: ".04em",
@@ -12136,11 +12168,10 @@ function Dashboard({
                     </p>
                     <p
                       style={{
-                        fontSize: 13.5,
+                        fontSize: 14.5,
                         fontWeight: 700,
                         marginTop: 2,
-                        fontFamily:
-                          "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                        fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                       }}
                     >
                       {hhmm(myShift.start)} – {hhmm(myShift.end)}
@@ -12194,13 +12225,13 @@ function Dashboard({
                 <Users size={20} color="#fff" />
               </div>
               <div>
-                <div style={{ fontSize: 12.5, opacity: 0.9 }}>
+                <div style={{ fontSize: 13.5, opacity: 0.9 }}>
                   {t.dash.totalEmp}
                 </div>
                 <div style={{ fontSize: 26, fontWeight: 700, marginTop: 2 }}>
                   {employees.length}
                 </div>
-                <div style={{ fontSize: 11, opacity: 0.85, marginTop: 2 }}>
+                <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>
                   +{hiresThisMonth} {t.dash.thisMonth}
                 </div>
               </div>
@@ -12289,7 +12320,7 @@ function Dashboard({
                   <div>
                     <div
                       style={{
-                        fontSize: 12.5,
+                        fontSize: 13.5,
                         color: vivid ? "rgba(255,255,255,0.9)" : T.textSoft,
                       }}
                     >
@@ -12307,7 +12338,7 @@ function Dashboard({
                     </div>
                     <div
                       style={{
-                        fontSize: 11,
+                        fontSize: 12,
                         color: vivid ? "rgba(255,255,255,0.85)" : T.muted,
                         marginTop: 2,
                       }}
@@ -12340,17 +12371,17 @@ function Dashboard({
               >
                 <h3
                   style={{
-                    fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                    fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                     fontWeight: 600,
                     color: T.ink,
-                    fontSize: 14,
+                    fontSize: 14.5,
                   }}
                 >
                   {t.dash.attendanceOverview}
                 </h3>
                 <span
                   style={{
-                    fontSize: 11,
+                    fontSize: 12,
                     color: T.muted,
                     border: `1px solid ${T.lineSoft}`,
                     borderRadius: 8,
@@ -12365,7 +12396,7 @@ function Dashboard({
                   display: "flex",
                   alignItems: "center",
                   gap: 14,
-                  fontSize: 11.5,
+                  fontSize: 12.5,
                   color: T.textSoft,
                   marginBottom: 6,
                 }}
@@ -12415,10 +12446,10 @@ function Dashboard({
             <Card style={{ padding: 18 }}>
               <h3
                 style={{
-                  fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                  fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                   fontWeight: 600,
                   color: T.ink,
-                  fontSize: 14,
+                  fontSize: 14.5,
                   marginBottom: 14,
                 }}
               >
@@ -12427,7 +12458,7 @@ function Dashboard({
               {deptDonutData.length === 0 ? (
                 <p
                   style={{
-                    fontSize: 13,
+                    fontSize: 14,
                     color: T.muted,
                     textAlign: "center",
                     padding: "28px 0",
@@ -12459,7 +12490,7 @@ function Dashboard({
                           display: "flex",
                           alignItems: "center",
                           gap: 8,
-                          fontSize: 12,
+                          fontSize: 13,
                         }}
                       >
                         <span
@@ -12486,7 +12517,7 @@ function Dashboard({
                           style={{
                             color: T.muted,
                             fontFamily: "'JetBrains Mono',monospace",
-                            fontSize: 11,
+                            fontSize: 12,
                             whiteSpace: "nowrap",
                           }}
                         >
@@ -12508,10 +12539,10 @@ function Dashboard({
             <Card style={{ padding: 18 }}>
               <h3
                 style={{
-                  fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                  fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                   fontWeight: 600,
                   color: T.ink,
-                  fontSize: 14,
+                  fontSize: 14.5,
                   marginBottom: 12,
                 }}
               >
@@ -12547,10 +12578,10 @@ function Dashboard({
           <Card style={{ padding: 18, marginBottom: 22 }}>
             <h3
               style={{
-                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                 fontWeight: 600,
                 color: T.ink,
-                fontSize: 14,
+                fontSize: 14.5,
                 marginBottom: 14,
               }}
             >
@@ -12637,7 +12668,7 @@ function Dashboard({
                         </div>
                         <div
                           style={{
-                            fontSize: 12,
+                            fontSize: 13,
                             color: T.textSoft,
                             whiteSpace: "nowrap",
                           }}
@@ -12664,10 +12695,10 @@ function Dashboard({
               >
                 <h3
                   style={{
-                    fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                    fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                     fontWeight: 600,
                     color: T.ink,
-                    fontSize: 14,
+                    fontSize: 14.5,
                     display: "flex",
                     alignItems: "center",
                     gap: 8,
@@ -12688,7 +12719,7 @@ function Dashboard({
                 </h3>
                 <span
                   style={{
-                    fontSize: 11,
+                    fontSize: 12,
                     color: T.muted,
                     fontFamily: "'JetBrains Mono',monospace",
                   }}
@@ -12699,7 +12730,7 @@ function Dashboard({
               {workingNowByBranch.length === 0 ? (
                 <p
                   style={{
-                    fontSize: 13,
+                    fontSize: 14,
                     color: T.muted,
                     textAlign: "center",
                     padding: "28px 0",
@@ -12730,7 +12761,7 @@ function Dashboard({
                           display: "flex",
                           alignItems: "center",
                           gap: 6,
-                          fontSize: 12,
+                          fontSize: 13,
                           fontWeight: 600,
                           color: T.ink,
                           marginBottom: 8,
@@ -12773,7 +12804,7 @@ function Dashboard({
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div
                                 style={{
-                                  fontSize: 12,
+                                  fontSize: 13,
                                   color: T.ink,
                                   overflow: "hidden",
                                   textOverflow: "ellipsis",
@@ -12785,7 +12816,7 @@ function Dashboard({
                             </div>
                             <div
                               style={{
-                                fontSize: 10,
+                                fontSize: 11,
                                 color: T.muted,
                                 fontFamily: "'JetBrains Mono',monospace",
                                 whiteSpace: "nowrap",
@@ -12822,10 +12853,10 @@ function Dashboard({
               >
                 <h3
                   style={{
-                    fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                    fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                     fontWeight: 600,
                     color: T.ink,
-                    fontSize: 14,
+                    fontSize: 14.5,
                   }}
                 >
                   {t.dash.recentAnnouncements}
@@ -12838,7 +12869,7 @@ function Dashboard({
                       background: "none",
                       border: "none",
                       color: T.blue,
-                      fontSize: 12,
+                      fontSize: 13,
                       fontWeight: 600,
                       cursor: "pointer",
                     }}
@@ -12850,7 +12881,7 @@ function Dashboard({
               {recentAnnouncements.length === 0 ? (
                 <p
                   style={{
-                    fontSize: 13,
+                    fontSize: 14,
                     color: T.muted,
                     textAlign: "center",
                     padding: "20px 0",
@@ -12889,7 +12920,7 @@ function Dashboard({
                       <div style={{ minWidth: 0 }}>
                         <div
                           style={{
-                            fontSize: 12.5,
+                            fontSize: 13.5,
                             fontWeight: 600,
                             color: T.ink,
                           }}
@@ -12898,7 +12929,7 @@ function Dashboard({
                         </div>
                         <div
                           style={{
-                            fontSize: 11.5,
+                            fontSize: 12.5,
                             color: T.textSoft,
                             marginTop: 2,
                             overflow: "hidden",
@@ -12912,7 +12943,7 @@ function Dashboard({
                         </div>
                         <div
                           style={{
-                            fontSize: 10.5,
+                            fontSize: 11.5,
                             color: T.muted,
                             marginTop: 3,
                           }}
@@ -12937,10 +12968,10 @@ function Dashboard({
               >
                 <h3
                   style={{
-                    fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                    fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                     fontWeight: 600,
                     color: T.ink,
-                    fontSize: 14,
+                    fontSize: 14.5,
                   }}
                 >
                   {t.dash.leaveRequestsTitle}
@@ -12953,7 +12984,7 @@ function Dashboard({
                       background: "none",
                       border: "none",
                       color: T.blue,
-                      fontSize: 12,
+                      fontSize: 13,
                       fontWeight: 600,
                       cursor: "pointer",
                     }}
@@ -12965,7 +12996,7 @@ function Dashboard({
               {recentLeaveRequests.length === 0 ? (
                 <p
                   style={{
-                    fontSize: 13,
+                    fontSize: 14,
                     color: T.muted,
                     textAlign: "center",
                     padding: "20px 0",
@@ -12998,14 +13029,14 @@ function Dashboard({
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div
                             style={{
-                              fontSize: 12.5,
+                              fontSize: 13.5,
                               fontWeight: 600,
                               color: T.ink,
                             }}
                           >
                             {emp?.name || "—"}
                           </div>
-                          <div style={{ fontSize: 11, color: T.muted }}>
+                          <div style={{ fontSize: 12, color: T.muted }}>
                             {LEAVE_TYPE_LABEL2[r.type] || r.type} ·{" "}
                             {r.startDate}
                             {r.endDate && r.endDate !== r.startDate
@@ -13032,10 +13063,10 @@ function Dashboard({
               >
                 <h3
                   style={{
-                    fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                    fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                     fontWeight: 600,
                     color: T.ink,
-                    fontSize: 14,
+                    fontSize: 14.5,
                   }}
                 >
                   {t.dash.recentlyJoined}
@@ -13048,7 +13079,7 @@ function Dashboard({
                       background: "none",
                       border: "none",
                       color: T.blue,
-                      fontSize: 12,
+                      fontSize: 13,
                       fontWeight: 600,
                       cursor: "pointer",
                     }}
@@ -13060,7 +13091,7 @@ function Dashboard({
               {recentlyJoined.length === 0 ? (
                 <p
                   style={{
-                    fontSize: 13,
+                    fontSize: 14,
                     color: T.muted,
                     textAlign: "center",
                     padding: "20px 0",
@@ -13081,14 +13112,14 @@ function Dashboard({
                       <div style={{ minWidth: 0 }}>
                         <div
                           style={{
-                            fontSize: 12.5,
+                            fontSize: 13.5,
                             fontWeight: 600,
                             color: T.ink,
                           }}
                         >
                           {e.name}
                         </div>
-                        <div style={{ fontSize: 11, color: T.muted }}>
+                        <div style={{ fontSize: 12, color: T.muted }}>
                           {e.position || "—"}
                         </div>
                       </div>
@@ -13113,15 +13144,15 @@ function Dashboard({
               <div>
                 <h3
                   style={{
-                    fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                    fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                     fontWeight: 600,
                     color: T.ink,
-                    fontSize: 14,
+                    fontSize: 14.5,
                   }}
                 >
                   {t.dash.payrollSummaryTitle}
                 </h3>
-                <p style={{ fontSize: 11.5, color: T.muted, marginTop: 2 }}>
+                <p style={{ fontSize: 12.5, color: T.muted, marginTop: 2 }}>
                   {t.dash.thisMonth}
                 </p>
               </div>
@@ -13191,12 +13222,12 @@ function Dashboard({
                     <c.icon size={17} color={OT_STAT_TINTS[c.tint].fg} />
                   </div>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 11, color: T.muted }}>
+                    <div style={{ fontSize: 12, color: T.muted }}>
                       {c.label}
                     </div>
                     <div
                       style={{
-                        fontSize: 15,
+                        fontSize: 15.5,
                         fontWeight: 700,
                         color: T.ink,
                         fontFamily: "'JetBrains Mono',monospace",
@@ -13252,7 +13283,7 @@ function Dashboard({
                 </span>
                 <div style={{ minWidth: 0 }}>
                   <div
-                    style={{ fontSize: 11, color: T.textSoft, fontWeight: 600 }}
+                    style={{ fontSize: 12, color: T.textSoft, fontWeight: 600 }}
                   >
                     {t.att.liveClockLabel}
                   </div>
@@ -13271,7 +13302,7 @@ function Dashboard({
                       ).padStart(2, "0")}`,
                     )}
                   </div>
-                  <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>
+                  <div style={{ fontSize: 12, color: T.muted, marginTop: 2 }}>
                     {liveClock.toLocaleDateString(
                       lang === "en" ? "en-US" : "km-KH",
                       {
@@ -13304,7 +13335,7 @@ function Dashboard({
                   <div style={{ minWidth: 0 }}>
                     <div
                       style={{
-                        fontSize: 11,
+                        fontSize: 12,
                         color: T.textSoft,
                         lineHeight: 1.3,
                       }}
@@ -13313,7 +13344,7 @@ function Dashboard({
                     </div>
                     <div
                       style={{
-                        fontSize: 11,
+                        fontSize: 12,
                         fontWeight: 700,
                         color: T.forestText,
                         marginTop: 2,
@@ -13401,11 +13432,10 @@ function Dashboard({
                 >
                   <h3
                     style={{
-                      fontFamily:
-                        "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                      fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                       fontWeight: 600,
                       color: T.ink,
-                      fontSize: 14,
+                      fontSize: 14.5,
                     }}
                   >
                     {t.dash.recentAnnouncements}
@@ -13418,7 +13448,7 @@ function Dashboard({
                         background: "none",
                         border: "none",
                         color: T.blue,
-                        fontSize: 12,
+                        fontSize: 13,
                         fontWeight: 600,
                         cursor: "pointer",
                       }}
@@ -13430,7 +13460,7 @@ function Dashboard({
                 {recentAnnouncements.length === 0 ? (
                   <p
                     style={{
-                      fontSize: 13,
+                      fontSize: 14,
                       color: T.muted,
                       textAlign: "center",
                       padding: "20px 0",
@@ -13476,7 +13506,7 @@ function Dashboard({
                         <div style={{ minWidth: 0 }}>
                           <div
                             style={{
-                              fontSize: 12.5,
+                              fontSize: 13.5,
                               fontWeight: 600,
                               color: T.ink,
                             }}
@@ -13485,7 +13515,7 @@ function Dashboard({
                           </div>
                           <div
                             style={{
-                              fontSize: 11.5,
+                              fontSize: 12.5,
                               color: T.textSoft,
                               marginTop: 2,
                               overflow: "hidden",
@@ -13499,7 +13529,7 @@ function Dashboard({
                           </div>
                           <div
                             style={{
-                              fontSize: 10.5,
+                              fontSize: 11.5,
                               color: T.muted,
                               marginTop: 3,
                             }}
@@ -13590,7 +13620,7 @@ function MiniBarChart({ data, color, formatValue, height = 160 }) {
           >
             <div
               style={{
-                fontSize: 10,
+                fontSize: 11,
                 color: T.muted,
                 fontFamily: "'JetBrains Mono',monospace",
                 marginBottom: 4,
@@ -13611,7 +13641,7 @@ function MiniBarChart({ data, color, formatValue, height = 160 }) {
             />
             <div
               style={{
-                fontSize: 10,
+                fontSize: 11,
                 color: T.muted,
                 marginTop: 6,
                 textAlign: "center",
@@ -13637,7 +13667,7 @@ function HorizontalBarChart({ data, color, formatValue }) {
             style={{
               display: "flex",
               justifyContent: "space-between",
-              fontSize: 12,
+              fontSize: 13,
               marginBottom: 4,
             }}
           >
@@ -13737,7 +13767,7 @@ function MiniLineChart({ data, color, formatValue, height = 170 }) {
             x={p.x}
             y={Math.max(11, p.y - 10)}
             textAnchor="middle"
-            fontSize="11"
+            fontSize="12"
             fontFamily="'JetBrains Mono',monospace"
             style={{ fill: "var(--wf-ink)" }}
           >
@@ -13747,7 +13777,7 @@ function MiniLineChart({ data, color, formatValue, height = 170 }) {
             x={p.x}
             y={height - 4}
             textAnchor="middle"
-            fontSize="10.5"
+            fontSize="11.5"
             style={{ fill: "var(--wf-muted)" }}
           >
             {p.label}
@@ -13776,7 +13806,7 @@ function TrendBadge({ direction, children }) {
         display: "inline-flex",
         alignItems: "center",
         gap: 4,
-        fontSize: 11.5,
+        fontSize: 12.5,
         fontWeight: 700,
         color,
       }}
@@ -13817,7 +13847,7 @@ function AnalyticsStatCard({ icon: Icon, color, value, label, trend, note }) {
       </div>
       <div
         style={{
-          fontSize: 13,
+          fontSize: 14,
           fontWeight: 600,
           color: T.textSoft,
           marginTop: 2,
@@ -13829,7 +13859,7 @@ function AnalyticsStatCard({ icon: Icon, color, value, label, trend, note }) {
       {note && (
         <div
           style={{
-            fontSize: 10.5,
+            fontSize: 11.5,
             color: T.muted,
             marginTop: 4,
             lineHeight: 1.5,
@@ -13877,7 +13907,7 @@ function MonthRangePicker({ value, onChange, t }) {
           borderRadius: 10,
           padding: "7px 12px",
           color: "#fff",
-          fontSize: 12.5,
+          fontSize: 13.5,
           fontWeight: 600,
           cursor: "pointer",
         }}
@@ -13921,7 +13951,7 @@ function MonthRangePicker({ value, onChange, t }) {
             >
               <ChevronLeft size={16} />
             </button>
-            <strong style={{ fontSize: 12.5, color: T.ink }}>
+            <strong style={{ fontSize: 13.5, color: T.ink }}>
               {monthLabel(value)}
             </strong>
             <button
@@ -13952,7 +13982,7 @@ function MonthRangePicker({ value, onChange, t }) {
               color: T.ink,
               borderRadius: 8,
               padding: "6px 8px",
-              fontSize: 12.5,
+              fontSize: 13.5,
               marginBottom: 10,
             }}
           />
@@ -13992,10 +14022,10 @@ function ChartCard({ title, subtitle, children, noData, noDataLabel }) {
     <Card style={{ padding: 18 }}>
       <h3
         style={{
-          fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+          fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
           fontWeight: 600,
           color: T.ink,
-          fontSize: 14,
+          fontSize: 14.5,
         }}
       >
         {title}
@@ -14003,7 +14033,7 @@ function ChartCard({ title, subtitle, children, noData, noDataLabel }) {
       {subtitle && (
         <p
           style={{
-            fontSize: 11,
+            fontSize: 12,
             color: T.muted,
             marginTop: 2,
             marginBottom: 14,
@@ -14015,7 +14045,7 @@ function ChartCard({ title, subtitle, children, noData, noDataLabel }) {
       {noData ? (
         <p
           style={{
-            fontSize: 13,
+            fontSize: 14,
             color: T.muted,
             textAlign: "center",
             padding: "28px 0",
@@ -14301,7 +14331,7 @@ function AnalyticsPage({
           <div>
             <h2
               style={{
-                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                 fontSize: 20,
                 fontWeight: 600,
                 display: "flex",
@@ -14311,7 +14341,7 @@ function AnalyticsPage({
             >
               <BarChart3 size={20} /> {t.analytics.title}
             </h2>
-            <p style={{ color: "#A9B4C7", fontSize: 12, marginTop: 6 }}>
+            <p style={{ color: "#A9B4C7", fontSize: 13, marginTop: 6 }}>
               {t.analytics.subtitle}
             </p>
           </div>
@@ -14347,7 +14377,7 @@ function AnalyticsPage({
                   background: "transparent",
                   border: "none",
                   color: "#fff",
-                  fontSize: 12.5,
+                  fontSize: 13.5,
                   fontWeight: 600,
                   outline: "none",
                 }}
@@ -14502,15 +14532,15 @@ function AnalyticsPage({
             <div>
               <h3
                 style={{
-                  fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                  fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                   fontWeight: 600,
                   color: T.ink,
-                  fontSize: 14,
+                  fontSize: 14.5,
                 }}
               >
                 {t.analytics.deptCost}
               </h3>
-              <p style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>
+              <p style={{ fontSize: 12, color: T.muted, marginTop: 2 }}>
                 {t.analytics.deptCostSub}
               </p>
             </div>
@@ -14521,7 +14551,7 @@ function AnalyticsPage({
           {deptCost.length === 0 ? (
             <p
               style={{
-                fontSize: 13,
+                fontSize: 14,
                 color: T.muted,
                 textAlign: "center",
                 padding: "28px 0",
@@ -14553,15 +14583,15 @@ function AnalyticsPage({
             <div>
               <h3
                 style={{
-                  fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                  fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                   fontWeight: 600,
                   color: T.ink,
-                  fontSize: 14,
+                  fontSize: 14.5,
                 }}
               >
                 {t.analytics.absenteeism}
               </h3>
-              <p style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>
+              <p style={{ fontSize: 12, color: T.muted, marginTop: 2 }}>
                 {t.analytics.absenteeismSub}
               </p>
             </div>
@@ -14572,7 +14602,7 @@ function AnalyticsPage({
           {!hasAbsenceData ? (
             <p
               style={{
-                fontSize: 13,
+                fontSize: 14,
                 color: T.muted,
                 textAlign: "center",
                 padding: "28px 0",
@@ -14595,17 +14625,17 @@ function AnalyticsPage({
       <Card id="wf-analytics-dept-summary" style={{ padding: 18 }}>
         <h3
           style={{
-            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
             fontWeight: 600,
             color: T.ink,
-            fontSize: 14,
+            fontSize: 14.5,
           }}
         >
           {t.analytics.deptSummaryTitle}
         </h3>
         <p
           style={{
-            fontSize: 11,
+            fontSize: 12,
             color: T.muted,
             marginTop: 2,
             marginBottom: 14,
@@ -14663,7 +14693,7 @@ function AnalyticsPage({
                         display: "inline-block",
                         padding: "2px 8px",
                         borderRadius: 999,
-                        fontSize: 11.5,
+                        fontSize: 12.5,
                         fontWeight: 700,
                         background:
                           d.absenteeismRate === null
@@ -14860,7 +14890,7 @@ function EmployeeForm({
                 gap: 8,
               }}
             >
-              <div style={{ fontSize: 12.5, color: T.muted }}>
+              <div style={{ fontSize: 13.5, color: T.muted }}>
                 {t.emps.pinResetDesc}
               </div>
               <Input
@@ -14871,7 +14901,7 @@ function EmployeeForm({
                 autoFocus
               />
               {resetPinError && (
-                <div style={{ fontSize: 12.5, color: T.roseDark }}>
+                <div style={{ fontSize: 13.5, color: T.roseDark }}>
                   {resetPinError}
                 </div>
               )}
@@ -14903,7 +14933,7 @@ function EmployeeForm({
         </Field>
       ) : (
         <Field label={t.emps.pinLabel}>
-          <div style={{ fontSize: 12.5, color: T.muted }}>
+          <div style={{ fontSize: 13.5, color: T.muted }}>
             {t.emps.pinAutoNote}
           </div>
         </Field>
@@ -14971,7 +15001,7 @@ function EmployeeForm({
             placeholder="0"
           />
         </Field>
-        <p style={{ fontSize: 11.5, color: T.muted, marginTop: 4 }}>
+        <p style={{ fontSize: 12.5, color: T.muted, marginTop: 4 }}>
           {t.emps.dependentsHint}
         </p>
       </div>
@@ -14989,7 +15019,7 @@ function EmployeeForm({
             alignItems: "center",
             gap: 8,
             cursor: "pointer",
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: 600,
             color: T.ink,
           }}
@@ -15004,7 +15034,7 @@ function EmployeeForm({
         </label>
         <p
           style={{
-            fontSize: 11.5,
+            fontSize: 12.5,
             color: T.muted,
             marginTop: 6,
             marginBottom: f.useCustomRate ? 12 : 0,
@@ -15051,7 +15081,7 @@ function EmployeeForm({
             alignItems: "center",
             gap: 8,
             cursor: "pointer",
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: 600,
             color: T.ink,
           }}
@@ -15068,7 +15098,7 @@ function EmployeeForm({
         </label>
         <p
           style={{
-            fontSize: 11.5,
+            fontSize: 12.5,
             color: T.muted,
             marginTop: 6,
             marginBottom: f.useCustomLatePolicy ? 12 : 0,
@@ -15136,7 +15166,7 @@ function EmployeeForm({
             alignItems: "center",
             gap: 8,
             cursor: "pointer",
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: 600,
             color: T.ink,
           }}
@@ -15153,7 +15183,7 @@ function EmployeeForm({
         </label>
         <p
           style={{
-            fontSize: 11.5,
+            fontSize: 12.5,
             color: T.muted,
             marginTop: 6,
             marginBottom: f.useCustomUlPolicy ? 12 : 0,
@@ -15240,7 +15270,7 @@ function EmployeeForm({
         />
         <p
           style={{
-            fontSize: 12,
+            fontSize: 13,
             color: T.muted,
             marginTop: 4,
             marginBottom: 0,
@@ -15266,7 +15296,7 @@ function EmployeeForm({
                   background: active ? T.forest : T.inputBg,
                   color: active ? "#fff" : T.text,
                   fontWeight: 700,
-                  fontSize: 12.5,
+                  fontSize: 13.5,
                   cursor: "pointer",
                   transition: "background .12s ease,border-color .12s ease",
                 }}
@@ -15297,7 +15327,7 @@ function EmployeeForm({
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 5,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: 600,
                   color: T.forestText,
                   background: T.forestSoft,
@@ -15339,7 +15369,7 @@ function EmployeeForm({
             alignItems: "center",
             gap: 8,
             cursor: "pointer",
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: 600,
             color: T.ink,
           }}
@@ -15354,7 +15384,7 @@ function EmployeeForm({
             ? "Disable Messages & Voice Call for this employee"
             : "បិទ សារ & ការហៅសំឡេង សម្រាប់បុគ្គលិកនេះ"}
         </label>
-        <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+        <p style={{ fontSize: 12.5, color: T.muted, marginTop: 6 }}>
           {lang === "en"
             ? "Overrides the company-wide setting for this one person only. Has no effect if Messages & Voice Call is already off for everyone in Role Permissions."
             : "អនុវត្តតែចំពោះបុគ្គលិកនេះម្នាក់ប៉ុណ្ណោះ ដោយបដិសេធការកំណត់ទូទៅរបស់ក្រុមហ៊ុន។ ប្រសិនបើមុខងារនេះបានបិទសម្រាប់អ្នកគ្រប់គ្នារួចហើយនៅ សិទ្ធិតួនាទី វានឹងគ្មានប្រសិទ្ធភាពទេ។"}
@@ -15699,7 +15729,7 @@ function ImportEmployeesModal({
     <Modal title={t.emps.importTitle} onClose={onClose} width={680}>
       <p
         style={{
-          fontSize: 12.5,
+          fontSize: 13.5,
           color: T.textSoft,
           marginBottom: 14,
           lineHeight: 1.6,
@@ -15709,7 +15739,7 @@ function ImportEmployeesModal({
       </p>
       <p
         style={{
-          fontSize: 11.5,
+          fontSize: 12.5,
           color: T.muted,
           marginBottom: 14,
           lineHeight: 1.6,
@@ -15752,7 +15782,7 @@ function ImportEmployeesModal({
       </div>
 
       {fileName && (
-        <div style={{ fontSize: 12, color: T.muted, marginBottom: 10 }}>
+        <div style={{ fontSize: 13, color: T.muted, marginBottom: 10 }}>
           📄 {fileName}
         </div>
       )}
@@ -15763,7 +15793,7 @@ function ImportEmployeesModal({
             alignItems: "center",
             gap: 8,
             color: T.muted,
-            fontSize: 13,
+            fontSize: 14,
           }}
         >
           <Loader2 size={15} style={{ animation: "spin 1s linear infinite" }} />{" "}
@@ -15777,7 +15807,7 @@ function ImportEmployeesModal({
             alignItems: "center",
             gap: 8,
             color: T.rose,
-            fontSize: 13,
+            fontSize: 14,
             marginBottom: 10,
           }}
         >
@@ -15789,7 +15819,7 @@ function ImportEmployeesModal({
         <div>
           <div
             style={{
-              fontSize: 12.5,
+              fontSize: 13.5,
               fontWeight: 600,
               color: errorRows.length ? T.rose : T.forestText,
               marginBottom: 10,
@@ -15814,7 +15844,7 @@ function ImportEmployeesModal({
               style={{
                 width: "100%",
                 borderCollapse: "collapse",
-                fontSize: 12,
+                fontSize: 13,
               }}
             >
               <thead>
@@ -16184,12 +16214,12 @@ function Employees({
               >
                 <Avatar name={e.name} photo={e.photo} />
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, color: T.ink, fontSize: 13 }}>
+                  <div style={{ fontWeight: 600, color: T.ink, fontSize: 14 }}>
                     {e.name}
                   </div>
                   <div
                     style={{
-                      fontSize: 11,
+                      fontSize: 12,
                       color: T.muted,
                       fontFamily: "'JetBrains Mono',monospace",
                     }}
@@ -16202,7 +16232,7 @@ function Employees({
             </div>
             <div
               style={{
-                fontSize: 12,
+                fontSize: 13,
                 color: T.textSoft,
                 marginBottom: 12,
                 display: "flex",
@@ -16326,7 +16356,7 @@ function Employees({
               gridColumn: "1/-1",
               textAlign: "center",
               color: T.muted,
-              fontSize: 13,
+              fontSize: 14,
               padding: "40px 0",
             }}
           >
@@ -16449,7 +16479,7 @@ function EmployeeProfile360({
           padding: 40,
           textAlign: "center",
           color: T.muted,
-          fontSize: 13,
+          fontSize: 14,
         }}
       >
         {t.noResults}
@@ -16673,7 +16703,7 @@ function EmployeeProfile360({
             </div>
             <div
               style={{
-                fontSize: 12.5,
+                fontSize: 13.5,
                 color: T.muted,
                 fontFamily: "'JetBrains Mono',monospace",
                 marginBottom: 14,
@@ -16752,7 +16782,7 @@ function EmployeeProfile360({
                 display: "flex",
                 alignItems: "center",
                 gap: 7,
-                fontSize: 12.5,
+                fontSize: 13.5,
                 fontWeight: isActive ? 600 : 500,
                 color: isActive ? "#fff" : T.textSoft,
                 whiteSpace: "nowrap",
@@ -16874,7 +16904,7 @@ function EmployeeProfile360({
           <h3
             style={{
               margin: "0 0 16px 0",
-              fontSize: 14.5,
+              fontSize: 15,
               fontWeight: 700,
               color: T.ink,
             }}
@@ -16901,7 +16931,7 @@ function EmployeeProfile360({
           <h3
             style={{
               margin: "0 0 14px 0",
-              fontSize: 14.5,
+              fontSize: 15,
               fontWeight: 700,
               color: T.ink,
             }}
@@ -16929,12 +16959,12 @@ function EmployeeProfile360({
                 >
                   <div style={{ minWidth: 0 }}>
                     <div
-                      style={{ fontSize: 13, fontWeight: 600, color: T.ink }}
+                      style={{ fontSize: 14, fontWeight: 600, color: T.ink }}
                     >
                       {getLeaveTypeLabel(lang)[r.type] || r.type}
                     </div>
                     <div
-                      style={{ fontSize: 11.5, color: T.muted, marginTop: 2 }}
+                      style={{ fontSize: 12.5, color: T.muted, marginTop: 2 }}
                     >
                       {r.startDate} → {r.endDate}
                       {r.reason ? ` · ${r.reason}` : ""}
@@ -16953,7 +16983,7 @@ function EmployeeProfile360({
           <h3
             style={{
               margin: "0 0 14px 0",
-              fontSize: 14.5,
+              fontSize: 15,
               fontWeight: 700,
               color: T.ink,
             }}
@@ -17010,7 +17040,7 @@ function EmployeeProfile360({
           <h3
             style={{
               margin: "0 0 14px 0",
-              fontSize: 14.5,
+              fontSize: 15,
               fontWeight: 700,
               color: T.ink,
             }}
@@ -17040,12 +17070,12 @@ function EmployeeProfile360({
                     }}
                   >
                     <span
-                      style={{ fontSize: 13, fontWeight: 600, color: T.ink }}
+                      style={{ fontSize: 14, fontWeight: 600, color: T.ink }}
                     >
                       {r.period}
                     </span>
                     <span
-                      style={{ fontSize: 13, fontWeight: 700, color: T.gold }}
+                      style={{ fontSize: 14, fontWeight: 700, color: T.gold }}
                     >
                       {r.rating ? `★ ${r.rating}` : "—"}
                     </span>
@@ -17053,7 +17083,7 @@ function EmployeeProfile360({
                   {r.strengths && (
                     <div
                       style={{
-                        fontSize: 12,
+                        fontSize: 13,
                         color: T.textSoft,
                         marginBottom: 3,
                       }}
@@ -17063,13 +17093,13 @@ function EmployeeProfile360({
                     </div>
                   )}
                   {r.improvements && (
-                    <div style={{ fontSize: 12, color: T.textSoft }}>
+                    <div style={{ fontSize: 13, color: T.textSoft }}>
                       <strong style={{ color: T.ink }}>Improvements:</strong>{" "}
                       {r.improvements}
                     </div>
                   )}
                   {r.reviewedByName && (
-                    <div style={{ fontSize: 11, color: T.muted, marginTop: 6 }}>
+                    <div style={{ fontSize: 12, color: T.muted, marginTop: 6 }}>
                       Reviewed by {r.reviewedByName}
                     </div>
                   )}
@@ -17085,7 +17115,7 @@ function EmployeeProfile360({
           <h3
             style={{
               margin: "0 0 14px 0",
-              fontSize: 14.5,
+              fontSize: 15,
               fontWeight: 700,
               color: T.ink,
             }}
@@ -17121,7 +17151,7 @@ function EmployeeProfile360({
                   <div style={{ minWidth: 0, flex: 1 }}>
                     <div
                       style={{
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: 600,
                         color: T.ink,
                         overflow: "hidden",
@@ -17131,7 +17161,7 @@ function EmployeeProfile360({
                     >
                       {d.fileName || "Untitled"}
                     </div>
-                    <div style={{ fontSize: 11, color: T.muted }}>
+                    <div style={{ fontSize: 12, color: T.muted }}>
                       {d.category || "—"}
                       {d.expiryDate ? ` · Expires ${d.expiryDate}` : ""}
                     </div>
@@ -17148,7 +17178,7 @@ function EmployeeProfile360({
           <h3
             style={{
               margin: "0 0 14px 0",
-              fontSize: 14.5,
+              fontSize: 15,
               fontWeight: 700,
               color: T.ink,
             }}
@@ -17176,12 +17206,12 @@ function EmployeeProfile360({
                 >
                   <div style={{ minWidth: 0 }}>
                     <div
-                      style={{ fontSize: 13, fontWeight: 600, color: T.ink }}
+                      style={{ fontSize: 14, fontWeight: 600, color: T.ink }}
                     >
                       {tr.courseName}
                     </div>
                     <div
-                      style={{ fontSize: 11.5, color: T.muted, marginTop: 2 }}
+                      style={{ fontSize: 12.5, color: T.muted, marginTop: 2 }}
                     >
                       {tr.provider ? `${tr.provider} · ` : ""}
                       {tr.completionDate || tr.startDate || "—"}
@@ -17189,7 +17219,7 @@ function EmployeeProfile360({
                   </div>
                   <span
                     style={{
-                      fontSize: 11,
+                      fontSize: 12,
                       fontWeight: 700,
                       padding: "3px 10px",
                       borderRadius: 999,
@@ -17213,7 +17243,7 @@ function EmployeeProfile360({
           <h3
             style={{
               margin: "0 0 14px 0",
-              fontSize: 14.5,
+              fontSize: 15,
               fontWeight: 700,
               color: T.ink,
             }}
@@ -17253,12 +17283,12 @@ function EmployeeProfile360({
                     />
                     <div style={{ minWidth: 0 }}>
                       <div
-                        style={{ fontSize: 13, fontWeight: 600, color: T.ink }}
+                        style={{ fontSize: 14, fontWeight: 600, color: T.ink }}
                       >
                         {a.name}
                       </div>
                       <div
-                        style={{ fontSize: 11.5, color: T.muted, marginTop: 2 }}
+                        style={{ fontSize: 12.5, color: T.muted, marginTop: 2 }}
                       >
                         {a.category ? `${a.category} · ` : ""}
                         {a.serial || "—"}
@@ -17267,7 +17297,7 @@ function EmployeeProfile360({
                   </div>
                   <span
                     style={{
-                      fontSize: 11,
+                      fontSize: 12,
                       fontWeight: 700,
                       padding: "3px 10px",
                       borderRadius: 999,
@@ -17291,7 +17321,7 @@ function EmployeeProfile360({
           <h3
             style={{
               margin: "0 0 14px 0",
-              fontSize: 14.5,
+              fontSize: 15,
               fontWeight: 700,
               color: T.ink,
             }}
@@ -17299,7 +17329,7 @@ function EmployeeProfile360({
             Recent Activity
           </h3>
           {activityLoading || activityLogs === null ? (
-            <p style={{ color: T.muted, fontSize: 13, margin: 0 }}>Loading…</p>
+            <p style={{ color: T.muted, fontSize: 14, margin: 0 }}>Loading…</p>
           ) : activityLogs.length === 0 ? (
             <EmptyTabState text="No recorded changes to this employee's record yet." />
           ) : (
@@ -17322,7 +17352,7 @@ function EmployeeProfile360({
                   <div style={{ minWidth: 0 }}>
                     <div
                       style={{
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: 600,
                         color: T.ink,
                         textTransform: "capitalize",
@@ -17331,7 +17361,7 @@ function EmployeeProfile360({
                       {log.action}
                       {log.actor_name ? ` · ${log.actor_name}` : ""}
                     </div>
-                    <div style={{ fontSize: 11, color: T.muted, marginTop: 2 }}>
+                    <div style={{ fontSize: 12, color: T.muted, marginTop: 2 }}>
                       {fmtAuditTime(log.created_at)}
                     </div>
                   </div>
@@ -17357,7 +17387,7 @@ function EmptyTabState({ text }) {
     <p
       style={{
         color: T.muted,
-        fontSize: 13,
+        fontSize: 14,
         margin: 0,
         textAlign: "center",
         padding: "20px 0",
@@ -17378,7 +17408,7 @@ function ApprovalPill({ status }) {
   return (
     <span
       style={{
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: 700,
         padding: "3px 10px",
         borderRadius: 999,
@@ -17405,10 +17435,10 @@ function MetaItem({ icon: Icon, label, value }) {
     >
       <Icon size={15} style={{ color: T.muted, flexShrink: 0, marginTop: 2 }} />
       <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 11, color: T.muted }}>{label}</div>
+        <div style={{ fontSize: 12, color: T.muted }}>{label}</div>
         <div
           style={{
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: 600,
             color: T.ink,
             overflow: "hidden",
@@ -17443,10 +17473,10 @@ function QuickStat({ icon: Icon, label, value, colorKey, pastel }) {
         <Icon size={18} color={p.text} strokeWidth={2} />
       </span>
       <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 11.5, color: T.muted, fontWeight: 500 }}>
+        <div style={{ fontSize: 12.5, color: T.muted, fontWeight: 500 }}>
           {label}
         </div>
-        <div style={{ fontSize: 15, fontWeight: 700, color: T.ink }}>
+        <div style={{ fontSize: 15.5, fontWeight: 700, color: T.ink }}>
           {value}
         </div>
       </div>
@@ -17481,7 +17511,7 @@ function SectionCard({ icon: Icon, title, colorKey, pastel, children }) {
           <Icon size={15} color={p.text} strokeWidth={2} />
         </span>
         <h3
-          style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: T.ink }}
+          style={{ margin: 0, fontSize: 14.5, fontWeight: 700, color: T.ink }}
         >
           {title}
         </h3>
@@ -17504,10 +17534,10 @@ function InfoRow({ label, value }) {
         borderBottom: `1px solid ${T.lineSoft}`,
       }}
     >
-      <span style={{ fontSize: 12, color: T.muted }}>{label}</span>
+      <span style={{ fontSize: 13, color: T.muted }}>{label}</span>
       <span
         style={{
-          fontSize: 12.5,
+          fontSize: 13.5,
           fontWeight: 600,
           color: T.ink,
           textAlign: "right",
@@ -17530,7 +17560,7 @@ function StatBox({ label, value }) {
         textAlign: "center",
       }}
     >
-      <div style={{ fontSize: 11.5, color: T.muted, marginBottom: 4 }}>
+      <div style={{ fontSize: 12.5, color: T.muted, marginBottom: 4 }}>
         {label}
       </div>
       <div style={{ fontSize: 19, fontWeight: 700, color: T.ink }}>{value}</div>
@@ -17639,12 +17669,12 @@ function Departments({ departments, setDepartments, employees, isSuperAdmin }) {
                   <Building2 size={18} color={T.ink} />
                 </div>
                 <div>
-                  <div style={{ fontWeight: 600, color: T.ink, fontSize: 13 }}>
+                  <div style={{ fontWeight: 600, color: T.ink, fontSize: 14 }}>
                     {d.name}
                   </div>
                   <div
                     style={{
-                      fontSize: 11,
+                      fontSize: 12,
                       color: T.muted,
                       fontFamily: "'JetBrains Mono',monospace",
                     }}
@@ -17655,7 +17685,7 @@ function Departments({ departments, setDepartments, employees, isSuperAdmin }) {
               </div>
               <span
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: 700,
                   color: T.textSoft,
                   background: T.paper,
@@ -17666,7 +17696,7 @@ function Departments({ departments, setDepartments, employees, isSuperAdmin }) {
                 {countIn(d.id)} {t.depts.staffCount}
               </span>
             </div>
-            <p style={{ fontSize: 12, color: T.muted, marginTop: 12 }}>
+            <p style={{ fontSize: 13, color: T.muted, marginTop: 12 }}>
               {d.desc}
             </p>
             <div
@@ -18007,13 +18037,13 @@ function Assets({ assets, setAssets, employees, isSuperAdmin }) {
                   </div>
                   <div>
                     <div
-                      style={{ fontWeight: 600, color: T.ink, fontSize: 13 }}
+                      style={{ fontWeight: 600, color: T.ink, fontSize: 14 }}
                     >
                       {a.name}
                     </div>
                     <div
                       style={{
-                        fontSize: 11,
+                        fontSize: 12,
                         color: T.muted,
                         fontFamily: "'JetBrains Mono',monospace",
                       }}
@@ -18026,7 +18056,7 @@ function Assets({ assets, setAssets, employees, isSuperAdmin }) {
               </div>
               <div
                 style={{
-                  fontSize: 12,
+                  fontSize: 13,
                   color: T.textSoft,
                   marginTop: 12,
                   display: "flex",
@@ -18281,7 +18311,7 @@ function Trainings({ trainings, setTrainings, employees, isSuperAdmin }) {
   return (
     <div>
       <div style={{ marginBottom: 14 }}>
-        <div style={{ fontSize: 13, color: T.muted }}>
+        <div style={{ fontSize: 14, color: T.muted }}>
           {t.training.subtitle}
         </div>
       </div>
@@ -18421,11 +18451,11 @@ function Trainings({ trainings, setTrainings, employees, isSuperAdmin }) {
                   </div>
                   <div>
                     <div
-                      style={{ fontWeight: 600, color: T.ink, fontSize: 13 }}
+                      style={{ fontWeight: 600, color: T.ink, fontSize: 14 }}
                     >
                       {r.courseName}
                     </div>
-                    <div style={{ fontSize: 11, color: T.muted }}>
+                    <div style={{ fontSize: 12, color: T.muted }}>
                       {empName(r.employeeId)}
                     </div>
                   </div>
@@ -18434,7 +18464,7 @@ function Trainings({ trainings, setTrainings, employees, isSuperAdmin }) {
               </div>
               <div
                 style={{
-                  fontSize: 12,
+                  fontSize: 13,
                   color: T.textSoft,
                   marginTop: 12,
                   display: "flex",
@@ -18571,7 +18601,7 @@ function MyTrainings({ currentEmp, trainings }) {
                   >
                     <GraduationCap size={18} color={T.ink} />
                   </div>
-                  <div style={{ fontWeight: 600, color: T.ink, fontSize: 13 }}>
+                  <div style={{ fontWeight: 600, color: T.ink, fontSize: 14 }}>
                     {r.courseName}
                   </div>
                 </div>
@@ -18579,7 +18609,7 @@ function MyTrainings({ currentEmp, trainings }) {
               </div>
               <div
                 style={{
-                  fontSize: 12,
+                  fontSize: 13,
                   color: T.textSoft,
                   marginTop: 12,
                   display: "flex",
@@ -18674,7 +18704,7 @@ function ShiftForm({
       </div>
       <p
         style={{
-          fontSize: 11.5,
+          fontSize: 12.5,
           color: T.muted,
           marginTop: -6,
           marginBottom: 14,
@@ -18687,7 +18717,7 @@ function ShiftForm({
       {f.end <= f.start && f.start && f.end && (
         <p
           style={{
-            fontSize: 11.5,
+            fontSize: 12.5,
             color: T.muted,
             marginTop: -6,
             marginBottom: 14,
@@ -18795,12 +18825,12 @@ function Shifts({
                   <Watch size={18} color={T.ink} />
                 </div>
                 <div>
-                  <div style={{ fontWeight: 600, color: T.ink, fontSize: 13 }}>
+                  <div style={{ fontWeight: 600, color: T.ink, fontSize: 14 }}>
                     {s.name}
                   </div>
                   <div
                     style={{
-                      fontSize: 11,
+                      fontSize: 12,
                       color: T.muted,
                       fontFamily: "'JetBrains Mono',monospace",
                     }}
@@ -18812,7 +18842,7 @@ function Shifts({
               </div>
               <span
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: 700,
                   color: T.textSoft,
                   background: T.paper,
@@ -19003,7 +19033,7 @@ function RosterAssignForm({
                 background: dateMode === m ? T.forestSoft : T.inputBg,
                 color: dateMode === m ? T.forestText : T.text,
                 fontWeight: 600,
-                fontSize: 12.5,
+                fontSize: 13.5,
                 cursor: "pointer",
               }}
             >
@@ -19057,7 +19087,7 @@ function RosterAssignForm({
                       background: active ? T.forest : T.inputBg,
                       color: active ? "#fff" : T.text,
                       fontWeight: 700,
-                      fontSize: 12,
+                      fontSize: 13,
                       cursor: "pointer",
                     }}
                   >
@@ -19101,7 +19131,7 @@ function RosterAssignForm({
           }}
         >
           {filteredEmp.length === 0 && (
-            <div style={{ padding: 14, fontSize: 12.5, color: T.muted }}>
+            <div style={{ padding: 14, fontSize: 13.5, color: T.muted }}>
               {t.noResults}
             </div>
           )}
@@ -19126,7 +19156,7 @@ function RosterAssignForm({
                   style={{ width: 16, height: 16, cursor: "pointer" }}
                 />
                 <Avatar name={e.name} size={28} photo={e.photo} />
-                <span style={{ fontSize: 12.5, color: T.ink, fontWeight: 600 }}>
+                <span style={{ fontSize: 13.5, color: T.ink, fontWeight: 600 }}>
                   {e.name}
                 </span>
               </label>
@@ -19134,7 +19164,7 @@ function RosterAssignForm({
           })}
         </div>
         {selectedEmp.length > 0 && (
-          <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+          <p style={{ fontSize: 12.5, color: T.muted, marginTop: 6 }}>
             {t.roster.assignedCountLabel(selectedEmp.length)}
           </p>
         )}
@@ -19148,7 +19178,7 @@ function RosterAssignForm({
       </Field>
       <p
         style={{
-          fontSize: 11.5,
+          fontSize: 12.5,
           color: T.muted,
           marginTop: -6,
           marginBottom: 14,
@@ -19205,7 +19235,7 @@ function RosterDayModal({
   return (
     <Modal title={fmtDateDisplay(date) || date} onClose={onClose} width={460}>
       {rows.length === 0 && (
-        <p style={{ fontSize: 13, color: T.muted, marginBottom: 16 }}>
+        <p style={{ fontSize: 14, color: T.muted, marginBottom: 16 }}>
           {t.roster.noneOnDay}
         </p>
       )}
@@ -19243,7 +19273,7 @@ function RosterDayModal({
                 <div style={{ minWidth: 0 }}>
                   <div
                     style={{
-                      fontSize: 12.5,
+                      fontSize: 13.5,
                       fontWeight: 600,
                       color: T.ink,
                       whiteSpace: "nowrap",
@@ -19265,14 +19295,14 @@ function RosterDayModal({
                         display: "inline-block",
                       }}
                     />
-                    <span style={{ fontSize: 11, color: T.muted }}>
+                    <span style={{ fontSize: 12, color: T.muted }}>
                       {shift ? shiftLabel(shift) : "—"}
                     </span>
                   </div>
                   {row.note && (
                     <div
                       style={{
-                        fontSize: 10.5,
+                        fontSize: 11.5,
                         color: T.mutedLight,
                         marginTop: 2,
                       }}
@@ -19375,17 +19405,17 @@ function Roster({
         <Card style={{ padding: 16, marginBottom: 16 }}>
           <h3
             style={{
-              fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+              fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
               fontWeight: 600,
               color: T.ink,
               marginBottom: 12,
-              fontSize: 14,
+              fontSize: 14.5,
             }}
           >
             {t.roster.myUpcoming}
           </h3>
           {myUpcoming.length === 0 && (
-            <p style={{ fontSize: 13, color: T.muted }}>
+            <p style={{ fontSize: 14, color: T.muted }}>
               {t.roster.noUpcoming}
             </p>
           )}
@@ -19406,7 +19436,7 @@ function Roster({
                     }}
                   >
                     <span
-                      style={{ fontSize: 12.5, fontWeight: 600, color: T.ink }}
+                      style={{ fontSize: 13.5, fontWeight: 600, color: T.ink }}
                     >
                       {r.date === today
                         ? t.roster.today
@@ -19448,7 +19478,7 @@ function Roster({
             >
               <ChevronLeft size={18} />
             </button>
-            <span style={{ fontSize: 13.5, fontWeight: 700, color: T.ink }}>
+            <span style={{ fontSize: 14.5, fontWeight: 700, color: T.ink }}>
               {title}
             </span>
             <button
@@ -19526,7 +19556,7 @@ function Roster({
           </button>
           <span
             style={{
-              fontSize: 15,
+              fontSize: 15.5,
               fontWeight: 700,
               color: T.ink,
               minWidth: 130,
@@ -19985,11 +20015,11 @@ function QrScanModal({ offices, mode, soundPreset, onMatch, onClose }) {
         </div>
         <canvas ref={canvasRef} style={{ display: "none" }} />
         {error ? (
-          <p style={{ fontSize: 12.5, color: T.rose, textAlign: "center" }}>
+          <p style={{ fontSize: 13.5, color: T.rose, textAlign: "center" }}>
             {error}
           </p>
         ) : (
-          <p style={{ fontSize: 12.5, color: T.muted, textAlign: "center" }}>
+          <p style={{ fontSize: 13.5, color: T.muted, textAlign: "center" }}>
             {ready ? t.att.scanQrHint : t.att.scanQrOpeningCamera}
           </p>
         )}
@@ -20174,9 +20204,9 @@ function SelfPunch({
       {!compact && (
         <h3
           style={{
-            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
             fontWeight: 700,
-            fontSize: 14,
+            fontSize: 14.5,
             color: T.ink,
             marginBottom: 14,
           }}
@@ -20220,7 +20250,7 @@ function SelfPunch({
             <div style={{ minWidth: 0 }}>
               <div
                 style={{
-                  fontSize: 12.5,
+                  fontSize: 13.5,
                   fontWeight: 600,
                   color: T.textSoft,
                   whiteSpace: "nowrap",
@@ -20263,7 +20293,7 @@ function SelfPunch({
             <div style={{ minWidth: 0 }}>
               <div
                 style={{
-                  fontSize: 12.5,
+                  fontSize: 13.5,
                   fontWeight: 600,
                   color: T.textSoft,
                   whiteSpace: "nowrap",
@@ -20297,7 +20327,7 @@ function SelfPunch({
           <div style={{ flex: "1.3 1 130px", minWidth: 0 }}>
             <div
               style={{
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: ".06em",
                 color: T.muted,
@@ -20314,7 +20344,7 @@ function SelfPunch({
               {hhmm(rec?.checkIn) || "--:--:--"}
             </div>
             {shift && (
-              <div style={{ fontSize: 10.5, color: T.muted, marginTop: 3 }}>
+              <div style={{ fontSize: 11.5, color: T.muted, marginTop: 3 }}>
                 {t.att.workTimeLabel} {hhmm(shift.start)}–{hhmm(shift.end)}
               </div>
             )}
@@ -20323,7 +20353,7 @@ function SelfPunch({
         <div style={{ flex: "1 1 120px", minWidth: 0 }}>
           <div
             style={{
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: ".06em",
               color: T.muted,
@@ -20337,7 +20367,7 @@ function SelfPunch({
             {rec ? (
               <StatusPill status={rec.status} />
             ) : (
-              <span style={{ fontSize: 13, fontWeight: 600, color: T.ink }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>
                 {t.dash.notCheckedIn}
               </span>
             )}
@@ -20346,7 +20376,7 @@ function SelfPunch({
         <div style={{ flex: "1.4 1 150px", minWidth: 0 }}>
           <div
             style={{
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: 700,
               letterSpacing: ".06em",
               color: T.muted,
@@ -20358,7 +20388,7 @@ function SelfPunch({
           </div>
           <div
             style={{
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 600,
               color: T.ink,
               marginTop: 5,
@@ -20371,7 +20401,7 @@ function SelfPunch({
           <div style={{ flex: "1.2 1 150px", minWidth: 0 }}>
             <div
               style={{
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
                 letterSpacing: ".06em",
                 color: T.muted,
@@ -20383,7 +20413,7 @@ function SelfPunch({
             </div>
             <div
               style={{
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: 600,
                 color: T.ink,
                 marginTop: 5,
@@ -20414,7 +20444,7 @@ function SelfPunch({
             style={{ marginTop: 1, flexShrink: 0 }}
           />
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 10, color: T.textSoft, lineHeight: 1.3 }}>
+            <div style={{ fontSize: 11, color: T.textSoft, lineHeight: 1.3 }}>
               {t.att.gpsRequiredHint(offices.length)}
             </div>
             <div
@@ -20422,7 +20452,7 @@ function SelfPunch({
                 display: "flex",
                 alignItems: "center",
                 gap: 3,
-                fontSize: 10,
+                fontSize: 11,
                 color: locBusy ? T.muted : T.forestText,
                 fontWeight: 600,
                 marginTop: 3,
@@ -20469,7 +20499,7 @@ function SelfPunch({
           </span>
           <p
             style={{
-              fontSize: 12.5,
+              fontSize: 13.5,
               fontWeight: 600,
               color: T.forestText,
               lineHeight: 1.4,
@@ -20482,7 +20512,7 @@ function SelfPunch({
       {branchWarning && (
         <p
           style={{
-            fontSize: 12.5,
+            fontSize: 13.5,
             fontWeight: 600,
             color: T.goldText,
             background: T.goldSoft,
@@ -20497,7 +20527,7 @@ function SelfPunch({
       {locError && (
         <p
           style={{
-            fontSize: 12.5,
+            fontSize: 13.5,
             color: T.rose,
             marginBottom: 12,
           }}
@@ -20511,7 +20541,7 @@ function SelfPunch({
             display: "flex",
             alignItems: "center",
             gap: 8,
-            fontSize: 12.5,
+            fontSize: 13.5,
             fontWeight: 600,
             color: T.goldText,
             background: T.goldSoft,
@@ -20549,7 +20579,7 @@ function SelfPunch({
             style={{
               justifyContent: "center",
               padding: "13px 22px",
-              fontSize: 15,
+              fontSize: 15.5,
               borderRadius: 11,
               flex: 1,
               minWidth: compact ? undefined : 160,
@@ -20568,7 +20598,7 @@ function SelfPunch({
           {hasOffices && (
             <>
               <span
-                style={{ color: T.mutedLight, fontSize: 11, flexShrink: 0 }}
+                style={{ color: T.mutedLight, fontSize: 12, flexShrink: 0 }}
               >
                 {t.att.scanQrOr}
               </span>
@@ -20579,7 +20609,7 @@ function SelfPunch({
                 style={{
                   justifyContent: "center",
                   padding: compact ? "13px 16px" : "13px 22px",
-                  fontSize: 14,
+                  fontSize: 14.5,
                   borderRadius: 11,
                   border: `1px solid ${T.line}`,
                   flex: 1,
@@ -20610,7 +20640,7 @@ function SelfPunch({
             style={{
               justifyContent: "center",
               padding: "13px 22px",
-              fontSize: 15,
+              fontSize: 15.5,
               borderRadius: 11,
               flex: 1,
               minWidth: compact ? undefined : 160,
@@ -20629,7 +20659,7 @@ function SelfPunch({
           {hasOffices && (
             <>
               <span
-                style={{ color: T.mutedLight, fontSize: 11, flexShrink: 0 }}
+                style={{ color: T.mutedLight, fontSize: 12, flexShrink: 0 }}
               >
                 {t.att.scanQrOr}
               </span>
@@ -20640,7 +20670,7 @@ function SelfPunch({
                 style={{
                   justifyContent: "center",
                   padding: compact ? "13px 16px" : "13px 22px",
-                  fontSize: 14,
+                  fontSize: 14.5,
                   borderRadius: 11,
                   border: `1px solid ${T.line}`,
                   flex: 1,
@@ -20657,9 +20687,9 @@ function SelfPunch({
       {rec && rec.checkOut && (
         <div
           style={{
-            fontSize: 13,
+            fontSize: 14,
             color: T.textSoft,
-            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
             textAlign: "center",
           }}
         >
@@ -20799,7 +20829,7 @@ function OfficeForm({ initial, onSave, onCancel }) {
         />
       </Field>
       {error && (
-        <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 10 }}>
+        <p style={{ fontSize: 13.5, color: T.rose, marginBottom: 10 }}>
           {error}
         </p>
       )}
@@ -20895,7 +20925,7 @@ function KioskDisplay({ officeId, offices, branding }) {
           <MapPin size={40} color="#8A93A8" style={{ marginBottom: 14 }} />
           <h1
             style={{
-              fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+              fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
               fontSize: 19,
               fontWeight: 600,
               marginBottom: 8,
@@ -20903,7 +20933,7 @@ function KioskDisplay({ officeId, offices, branding }) {
           >
             {t.att.kioskNotFoundTitle}
           </h1>
-          <p style={{ fontSize: 13, color: "#A9B4C7" }}>
+          <p style={{ fontSize: 14, color: "#A9B4C7" }}>
             {t.att.kioskNotFoundDesc}
           </p>
         </div>
@@ -20958,7 +20988,7 @@ function KioskDisplay({ officeId, offices, branding }) {
               color: "#fff",
               fontWeight: 700,
               fontSize: 18,
-              fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+              fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
             }}
           >
             {brandName}
@@ -20970,7 +21000,7 @@ function KioskDisplay({ officeId, offices, branding }) {
             alignItems: "center",
             gap: 7,
             color: "#A9B4C7",
-            fontSize: 13.5,
+            fontSize: 14.5,
             fontWeight: 600,
             marginBottom: 8,
           }}
@@ -20981,7 +21011,7 @@ function KioskDisplay({ officeId, offices, branding }) {
         <h1
           style={{
             color: "#fff",
-            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
             fontSize: 21,
             fontWeight: 600,
             marginBottom: 26,
@@ -21010,7 +21040,7 @@ function KioskDisplay({ officeId, offices, branding }) {
         <p
           style={{
             color: "#8A93A8",
-            fontSize: 12.5,
+            fontSize: 13.5,
             marginTop: 20,
             textAlign: "center",
           }}
@@ -21141,12 +21171,12 @@ function OfficeLocationSettings({ offices, setOffices }) {
             <MapPin size={19} color="#7C6AE8" />
           </div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 14.5, color: T.ink }}>
+            <div style={{ fontWeight: 700, fontSize: 15, color: T.ink }}>
               {t.att.officeGeofenceTitle}
             </div>
             <p
               style={{
-                fontSize: 12,
+                fontSize: 13,
                 color: T.muted,
                 marginTop: 3,
                 maxWidth: 520,
@@ -21167,7 +21197,7 @@ function OfficeLocationSettings({ offices, setOffices }) {
         >
           <span
             style={{
-              fontSize: 11.5,
+              fontSize: 12.5,
               fontWeight: 600,
               padding: "4px 11px",
               borderRadius: 999,
@@ -21193,7 +21223,7 @@ function OfficeLocationSettings({ offices, setOffices }) {
       {open && (
         <div style={{ marginTop: 16 }}>
           {offices.length === 0 && (
-            <p style={{ fontSize: 12, color: T.mutedLight, marginBottom: 12 }}>
+            <p style={{ fontSize: 13, color: T.mutedLight, marginBottom: 12 }}>
               {t.att.officeNoneYet}
             </p>
           )}
@@ -21223,13 +21253,13 @@ function OfficeLocationSettings({ offices, setOffices }) {
                   />
                   <div>
                     <div
-                      style={{ fontWeight: 600, fontSize: 13.5, color: T.ink }}
+                      style={{ fontWeight: 600, fontSize: 14.5, color: T.ink }}
                     >
                       {o.name}
                     </div>
                     <div
                       style={{
-                        fontSize: 11,
+                        fontSize: 12,
                         color: T.muted,
                         fontFamily: "'JetBrains Mono',monospace",
                         marginTop: 2,
@@ -21349,7 +21379,7 @@ function OfficeLocationSettings({ offices, setOffices }) {
           footer={
             <p
               style={{
-                fontSize: 11,
+                fontSize: 12,
                 color: T.mutedLight,
                 textAlign: "center",
                 margin: 0,
@@ -21370,7 +21400,7 @@ function OfficeLocationSettings({ offices, setOffices }) {
             <>
               <p
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   color: T.rose,
                   textAlign: "center",
                   margin: 0,
@@ -21437,12 +21467,12 @@ function ManualAttendanceForm({ employees, initial, onSave, onCancel }) {
           >
             <Avatar name={emp?.name} photo={emp?.photo} size={26} />
             <div>
-              <div style={{ fontWeight: 600, fontSize: 13, color: T.ink }}>
+              <div style={{ fontWeight: 600, fontSize: 14, color: T.ink }}>
                 {emp?.name}
               </div>
               <div
                 style={{
-                  fontSize: 10.5,
+                  fontSize: 11.5,
                   color: T.muted,
                   fontFamily: "'JetBrains Mono',monospace",
                 }}
@@ -21611,12 +21641,12 @@ function Holidays({ holidays, setHolidays, isSuperAdmin }) {
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <CalendarDays size={16} color={T.forestText} />
         <div>
-          <div style={{ fontSize: 13, fontWeight: 600, color: T.ink }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>
             {h.name}
           </div>
           <div
             style={{
-              fontSize: 11,
+              fontSize: 12,
               color: T.muted,
               fontFamily: "'JetBrains Mono',monospace",
             }}
@@ -21673,7 +21703,7 @@ function Holidays({ holidays, setHolidays, isSuperAdmin }) {
             textAlign: "center",
             padding: "32px 0",
             color: T.muted,
-            fontSize: 13,
+            fontSize: 14,
           }}
         >
           {t.hol.noHolidays}
@@ -21683,7 +21713,7 @@ function Holidays({ holidays, setHolidays, isSuperAdmin }) {
         <div style={{ marginBottom: 20 }}>
           <div
             style={{
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: 700,
               color: T.muted,
               textTransform: "uppercase",
@@ -21702,7 +21732,7 @@ function Holidays({ holidays, setHolidays, isSuperAdmin }) {
         <div>
           <div
             style={{
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: 700,
               color: T.muted,
               textTransform: "uppercase",
@@ -21879,11 +21909,11 @@ function Attendance({
         <Card style={{ padding: 16 }}>
           <h3
             style={{
-              fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+              fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
               fontWeight: 600,
               color: T.ink,
               marginBottom: 12,
-              fontSize: 14,
+              fontSize: 14.5,
             }}
           >
             {t.nav.myAttendance}
@@ -21925,7 +21955,7 @@ function Attendance({
                     <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
                       {hhmm(a.checkOut) || "—"}
                     </td>
-                    <td style={{ fontSize: 11.5, color: T.muted }}>
+                    <td style={{ fontSize: 12.5, color: T.muted }}>
                       {a.checkInLoc?.officeName &&
                       a.checkOutLoc?.officeName &&
                       a.checkInLoc.officeName !== a.checkOutLoc.officeName
@@ -21963,7 +21993,7 @@ function Attendance({
           }}
         >
           <CalendarDays size={18} color={T.goldText} />
-          <span style={{ fontSize: 13, fontWeight: 600, color: T.ink }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>
             {t.hol.todayBanner}: {holidayToday.name}
           </span>
         </Card>
@@ -22181,14 +22211,14 @@ function Attendance({
                           style={{
                             fontWeight: 500,
                             color: T.ink,
-                            fontSize: 13,
+                            fontSize: 14,
                           }}
                         >
                           {emp.name}
                         </div>
                         <div
                           style={{
-                            fontSize: 10.5,
+                            fontSize: 11.5,
                             color: T.muted,
                             fontFamily: "'JetBrains Mono',monospace",
                           }}
@@ -22200,7 +22230,7 @@ function Attendance({
                   </td>
                   <td
                     style={{
-                      fontSize: 11.5,
+                      fontSize: 12.5,
                       color: T.muted,
                       whiteSpace: "nowrap",
                     }}
@@ -22209,7 +22239,7 @@ function Attendance({
                   </td>
                   <td
                     style={{
-                      fontSize: 11.5,
+                      fontSize: 12.5,
                       color: T.muted,
                       whiteSpace: "nowrap",
                     }}
@@ -22240,11 +22270,10 @@ function Attendance({
                         </div>
                         <div
                           style={{
-                            fontSize: 10.5,
+                            fontSize: 11.5,
                             color:
                               rec.status === "late" ? T.goldText : T.forest,
-                            fontFamily:
-                              "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                            fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                           }}
                         >
                           {rec.status === "late"
@@ -22266,10 +22295,10 @@ function Attendance({
                         {otHours > 0 && (
                           <div
                             style={{
-                              fontSize: 10.5,
+                              fontSize: 11.5,
                               color: T.blue,
                               fontFamily:
-                                "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                                "'Inter','Noto Sans Khmer',sans-serif",
                             }}
                           >
                             {t.att.otPrefix}
@@ -22281,7 +22310,7 @@ function Attendance({
                       "—"
                     )}
                   </td>
-                  <td style={{ fontSize: 11.5, color: T.muted }}>
+                  <td style={{ fontSize: 12.5, color: T.muted }}>
                     {officeName ? (
                       <div>
                         <div
@@ -22300,7 +22329,7 @@ function Attendance({
                               display: "flex",
                               alignItems: "center",
                               gap: 4,
-                              fontSize: 10.5,
+                              fontSize: 11.5,
                               color: T.forest,
                               marginTop: 2,
                             }}
@@ -22318,7 +22347,7 @@ function Attendance({
                     {rec ? (
                       <StatusPill status={rec.status} />
                     ) : (
-                      <span style={{ fontSize: 12, color: T.mutedLight }}>
+                      <span style={{ fontSize: 13, color: T.mutedLight }}>
                         {t.att.noData}
                       </span>
                     )}
@@ -22426,7 +22455,7 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
   const [attachError, setAttachError] = useState("");
   const [attachBusy, setAttachBusy] = useState(false);
   const fileInputRef = useRef(null);
-  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const set = (k) => (e) => setF((cur) => ({ ...cur, [k]: e.target.value }));
   const isHourly = f.durationType === "hourly";
   // "Half Day" is a UI-only shortcut — under the hood it's saved as an
   // hourly request with fixed morning/afternoon clock times (see
@@ -22507,7 +22536,7 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
       {f.type === "unpaid" && (
         <p
           style={{
-            fontSize: 12,
+            fontSize: 13,
             color: T.muted,
             marginTop: -8,
             marginBottom: 12,
@@ -22519,7 +22548,7 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
       {f.type === "annual" && typeof remainingForType === "number" && (
         <p
           style={{
-            fontSize: 12,
+            fontSize: 13,
             color: T.muted,
             marginTop: -8,
             marginBottom: 12,
@@ -22531,7 +22560,7 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
       {f.type === "sick" && typeof remainingForType === "number" && (
         <p
           style={{
-            fontSize: 12,
+            fontSize: 13,
             color: T.muted,
             marginTop: -8,
             marginBottom: 12,
@@ -22562,7 +22591,7 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
                 background: f.durationType === dt ? T.forest : T.paper,
                 color: f.durationType === dt ? "#fff" : T.textSoft,
                 fontWeight: 600,
-                fontSize: 13,
+                fontSize: 14,
                 cursor: "pointer",
               }}
             >
@@ -22606,7 +22635,7 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
           {invalidTimeRange && (
             <p
               style={{
-                fontSize: 12.5,
+                fontSize: 13.5,
                 color: T.rose,
                 marginTop: -8,
                 marginBottom: 12,
@@ -22645,7 +22674,7 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
                     background: f.halfPeriod === p ? T.forest : T.paper,
                     color: f.halfPeriod === p ? "#fff" : T.textSoft,
                     fontWeight: 600,
-                    fontSize: 13,
+                    fontSize: 14,
                     cursor: "pointer",
                   }}
                 >
@@ -22671,7 +22700,7 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
       {invalidRange && (
         <p
           style={{
-            fontSize: 12.5,
+            fontSize: 13.5,
             color: T.rose,
             marginTop: -8,
             marginBottom: 12,
@@ -22693,11 +22722,11 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
             marginBottom: 14,
           }}
         >
-          <span style={{ fontSize: 12.5, fontWeight: 600, color: T.ink }}>
+          <span style={{ fontSize: 13.5, fontWeight: 600, color: T.ink }}>
             {t.lv.totalDuration}
           </span>
           <span
-            style={{ fontSize: 13.5, fontWeight: 700, color: T.forestText }}
+            style={{ fontSize: 14.5, fontWeight: 700, color: T.forestText }}
           >
             {isHourly
               ? `${t.lv.hoursShort(requestedHours)} · ${durationLabel}`
@@ -22710,7 +22739,7 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
       {overQuota && (
         <p
           style={{
-            fontSize: 12.5,
+            fontSize: 13.5,
             fontWeight: 600,
             color: T.goldText,
             background: T.goldSoft,
@@ -22744,7 +22773,7 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
               background: T.paper,
               border: `1px solid ${T.lineSoft}`,
               borderRadius: 9,
-              fontSize: 12.5,
+              fontSize: 13.5,
               color: T.textSoft,
             }}
           >
@@ -22794,7 +22823,7 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
           </Button>
         )}
         {attachError && (
-          <span style={{ fontSize: 12, color: T.rose }}>{attachError}</span>
+          <span style={{ fontSize: 13, color: T.rose }}>{attachError}</span>
         )}
       </Field>
       <Field label={t.lv.reason}>
@@ -22846,7 +22875,7 @@ function LeaveDecisionNote({ r, admins }) {
   const name = r.decidedByName || decider?.name || "—";
   const roleLabel = adminRoleLabel(r.decidedByRole, lang);
   return (
-    <div style={{ fontSize: 11.5, color: T.textSoft, marginTop: 3 }}>
+    <div style={{ fontSize: 12.5, color: T.textSoft, marginTop: 3 }}>
       {r.status === "approved" ? (
         <span>
           {t.lv.approvedBy} <strong>{name}</strong>
@@ -22870,10 +22899,115 @@ function LeaveDecisionNote({ r, admins }) {
 // decidedById the rest of the app already stores — so this panel is
 // purely a read of who's eligible plus that one decision, no new
 // backend workflow required.
+// Small "icon + value + caption" tile used across the leave detail modal —
+// a colored icon square, a bold value, and a small label underneath —
+// reused for leave/duration type, date/time, and balance tiles so they
+// all read consistently instead of the plain label-over-value pairs.
+function LeaveInfoTile({
+  icon: Icon,
+  value,
+  label,
+  mono,
+  valueColor,
+  valueSize = 14.5,
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 10,
+        minWidth: 0,
+      }}
+    >
+      {Icon && (
+        <div
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: 9,
+            background: "rgba(91,141,239,.12)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          <Icon size={15} color={T.blue} />
+        </div>
+      )}
+      <div style={{ minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: valueSize,
+            fontWeight: 700,
+            color: valueColor || T.ink,
+            fontFamily: mono ? "'JetBrains Mono',monospace" : "inherit",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {value}
+        </div>
+        <div style={{ fontSize: 12, color: T.muted, marginTop: 1 }}>
+          {label}
+        </div>
+      </div>
+    </div>
+  );
+}
+// Small icon-badge section heading (e.g. "Leave Balance", "Reason") used
+// throughout the leave detail modal, with an optional trailing element
+// (a count pill, in the approvers section).
+function LeaveSectionHeading({ icon: Icon, children, trailing }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: 8,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        {Icon && (
+          <div
+            style={{
+              width: 26,
+              height: 26,
+              borderRadius: 7,
+              background: "rgba(91,141,239,.12)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <Icon size={13} color={T.blue} />
+          </div>
+        )}
+        <span style={{ fontSize: 14, fontWeight: 700, color: T.ink }}>
+          {children}
+        </span>
+      </div>
+      {trailing}
+    </div>
+  );
+}
+// Thin vertical rule used to separate tiles laid out in a row (leave
+// type/duration type, date/time, balance) — mirrors the reference design's
+// divider between fields sharing one bordered box.
+function LeaveTileDivider() {
+  return (
+    <div style={{ width: 1, alignSelf: "stretch", background: T.lineSoft }} />
+  );
+}
+
 function LeaveApproversPanel({ request, approvers, t, lang }) {
   if (!approvers || approvers.length === 0) {
     return (
-      <div style={{ fontSize: 12.5, color: T.muted, padding: "6px 0" }}>
+      <div style={{ fontSize: 13.5, color: T.muted, padding: "6px 0" }}>
         {t.lv.noApprovers}
       </div>
     );
@@ -22887,31 +23021,26 @@ function LeaveApproversPanel({ request, approvers, t, lang }) {
   };
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 10,
-        }}
+      <LeaveSectionHeading
+        icon={Users}
+        trailing={
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: T.forestText,
+              background: T.forestSoft,
+              padding: "3px 9px",
+              borderRadius: 999,
+              flexShrink: 0,
+            }}
+          >
+            {t.lv.canApproveCount(approvers.length)}
+          </span>
+        }
       >
-        <span style={{ fontSize: 13, fontWeight: 700, color: T.ink }}>
-          {t.lv.approversInformation}
-        </span>
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 600,
-            color: T.forestText,
-            background: T.forestSoft,
-            padding: "3px 9px",
-            borderRadius: 999,
-            flexShrink: 0,
-          }}
-        >
-          {t.lv.canApproveCount(approvers.length)}
-        </span>
-      </div>
+        {t.lv.approversInformation}
+      </LeaveSectionHeading>
       <div style={{ display: "flex", flexDirection: "column" }}>
         {approvers.map((a, i) => (
           <div key={a.id}>
@@ -22930,7 +23059,7 @@ function LeaveApproversPanel({ request, approvers, t, lang }) {
               <div style={{ minWidth: 0, flex: 1 }}>
                 <div
                   style={{
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: 600,
                     color: T.ink,
                     overflow: "hidden",
@@ -22940,17 +23069,18 @@ function LeaveApproversPanel({ request, approvers, t, lang }) {
                 >
                   {a.name}
                 </div>
-                <div style={{ fontSize: 11, color: T.muted }}>
+                <div style={{ fontSize: 12, color: T.muted }}>
                   {adminRoleLabel(a.role, lang)}
                 </div>
               </div>
               <StatusPill status={statusFor(a)} />
+              <ChevronRight size={15} color={T.mutedLight} />
             </div>
             {i < approvers.length - 1 && (
               <div
                 style={{
                   textAlign: "center",
-                  fontSize: 10.5,
+                  fontSize: 11.5,
                   fontWeight: 700,
                   color: T.mutedLight,
                   padding: "3px 0",
@@ -22985,7 +23115,7 @@ function LeaveRejectModal({ onCancel, onConfirm }) {
       {reason !== "" && !trimmed && (
         <p
           style={{
-            fontSize: 12.5,
+            fontSize: 13.5,
             color: T.rose,
             marginTop: -8,
             marginBottom: 12,
@@ -23037,132 +23167,133 @@ function LeaveDetailModal({
     ? leaveHoursBetween(request.startTime, request.endTime)
     : 0;
   const durationWords = days === 0.5 ? t.lv.halfDay : t.lv.durationDays(days);
+  // Half-day requests are stored as plain "hourly" rows (see
+  // HALF_DAY_TIMES / the leave request form), so the Duration Type tile
+  // shows "Half Day" specifically for the 0.5-day case rather than the
+  // more generic "Hourly" label.
+  const durationTypeLabel = !isHourly
+    ? t.lv.durationTypeDay
+    : days === 0.5
+      ? t.lv.durationTypeHalfDay
+      : t.lv.durationTypeHourly;
   const boxStyle = {
     padding: "10px 12px",
     background: T.paper,
     border: `1px solid ${T.lineSoft}`,
     borderRadius: 10,
   };
-  const labelStyle = {
-    fontSize: 10.5,
-    color: T.muted,
-    marginBottom: 3,
-    fontWeight: 700,
-    textTransform: "uppercase",
-    letterSpacing: ".03em",
-  };
   return (
-    <Modal title={t.lv.detailTitle} onClose={onClose} width={460}>
+    <Modal
+      title={t.lv.detailTitle}
+      subtitle={t.lv.detailSubtitle}
+      icon={ListChecks}
+      onClose={onClose}
+      width={480}
+    >
       <div>
         {employee && (
           <div
             style={{
               display: "flex",
               alignItems: "center",
+              justifyContent: "space-between",
               gap: 10,
               marginBottom: 16,
             }}
           >
-            <Avatar name={employee.name} photo={employee.photo} size={36} />
-            <div>
-              <div style={{ fontWeight: 600, color: T.ink, fontSize: 14 }}>
-                {employee.name}
-              </div>
-              <div
-                style={{
-                  fontSize: 11,
-                  color: T.muted,
-                  fontFamily: "'JetBrains Mono',monospace",
-                }}
-              >
-                {employee.code}
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <Avatar name={employee.name} photo={employee.photo} size={52} />
+              <div>
+                <div style={{ fontWeight: 700, color: T.ink, fontSize: 16 }}>
+                  {employee.name}
+                </div>
+                <div style={{ fontSize: 13, color: T.muted, marginTop: 1 }}>
+                  {t.login.employeeId}: {employee.code}
+                </div>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
+                    marginTop: 6,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: T.blue,
+                    background: "rgba(91,141,239,.12)",
+                    padding: "3px 9px",
+                    borderRadius: 999,
+                  }}
+                >
+                  <User size={11} /> {t.employee}
+                </span>
               </div>
             </div>
+            <StatusPill status={request.status} />
           </div>
         )}
         <div
           style={{
             display: "flex",
-            alignItems: "center",
+            alignItems: "stretch",
             justifyContent: "space-between",
+            gap: 12,
             ...boxStyle,
             marginBottom: 12,
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: "50%",
-                background: LEAVE_TYPE_DOT[request.type] || T.muted,
-              }}
-            />
-            <span style={{ fontSize: 14, fontWeight: 700, color: T.ink }}>
-              {getLeaveTypeLabel(lang)[request.type] || request.type}
-            </span>
-          </div>
-          <StatusPill status={request.status} />
-        </div>
-        <div className="wf-grid-2" style={{ marginBottom: 12 }}>
-          <div style={boxStyle}>
-            <div style={labelStyle}>{t.lv.totalDuration}</div>
-            <div style={{ fontSize: 14.5, fontWeight: 700, color: T.ink }}>
-              {durationWords}
-            </div>
-          </div>
-          <div style={boxStyle}>
-            <div style={labelStyle}>{t.lv.durationType}</div>
-            <div style={{ fontSize: 14.5, fontWeight: 700, color: T.ink }}>
-              {isHourly ? t.lv.durationTypeHourly : t.lv.durationTypeDay}
-            </div>
-          </div>
+          <LeaveInfoTile
+            icon={CalendarDays}
+            value={getLeaveTypeLabel(lang)[request.type] || request.type}
+            label={t.lv.type}
+          />
+          <LeaveTileDivider />
+          <LeaveInfoTile
+            icon={CalendarClock}
+            value={durationTypeLabel}
+            label={t.lv.durationType}
+          />
         </div>
         <div style={{ ...boxStyle, marginBottom: 12 }}>
-          <div style={labelStyle}>{request.startDate}</div>
           {isHourly ? (
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
+                gap: 8,
               }}
             >
-              <div>
-                <div style={{ fontSize: 10.5, color: T.muted }}>
-                  {t.lv.startTime}
-                </div>
-                <div
-                  style={{
-                    fontSize: 18,
-                    fontWeight: 700,
-                    color: T.forestText,
-                    fontFamily: "'JetBrains Mono',monospace",
-                  }}
-                >
-                  {request.startTime}
-                </div>
-              </div>
-              <div
-                style={{ fontSize: 11, fontWeight: 700, color: T.mutedLight }}
+              <LeaveInfoTile
+                icon={Calendar}
+                value={request.startDate}
+                label={t.lv.startDate}
+                mono
+              />
+              <LeaveTileDivider />
+              <LeaveInfoTile
+                icon={Clock}
+                value={request.startTime}
+                label={t.lv.startTime}
+                mono
+                valueColor={T.forestText}
+              />
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: T.mutedLight,
+                  flexShrink: 0,
+                }}
               >
                 {t.lv.hoursShort(hours)}
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 10.5, color: T.muted }}>
-                  {t.lv.endTime}
-                </div>
-                <div
-                  style={{
-                    fontSize: 18,
-                    fontWeight: 700,
-                    color: T.forestText,
-                    fontFamily: "'JetBrains Mono',monospace",
-                  }}
-                >
-                  {request.endTime}
-                </div>
-              </div>
+              </span>
+              <LeaveInfoTile
+                icon={Clock}
+                value={request.endTime}
+                label={t.lv.endTime}
+                mono
+                valueColor={T.forestText}
+              />
             </div>
           ) : (
             <div
@@ -23170,67 +23301,74 @@ function LeaveDetailModal({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
+                gap: 12,
               }}
             >
-              <div>
-                <div style={{ fontSize: 10.5, color: T.muted }}>
-                  {t.lv.fromShort}
-                </div>
-                <div
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 700,
-                    color: T.ink,
-                    fontFamily: "'JetBrains Mono',monospace",
-                  }}
-                >
-                  {request.startDate}
-                </div>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 10.5, color: T.muted }}>
-                  {t.lv.toShort}
-                </div>
-                <div
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 700,
-                    color: T.ink,
-                    fontFamily: "'JetBrains Mono',monospace",
-                  }}
-                >
-                  {request.endDate}
-                </div>
-              </div>
+              <LeaveInfoTile
+                icon={Calendar}
+                value={request.startDate}
+                label={t.lv.fromShort}
+                mono
+              />
+              <LeaveTileDivider />
+              <LeaveInfoTile
+                icon={Calendar}
+                value={request.endDate}
+                label={t.lv.toShort}
+                mono
+              />
             </div>
           )}
         </div>
         {typeof remainingDays === "number" && (
           <div style={{ marginBottom: 12 }}>
-            <div style={labelStyle}>{t.lv.leaveBalance}</div>
-            <div style={boxStyle}>
-              <div style={{ fontSize: 10.5, color: T.muted, marginBottom: 2 }}>
-                {lang === "en" ? "Remaining" : "នៅសល់"}
-              </div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: T.ink }}>
-                {isHourly
-                  ? t.lv.remainingHours(
-                      Math.round(remainingDays * STANDARD_WORKDAY_HOURS),
-                    )
-                  : t.lv.remainingDays(remainingDays)}
-              </div>
+            <LeaveSectionHeading icon={Wallet}>
+              {t.lv.leaveBalance}
+            </LeaveSectionHeading>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "stretch",
+                justifyContent: "space-between",
+                gap: 12,
+                ...boxStyle,
+                background: T.forestSoft || T.paper,
+              }}
+            >
+              <LeaveInfoTile
+                value={
+                  isHourly
+                    ? t.lv.remainingHours(
+                        Math.round(remainingDays * STANDARD_WORKDAY_HOURS),
+                      )
+                    : t.lv.remainingDays(remainingDays)
+                }
+                label={lang === "en" ? "Remaining" : "នៅសល់"}
+                valueColor={T.forestText}
+                valueSize={19}
+              />
+              <LeaveTileDivider />
+              <LeaveInfoTile
+                icon={Clock}
+                value={durationWords}
+                label={t.lv.totalDuration}
+              />
             </div>
           </div>
         )}
         <div style={{ marginBottom: 12 }}>
-          <div style={labelStyle}>{t.lv.reason}</div>
-          <div style={{ ...boxStyle, fontSize: 13, color: T.textSoft }}>
+          <LeaveSectionHeading icon={MessageCircle}>
+            {t.lv.reason}
+          </LeaveSectionHeading>
+          <div style={{ ...boxStyle, fontSize: 14, color: T.textSoft }}>
             {request.reason || "—"}
           </div>
         </div>
         {request.attachment && (
           <div style={{ marginBottom: 12 }}>
-            <div style={labelStyle}>{t.lv.attachment}</div>
+            <LeaveSectionHeading icon={Paperclip}>
+              {t.lv.attachment}
+            </LeaveSectionHeading>
             <a
               href={request.attachment.dataUrl}
               download={request.attachment.fileName}
@@ -23239,7 +23377,7 @@ function LeaveDetailModal({
                 alignItems: "center",
                 gap: 8,
                 ...boxStyle,
-                fontSize: 12.5,
+                fontSize: 13.5,
                 color: T.forestText,
                 textDecoration: "none",
               }}
@@ -23553,7 +23691,7 @@ function LeaveRequests({
             <div>
               <div
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: 700,
                   textTransform: "uppercase",
                   letterSpacing: ".04em",
@@ -23563,16 +23701,16 @@ function LeaveRequests({
               >
                 {t.lv.annualLeaveYear(new Date().getFullYear())}
               </div>
-              <div style={{ fontSize: 13, color: T.textSoft }}>
+              <div style={{ fontSize: 14, color: T.textSoft }}>
                 {t.lv.accruedOfAnnualQuota(bal.accrued, bal.annualQuota)}
                 {bal.carryOver > 0 &&
                   ` · ${t.lv.carriedOverNote(bal.carryOver)}`}
               </div>
-              <div style={{ fontSize: 12.5, color: T.textSoft, marginTop: 2 }}>
+              <div style={{ fontSize: 13.5, color: T.textSoft, marginTop: 2 }}>
                 {t.lv.usedOfQuota(bal.used, bal.quota)}
               </div>
               <div
-                style={{ fontSize: 10.5, color: T.mutedLight, marginTop: 2 }}
+                style={{ fontSize: 11.5, color: T.mutedLight, marginTop: 2 }}
               >
                 {t.lv.accrualNote}
               </div>
@@ -23581,7 +23719,7 @@ function LeaveRequests({
               style={{
                 fontSize: 22,
                 fontWeight: 700,
-                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                 color: bal.remaining <= 0 ? T.rose : T.forestText,
               }}
             >
@@ -23602,7 +23740,7 @@ function LeaveRequests({
             <div>
               <div
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: 700,
                   textTransform: "uppercase",
                   letterSpacing: ".04em",
@@ -23612,7 +23750,7 @@ function LeaveRequests({
               >
                 {t.lv.sickLeaveYear(new Date().getFullYear())}
               </div>
-              <div style={{ fontSize: 13, color: T.textSoft }}>
+              <div style={{ fontSize: 14, color: T.textSoft }}>
                 {t.lv.usedOfQuota(sickBal.used, sickBal.quota)}
               </div>
             </div>
@@ -23620,7 +23758,7 @@ function LeaveRequests({
               style={{
                 fontSize: 22,
                 fontWeight: 700,
-                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                 color: sickBal.remaining <= 0 ? T.rose : T.blue,
               }}
             >
@@ -23649,7 +23787,7 @@ function LeaveRequests({
                   border: "none",
                   cursor: "pointer",
                   padding: "9px 14px",
-                  fontSize: 13,
+                  fontSize: 14,
                   fontWeight: active ? 600 : 500,
                   color: active ? T.forestText : T.muted,
                   borderBottom: active
@@ -23767,7 +23905,7 @@ function LeaveRequests({
                     </td>
                     <td
                       style={{
-                        fontSize: 12.5,
+                        fontSize: 13.5,
                         color: T.textSoft,
                         whiteSpace: "nowrap",
                       }}
@@ -23776,7 +23914,7 @@ function LeaveRequests({
                     </td>
                     <td
                       style={{
-                        fontSize: 12.5,
+                        fontSize: 13.5,
                         color: T.textSoft,
                         maxWidth: 200,
                       }}
@@ -23789,13 +23927,13 @@ function LeaveRequests({
                     </td>
                     <td
                       style={{
-                        fontSize: 11.5,
+                        fontSize: 12.5,
                         color: T.textSoft,
                         whiteSpace: "nowrap",
                       }}
                     >
                       <div>{applied.date}</div>
-                      <div style={{ fontSize: 10.5, color: T.muted }}>
+                      <div style={{ fontSize: 11.5, color: T.muted }}>
                         {applied.time}
                       </div>
                     </td>
@@ -23822,7 +23960,7 @@ function LeaveRequests({
                 flexWrap: "wrap",
                 gap: 10,
                 padding: "12px 4px 2px",
-                fontSize: 12.5,
+                fontSize: 13.5,
                 color: T.muted,
               }}
             >
@@ -23833,7 +23971,7 @@ function LeaveRequests({
                 <Select
                   style={{
                     width: "auto",
-                    fontSize: 12,
+                    fontSize: 13,
                     padding: "5px 26px 5px 10px",
                   }}
                   value={pageSize}
@@ -23860,7 +23998,7 @@ function LeaveRequests({
                     </Button>
                     <span
                       style={{
-                        fontSize: 12.5,
+                        fontSize: 13.5,
                         color: T.ink,
                         padding: "0 6px",
                         fontFamily: "'JetBrains Mono',monospace",
@@ -23976,10 +24114,10 @@ function LeaveRequests({
               <CalendarDays size={18} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 14.5, fontWeight: 700, color: T.ink }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: T.ink }}>
                 {t.lv.accrualPolicyTitle}
               </div>
-              <div style={{ fontSize: 12.5, color: T.textSoft, marginTop: 2 }}>
+              <div style={{ fontSize: 13.5, color: T.textSoft, marginTop: 2 }}>
                 {t.lv.accrualPolicyDesc}
               </div>
               <div style={{ marginTop: 12 }}>
@@ -23997,7 +24135,7 @@ function LeaveRequests({
                     <option value="flat">{t.lv.accrualModeFlat}</option>
                   </Select>
                 </Field>
-                <p style={{ fontSize: 11.5, color: T.muted, marginTop: -6 }}>
+                <p style={{ fontSize: 12.5, color: T.muted, marginTop: -6 }}>
                   {accrualMode === "flat"
                     ? t.lv.accrualModeFlatHint
                     : t.lv.accrualModeMonthlyHint}
@@ -24027,11 +24165,11 @@ function LeaveRequests({
                 <Repeat size={18} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 14.5, fontWeight: 700, color: T.ink }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: T.ink }}>
                   {t.lv.rolloverTitle}
                 </div>
                 <div
-                  style={{ fontSize: 12.5, color: T.textSoft, marginTop: 2 }}
+                  style={{ fontSize: 13.5, color: T.textSoft, marginTop: 2 }}
                 >
                   {t.lv.rolloverDesc(rolloverYear, rolloverYear + 1)}
                 </div>
@@ -24069,7 +24207,7 @@ function LeaveRequests({
           >
             <div
               style={{
-                fontSize: 12.5,
+                fontSize: 13.5,
                 fontWeight: 700,
                 color: T.forestText,
                 marginBottom: 10,
@@ -24105,7 +24243,7 @@ function LeaveRequests({
                       marginTop: 1,
                     }}
                   />
-                  <span style={{ fontSize: 12.5, color: T.forestText }}>
+                  <span style={{ fontSize: 13.5, color: T.forestText }}>
                     {line}
                   </span>
                 </div>
@@ -24125,12 +24263,12 @@ function LeaveRequests({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontWeight: 700, fontSize: 14.5, color: T.ink }}>
+          <span style={{ fontWeight: 700, fontSize: 15, color: T.ink }}>
             {t.nav.leave}
           </span>
           <span
             style={{
-              fontSize: 11.5,
+              fontSize: 12.5,
               fontWeight: 700,
               color: T.forestText,
               background: T.forestSoft,
@@ -24253,14 +24391,14 @@ function LeaveRequests({
                           style={{
                             fontWeight: 500,
                             color: T.ink,
-                            fontSize: 13,
+                            fontSize: 14,
                           }}
                         >
                           {emp?.name || "—"}
                         </div>
                         <div
                           style={{
-                            fontSize: 10.5,
+                            fontSize: 11.5,
                             color: T.muted,
                             fontFamily: "'JetBrains Mono',monospace",
                           }}
@@ -24288,7 +24426,7 @@ function LeaveRequests({
                     {r.type === "annual" && emp && (
                       <div
                         style={{
-                          fontSize: 10.5,
+                          fontSize: 11.5,
                           color: T.muted,
                           marginLeft: 13,
                         }}
@@ -24306,7 +24444,7 @@ function LeaveRequests({
                     {r.type === "sick" && emp && (
                       <div
                         style={{
-                          fontSize: 10.5,
+                          fontSize: 11.5,
                           color: T.muted,
                           marginLeft: 13,
                         }}
@@ -24317,7 +24455,7 @@ function LeaveRequests({
                       </div>
                     )}
                   </td>
-                  <td style={{ fontSize: 12.5 }}>
+                  <td style={{ fontSize: 13.5 }}>
                     <div
                       style={{
                         fontFamily: "'JetBrains Mono',monospace",
@@ -24326,13 +24464,13 @@ function LeaveRequests({
                     >
                       {r.startDate}
                     </div>
-                    <div style={{ fontSize: 10.5, color: T.muted }}>
+                    <div style={{ fontSize: 11.5, color: T.muted }}>
                       {t.lv.toShort} {r.endDate}
                     </div>
                   </td>
                   <td
                     style={{
-                      fontSize: 12.5,
+                      fontSize: 13.5,
                       color: T.textSoft,
                       whiteSpace: "nowrap",
                     }}
@@ -24340,7 +24478,7 @@ function LeaveRequests({
                     {t.lv.durationDays(leaveDurationDays(r))}
                   </td>
                   <td
-                    style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 180 }}
+                    style={{ fontSize: 13.5, color: T.textSoft, maxWidth: 180 }}
                   >
                     {r.reason || "—"}
                   </td>
@@ -24350,13 +24488,13 @@ function LeaveRequests({
                   </td>
                   <td
                     style={{
-                      fontSize: 11.5,
+                      fontSize: 12.5,
                       color: T.textSoft,
                       whiteSpace: "nowrap",
                     }}
                   >
                     <div>{applied.date}</div>
-                    <div style={{ fontSize: 10.5, color: T.muted }}>
+                    <div style={{ fontSize: 11.5, color: T.muted }}>
                       {applied.time}
                     </div>
                   </td>
@@ -24432,7 +24570,7 @@ function LeaveRequests({
               flexWrap: "wrap",
               gap: 10,
               padding: "12px 4px 2px",
-              fontSize: 12.5,
+              fontSize: 13.5,
               color: T.muted,
             }}
           >
@@ -24443,7 +24581,7 @@ function LeaveRequests({
               <Select
                 style={{
                   width: "auto",
-                  fontSize: 12,
+                  fontSize: 13,
                   padding: "5px 26px 5px 10px",
                 }}
                 value={pageSize}
@@ -24483,7 +24621,7 @@ function LeaveRequests({
                         background: n === pg.page ? T.forest : "transparent",
                         color: n === pg.page ? "#fff" : T.textSoft,
                         fontWeight: n === pg.page ? 700 : 500,
-                        fontSize: 12.5,
+                        fontSize: 13.5,
                         cursor: "pointer",
                       }}
                     >
@@ -24657,7 +24795,7 @@ function OvertimeRequestForm({
       {rangeEntered && hoursNum <= 0 && (
         <p
           style={{
-            fontSize: 12.5,
+            fontSize: 13.5,
             color: T.rose,
             marginTop: -8,
             marginBottom: 12,
@@ -24669,7 +24807,7 @@ function OvertimeRequestForm({
       {rangeEntered && hoursNum > 0 && (
         <div
           style={{
-            fontSize: 12.5,
+            fontSize: 13.5,
             color: T.textSoft,
             marginTop: -8,
             marginBottom: 14,
@@ -24722,14 +24860,14 @@ function OvertimeRequestForm({
           <div
             style={{
               fontWeight: 600,
-              fontSize: 12.5,
+              fontSize: 13.5,
               color: T.ink,
               marginBottom: 2,
             }}
           >
             {t.ot.policyNoteTitle}
           </div>
-          <div style={{ fontSize: 11.5, color: T.textSoft, lineHeight: 1.4 }}>
+          <div style={{ fontSize: 12.5, color: T.textSoft, lineHeight: 1.4 }}>
             {t.ot.policyNoteDesc}
           </div>
         </div>
@@ -24786,7 +24924,7 @@ function OvertimeRejectModal({ onCancel, onConfirm }) {
       {reason !== "" && !trimmed && (
         <p
           style={{
-            fontSize: 12.5,
+            fontSize: 13.5,
             color: T.rose,
             marginTop: -8,
             marginBottom: 12,
@@ -24858,10 +24996,10 @@ function OvertimePolicySettings({ otPolicy, setOtPolicy }) {
             <Timer size={16} color={OT_STAT_TINTS.violet.fg} />
           </div>
           <div>
-            <div style={{ fontWeight: 600, fontSize: 13.5, color: T.ink }}>
+            <div style={{ fontWeight: 600, fontSize: 14.5, color: T.ink }}>
               {t.ot.policyTitle}
             </div>
-            <div style={{ fontSize: 11.5, color: T.textSoft, marginTop: 1 }}>
+            <div style={{ fontSize: 12.5, color: T.textSoft, marginTop: 1 }}>
               {t.ot.policyBannerSub}
             </div>
           </div>
@@ -24876,7 +25014,7 @@ function OvertimePolicySettings({ otPolicy, setOtPolicy }) {
         >
           <span
             style={{
-              fontSize: 11.5,
+              fontSize: 12.5,
               color: T.textSoft,
               fontFamily: "'JetBrains Mono',monospace",
               border: `1px solid ${T.lineSoft}`,
@@ -24903,7 +25041,7 @@ function OvertimePolicySettings({ otPolicy, setOtPolicy }) {
             borderTop: `1px solid ${T.lineSoft}`,
           }}
         >
-          <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
+          <p style={{ fontSize: 13, color: T.muted, marginBottom: 14 }}>
             {t.ot.policyDesc}
           </p>
           <div className="wf-grid-2">
@@ -25042,7 +25180,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
             <span
               style={{
                 fontWeight: 700,
-                fontSize: 13.5,
+                fontSize: 14.5,
                 color: open ? T.ink : T.forestText,
               }}
             >
@@ -25051,7 +25189,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
             {!open && (
               <div
                 style={{
-                  fontSize: 12,
+                  fontSize: 13,
                   color: T.forestText,
                   opacity: 0.85,
                   marginTop: 1,
@@ -25068,7 +25206,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
               display: "flex",
               alignItems: "center",
               gap: 3,
-              fontSize: 12.5,
+              fontSize: 13.5,
               fontWeight: 700,
               color: T.blue,
               whiteSpace: "nowrap",
@@ -25081,7 +25219,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
         {open && (
           <span
             style={{
-              fontSize: 11.5,
+              fontSize: 12.5,
               color: T.textSoft,
               fontFamily: "'JetBrains Mono',monospace",
             }}
@@ -25108,7 +25246,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
             borderTop: `1px solid ${T.lineSoft}`,
           }}
         >
-          <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
+          <p style={{ fontSize: 13, color: T.muted, marginBottom: 14 }}>
             {t.pay.policyDesc}
           </p>
           <div style={{ marginBottom: 14 }}>
@@ -25119,7 +25257,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
               </Select>
             </Field>
             {isKhmerMode && (
-              <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+              <p style={{ fontSize: 12.5, color: T.muted, marginTop: 6 }}>
                 {t.pay.taxModeKhmerDesc}
               </p>
             )}
@@ -25146,7 +25284,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
                   />
                 </Field>
               </div>
-              <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+              <p style={{ fontSize: 12.5, color: T.muted, marginTop: 6 }}>
                 {t.pay.exchangeRateHint}
               </p>
               <div className="wf-grid-2" style={{ marginTop: 12 }}>
@@ -25187,7 +25325,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
                   />
                 </Field>
               </div>
-              <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+              <p style={{ fontSize: 12.5, color: T.muted, marginTop: 6 }}>
                 {t.pay.nssfEmployerOnlyHint}
               </p>
             </div>
@@ -25224,7 +25362,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
                     onChange={set("minSalaryThreshold")}
                   />
                 </Field>
-                <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+                <p style={{ fontSize: 12.5, color: T.muted, marginTop: 6 }}>
                   {Number(f.minSalaryThreshold) > 0
                     ? t.pay.minSalaryThresholdHint
                     : t.pay.noThreshold}
@@ -25239,7 +25377,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
               borderTop: `1px solid ${T.lineSoft}`,
             }}
           >
-            <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
+            <p style={{ fontSize: 13, color: T.muted, marginBottom: 14 }}>
               {t.pay.latePolicyDesc}
             </p>
             <div className="wf-grid-2">
@@ -25281,7 +25419,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
                   onChange={set("lateDeductionValue")}
                 />
               </Field>
-              <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+              <p style={{ fontSize: 12.5, color: T.muted, marginTop: 6 }}>
                 {Number(f.lateDeductionValue) > 0
                   ? t.pay.lateDeductionHint(Number(f.lateGraceCount) || 0)
                   : t.pay.lateDeductionDisabledHint}
@@ -25295,7 +25433,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
               borderTop: `1px solid ${T.lineSoft}`,
             }}
           >
-            <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
+            <p style={{ fontSize: 13, color: T.muted, marginBottom: 14 }}>
               {t.pay.ulPolicyDesc}
             </p>
             <div className="wf-grid-2">
@@ -25332,7 +25470,7 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
                 </Field>
               )}
             </div>
-            <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+            <p style={{ fontSize: 12.5, color: T.muted, marginTop: 6 }}>
               {t.pay.ulDeductionHint}
             </p>
           </div>
@@ -25362,7 +25500,7 @@ function OtDecisionNote({ r, admins }) {
   const name = r.decidedByName || decider?.name || "—";
   const roleLabel = adminRoleLabel(r.decidedByRole, lang);
   return (
-    <div style={{ fontSize: 11.5, color: T.textSoft, marginTop: 3 }}>
+    <div style={{ fontSize: 12.5, color: T.textSoft, marginTop: 3 }}>
       {r.status === "approved" ? (
         <span>
           {t.ot.approvedBy} <strong>{name}</strong>
@@ -25415,7 +25553,7 @@ function OtStatCard({ icon: Icon, tint, label, value, sub }) {
       </div>
       <div
         style={{
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: 700,
           textTransform: "uppercase",
           letterSpacing: ".03em",
@@ -25429,14 +25567,14 @@ function OtStatCard({ icon: Icon, tint, label, value, sub }) {
         style={{
           fontSize: 21,
           fontWeight: 700,
-          fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+          fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
           color: T.ink,
         }}
       >
         {value}
       </div>
       {sub && (
-        <div style={{ fontSize: 11.5, color: T.textSoft, marginTop: 2 }}>
+        <div style={{ fontSize: 12.5, color: T.textSoft, marginTop: 2 }}>
           {sub}
         </div>
       )}
@@ -25697,7 +25835,7 @@ function OvertimeRequests({
                   border: "none",
                   cursor: "pointer",
                   padding: "9px 14px",
-                  fontSize: 13,
+                  fontSize: 14,
                   fontWeight: active ? 600 : 500,
                   color: active ? T.forestText : T.muted,
                   borderBottom: active
@@ -25810,7 +25948,7 @@ function OvertimeRequests({
                     <td>{DAY_TYPE_LABEL[r.dayType] || r.dayType}</td>
                     <td
                       style={{
-                        fontSize: 12.5,
+                        fontSize: 13.5,
                         color: T.textSoft,
                         maxWidth: 200,
                       }}
@@ -25826,13 +25964,13 @@ function OvertimeRequests({
                     </td>
                     <td
                       style={{
-                        fontSize: 11.5,
+                        fontSize: 12.5,
                         color: T.textSoft,
                         whiteSpace: "nowrap",
                       }}
                     >
                       <div>{applied.date}</div>
-                      <div style={{ fontSize: 10.5, color: T.muted }}>
+                      <div style={{ fontSize: 11.5, color: T.muted }}>
                         {applied.time}
                       </div>
                     </td>
@@ -25850,7 +25988,7 @@ function OvertimeRequests({
                 flexWrap: "wrap",
                 gap: 10,
                 padding: "12px 4px 2px",
-                fontSize: 12.5,
+                fontSize: 13.5,
                 color: T.muted,
               }}
             >
@@ -25861,7 +25999,7 @@ function OvertimeRequests({
                 <Select
                   style={{
                     width: "auto",
-                    fontSize: 12,
+                    fontSize: 13,
                     padding: "5px 26px 5px 10px",
                   }}
                   value={otPageSize}
@@ -25888,7 +26026,7 @@ function OvertimeRequests({
                     </Button>
                     <span
                       style={{
-                        fontSize: 12.5,
+                        fontSize: 13.5,
                         color: T.ink,
                         padding: "0 6px",
                         fontFamily: "'JetBrains Mono',monospace",
@@ -26010,7 +26148,7 @@ function OvertimeRequests({
                 border: "none",
                 cursor: "pointer",
                 padding: "9px 14px",
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: active ? 600 : 500,
                 color: active ? T.forestText : T.muted,
                 borderBottom: active
@@ -26134,14 +26272,14 @@ function OvertimeRequests({
                           style={{
                             fontWeight: 500,
                             color: T.ink,
-                            fontSize: 13,
+                            fontSize: 14,
                           }}
                         >
                           {emp?.name || "—"}
                         </div>
                         <div
                           style={{
-                            fontSize: 10.5,
+                            fontSize: 11.5,
                             color: T.muted,
                             fontFamily: "'JetBrains Mono',monospace",
                           }}
@@ -26164,7 +26302,7 @@ function OvertimeRequests({
                   </td>
                   <td>{DAY_TYPE_LABEL[r.dayType] || r.dayType}</td>
                   <td
-                    style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}
+                    style={{ fontSize: 13.5, color: T.textSoft, maxWidth: 200 }}
                   >
                     {r.reason || "—"}
                   </td>
@@ -26174,13 +26312,13 @@ function OvertimeRequests({
                   </td>
                   <td
                     style={{
-                      fontSize: 11.5,
+                      fontSize: 12.5,
                       color: T.textSoft,
                       whiteSpace: "nowrap",
                     }}
                   >
                     <div>{applied.date}</div>
-                    <div style={{ fontSize: 10.5, color: T.muted }}>
+                    <div style={{ fontSize: 11.5, color: T.muted }}>
                       {applied.time}
                     </div>
                   </td>
@@ -26238,7 +26376,7 @@ function OvertimeRequests({
               flexWrap: "wrap",
               gap: 10,
               padding: "12px 4px 2px",
-              fontSize: 12.5,
+              fontSize: 13.5,
               color: T.muted,
             }}
           >
@@ -26253,7 +26391,7 @@ function OvertimeRequests({
               <Select
                 style={{
                   width: "auto",
-                  fontSize: 12,
+                  fontSize: 13,
                   padding: "5px 26px 5px 10px",
                 }}
                 value={otAdminPageSize}
@@ -26278,7 +26416,7 @@ function OvertimeRequests({
                   </Button>
                   <span
                     style={{
-                      fontSize: 12.5,
+                      fontSize: 13.5,
                       color: T.ink,
                       padding: "0 6px",
                       fontFamily: "'JetBrains Mono',monospace",
@@ -26362,7 +26500,7 @@ function AcRejectModal({ onCancel, onConfirm }) {
       {reason !== "" && !trimmed && (
         <p
           style={{
-            fontSize: 12.5,
+            fontSize: 13.5,
             color: T.rose,
             marginTop: -8,
             marginBottom: 12,
@@ -26393,7 +26531,7 @@ function AcDecisionNote({ r, admins }) {
   const decider = admins.find((a) => a.id === r.decidedById);
   const name = r.decidedByName || decider?.name || "—";
   return (
-    <div style={{ fontSize: 11.5, color: T.textSoft, marginTop: 3 }}>
+    <div style={{ fontSize: 12.5, color: T.textSoft, marginTop: 3 }}>
       {r.status === "approved" ? (
         <span>
           {t.ac.approvedBy} <strong>{name}</strong>
@@ -26442,7 +26580,7 @@ function AttendanceCorrectionForm({ onSave, onCancel }) {
       {!hasTime && (
         <p
           style={{
-            fontSize: 12.5,
+            fontSize: 13.5,
             color: T.rose,
             marginTop: -8,
             marginBottom: 12,
@@ -26650,7 +26788,7 @@ function AttendanceCorrections({
                     {r.requestedCheckOut || "—"}
                   </td>
                   <td
-                    style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}
+                    style={{ fontSize: 13.5, color: T.textSoft, maxWidth: 200 }}
                   >
                     {r.reason || "—"}
                   </td>
@@ -26729,14 +26867,14 @@ function AttendanceCorrections({
                           style={{
                             fontWeight: 500,
                             color: T.ink,
-                            fontSize: 13,
+                            fontSize: 14,
                           }}
                         >
                           {emp?.name || "—"}
                         </div>
                         <div
                           style={{
-                            fontSize: 10.5,
+                            fontSize: 11.5,
                             color: T.muted,
                             fontFamily: "'JetBrains Mono',monospace",
                           }}
@@ -26756,7 +26894,7 @@ function AttendanceCorrections({
                     {r.requestedCheckOut || "—"}
                   </td>
                   <td
-                    style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}
+                    style={{ fontSize: 13.5, color: T.textSoft, maxWidth: 200 }}
                   >
                     {r.reason || "—"}
                   </td>
@@ -26860,7 +26998,7 @@ function SsRejectModal({ onCancel, onConfirm }) {
       {reason !== "" && !trimmed && (
         <p
           style={{
-            fontSize: 12.5,
+            fontSize: 13.5,
             color: T.rose,
             marginTop: -8,
             marginBottom: 12,
@@ -26891,7 +27029,7 @@ function SsDecisionNote({ r, admins }) {
   const decider = admins.find((a) => a.id === r.decidedById);
   const name = r.decidedByName || decider?.name || "—";
   return (
-    <div style={{ fontSize: 11.5, color: T.textSoft, marginTop: 3 }}>
+    <div style={{ fontSize: 12.5, color: T.textSoft, marginTop: 3 }}>
       {r.status === "approved" ? (
         <span>
           {t.ss.approvedBy} <strong>{name}</strong>
@@ -26925,7 +27063,7 @@ function ShiftSwapRequestForm({ currentEmp, shifts, onSave, onCancel }) {
   if (otherShifts.length === 0) {
     return (
       <div style={{ padding: "8px 0" }}>
-        <p style={{ fontSize: 13, color: T.textSoft }}>{t.ss.noOtherShift}</p>
+        <p style={{ fontSize: 14, color: T.textSoft }}>{t.ss.noOtherShift}</p>
         <div
           style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}
         >
@@ -26942,7 +27080,7 @@ function ShiftSwapRequestForm({ currentEmp, shifts, onSave, onCancel }) {
         <Field label={t.ss.fromShift}>
           <div
             style={{
-              fontSize: 13,
+              fontSize: 14,
               color: T.ink,
               background: T.chipBg || "rgba(91,141,239,0.08)",
               borderRadius: 8,
@@ -27098,7 +27236,7 @@ function ShiftSwapRequests({
 
   const ShiftChangeCell = ({ r }) => (
     <div
-      style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5 }}
+      style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13.5 }}
     >
       <span style={{ color: T.textSoft }}>
         {shiftLabel(shiftOf(r.fromShiftId))}
@@ -27161,7 +27299,7 @@ function ShiftSwapRequests({
                     <ShiftChangeCell r={r} />
                   </td>
                   <td
-                    style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}
+                    style={{ fontSize: 13.5, color: T.textSoft, maxWidth: 200 }}
                   >
                     {r.reason || "—"}
                   </td>
@@ -27196,7 +27334,7 @@ function ShiftSwapRequests({
   });
   return (
     <div>
-      <p style={{ fontSize: 12.5, color: T.textSoft, marginBottom: 12 }}>
+      <p style={{ fontSize: 13.5, color: T.textSoft, marginBottom: 12 }}>
         {t.ss.note}
       </p>
       <Card style={{ overflowX: "auto" }}>
@@ -27244,14 +27382,14 @@ function ShiftSwapRequests({
                           style={{
                             fontWeight: 500,
                             color: T.ink,
-                            fontSize: 13,
+                            fontSize: 14,
                           }}
                         >
                           {emp?.name || "—"}
                         </div>
                         <div
                           style={{
-                            fontSize: 10.5,
+                            fontSize: 11.5,
                             color: T.muted,
                             fontFamily: "'JetBrains Mono',monospace",
                           }}
@@ -27268,7 +27406,7 @@ function ShiftSwapRequests({
                     <ShiftChangeCell r={r} />
                   </td>
                   <td
-                    style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}
+                    style={{ fontSize: 13.5, color: T.textSoft, maxWidth: 200 }}
                   >
                     {r.reason || "—"}
                   </td>
@@ -27456,7 +27594,7 @@ function Announcements({
             textAlign: "center",
             padding: "32px 0",
             color: T.muted,
-            fontSize: 13,
+            fontSize: 14,
           }}
         >
           {t.ann.noAnn}
@@ -27481,7 +27619,7 @@ function Announcements({
                   gap: 8,
                   fontWeight: 700,
                   color: T.ink,
-                  fontSize: 14,
+                  fontSize: 14.5,
                 }}
               >
                 <Megaphone size={16} color={T.goldText} /> {a.title}
@@ -27517,7 +27655,7 @@ function Announcements({
             </div>
             <div
               style={{
-                fontSize: 13,
+                fontSize: 14,
                 color: T.textSoft,
                 whiteSpace: "pre-wrap",
                 marginBottom: 10,
@@ -27529,7 +27667,7 @@ function Announcements({
               style={{
                 display: "flex",
                 justifyContent: "space-between",
-                fontSize: 11,
+                fontSize: 12,
                 color: T.muted,
               }}
             >
@@ -27755,7 +27893,7 @@ function PerformanceReviews({
               textAlign: "center",
               padding: "32px 0",
               color: T.muted,
-              fontSize: 13,
+              fontSize: 14,
             }}
           >
             {t.pr.noReview}
@@ -27772,14 +27910,14 @@ function PerformanceReviews({
                   marginBottom: 8,
                 }}
               >
-                <span style={{ fontWeight: 600, color: T.ink, fontSize: 13 }}>
+                <span style={{ fontWeight: 600, color: T.ink, fontSize: 14 }}>
                   {r.period}
                 </span>
                 <RatingStars value={r.rating} />
               </div>
               {r.strengths && (
                 <div
-                  style={{ fontSize: 12.5, color: T.textSoft, marginBottom: 6 }}
+                  style={{ fontSize: 13.5, color: T.textSoft, marginBottom: 6 }}
                 >
                   <strong style={{ color: T.forestText }}>
                     {t.pr.strengths}:
@@ -27789,7 +27927,7 @@ function PerformanceReviews({
               )}
               {r.improvements && (
                 <div
-                  style={{ fontSize: 12.5, color: T.textSoft, marginBottom: 6 }}
+                  style={{ fontSize: 13.5, color: T.textSoft, marginBottom: 6 }}
                 >
                   <strong style={{ color: T.goldText }}>
                     {t.pr.improvements}:
@@ -27797,7 +27935,7 @@ function PerformanceReviews({
                   {r.improvements}
                 </div>
               )}
-              <div style={{ fontSize: 11, color: T.muted, marginTop: 8 }}>
+              <div style={{ fontSize: 12, color: T.muted, marginTop: 8 }}>
                 {t.pr.reviewedBy} {r.reviewedByName || "—"}
               </div>
             </Card>
@@ -27871,14 +28009,14 @@ function PerformanceReviews({
                           style={{
                             fontWeight: 500,
                             color: T.ink,
-                            fontSize: 13,
+                            fontSize: 14,
                           }}
                         >
                           {emp?.name || "—"}
                         </div>
                         <div
                           style={{
-                            fontSize: 10.5,
+                            fontSize: 11.5,
                             color: T.muted,
                             fontFamily: "'JetBrains Mono',monospace",
                           }}
@@ -27888,11 +28026,11 @@ function PerformanceReviews({
                       </div>
                     </div>
                   </td>
-                  <td style={{ fontSize: 12.5 }}>{r.period}</td>
+                  <td style={{ fontSize: 13.5 }}>{r.period}</td>
                   <td>
                     <RatingStars value={r.rating} size={14} />
                   </td>
-                  <td style={{ fontSize: 12, color: T.textSoft }}>
+                  <td style={{ fontSize: 13, color: T.textSoft }}>
                     {r.reviewedByName || "—"}
                   </td>
                   <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
@@ -28093,7 +28231,7 @@ function DocViewDownloadLinks({ doc, iconOnly }) {
         alignItems: "center",
         justifyContent: "center",
         gap: 6,
-        fontSize: 12.5,
+        fontSize: 13.5,
         fontWeight: 600,
         color: T.forestText,
         padding: "6px 0",
@@ -28214,7 +28352,7 @@ function DocUploadRow({ emp, currentAdmin, documents, setDocuments, t }) {
           {t.doc.chooseFile}
         </Button>
       </div>
-      {error && <span style={{ fontSize: 12, color: T.rose }}>{error}</span>}
+      {error && <span style={{ fontSize: 13, color: T.rose }}>{error}</span>}
     </div>
   );
 }
@@ -28248,7 +28386,7 @@ function EmployeeDocumentsModal({
           style={{
             textAlign: "center",
             color: T.muted,
-            fontSize: 13,
+            fontSize: 14,
             padding: "20px 0",
           }}
         >
@@ -28285,7 +28423,7 @@ function EmployeeDocumentsModal({
               <div style={{ minWidth: 0 }}>
                 <div
                   style={{
-                    fontSize: 12.5,
+                    fontSize: 13.5,
                     fontWeight: 600,
                     color: T.ink,
                     overflow: "hidden",
@@ -28295,7 +28433,7 @@ function EmployeeDocumentsModal({
                 >
                   {d.fileName}
                 </div>
-                <div style={{ fontSize: 10.5, color: T.muted }}>
+                <div style={{ fontSize: 11.5, color: T.muted }}>
                   {CAT_LABEL[d.category] || d.category} · {t.doc.uploadedBy}{" "}
                   {d.uploadedByName || "—"}
                 </div>
@@ -28353,7 +28491,7 @@ function MyDocuments({ currentEmp, documents }) {
             textAlign: "center",
             padding: "32px 0",
             color: T.muted,
-            fontSize: 13,
+            fontSize: 14,
           }}
         >
           {t.doc.noDocs}
@@ -28387,7 +28525,7 @@ function MyDocuments({ currentEmp, documents }) {
               <div style={{ minWidth: 0 }}>
                 <div
                   style={{
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: 600,
                     color: T.ink,
                     overflow: "hidden",
@@ -28397,7 +28535,7 @@ function MyDocuments({ currentEmp, documents }) {
                 >
                   {d.fileName}
                 </div>
-                <div style={{ fontSize: 11, color: T.muted }}>
+                <div style={{ fontSize: 12, color: T.muted }}>
                   {CAT_LABEL[d.category] || d.category}
                 </div>
                 {d.expiryDate && (
@@ -28457,7 +28595,7 @@ function DocumentExpiryPage({ documents, employees }) {
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 13, color: T.textSoft }}>
+        <div style={{ fontSize: 14, color: T.textSoft }}>
           {t.contracts.subtitle}
         </div>
       </div>
@@ -28539,7 +28677,7 @@ function DocumentExpiryPage({ documents, employees }) {
       {filtered.length === 0 ? (
         <Card style={{ padding: 24, textAlign: "center", color: T.muted }}>
           <div>{t.contracts.noItems}</div>
-          <div style={{ fontSize: 11.5, marginTop: 6 }}>
+          <div style={{ fontSize: 12.5, marginTop: 6 }}>
             {t.contracts.noItemsHint}
           </div>
         </Card>
@@ -28584,7 +28722,7 @@ function DocumentExpiryPage({ documents, employees }) {
                       style={{
                         fontWeight: 600,
                         color: T.ink,
-                        fontSize: 13,
+                        fontSize: 14,
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
@@ -28594,7 +28732,7 @@ function DocumentExpiryPage({ documents, employees }) {
                     </div>
                     <div
                       style={{
-                        fontSize: 11,
+                        fontSize: 12,
                         color: T.muted,
                         overflow: "hidden",
                         textOverflow: "ellipsis",
@@ -28608,7 +28746,7 @@ function DocumentExpiryPage({ documents, employees }) {
               </div>
               <div
                 style={{
-                  fontSize: 12,
+                  fontSize: 13,
                   color: T.textSoft,
                   marginTop: 12,
                   display: "flex",
@@ -28698,7 +28836,7 @@ function StagePill({ stage, t }) {
         alignItems: "center",
         padding: "3px 10px",
         borderRadius: 999,
-        fontSize: 11.5,
+        fontSize: 12.5,
         fontWeight: 600,
         color: c,
         background: `${c}1a`,
@@ -28777,7 +28915,7 @@ function JobPostingForm({ initial, departments, onSave, onCancel }) {
             background: T.inputBg,
             color: T.text,
             padding: "10px 12px",
-            fontSize: 13.5,
+            fontSize: 14.5,
             fontFamily: "inherit",
             resize: "vertical",
           }}
@@ -28864,8 +29002,8 @@ function JobPostingsTab({
                 onClick={() => onSelectJob && onSelectJob(j.id)}
                 style={{ marginBottom: 10 }}
               >
-                <div style={{ fontWeight: 700, fontSize: 15 }}>{j.title}</div>
-                <div style={{ fontSize: 12.5, color: T.textSoft }}>
+                <div style={{ fontWeight: 700, fontSize: 15.5 }}>{j.title}</div>
+                <div style={{ fontSize: 13.5, color: T.textSoft }}>
                   {deptName(j.departmentId)} ·{" "}
                   {jobTypeLabel(j.employmentType, t)}
                 </div>
@@ -28880,7 +29018,7 @@ function JobPostingsTab({
               >
                 <span
                   style={{
-                    fontSize: 11.5,
+                    fontSize: 12.5,
                     fontWeight: 600,
                     padding: "3px 10px",
                     borderRadius: 999,
@@ -28893,7 +29031,7 @@ function JobPostingsTab({
                     ? t.recruit.jobStatusOpen
                     : t.recruit.jobStatusClosed}
                 </span>
-                <span style={{ fontSize: 12, color: T.textSoft }}>
+                <span style={{ fontSize: 13, color: T.textSoft }}>
                   {t.recruit.candidatesFor(candidateCount(j.id))}
                 </span>
               </div>
@@ -29063,7 +29201,7 @@ function CandidateForm({
             background: T.inputBg,
             color: T.text,
             padding: "10px 12px",
-            fontSize: 13.5,
+            fontSize: 14.5,
             fontFamily: "inherit",
             resize: "vertical",
           }}
@@ -29094,7 +29232,7 @@ function CandidateForm({
             </Button>
           </div>
         ) : (
-          <div style={{ fontSize: 12.5, color: T.textSoft, marginBottom: 6 }}>
+          <div style={{ fontSize: 13.5, color: T.textSoft, marginBottom: 6 }}>
             {t.recruit.noResume}
           </div>
         )}
@@ -29121,7 +29259,7 @@ function CandidateForm({
           {t.recruit.uploadResume}
         </Button>
         {error && (
-          <div style={{ fontSize: 12, color: T.rose, marginTop: 6 }}>
+          <div style={{ fontSize: 13, color: T.rose, marginTop: 6 }}>
             {error}
           </div>
         )}
@@ -29276,12 +29414,12 @@ function CandidatesTab({
               }}
             >
               <div style={{ minWidth: 180 }}>
-                <div style={{ fontWeight: 700, fontSize: 14 }}>{c.name}</div>
-                <div style={{ fontSize: 12, color: T.textSoft }}>
+                <div style={{ fontWeight: 700, fontSize: 14.5 }}>{c.name}</div>
+                <div style={{ fontSize: 13, color: T.textSoft }}>
                   {jobTitle(c.jobPostingId) || t.recruit.noJobSelected}
                 </div>
               </div>
-              <div style={{ fontSize: 12.5, color: T.textSoft }}>
+              <div style={{ fontSize: 13.5, color: T.textSoft }}>
                 {c.phone} {c.email && `· ${c.email}`}
               </div>
               <StagePill stage={c.stage} t={t} />
@@ -29303,7 +29441,7 @@ function CandidatesTab({
         </div>
       )}
       {t.recruit.hireHint && (
-        <div style={{ fontSize: 11.5, color: T.textSoft, marginTop: 10 }}>
+        <div style={{ fontSize: 12.5, color: T.textSoft, marginTop: 10 }}>
           {t.recruit.hireHint}
         </div>
       )}
@@ -29507,7 +29645,7 @@ function OnboardingOffboarding({
 
   return (
     <div>
-      <div style={{ fontSize: 13, color: T.textSoft, marginBottom: 16 }}>
+      <div style={{ fontSize: 14, color: T.textSoft, marginBottom: 16 }}>
         {t.onboard.subtitle}
       </div>
       <div
@@ -29562,7 +29700,7 @@ function OnboardingOffboarding({
               marginBottom: 14,
             }}
           >
-            <div style={{ fontSize: 13, color: T.textSoft }}>
+            <div style={{ fontSize: 14, color: T.textSoft }}>
               {t.onboard.progress(doneCount, tasks.length)}
             </div>
             {tasks.length === 0 && (
@@ -29576,12 +29714,12 @@ function OnboardingOffboarding({
               style={{
                 textAlign: "center",
                 color: T.textSoft,
-                fontSize: 13,
+                fontSize: 14,
                 padding: "16px 0",
               }}
             >
               <div>{t.onboard.noTasks}</div>
-              <div style={{ fontSize: 12, marginTop: 4 }}>
+              <div style={{ fontSize: 13, marginTop: 4 }}>
                 {t.onboard.noTasksHint}
               </div>
             </div>
@@ -29608,7 +29746,7 @@ function OnboardingOffboarding({
                   <div
                     style={{
                       flex: 1,
-                      fontSize: 13.5,
+                      fontSize: 14.5,
                       textDecoration: tk.done ? "line-through" : "none",
                       color: tk.done ? T.textSoft : T.text,
                     }}
@@ -29616,7 +29754,7 @@ function OnboardingOffboarding({
                     {tk.title}
                   </div>
                   {tk.dueDate && (
-                    <div style={{ fontSize: 11.5, color: T.textSoft }}>
+                    <div style={{ fontSize: 12.5, color: T.textSoft }}>
                       {tk.dueDate}
                     </div>
                   )}
@@ -29719,7 +29857,7 @@ function AdminAccountForm({ initial, onSave, onCancel, saving }) {
       {initial && (
         <p
           style={{
-            fontSize: 11.5,
+            fontSize: 12.5,
             color: T.muted,
             marginTop: -10,
             marginBottom: 14,
@@ -29761,7 +29899,7 @@ function AdminAccountForm({ initial, onSave, onCancel, saving }) {
       </Field>
       <p
         style={{
-          fontSize: 11.5,
+          fontSize: 12.5,
           color: T.muted,
           marginTop: -8,
           marginBottom: 14,
@@ -29855,7 +29993,7 @@ function RolePermissionsPage({ rolePermissions, setRolePermissions }) {
       <Card style={{ padding: 20, marginBottom: 18 }}>
         <h2
           style={{
-            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
             fontSize: 18,
             fontWeight: 600,
             color: T.ink,
@@ -29863,7 +30001,7 @@ function RolePermissionsPage({ rolePermissions, setRolePermissions }) {
         >
           {t.nav.rolePerms}
         </h2>
-        <p style={{ fontSize: 12, color: T.muted, marginTop: 6 }}>
+        <p style={{ fontSize: 13, color: T.muted, marginTop: 6 }}>
           {lang === "en"
             ? "Choose what each rank can access below. Superadmin always has full access (including managing admin accounts) and isn't shown here — that stays superadmin-exclusive."
             : "កំណត់ថាតួនាទីនីមួយៗអាចប្រើមុខងារអ្វីខ្លះខាងក្រោម។ Superadmin មានសិទ្ធិពេញលេញជានិច្ច (រួមទាំងគ្រប់គ្រងគណនីអ្នកគ្រប់គ្រង) ដូច្នេះមិនបង្ហាញនៅទីនេះទេ — សិទ្ធិនោះនៅតែសម្រាប់ Superadmin ប៉ុណ្ណោះ។"}
@@ -29917,7 +30055,7 @@ function RolePermissionsPage({ rolePermissions, setRolePermissions }) {
       <Card style={{ padding: 20, marginBottom: 18 }}>
         <h2
           style={{
-            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
             fontSize: 18,
             fontWeight: 600,
             color: T.ink,
@@ -29927,7 +30065,7 @@ function RolePermissionsPage({ rolePermissions, setRolePermissions }) {
             ? "Employee Self-Service Portal"
             : "កម្មវិធីសម្រាប់បុគ្គលិក (Self-Service)"}
         </h2>
-        <p style={{ fontSize: 12, color: T.muted, marginTop: 6 }}>
+        <p style={{ fontSize: 13, color: T.muted, marginTop: 6 }}>
           {lang === "en"
             ? "Turn features off here to hide them for every employee company-wide. This applies to all employees equally — they don't have ranks the way admin accounts do. Dashboard always stays on."
             : "បិទមុខងារនៅទីនេះ ដើម្បីលាក់វាចេញពីបុគ្គលិកទាំងអស់ក្នុងក្រុមហ៊ុនតែម្តង។ ការកំណត់នេះអនុវត្តដូចគ្នាចំពោះបុគ្គលិកទាំងអស់ ព្រោះពួកគេគ្មានតួនាទីខុសៗគ្នាដូច admin ទេ។ Dashboard នៅតែបើកជានិច្ច។"}
@@ -29974,7 +30112,7 @@ function RolePermissionsPage({ rolePermissions, setRolePermissions }) {
         }}
       >
         {dirty && (
-          <span style={{ fontSize: 12, color: T.gold }}>
+          <span style={{ fontSize: 13, color: T.gold }}>
             {lang === "en" ? "Unsaved changes" : "មិនទាន់រក្សាទុក"}
           </span>
         )}
@@ -30703,7 +30841,7 @@ function CallOverlay({
           display: "flex",
           alignItems: "center",
           gap: 10,
-          fontSize: 13,
+          fontSize: 14,
         }}
       >
         <AlertCircle size={16} style={{ flexShrink: 0, color: "#ff8a80" }} />
@@ -30739,7 +30877,7 @@ function CallOverlay({
     <div className="wf-callscreen">
       <div
         style={{
-          fontSize: 12.5,
+          fontSize: 13.5,
           fontWeight: 700,
           color: "rgba(255,255,255,0.5)",
           letterSpacing: 0.5,
@@ -30808,7 +30946,7 @@ function CallOverlay({
           <div
             style={{
               marginTop: 7,
-              fontSize: 14.5,
+              fontSize: 15,
               color: "rgba(255,255,255,0.65)",
               display: "flex",
               alignItems: "center",
@@ -31358,7 +31496,7 @@ function MessagesPage({
                 <div
                   style={{
                     fontWeight: 700,
-                    fontSize: 13.5,
+                    fontSize: 14.5,
                     color: T.ink,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -31369,7 +31507,7 @@ function MessagesPage({
                 </div>
                 <div
                   style={{
-                    fontSize: 11,
+                    fontSize: 12,
                     color: peerOnline ? "#22c55e" : T.muted,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -31449,7 +31587,7 @@ function MessagesPage({
                   style={{
                     margin: "auto",
                     color: T.muted,
-                    fontSize: 12.5,
+                    fontSize: 13.5,
                     textAlign: "center",
                     padding: "0 24px",
                   }}
@@ -31477,7 +31615,7 @@ function MessagesPage({
                           >
                             <span
                               style={{
-                                fontSize: 10.5,
+                                fontSize: 11.5,
                                 fontWeight: 600,
                                 color: T.muted,
                                 background: T.inputBg,
@@ -31506,7 +31644,7 @@ function MessagesPage({
                               m.senderName && (
                                 <div
                                   style={{
-                                    fontSize: 10,
+                                    fontSize: 11,
                                     color: T.muted,
                                     marginBottom: 2,
                                     textAlign: "right",
@@ -31611,7 +31749,7 @@ function MessagesPage({
                                       <div
                                         style={{
                                           minWidth: 0,
-                                          fontSize: 12.5,
+                                          fontSize: 13.5,
                                           fontWeight: 600,
                                           overflow: "hidden",
                                           textOverflow: "ellipsis",
@@ -31737,7 +31875,7 @@ function MessagesPage({
                                 </>
                               )}
                               <div
-                                style={{ fontSize: 10, color: T.mutedLight }}
+                                style={{ fontSize: 11, color: T.mutedLight }}
                               >
                                 {m.editedAt && !m.deleted
                                   ? `${timeAgoLabel(m.createdAt)} · ${t.chat.edited}`
@@ -31783,7 +31921,7 @@ function MessagesPage({
                         display: "flex",
                         alignItems: "center",
                         gap: 6,
-                        fontSize: 12,
+                        fontSize: 13,
                         color: T.muted,
                       }}
                     >
@@ -31824,7 +31962,7 @@ function MessagesPage({
                             padding: "6px 10px",
                             borderRadius: 8,
                             border: `1px solid ${T.lineSoft}`,
-                            fontSize: 12,
+                            fontSize: 13,
                             color: T.ink,
                             maxWidth: 220,
                           }}
@@ -31864,7 +32002,7 @@ function MessagesPage({
                 <div
                   style={{
                     padding: "6px 12px 0 12px",
-                    fontSize: 11.5,
+                    fontSize: 12.5,
                     color: T.rose,
                   }}
                 >
@@ -31875,7 +32013,7 @@ function MessagesPage({
                 <div
                   style={{
                     padding: "6px 12px 0 12px",
-                    fontSize: 11.5,
+                    fontSize: 12.5,
                     color: T.rose,
                   }}
                 >
@@ -31898,7 +32036,7 @@ function MessagesPage({
                       gap: 8,
                       flex: 1,
                       color: T.rose,
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: 600,
                     }}
                   >
@@ -32020,7 +32158,7 @@ function MessagesPage({
             style={{
               margin: "auto",
               color: T.muted,
-              fontSize: 13,
+              fontSize: 14,
               textAlign: "center",
               padding: 24,
             }}
@@ -32083,7 +32221,7 @@ function MessagesPage({
               padding: "24px 14px",
               textAlign: "center",
               color: T.muted,
-              fontSize: 12.5,
+              fontSize: 13.5,
             }}
           >
             {query.trim() ? t.chat.noEmployeesFound : t.chat.noConversations}
@@ -32128,7 +32266,7 @@ function MessagesPage({
                   <div
                     style={{
                       fontWeight: 600,
-                      fontSize: 12.5,
+                      fontSize: 13.5,
                       color: T.ink,
                       overflow: "hidden",
                       textOverflow: "ellipsis",
@@ -32140,7 +32278,7 @@ function MessagesPage({
                   {c.hasConversation && (
                     <div
                       style={{
-                        fontSize: 10,
+                        fontSize: 11,
                         color: T.mutedLight,
                         flexShrink: 0,
                       }}
@@ -32159,7 +32297,7 @@ function MessagesPage({
                 >
                   <div
                     style={{
-                      fontSize: 11.5,
+                      fontSize: 12.5,
                       color: T.textSoft,
                       overflow: "hidden",
                       textOverflow: "ellipsis",
@@ -32175,7 +32313,7 @@ function MessagesPage({
                       style={{
                         background: T.rose,
                         color: "#fff",
-                        fontSize: 10,
+                        fontSize: 11,
                         fontWeight: 700,
                         borderRadius: 999,
                         minWidth: 16,
@@ -32392,7 +32530,7 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
                           style={{
                             fontWeight: 500,
                             color: T.ink,
-                            fontSize: 13,
+                            fontSize: 14,
                           }}
                         >
                           {a.name}{" "}
@@ -32516,7 +32654,7 @@ function AdminAccounts({ admins, setAdmins, currentAdminId }) {
           onClose={() => setModal(null)}
         >
           {error && (
-            <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 12 }}>
+            <p style={{ fontSize: 13.5, color: T.rose, marginBottom: 12 }}>
               {error}
             </p>
           )}
@@ -32790,12 +32928,12 @@ function MyProfile({
             size={56}
           />
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontWeight: 700, color: T.ink, fontSize: 15 }}>
+            <div style={{ fontWeight: 700, color: T.ink, fontSize: 15.5 }}>
               {f.name || currentEmp.name}
             </div>
             <div
               style={{
-                fontSize: 11.5,
+                fontSize: 12.5,
                 color: T.muted,
                 fontFamily: "'JetBrains Mono',monospace",
               }}
@@ -32806,7 +32944,7 @@ function MyProfile({
         </div>
         <div
           style={{
-            fontSize: 12,
+            fontSize: 13,
             color: T.textSoft,
             marginBottom: 18,
             display: "flex",
@@ -32835,7 +32973,7 @@ function MyProfile({
           />
         </Field>
         {nameError && (
-          <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 10 }}>
+          <p style={{ fontSize: 13.5, color: T.rose, marginBottom: 10 }}>
             {nameError}
           </p>
         )}
@@ -32860,7 +32998,7 @@ function MyProfile({
           </label>
         </Field>
         {photoError && (
-          <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 10 }}>
+          <p style={{ fontSize: 13.5, color: T.rose, marginBottom: 10 }}>
             {photoError}
           </p>
         )}
@@ -32873,7 +33011,7 @@ function MyProfile({
         {attemptedSave && saveError && (
           <p
             style={{
-              fontSize: 12.5,
+              fontSize: 13.5,
               color: T.rose,
               display: "flex",
               alignItems: "flex-start",
@@ -32890,7 +33028,7 @@ function MyProfile({
         {saved && !saveError && (
           <p
             style={{
-              fontSize: 12.5,
+              fontSize: 13.5,
               color: T.forestText,
               display: "flex",
               alignItems: "center",
@@ -32909,11 +33047,11 @@ function MyProfile({
       <Card style={{ padding: 20 }}>
         <h3
           style={{
-            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
             fontWeight: 600,
             color: T.ink,
             marginBottom: 4,
-            fontSize: 14,
+            fontSize: 14.5,
             display: "flex",
             alignItems: "center",
             gap: 8,
@@ -32921,7 +33059,7 @@ function MyProfile({
         >
           <KeyRound size={16} /> {t.profile.changePin}
         </h3>
-        <p style={{ fontSize: 12, color: T.muted, marginBottom: 16 }}>
+        <p style={{ fontSize: 13, color: T.muted, marginBottom: 16 }}>
           {t.profile.pinDesc}
         </p>
         <Field label={t.profile.oldPin}>
@@ -32967,14 +33105,14 @@ function MyProfile({
           />
         </Field>
         {pinError && (
-          <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 10 }}>
+          <p style={{ fontSize: 13.5, color: T.rose, marginBottom: 10 }}>
             {pinError}
           </p>
         )}
         {pinSaved && (
           <p
             style={{
-              fontSize: 12.5,
+              fontSize: 13.5,
               color: T.forestText,
               display: "flex",
               alignItems: "center",
@@ -33009,7 +33147,7 @@ function GlassToggleRow() {
     <div style={{ marginTop: 18 }}>
       <div
         style={{
-          fontSize: 11.5,
+          fontSize: 12.5,
           fontWeight: 600,
           color: T.muted,
           marginBottom: 8,
@@ -33053,7 +33191,7 @@ function GlassToggleRow() {
           >
             <Droplets size={15} />
           </span>
-          <p style={{ fontSize: 12, color: T.muted, lineHeight: 1.4 }}>
+          <p style={{ fontSize: 13, color: T.muted, lineHeight: 1.4 }}>
             {t.settings.glassEffectDesc}
           </p>
         </div>
@@ -33067,7 +33205,7 @@ function GlassToggleRow() {
         >
           <span
             style={{
-              fontSize: 11.5,
+              fontSize: 12.5,
               fontWeight: 600,
               color: glassEffect ? T.gold : T.muted,
             }}
@@ -33123,11 +33261,11 @@ function AppearanceCard() {
     <Card style={{ padding: 20 }}>
       <h3
         style={{
-          fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+          fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
           fontWeight: 600,
           color: T.ink,
           marginBottom: 4,
-          fontSize: 14,
+          fontSize: 14.5,
           display: "flex",
           alignItems: "center",
           gap: 8,
@@ -33136,7 +33274,7 @@ function AppearanceCard() {
         {theme === "dark" ? <Moon size={16} /> : <Sun size={16} />}{" "}
         {t.settings.appearance}
       </h3>
-      <p style={{ fontSize: 12, color: T.muted, marginBottom: 16 }}>
+      <p style={{ fontSize: 13, color: T.muted, marginBottom: 16 }}>
         {t.settings.appearanceDesc}
       </p>
       <div style={{ display: "flex", gap: 10 }}>
@@ -33171,7 +33309,7 @@ function AppearanceCard() {
       <div style={{ marginTop: 18 }}>
         <div
           style={{
-            fontSize: 11.5,
+            fontSize: 12.5,
             fontWeight: 600,
             color: T.muted,
             marginBottom: 8,
@@ -33221,7 +33359,7 @@ function AppearanceCard() {
       <div style={{ marginTop: 18 }}>
         <div
           style={{
-            fontSize: 11.5,
+            fontSize: 12.5,
             fontWeight: 600,
             color: T.muted,
             marginBottom: 8,
@@ -33289,7 +33427,7 @@ function SettingsNum({ n, tint = "violet", title, desc }) {
           alignItems: "center",
           justifyContent: "center",
           fontWeight: 700,
-          fontSize: 13,
+          fontSize: 14,
           flexShrink: 0,
           fontFamily: "'JetBrains Mono',monospace",
         }}
@@ -33299,16 +33437,16 @@ function SettingsNum({ n, tint = "violet", title, desc }) {
       <div style={{ minWidth: 0 }}>
         <h3
           style={{
-            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
             fontWeight: 700,
             color: T.ink,
-            fontSize: 14.5,
+            fontSize: 15,
             marginBottom: 3,
           }}
         >
           {title}
         </h3>
-        <p style={{ fontSize: 11.5, color: T.muted, lineHeight: 1.4 }}>
+        <p style={{ fontSize: 12.5, color: T.muted, lineHeight: 1.4 }}>
           {desc}
         </p>
       </div>
@@ -33340,7 +33478,7 @@ function PushNotificationCard({ userType, userId }) {
       {permission === "denied" ? (
         <p
           style={{
-            fontSize: 12,
+            fontSize: 13,
             color: T.rose,
             display: "flex",
             alignItems: "center",
@@ -33369,7 +33507,7 @@ function PushNotificationCard({ userType, userId }) {
       {subscribed && permission !== "denied" && (
         <p
           style={{
-            fontSize: 12,
+            fontSize: 13,
             color: T.forest,
             display: "flex",
             alignItems: "center",
@@ -33381,7 +33519,7 @@ function PushNotificationCard({ userType, userId }) {
         </p>
       )}
       {error && (
-        <p style={{ fontSize: 12, color: T.rose, marginTop: 10 }}>
+        <p style={{ fontSize: 13, color: T.rose, marginTop: 10 }}>
           {t.settings.pushError} {error}
         </p>
       )}
@@ -33412,6 +33550,7 @@ function TelegramSettingsCard() {
   const toggle = (k) => () => setF((prev) => ({ ...prev, [k]: !prev[k] }));
 
   const canEnable = !!(f.botToken?.trim() && f.chatId?.trim());
+  const telegramDirty = JSON.stringify(f) !== JSON.stringify(policy);
 
   const save = () => {
     setPolicy({ ...f, enabled: !!f.enabled && canEnable });
@@ -33466,7 +33605,7 @@ function TelegramSettingsCard() {
           onChange={toggle("enabled")}
           style={{ accentColor: T.forest, width: 16, height: 16 }}
         />
-        <span style={{ fontSize: 13, fontWeight: 600, color: T.ink }}>
+        <span style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>
           {t.settings.telegramEnable}
         </span>
       </label>
@@ -33487,13 +33626,13 @@ function TelegramSettingsCard() {
           />
         </Field>
       </div>
-      <p style={{ fontSize: 11.5, color: T.muted, marginTop: 6 }}>
+      <p style={{ fontSize: 12.5, color: T.muted, marginTop: 6 }}>
         {t.settings.telegramChatIdHint}
       </p>
       <div style={{ marginTop: 16 }}>
         <span
           style={{
-            fontSize: 12,
+            fontSize: 13,
             fontWeight: 600,
             color: T.ink,
             display: "block",
@@ -33519,7 +33658,7 @@ function TelegramSettingsCard() {
                 onChange={toggle(c.key)}
                 style={{ accentColor: T.forest, width: 15, height: 15 }}
               />
-              <span style={{ fontSize: 12.5, color: T.textSoft }}>
+              <span style={{ fontSize: 13.5, color: T.textSoft }}>
                 {c.label}
               </span>
             </label>
@@ -33527,7 +33666,7 @@ function TelegramSettingsCard() {
         </div>
       </div>
       {!canEnable && (
-        <p style={{ fontSize: 11.5, color: T.rose, marginTop: 10 }}>
+        <p style={{ fontSize: 12.5, color: T.rose, marginTop: 10 }}>
           {t.settings.telegramNeedsSetup}
         </p>
       )}
@@ -33540,7 +33679,7 @@ function TelegramSettingsCard() {
           flexWrap: "wrap",
         }}
       >
-        <Button variant="accent" onClick={save}>
+        <Button variant="accent" onClick={save} disabled={!telegramDirty}>
           {t.save}
         </Button>
         <Button
@@ -33557,7 +33696,7 @@ function TelegramSettingsCard() {
       {saved && (
         <p
           style={{
-            fontSize: 12,
+            fontSize: 13,
             color: T.forest,
             display: "flex",
             alignItems: "center",
@@ -33571,7 +33710,7 @@ function TelegramSettingsCard() {
       {testState === "ok" && (
         <p
           style={{
-            fontSize: 12,
+            fontSize: 13,
             color: T.forest,
             display: "flex",
             alignItems: "center",
@@ -33585,7 +33724,7 @@ function TelegramSettingsCard() {
       {testState === "error" && (
         <p
           style={{
-            fontSize: 12,
+            fontSize: 13,
             color: T.rose,
             display: "flex",
             alignItems: "center",
@@ -33660,6 +33799,10 @@ function AdminSettings({
     }
   };
 
+  const brandingDirty =
+    brandForm.name.trim() !== (branding.name || "").trim() ||
+    (brandForm.logo || null) !== (branding.logo || null);
+
   const saveBranding = () => {
     setBranding({ name: brandForm.name.trim(), logo: brandForm.logo || null });
     setBrandSaved(true);
@@ -33667,6 +33810,7 @@ function AdminSettings({
 
   const [soundForm, setSoundForm] = useState(soundPolicy?.preset || "chime");
   const [soundSaved, setSoundSaved] = useState(false);
+  const soundDirty = soundForm !== (soundPolicy?.preset || "chime");
   const saveSound = () => {
     setSoundPolicy({ preset: soundForm });
     setSoundSaved(true);
@@ -33696,6 +33840,10 @@ function AdminSettings({
       setPhotoError("មិនអាចអានរូបភាពនេះបានទេ សូមសាកល្បងរូបភាពផ្សេង");
     }
   };
+
+  const profileDirty =
+    f.name.trim() !== (currentAdmin.name || "").trim() ||
+    (photoPreview || null) !== (currentAdmin.photo || null);
 
   const save = () => {
     if (!f.name.trim()) {
@@ -33740,12 +33888,12 @@ function AdminSettings({
             size={56}
           />
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontWeight: 700, color: T.ink, fontSize: 15 }}>
+            <div style={{ fontWeight: 700, color: T.ink, fontSize: 15.5 }}>
               {f.name || currentAdmin.name}
             </div>
             <div
               style={{
-                fontSize: 11.5,
+                fontSize: 12.5,
                 color: T.muted,
                 fontFamily: "'JetBrains Mono',monospace",
               }}
@@ -33767,7 +33915,7 @@ function AdminSettings({
           />
         </Field>
         {nameError && (
-          <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 10 }}>
+          <p style={{ fontSize: 13.5, color: T.rose, marginBottom: 10 }}>
             {nameError}
           </p>
         )}
@@ -33792,14 +33940,14 @@ function AdminSettings({
           </label>
         </Field>
         {photoError && (
-          <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 10 }}>
+          <p style={{ fontSize: 13.5, color: T.rose, marginBottom: 10 }}>
             {photoError}
           </p>
         )}
         {attemptedSave && saveError && (
           <p
             style={{
-              fontSize: 12.5,
+              fontSize: 13.5,
               color: T.rose,
               display: "flex",
               alignItems: "flex-start",
@@ -33816,7 +33964,7 @@ function AdminSettings({
         {saved && !saveError && (
           <p
             style={{
-              fontSize: 12.5,
+              fontSize: 13.5,
               color: T.forestText,
               display: "flex",
               alignItems: "center",
@@ -33827,7 +33975,7 @@ function AdminSettings({
             <CheckCircle2 size={14} /> {t.settings.saved}
           </p>
         )}
-        <Button variant="accent" onClick={save}>
+        <Button variant="accent" onClick={save} disabled={!profileDirty}>
           {t.save}
         </Button>
       </Card>
@@ -33871,7 +34019,7 @@ function AdminSettings({
         <div style={{ marginTop: 18 }}>
           <div
             style={{
-              fontSize: 11.5,
+              fontSize: 12.5,
               fontWeight: 600,
               color: T.muted,
               marginBottom: 8,
@@ -33921,7 +34069,7 @@ function AdminSettings({
         <div style={{ marginTop: 18 }}>
           <div
             style={{
-              fontSize: 11.5,
+              fontSize: 12.5,
               fontWeight: 600,
               color: T.muted,
               marginBottom: 8,
@@ -33991,7 +34139,7 @@ function AdminSettings({
                 flexShrink: 0,
                 color: "#fff",
                 fontWeight: 700,
-                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
               }}
             >
               {brandForm.logo ? (
@@ -34038,7 +34186,7 @@ function AdminSettings({
             </div>
           </div>
           {brandLogoError && (
-            <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 10 }}>
+            <p style={{ fontSize: 13.5, color: T.rose, marginBottom: 10 }}>
               {brandLogoError}
             </p>
           )}
@@ -34055,7 +34203,7 @@ function AdminSettings({
           {brandSaved && (
             <p
               style={{
-                fontSize: 12.5,
+                fontSize: 13.5,
                 color: T.forestText,
                 display: "flex",
                 alignItems: "center",
@@ -34066,7 +34214,11 @@ function AdminSettings({
               <CheckCircle2 size={14} /> {t.settings.brandingSaved}
             </p>
           )}
-          <Button variant="accent" onClick={saveBranding}>
+          <Button
+            variant="accent"
+            onClick={saveBranding}
+            disabled={!brandingDirty}
+          >
             {t.save}
           </Button>
         </Card>
@@ -34109,7 +34261,7 @@ function AdminSettings({
                 />
                 <span
                   style={{
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: 600,
                     color: T.ink,
                     flex: 1,
@@ -34133,7 +34285,7 @@ function AdminSettings({
                       border: `1px solid ${T.divider}`,
                       borderRadius: 8,
                       padding: "4px 9px",
-                      fontSize: 11.5,
+                      fontSize: 12.5,
                       color: T.muted,
                       cursor: "pointer",
                     }}
@@ -34147,7 +34299,7 @@ function AdminSettings({
           {soundSaved && (
             <p
               style={{
-                fontSize: 12,
+                fontSize: 13,
                 color: T.forest,
                 display: "flex",
                 alignItems: "center",
@@ -34162,6 +34314,7 @@ function AdminSettings({
           <Button
             variant="accent"
             onClick={saveSound}
+            disabled={!soundDirty}
             style={{ marginTop: soundSaved ? 0 : 14 }}
           >
             {t.save}
@@ -34218,7 +34371,7 @@ function AuditActionBadge({ action, t }) {
   return (
     <span
       style={{
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: 700,
         padding: "3px 9px",
         borderRadius: 999,
@@ -34309,7 +34462,7 @@ function AuditLogPage() {
         <div>
           <h2
             style={{
-              fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+              fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
               fontSize: 18,
               fontWeight: 600,
               color: T.ink,
@@ -34318,7 +34471,7 @@ function AuditLogPage() {
           >
             {t.audit.title}
           </h2>
-          <p style={{ fontSize: 12.5, color: T.muted, margin: "4px 0 0" }}>
+          <p style={{ fontSize: 13.5, color: T.muted, margin: "4px 0 0" }}>
             {t.audit.subtitle}
           </p>
         </div>
@@ -34364,7 +34517,7 @@ function AuditLogPage() {
             textAlign: "center",
             padding: "32px 0",
             color: T.muted,
-            fontSize: 13,
+            fontSize: 14,
           }}
         >
           <Loader2
@@ -34382,7 +34535,7 @@ function AuditLogPage() {
             textAlign: "center",
             padding: "32px 0",
             color: T.muted,
-            fontSize: 13,
+            fontSize: 14,
           }}
         >
           {t.audit.noLogs}
@@ -34416,7 +34569,7 @@ function AuditLogPage() {
                       <td
                         style={{
                           fontFamily: "'JetBrains Mono',monospace",
-                          fontSize: 11.5,
+                          fontSize: 12.5,
                           color: T.muted,
                           whiteSpace: "nowrap",
                         }}
@@ -34438,7 +34591,7 @@ function AuditLogPage() {
                           <div>
                             <div
                               style={{
-                                fontSize: 12.5,
+                                fontSize: 13.5,
                                 fontWeight: 500,
                                 color: T.ink,
                               }}
@@ -34446,7 +34599,7 @@ function AuditLogPage() {
                               {l.actor_name || t.audit.unknownActor}
                             </div>
                             {l.actor_type && (
-                              <div style={{ fontSize: 10.5, color: T.muted }}>
+                              <div style={{ fontSize: 11.5, color: T.muted }}>
                                 {l.actor_type === "admin"
                                   ? t.nav.admins
                                   : t.employee}
@@ -34458,11 +34611,11 @@ function AuditLogPage() {
                       <td>
                         <AuditActionBadge action={l.action} t={t} />
                       </td>
-                      <td style={{ fontSize: 12.5 }}>
+                      <td style={{ fontSize: 13.5 }}>
                         <div style={{ color: T.ink }}>
                           {l.entity_label || l.entity_id || "—"}
                         </div>
-                        <div style={{ fontSize: 10.5, color: T.muted }}>
+                        <div style={{ fontSize: 11.5, color: T.muted }}>
                           {t.audit.tables[l.entity_table] || l.entity_table}
                         </div>
                       </td>
@@ -34494,7 +34647,7 @@ function AuditLogPage() {
                                 style={{
                                   display: "flex",
                                   gap: 8,
-                                  fontSize: 11.5,
+                                  fontSize: 12.5,
                                   flexWrap: "wrap",
                                 }}
                               >
@@ -34564,7 +34717,7 @@ function LoginActionBadge({ action, t }) {
         display: "inline-flex",
         alignItems: "center",
         gap: 4,
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: 700,
         padding: "3px 9px",
         borderRadius: 999,
@@ -34909,7 +35062,7 @@ function LoginActivityPage({
         <div>
           <h2
             style={{
-              fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+              fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
               fontSize: 18,
               fontWeight: 600,
               color: T.ink,
@@ -34918,7 +35071,7 @@ function LoginActivityPage({
           >
             {t.loginAct.title}
           </h2>
-          <p style={{ fontSize: 12.5, color: T.muted, margin: "4px 0 0" }}>
+          <p style={{ fontSize: 13.5, color: T.muted, margin: "4px 0 0" }}>
             {viewingAll ? t.loginAct.subtitleAll : t.loginAct.subtitle}
           </p>
         </div>
@@ -34981,7 +35134,7 @@ function LoginActivityPage({
             textAlign: "center",
             padding: "32px 0",
             color: T.muted,
-            fontSize: 13,
+            fontSize: 14,
           }}
         >
           <Loader2
@@ -34999,7 +35152,7 @@ function LoginActivityPage({
             textAlign: "center",
             padding: "32px 0",
             color: T.muted,
-            fontSize: 13,
+            fontSize: 14,
           }}
         >
           {t.loginAct.noLogs}
@@ -35027,7 +35180,7 @@ function LoginActivityPage({
                   <td
                     style={{
                       fontFamily: "'JetBrains Mono',monospace",
-                      fontSize: 11.5,
+                      fontSize: 12.5,
                       color: T.muted,
                       whiteSpace: "nowrap",
                     }}
@@ -35049,7 +35202,7 @@ function LoginActivityPage({
                         />
                         <div
                           style={{
-                            fontSize: 12.5,
+                            fontSize: 13.5,
                             fontWeight: 500,
                             color: T.ink,
                           }}
@@ -35068,7 +35221,7 @@ function LoginActivityPage({
                         display: "flex",
                         alignItems: "center",
                         gap: 6,
-                        fontSize: 12.5,
+                        fontSize: 13.5,
                         color: T.ink,
                       }}
                     >
@@ -35079,10 +35232,10 @@ function LoginActivityPage({
                       {deviceTypeLabel(l.device_type, t)}
                     </div>
                   </td>
-                  <td style={{ fontSize: 12.5, color: T.ink }}>
+                  <td style={{ fontSize: 13.5, color: T.ink }}>
                     {l.os || t.loginAct.unknown}
                   </td>
-                  <td style={{ fontSize: 12.5 }}>
+                  <td style={{ fontSize: 13.5 }}>
                     {l.device_model ? (
                       <>
                         <div style={{ color: T.ink }}>
@@ -35091,7 +35244,7 @@ function LoginActivityPage({
                         {androidModelName(l.device_model) && (
                           <div
                             style={{
-                              fontSize: 10.5,
+                              fontSize: 11.5,
                               color: T.muted,
                               fontFamily: "'JetBrains Mono',monospace",
                             }}
@@ -35104,7 +35257,7 @@ function LoginActivityPage({
                       <span style={{ color: T.muted }}>—</span>
                     )}
                   </td>
-                  <td style={{ fontSize: 12.5, color: T.ink }}>
+                  <td style={{ fontSize: 13.5, color: T.ink }}>
                     {l.browser || t.loginAct.unknown}
                   </td>
                   <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
@@ -35117,14 +35270,14 @@ function LoginActivityPage({
                       }}
                     >
                       {l.session_id && l.session_id === activeSessionId ? (
-                        <span style={{ fontSize: 10.5, color: T.muted }}>
+                        <span style={{ fontSize: 11.5, color: T.muted }}>
                           {t.loginAct.currentDevice}
                         </span>
                       ) : isActiveSession(l) ? (
                         <>
                           <span
                             style={{
-                              fontSize: 10.5,
+                              fontSize: 11.5,
                               fontWeight: 700,
                               color: T.forestText,
                               background: T.forestSoft,
@@ -35145,7 +35298,7 @@ function LoginActivityPage({
                           </Button>
                         </>
                       ) : l.revoked_at ? (
-                        <span style={{ fontSize: 10.5, color: T.muted }}>
+                        <span style={{ fontSize: 11.5, color: T.muted }}>
                           {t.loginAct.revoked}
                         </span>
                       ) : null}
@@ -36034,7 +36187,7 @@ function CertificateModal({ emp, deptLabel, onClose }) {
           />
           <span
             style={{
-              fontSize: 11,
+              fontSize: 12,
               color: T.muted,
               display: "block",
               marginTop: 4,
@@ -36077,7 +36230,7 @@ function CertificateModal({ emp, deptLabel, onClose }) {
         />
       </Field>
       {popupBlocked && (
-        <p style={{ fontSize: 12.5, color: T.rose, marginBottom: 10 }}>
+        <p style={{ fontSize: 13.5, color: T.rose, marginBottom: 10 }}>
           {t.cert.popupBlocked}
         </p>
       )}
@@ -36263,14 +36416,14 @@ function Payslip({
               gap: 8,
               color: T.forest,
               fontWeight: 700,
-              fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+              fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
             }}
           >
             <Receipt size={20} /> {t.nav.myPayroll}
           </div>
           <span
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: T.muted,
               fontFamily: "'JetBrains Mono',monospace",
             }}
@@ -36287,13 +36440,13 @@ function Payslip({
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>
+            <span style={{ fontSize: 14.5, fontWeight: 600, color: T.ink }}>
               {emp.name}
             </span>
             {usesCustomRate && (
               <span
                 style={{
-                  fontSize: 9.5,
+                  fontSize: 10.5,
                   fontWeight: 700,
                   color: T.goldText,
                   background: T.goldSoft,
@@ -36308,7 +36461,7 @@ function Payslip({
             {usesCustomLatePolicy && (
               <span
                 style={{
-                  fontSize: 9.5,
+                  fontSize: 10.5,
                   fontWeight: 700,
                   color: T.goldText,
                   background: T.goldSoft,
@@ -36323,7 +36476,7 @@ function Payslip({
             {usesCustomUlPolicy && (
               <span
                 style={{
-                  fontSize: 9.5,
+                  fontSize: 10.5,
                   fontWeight: 700,
                   color: T.goldText,
                   background: T.goldSoft,
@@ -36338,7 +36491,7 @@ function Payslip({
           </div>
           <div
             style={{
-              fontSize: 11,
+              fontSize: 12,
               color: T.muted,
               fontFamily: "'JetBrains Mono',monospace",
             }}
@@ -36348,7 +36501,7 @@ function Payslip({
         </div>
         <div
           style={{
-            fontSize: 13,
+            fontSize: 14,
             display: "flex",
             flexDirection: "column",
             gap: 8,
@@ -36416,7 +36569,7 @@ function Payslip({
                 display: "flex",
                 justifyContent: "space-between",
                 color: T.blue,
-                fontSize: 12,
+                fontSize: 13,
               }}
             >
               <span>{t.lv.approved}</span>
@@ -36464,7 +36617,7 @@ function Payslip({
                 display: "flex",
                 justifyContent: "space-between",
                 color: T.textSoft,
-                fontSize: 11.5,
+                fontSize: 12.5,
               }}
             >
               <span>{t.pay.employerNssfCostLabel}</span>
@@ -36502,7 +36655,7 @@ function Payslip({
             marginTop: 16,
           }}
         >
-          <span style={{ fontWeight: 600, fontSize: 13 }}>
+          <span style={{ fontWeight: 600, fontSize: 14 }}>
             {t.pay.netSalary}
           </span>
           <span
@@ -36625,7 +36778,7 @@ function HistoricalPayrollModal({
 
   return (
     <Modal title={t.pay.historicalTitle} onClose={onClose} width={760}>
-      <p style={{ fontSize: 12, color: T.muted, marginBottom: 14 }}>
+      <p style={{ fontSize: 13, color: T.muted, marginBottom: 14 }}>
         {t.pay.historicalDesc}
       </p>
       <div
@@ -36651,13 +36804,13 @@ function HistoricalPayrollModal({
       </div>
 
       {error && (
-        <p style={{ color: T.rose, fontSize: 13, marginBottom: 12 }}>{error}</p>
+        <p style={{ color: T.rose, fontSize: 14, marginBottom: 12 }}>{error}</p>
       )}
 
       {loading && (
         <p
           style={{
-            fontSize: 13,
+            fontSize: 14,
             color: T.muted,
             textAlign: "center",
             padding: "24px 0",
@@ -36672,7 +36825,7 @@ function HistoricalPayrollModal({
           {histAttendance.length === 0 && (
             <p
               style={{
-                fontSize: 13,
+                fontSize: 14,
                 color: T.muted,
                 textAlign: "center",
                 padding: "16px 0",
@@ -36791,7 +36944,7 @@ function PayStatCard({ icon: Icon, tint, label, value }) {
       <div style={{ minWidth: 0 }}>
         <div
           style={{
-            fontSize: 11.5,
+            fontSize: 12.5,
             fontWeight: 700,
             color: c.fg,
             marginBottom: 5,
@@ -36859,7 +37012,7 @@ function AdjRejectModal({ onCancel, onConfirm }) {
       {reason !== "" && !trimmed && (
         <p
           style={{
-            fontSize: 12.5,
+            fontSize: 13.5,
             color: T.rose,
             marginTop: -8,
             marginBottom: 12,
@@ -36889,7 +37042,7 @@ function AdjDecisionNote({ r, admins }) {
   const decider = admins.find((a) => a.id === r.decidedById);
   const name = r.decidedByName || decider?.name || "—";
   return (
-    <div style={{ fontSize: 11.5, color: T.textSoft, marginTop: 3 }}>
+    <div style={{ fontSize: 12.5, color: T.textSoft, marginTop: 3 }}>
       {r.status === "approved" ? (
         <span>
           {t.adj.approvedBy} <strong>{name}</strong>
@@ -36986,7 +37139,7 @@ function SalaryAdjustmentForm({
             value={f.installments}
             onChange={set("installments")}
           />
-          <p style={{ fontSize: 11.5, color: T.muted, marginTop: 4 }}>
+          <p style={{ fontSize: 12.5, color: T.muted, marginTop: 4 }}>
             {t.adj.installmentsHint}
             {amountNum > 0 && (
               <>
@@ -37151,12 +37304,12 @@ function SalaryAdjustments({
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <Avatar name={emp?.name || "?"} photo={emp?.photo} size={30} />
               <div>
-                <div style={{ fontWeight: 500, color: T.ink, fontSize: 13 }}>
+                <div style={{ fontWeight: 500, color: T.ink, fontSize: 14 }}>
                   {emp?.name || "—"}
                 </div>
                 <div
                   style={{
-                    fontSize: 10.5,
+                    fontSize: 11.5,
                     color: T.muted,
                     fontFamily: "'JetBrains Mono',monospace",
                   }}
@@ -37179,7 +37332,7 @@ function SalaryAdjustments({
         <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
           {monthLabel(r.effectiveMonth)}
         </td>
-        <td style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 200 }}>
+        <td style={{ fontSize: 13.5, color: T.textSoft, maxWidth: 200 }}>
           {r.reason || "—"}
         </td>
         <td>
@@ -37825,7 +37978,7 @@ function Payroll({
           <div style={{ padding: "22px 24px", position: "relative" }}>
             <h2
               style={{
-                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                 fontWeight: 700,
                 fontSize: 19,
                 color: T.ink,
@@ -37834,7 +37987,7 @@ function Payroll({
             >
               {t.pay.overviewTitle}
             </h2>
-            <p style={{ fontSize: 12.5, color: T.textSoft, maxWidth: 420 }}>
+            <p style={{ fontSize: 13.5, color: T.textSoft, maxWidth: 420 }}>
               {t.pay.overviewDesc}
             </p>
           </div>
@@ -37881,16 +38034,16 @@ function Payroll({
           >
             <h3
               style={{
-                fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                 fontWeight: 600,
-                fontSize: 15,
+                fontSize: 15.5,
                 color: T.ink,
                 marginBottom: 3,
               }}
             >
               {t.pay.payslipsTitle}
             </h3>
-            <p style={{ fontSize: 12, color: T.textSoft }}>
+            <p style={{ fontSize: 13, color: T.textSoft }}>
               {t.pay.payslipsDesc}
             </p>
           </div>
@@ -37949,7 +38102,7 @@ function Payroll({
                       <span
                         style={{
                           fontWeight: 600,
-                          fontSize: 13.5,
+                          fontSize: 14.5,
                           color: T.ink,
                         }}
                       >
@@ -37958,7 +38111,7 @@ function Payroll({
                       {m === currentMk && (
                         <span
                           style={{
-                            fontSize: 9.5,
+                            fontSize: 10.5,
                             fontWeight: 700,
                             color: T.forestText,
                             background: T.forestSoft,
@@ -37971,7 +38124,7 @@ function Payroll({
                         </span>
                       )}
                     </div>
-                    <div style={{ fontSize: 11.5, color: T.muted }}>
+                    <div style={{ fontSize: 12.5, color: T.muted }}>
                       {monthRangeLabel(m)}
                     </div>
                   </div>
@@ -37979,13 +38132,13 @@ function Payroll({
                     <div
                       style={{
                         fontFamily: "'JetBrains Mono',monospace",
-                        fontSize: 13,
+                        fontSize: 14,
                         color: T.ink,
                       }}
                     >
                       {fmtMoney(currentEmp.salary)}
                     </div>
-                    <div style={{ fontSize: 10.5, color: T.muted }}>
+                    <div style={{ fontSize: 11.5, color: T.muted }}>
                       {t.pay.grossSalary}
                     </div>
                   </div>
@@ -37993,13 +38146,13 @@ function Payroll({
                     <div
                       style={{
                         fontFamily: "'JetBrains Mono',monospace",
-                        fontSize: 13,
+                        fontSize: 14,
                         color: ded > 0 ? T.rose : T.textSoft,
                       }}
                     >
                       {ded > 0 ? `-${fmtMoney(ded)}` : fmtMoney(0)}
                     </div>
-                    <div style={{ fontSize: 10.5, color: T.muted }}>
+                    <div style={{ fontSize: 11.5, color: T.muted }}>
                       {t.pay.deductions}
                     </div>
                   </div>
@@ -38007,14 +38160,14 @@ function Payroll({
                     <div
                       style={{
                         fontFamily: "'JetBrains Mono',monospace",
-                        fontSize: 13.5,
+                        fontSize: 14.5,
                         fontWeight: 700,
                         color: T.forestText,
                       }}
                     >
                       {fmtMoney(p.net)}
                     </div>
-                    <div style={{ fontSize: 10.5, color: T.muted }}>
+                    <div style={{ fontSize: 11.5, color: T.muted }}>
                       {t.pay.netSalary}
                     </div>
                   </div>
@@ -38107,14 +38260,14 @@ function Payroll({
             <div
               style={{
                 fontWeight: 700,
-                fontSize: 13,
+                fontSize: 14,
                 color: T.ink,
                 marginBottom: 2,
               }}
             >
               {t.pay.infoTitle}
             </div>
-            <div style={{ fontSize: 12, color: T.textSoft, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 13, color: T.textSoft, lineHeight: 1.5 }}>
               {t.pay.infoDesc}
             </div>
           </div>
@@ -38209,7 +38362,7 @@ function Payroll({
       >
         <span
           style={{
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: 700,
             color: T.muted,
             textTransform: "uppercase",
@@ -38233,7 +38386,7 @@ function Payroll({
         {isPastMonth && (
           <span
             style={{
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: 700,
               background: T.goldSoft,
               color: T.goldText,
@@ -38387,7 +38540,7 @@ function Payroll({
           <div style={{ padding: "20px 22px", position: "relative" }}>
             <div
               style={{
-                fontSize: 10.5,
+                fontSize: 11.5,
                 fontWeight: 700,
                 textTransform: "uppercase",
                 letterSpacing: ".04em",
@@ -38510,7 +38663,7 @@ function Payroll({
                             style={{
                               fontWeight: 500,
                               color: T.ink,
-                              fontSize: 13,
+                              fontSize: 14,
                             }}
                           >
                             {e.name}
@@ -38518,7 +38671,7 @@ function Payroll({
                           {usesCustomRate && (
                             <span
                               style={{
-                                fontSize: 9.5,
+                                fontSize: 10.5,
                                 fontWeight: 700,
                                 color: T.goldText,
                                 background: T.goldSoft,
@@ -38533,7 +38686,7 @@ function Payroll({
                           {usesCustomLatePolicy && (
                             <span
                               style={{
-                                fontSize: 9.5,
+                                fontSize: 10.5,
                                 fontWeight: 700,
                                 color: T.goldText,
                                 background: T.goldSoft,
@@ -38548,7 +38701,7 @@ function Payroll({
                           {usesCustomUlPolicy && (
                             <span
                               style={{
-                                fontSize: 9.5,
+                                fontSize: 10.5,
                                 fontWeight: 700,
                                 color: T.goldText,
                                 background: T.goldSoft,
@@ -38562,22 +38715,22 @@ function Payroll({
                           )}
                         </div>
                         {absentDays > 0 && (
-                          <div style={{ fontSize: 10.5, color: T.rose }}>
+                          <div style={{ fontSize: 11.5, color: T.rose }}>
                             {t.att.absentDays} {absentDays}
                           </div>
                         )}
                         {unpaidLeaveDays > 0 && (
-                          <div style={{ fontSize: 10.5, color: T.rose }}>
+                          <div style={{ fontSize: 11.5, color: T.rose }}>
                             {t.pay.unpaidLeaveDed}: {unpaidLeaveDays}
                           </div>
                         )}
                         {excessLateDays > 0 && (
-                          <div style={{ fontSize: 10.5, color: T.rose }}>
+                          <div style={{ fontSize: 11.5, color: T.rose }}>
                             {t.pay.lateDed}: {excessLateDays}
                           </div>
                         )}
                         {otHours > 0 && (
-                          <div style={{ fontSize: 10.5, color: T.forestText }}>
+                          <div style={{ fontSize: 11.5, color: T.forestText }}>
                             {t.ot.totalOtHours}: {otHours} {t.ot.hoursShort}
                           </div>
                         )}
@@ -38614,7 +38767,7 @@ function Payroll({
                         background: "none",
                         border: "none",
                         cursor: "pointer",
-                        fontSize: 12,
+                        fontSize: 13,
                         fontWeight: 700,
                         color: T.blue,
                         marginRight: 12,
@@ -38629,7 +38782,7 @@ function Payroll({
                           background: "none",
                           border: "none",
                           cursor: "pointer",
-                          fontSize: 12,
+                          fontSize: 13,
                           fontWeight: 700,
                           color: T.forest,
                         }}
@@ -38805,7 +38958,7 @@ function MoreAppsPage({
       >
         <h2
           style={{
-            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
             fontSize: 19,
             fontWeight: 700,
             color: T.ink,
@@ -38959,7 +39112,7 @@ function MoreAppsPage({
                 </div>
                 <div
                   style={{
-                    fontSize: 10.5,
+                    fontSize: 11.5,
                     color: T.muted,
                     lineHeight: 1.3,
                     marginTop: 2,
@@ -38992,7 +39145,7 @@ function MoreAppsPage({
             border: `1px solid ${T.dangerBorder}`,
             background: "transparent",
             color: T.rose,
-            fontSize: 13.5,
+            fontSize: 14.5,
             fontWeight: 600,
             cursor: "pointer",
           }}
@@ -39666,7 +39819,7 @@ function ReportsCenter({
       <div style={{ marginBottom: 18 }}>
         <h1
           style={{
-            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
             fontWeight: 700,
             fontSize: 22,
             color: T.ink,
@@ -39675,7 +39828,7 @@ function ReportsCenter({
         >
           {t.reports.title}
         </h1>
-        <p style={{ color: T.textSoft, fontSize: 13, margin: "4px 0 0" }}>
+        <p style={{ color: T.textSoft, fontSize: 14, margin: "4px 0 0" }}>
           {t.reports.subtitle}
         </p>
       </div>
@@ -39752,17 +39905,17 @@ function ReportsCenter({
                 <c.icon size={17} color={c.accent} />
               </div>
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontWeight: 700, fontSize: 14, color: T.ink }}>
+                <div style={{ fontWeight: 700, fontSize: 14.5, color: T.ink }}>
                   {c.title}
                 </div>
-                <div style={{ fontSize: 11.5, color: T.muted, marginTop: 2 }}>
+                <div style={{ fontSize: 12.5, color: T.muted, marginTop: 2 }}>
                   {c.desc}
                 </div>
               </div>
             </div>
             <div
               style={{
-                fontSize: 11,
+                fontSize: 12,
                 color: T.muted,
                 fontFamily: "'JetBrains Mono',monospace",
                 marginBottom: 12,
@@ -39809,7 +39962,7 @@ function ReportsCenter({
               </Button>
             </div>
             {c.rows.length === 0 && !c.noRangeFilter && (
-              <div style={{ fontSize: 11.5, color: T.muted, marginTop: 8 }}>
+              <div style={{ fontSize: 12.5, color: T.muted, marginTop: 8 }}>
                 {t.reports.noData}
               </div>
             )}
@@ -39840,10 +39993,10 @@ function ReportsCenter({
               <Wallet size={17} color={T.forest} />
             </div>
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontWeight: 700, fontSize: 14, color: T.ink }}>
+              <div style={{ fontWeight: 700, fontSize: 14.5, color: T.ink }}>
                 {t.reports.payroll}
               </div>
-              <div style={{ fontSize: 11.5, color: T.muted, marginTop: 2 }}>
+              <div style={{ fontSize: 12.5, color: T.muted, marginTop: 2 }}>
                 {t.reports.payrollDesc}
               </div>
             </div>
@@ -39947,7 +40100,7 @@ function CalendarPage({
       <div style={{ marginBottom: 18 }}>
         <h1
           style={{
-            fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+            fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
             fontWeight: 700,
             fontSize: 22,
             color: T.ink,
@@ -39956,7 +40109,7 @@ function CalendarPage({
         >
           {t.calendar.title}
         </h1>
-        <p style={{ color: T.textSoft, fontSize: 13, margin: "4px 0 0" }}>
+        <p style={{ color: T.textSoft, fontSize: 14, margin: "4px 0 0" }}>
           {t.calendar.subtitle}
         </p>
       </div>
@@ -39989,7 +40142,7 @@ function CalendarPage({
               <ChevronLeft size={16} />
             </button>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontWeight: 700, fontSize: 15, color: T.ink }}>
+              <span style={{ fontWeight: 700, fontSize: 15.5, color: T.ink }}>
                 {monthTitle}
               </span>
               <Button
@@ -40103,7 +40256,7 @@ function CalendarPage({
                   display: "flex",
                   alignItems: "center",
                   gap: 6,
-                  fontSize: 11.5,
+                  fontSize: 12.5,
                   color: T.muted,
                 }}
               >
@@ -40126,7 +40279,7 @@ function CalendarPage({
           <div
             style={{
               fontWeight: 700,
-              fontSize: 14,
+              fontSize: 14.5,
               color: T.ink,
               marginBottom: 4,
             }}
@@ -40139,7 +40292,7 @@ function CalendarPage({
             })}
           </div>
           {!hasSelectedEvents ? (
-            <p style={{ fontSize: 12.5, color: T.muted, marginTop: 10 }}>
+            <p style={{ fontSize: 13.5, color: T.muted, marginTop: 10 }}>
               {t.calendar.noEvents}
             </p>
           ) : (
@@ -40158,7 +40311,7 @@ function CalendarPage({
                     display: "flex",
                     alignItems: "center",
                     gap: 8,
-                    fontSize: 13,
+                    fontSize: 14,
                     color: T.ink,
                   }}
                 >
@@ -40180,7 +40333,7 @@ function CalendarPage({
                     display: "flex",
                     alignItems: "flex-start",
                     gap: 8,
-                    fontSize: 13,
+                    fontSize: 14,
                     color: T.ink,
                   }}
                 >
@@ -40197,7 +40350,7 @@ function CalendarPage({
                   <div>
                     <div>{t.calendar.peopleOnLeave(selectedLeave.length)}</div>
                     <div
-                      style={{ color: T.muted, fontSize: 11.5, marginTop: 2 }}
+                      style={{ color: T.muted, fontSize: 12.5, marginTop: 2 }}
                     >
                       {selectedLeave
                         .map((r) => empName(r.employeeId))
@@ -40213,7 +40366,7 @@ function CalendarPage({
                     display: "flex",
                     alignItems: "center",
                     gap: 8,
-                    fontSize: 13,
+                    fontSize: 14,
                     color: T.ink,
                   }}
                 >
@@ -41825,12 +41978,12 @@ function AppInner() {
             color={T.muted}
             style={{ animation: "spin 1s linear infinite" }}
           />
-          <div style={{ fontSize: 15, fontWeight: 600, color: T.ink }}>
+          <div style={{ fontSize: 15.5, fontWeight: 600, color: T.ink }}>
             {lang === "km"
               ? "ការផ្ទុកកំពុងចំណាយពេលយូរជាងធម្មតា"
               : "This is taking longer than usual"}
           </div>
-          <div style={{ fontSize: 13, color: T.muted, maxWidth: 320 }}>
+          <div style={{ fontSize: 14, color: T.muted, maxWidth: 320 }}>
             {lang === "km"
               ? "សូមពិនិត្យមើលការតភ្ជាប់អ៊ីនធឺណិត រួចសាកល្បង Reload ម្តងទៀត"
               : "Check your internet connection, then try reloading."}
@@ -42224,8 +42377,8 @@ function AppInner() {
               <span
                 style={{
                   fontWeight: 600,
-                  fontSize: 15,
-                  fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                  fontSize: 15.5,
+                  fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
@@ -42344,7 +42497,7 @@ function AppInner() {
                 <div style={{ minWidth: 0, flex: 1 }}>
                   <div
                     style={{
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: 600,
                       color: T.ink,
                       overflow: "hidden",
@@ -42356,7 +42509,7 @@ function AppInner() {
                   </div>
                   <div
                     style={{
-                      fontSize: 10.5,
+                      fontSize: 11.5,
                       color: T.muted,
                       fontFamily: "'JetBrains Mono',monospace",
                     }}
@@ -42403,7 +42556,7 @@ function AppInner() {
                   border: `1px solid ${T.line}`,
                   background: T.card,
                   color: T.ink,
-                  fontSize: 13,
+                  fontSize: 14,
                   fontWeight: 500,
                   cursor: "pointer",
                 }}
@@ -42452,7 +42605,7 @@ function AppInner() {
               <div
                 style={{
                   fontFamily: "'JetBrains Mono',monospace",
-                  fontSize: 10.5,
+                  fontSize: 11.5,
                   fontWeight: 600,
                   letterSpacing: ".08em",
                   textTransform: "uppercase",
@@ -42467,7 +42620,7 @@ function AppInner() {
               </div>
               <h1
                 style={{
-                  fontFamily: "'Kantumruy Pro','Noto Sans Khmer',sans-serif",
+                  fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
                   fontWeight: 700,
                   color: T.ink,
                   fontSize: 16,
@@ -42499,7 +42652,7 @@ function AppInner() {
                 <span
                   className="wf-role-badge"
                   style={{
-                    fontSize: 11,
+                    fontSize: 12,
                     fontWeight: 700,
                     background: T.forestSoft,
                     color: T.forestText,
@@ -42518,7 +42671,7 @@ function AppInner() {
                 <span
                   className="wf-role-badge"
                   style={{
-                    fontSize: 11,
+                    fontSize: 12,
                     fontWeight: 700,
                     background: "rgba(91,141,239,0.14)",
                     color: T.blue,
@@ -42588,7 +42741,7 @@ function AppInner() {
                     gap: 8,
                     background: T.goldSoft,
                     color: T.goldText,
-                    fontSize: 13,
+                    fontSize: 14,
                     padding: "10px 16px",
                     borderRadius: 10,
                   }}
