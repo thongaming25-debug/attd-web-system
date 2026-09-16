@@ -101,6 +101,10 @@ import {
   XCircle,
   Droplets,
   BedDouble,
+  ZoomIn,
+  ZoomOut,
+  RotateCw,
+  Maximize2,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -7747,9 +7751,9 @@ function useLocalStorage(key, fallback) {
 /* ---------------------------------------------------------------
    Small UI atoms
 ----------------------------------------------------------------*/
-function Avatar({ name, size = 40, photo }) {
+function Avatar({ name, size = 40, photo, onClick }) {
   if (photo) {
-    return (
+    const img = (
       <img
         src={photo}
         alt={name || "avatar"}
@@ -7761,6 +7765,32 @@ function Avatar({ name, size = 40, photo }) {
           flexShrink: 0,
         }}
       />
+    );
+    // onClick is optional — every existing call site that doesn't pass it
+    // renders exactly as before (a plain <img>). Only when a handler is
+    // given (see EmployeeProfile360's photo viewer) does the avatar become
+    // an actual button with a zoom-in cursor, so this stays a no-op change
+    // everywhere else the component is already used.
+    if (!onClick) return img;
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        title={name ? `${name} — view photo` : "View photo"}
+        style={{
+          width: size,
+          height: size,
+          flexShrink: 0,
+          padding: 0,
+          border: "none",
+          background: "none",
+          cursor: "zoom-in",
+          borderRadius: "50%",
+          lineHeight: 0,
+        }}
+      >
+        {img}
+      </button>
     );
   }
   return (
@@ -8432,6 +8462,239 @@ function Modal({ title, onClose, children, width = 480 }) {
           </button>
         </div>
         <div style={{ padding: 20 }}>{children}</div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+// Full-screen "View Photo" lightbox — pinch/scroll/button zoom, drag-to-pan
+// once zoomed, rotate, reset, download, Esc/backdrop-click to close. Used
+// wherever a single photo (e.g. the Profile 360° avatar) should open into a
+// proper viewer instead of just sitting there at its thumbnail size.
+function PhotoViewerModal({ src, alt, onClose }) {
+  const [scale, setScale] = useState(1);
+  const [rotation, setRotation] = useState(0);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+  const dragRef = useRef(null);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const clampScale = (s) => Math.min(4, Math.max(0.5, +s.toFixed(2)));
+  const zoomIn = () => setScale((s) => clampScale(s + 0.25));
+  const zoomOut = () =>
+    setScale((s) => {
+      const next = clampScale(s - 0.25);
+      if (next <= 1) setPos({ x: 0, y: 0 });
+      return next;
+    });
+  const reset = () => {
+    setScale(1);
+    setRotation(0);
+    setPos({ x: 0, y: 0 });
+  };
+  const rotate = () => setRotation((r) => (r + 90) % 360);
+
+  const onWheel = (e) => {
+    e.preventDefault();
+    setScale((s) => {
+      const next = clampScale(s - e.deltaY * 0.0015);
+      if (next <= 1) setPos({ x: 0, y: 0 });
+      return next;
+    });
+  };
+  const onPointerDown = (e) => {
+    if (scale <= 1) return;
+    dragRef.current = { startX: e.clientX - pos.x, startY: e.clientY - pos.y };
+    setDragging(true);
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+  const onPointerMove = (e) => {
+    if (!dragRef.current) return;
+    setPos({
+      x: e.clientX - dragRef.current.startX,
+      y: e.clientY - dragRef.current.startY,
+    });
+  };
+  const endDrag = () => {
+    dragRef.current = null;
+    setDragging(false);
+  };
+
+  const toolBtn = {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    border: "1px solid rgba(255,255,255,0.16)",
+    background: "rgba(255,255,255,0.08)",
+    color: "#fff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    textDecoration: "none",
+  };
+
+  return createPortal(
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 300,
+        background: "rgba(3,5,10,0.92)",
+        display: "flex",
+        flexDirection: "column",
+        animation: "wf-fade .15s ease",
+      }}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-end",
+          padding: "14px 18px",
+          flexShrink: 0,
+        }}
+      >
+        <button
+          onClick={onClose}
+          style={toolBtn}
+          title="Close"
+          aria-label="Close"
+        >
+          <X size={18} />
+        </button>
+      </div>
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden",
+          cursor: scale > 1 ? (dragging ? "grabbing" : "grab") : "default",
+          touchAction: "none",
+        }}
+        onWheel={onWheel}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDrag}
+        onPointerLeave={endDrag}
+      >
+        <img
+          src={src}
+          alt={alt || "photo"}
+          draggable={false}
+          style={{
+            maxWidth: "88vw",
+            maxHeight: "76vh",
+            userSelect: "none",
+            borderRadius: 8,
+            boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+            transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale}) rotate(${rotation}deg)`,
+            transition: dragging ? "none" : "transform .15s ease",
+          }}
+        />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          padding: "0 18px",
+          paddingBottom: "max(20px, env(safe-area-inset-bottom))",
+          flexShrink: 0,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            background: "rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.16)",
+            borderRadius: 14,
+            padding: 6,
+            backdropFilter: "blur(6px)",
+          }}
+        >
+          <button
+            onClick={zoomOut}
+            style={toolBtn}
+            title="Zoom out"
+            aria-label="Zoom out"
+          >
+            <ZoomOut size={17} />
+          </button>
+          <div
+            style={{
+              minWidth: 46,
+              textAlign: "center",
+              fontSize: 12.5,
+              fontWeight: 600,
+              color: "#fff",
+              fontFamily: "'JetBrains Mono',monospace",
+            }}
+          >
+            {Math.round(scale * 100)}%
+          </div>
+          <button
+            onClick={zoomIn}
+            style={toolBtn}
+            title="Zoom in"
+            aria-label="Zoom in"
+          >
+            <ZoomIn size={17} />
+          </button>
+          <div
+            style={{
+              width: 1,
+              height: 22,
+              background: "rgba(255,255,255,0.16)",
+              margin: "0 2px",
+            }}
+          />
+          <button
+            onClick={rotate}
+            style={toolBtn}
+            title="Rotate"
+            aria-label="Rotate"
+          >
+            <RotateCw size={16} />
+          </button>
+          <button
+            onClick={reset}
+            style={toolBtn}
+            title="Reset"
+            aria-label="Reset"
+          >
+            <Maximize2 size={15} />
+          </button>
+          <a
+            href={src}
+            download
+            style={toolBtn}
+            title="Download"
+            aria-label="Download"
+          >
+            <Download size={16} />
+          </a>
+        </div>
       </div>
     </div>,
     document.body,
@@ -16075,6 +16338,7 @@ function EmployeeProfile360({
   const { t, lang } = useLang();
   const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState("overview");
+  const [showPhotoViewer, setShowPhotoViewer] = useState(false);
 
   const employee = useMemo(
     () => employees.find((e) => e.id === employeeId),
@@ -16282,7 +16546,14 @@ function EmployeeProfile360({
             flexWrap: "wrap",
           }}
         >
-          <Avatar name={employee.name} photo={employee.photo} size={68} />
+          <Avatar
+            name={employee.name}
+            photo={employee.photo}
+            size={68}
+            onClick={
+              employee.photo ? () => setShowPhotoViewer(true) : undefined
+            }
+          />
           <div style={{ flex: 1, minWidth: 220 }}>
             <div
               style={{
@@ -16974,6 +17245,13 @@ function EmployeeProfile360({
             </div>
           )}
         </Card>
+      )}
+      {showPhotoViewer && employee.photo && (
+        <PhotoViewerModal
+          src={employee.photo}
+          alt={employee.name}
+          onClose={() => setShowPhotoViewer(false)}
+        />
       )}
     </div>
   );
