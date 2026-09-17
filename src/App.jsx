@@ -1237,6 +1237,8 @@ const LANG_RAW = {
       bannerBody:
         "អ្នកអាចចូលមើលព័ត៌មានធម្មតា ប៉ុន្តែមិនអាច Check-in/Check-out ឬស្នើសុំអ្វីមួយបានទេ លុះត្រាតែ admin អនុញ្ញាតឧបករណ៍នេះសិន",
       rejectedBanner: "ឧបករណ៍នេះត្រូវបានបដិសេធ សូមទាក់ទង admin របស់អ្នក",
+      requestAgain: "ស្នើសុំម្តងទៀត",
+      requestAgainSent: "បានផ្ញើសំណើទៅ admin រួចហើយ",
     },
     adj: {
       pageTitle: "ប្រាក់ខ្ចី & ប្រាក់រង្វាន់",
@@ -2726,6 +2728,8 @@ const LANG_RAW = {
       bannerBody:
         "You can browse normally, but you can't check in/out or submit any request until an admin approves this device.",
       rejectedBanner: "This device was rejected — please contact your admin.",
+      requestAgain: "Request again",
+      requestAgainSent: "Request sent to admin",
     },
     adj: {
       pageTitle: "Advances & Bonuses",
@@ -3547,6 +3551,7 @@ const useBranding = () => useCtx(BrandingContext);
 // AttendanceCorrections, ShiftSwapRequests).
 const DeviceApprovalContext = createContext({
   status: "approved", // "approved" | "pending" | "rejected" (admin/kiosk sessions never set this, so it defaults to "approved" = unrestricted)
+  requestAgain: () => {}, // employee-side action: turns a "rejected" device back to "pending" so it reappears on the admin's Device Approvals page
 });
 const useDeviceApproval = () => useCtx(DeviceApprovalContext);
 
@@ -20116,7 +20121,8 @@ function QrScanModal({ offices, mode, soundPreset, onMatch, onClose }) {
 // page unconditionally.
 function DeviceApprovalBanner({ style }) {
   const { t } = useLang();
-  const { status } = useDeviceApproval();
+  const { status, requestAgain } = useDeviceApproval();
+  const [justSent, setJustSent] = useState(false);
   if (status !== "pending" && status !== "rejected") return null;
   const rejected = status === "rejected";
   return (
@@ -20141,13 +20147,40 @@ function DeviceApprovalBanner({ style }) {
           color: rejected ? T.rose : T.gold,
         }}
       />
-      <div style={{ fontSize: 12.5, color: T.textSoft, lineHeight: 1.5 }}>
+      <div
+        style={{ fontSize: 12.5, color: T.textSoft, lineHeight: 1.5, flex: 1 }}
+      >
         <div style={{ fontWeight: 700, color: T.ink, marginBottom: 2 }}>
           {rejected
             ? t.devApproval?.rejectedBanner
             : t.devApproval?.bannerTitle}
         </div>
         {!rejected && t.devApproval?.bannerBody}
+        {rejected && (
+          <button
+            type="button"
+            disabled={justSent}
+            onClick={() => {
+              requestAgain();
+              setJustSent(true);
+            }}
+            style={{
+              marginTop: 8,
+              padding: "6px 12px",
+              borderRadius: 8,
+              border: `1px solid ${T.rose}`,
+              background: justSent ? "transparent" : T.rose,
+              color: justSent ? T.rose : "#fff",
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: justSent ? "default" : "pointer",
+            }}
+          >
+            {justSent
+              ? t.devApproval?.requestAgainSent
+              : t.devApproval?.requestAgain}
+          </button>
+        )}
       </div>
     </div>
   );
@@ -41993,6 +42026,28 @@ function AppInner() {
         }
         if (
           type === "update" &&
+          old?.status === "rejected" &&
+          row.status === "pending"
+        ) {
+          // Employee tapped "Request again" from a rejected device (see
+          // requestAgain below) — notify admin exactly like a brand-new
+          // pending request does.
+          const emp = employees.find((e) => e.id === row.employeeId);
+          const deviceLabel = [row.deviceType, row.os, row.browser]
+            .filter(Boolean)
+            .join(" · ");
+          return {
+            userType: "admin",
+            title: "សំណើអនុញ្ញាតឧបករណ៍ថ្មី",
+            body: `${emp?.name || "?"} (${emp?.code || row.employeeId}) កំពុងស្នើសុំឧបករណ៍នេះម្តងទៀត${deviceLabel ? `\n${deviceLabel}` : ""}`,
+            page: "device",
+            portal: "admin",
+            tag: `device-approval-${row.id}`,
+            entityId: row.id,
+          };
+        }
+        if (
+          type === "update" &&
           old?.status !== row.status &&
           (row.status === "approved" || row.status === "rejected")
         ) {
@@ -42228,9 +42283,35 @@ function AppInner() {
     );
     return mine?.status || "approved";
   }, [role, currentEmp, deviceApprovals]);
+  // Lets an employee whose device was rejected ask again, instead of
+  // being stuck forever if the admin rejected it by mistake — flips
+  // that row back to "pending" (clearing the old decision) so it
+  // reappears on the admin's Device Approvals page and re-notifies
+  // them (see the device_approvals notify callback above).
+  const requestAgain = useCallback(() => {
+    if (role === "admin" || !currentEmp) return;
+    const deviceId = getOrCreateDeviceId();
+    const row = deviceApprovals.find(
+      (d) => d.employeeId === currentEmp.id && d.deviceId === deviceId,
+    );
+    if (!row || row.status !== "rejected") return;
+    setDeviceApprovals(
+      deviceApprovals.map((d) =>
+        d.id === row.id
+          ? {
+              ...d,
+              status: "pending",
+              decidedAt: null,
+              decidedById: null,
+              decidedByName: "",
+            }
+          : d,
+      ),
+    );
+  }, [role, currentEmp, deviceApprovals, setDeviceApprovals]);
   const deviceApprovalCtxValue = useMemo(
-    () => ({ status: deviceApprovalStatus }),
-    [deviceApprovalStatus],
+    () => ({ status: deviceApprovalStatus, requestAgain }),
+    [deviceApprovalStatus, requestAgain],
   );
   // Same merge feeds the side nav so the "Messages" item itself
   // disappears for an employee whose override is on, not just the page
