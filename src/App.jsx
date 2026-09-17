@@ -74,6 +74,7 @@ import {
   History,
   RefreshCw,
   Smartphone,
+  ShieldAlert,
   Tablet,
   Monitor,
   BarChart3,
@@ -187,6 +188,7 @@ const LANG_RAW = {
       settings: "ការកំណត់",
       audits: "កំណត់ត្រាសកម្មភាព",
       loginActivity: "សកម្មភាពចូលគណនី",
+      deviceApprovals: "ការអនុញ្ញាតឧបករណ៍ថ្មី",
       analytics: "វិភាគទិន្នន័យ",
       rolePerms: "សិទ្ធិតួនាទី",
       reports: "មជ្ឈមណ្ឌលរបាយការណ៍",
@@ -1216,6 +1218,26 @@ const LANG_RAW = {
       noRequest: "មិនទាន់មានសំណើកែតម្រូវវត្តមានទេ",
       needOneField: "សូមបញ្ចូលម៉ោងចូល ឬម៉ោងចេញ យ៉ាងហោចណាស់មួយ",
     },
+    devApproval: {
+      pageTitle: "ការអនុញ្ញាតឧបករណ៍ថ្មី",
+      pageDesc:
+        "នៅពេលបុគ្គលិកចូល login ពីឧបករណ៍ថ្មីមួយ (ក្រៅពីឧបករណ៍ដំបូងគេ) សំណើនឹងបង្ហាញនៅទីនេះឱ្យអ្នកអនុញ្ញាតឬបដិសេធ",
+      pending: "កំពុងរង់ចាំ",
+      approved: "បានអនុញ្ញាត",
+      rejected: "បានបដិសេធ",
+      employee: "បុគ្គលិក",
+      device: "ឧបករណ៍",
+      requestedAt: "ស្នើសុំនៅ",
+      status: "ស្ថានភាព",
+      approve: "អនុញ្ញាត",
+      reject: "បដិសេធ",
+      noRequest: "មិនទាន់មានសំណើអនុញ្ញាតឧបករណ៍ទេ",
+      decidedBy: "សម្រេចដោយ",
+      bannerTitle: "កំពុងរង់ចាំ admin អនុញ្ញាតឧបករណ៍នេះ",
+      bannerBody:
+        "អ្នកអាចចូលមើលព័ត៌មានធម្មតា ប៉ុន្តែមិនអាច Check-in/Check-out ឬស្នើសុំអ្វីមួយបានទេ លុះត្រាតែ admin អនុញ្ញាតឧបករណ៍នេះសិន",
+      rejectedBanner: "ឧបករណ៍នេះត្រូវបានបដិសេធ សូមទាក់ទង admin របស់អ្នក",
+    },
     adj: {
       pageTitle: "ប្រាក់ខ្ចី & ប្រាក់រង្វាន់",
       addBtn: "ស្នើសុំប្រាក់ខ្ចី/រង្វាន់",
@@ -1486,6 +1508,7 @@ const LANG_RAW = {
       telegramCatPayroll: "ប្រាក់ខែបានបើកចប់",
       telegramCatLate: "បុគ្គលិកមកយឺត",
       telegramCatChat: "សារជជែក (Chat)",
+      telegramCatDevice: "សំណើអនុញ្ញាតឧបករណ៍ថ្មី",
       telegramTestBtn: "ផ្ញើសារសាកល្បង",
       telegramTestSending: "កំពុងផ្ញើ...",
       telegramTestSuccess:
@@ -1649,6 +1672,7 @@ const LANG_RAW = {
       settings: "Settings",
       audits: "Audit Log",
       loginActivity: "Login Activity",
+      deviceApprovals: "Device Approvals",
       analytics: "Analytics",
       rolePerms: "Roles & Permissions",
       reports: "Reports Center",
@@ -2683,6 +2707,26 @@ const LANG_RAW = {
       noRequest: "No correction requests yet",
       needOneField: "Please enter at least a check-in or check-out time",
     },
+    devApproval: {
+      pageTitle: "Device Approvals",
+      pageDesc:
+        "When an employee logs in from a new device (other than their first one), the request shows up here for you to approve or reject.",
+      pending: "Pending",
+      approved: "Approved",
+      rejected: "Rejected",
+      employee: "Employee",
+      device: "Device",
+      requestedAt: "Requested",
+      status: "Status",
+      approve: "Approve",
+      reject: "Reject",
+      noRequest: "No device approval requests yet",
+      decidedBy: "Decided by",
+      bannerTitle: "Waiting for admin to approve this device",
+      bannerBody:
+        "You can browse normally, but you can't check in/out or submit any request until an admin approves this device.",
+      rejectedBanner: "This device was rejected — please contact your admin.",
+    },
     adj: {
       pageTitle: "Advances & Bonuses",
       addBtn: "Request Advance/Bonus",
@@ -2955,6 +2999,7 @@ const LANG_RAW = {
       telegramCatPayroll: "Payroll completed",
       telegramCatLate: "Employee checked in late",
       telegramCatChat: "Chat messages",
+      telegramCatDevice: "Device approval requests",
       telegramTestBtn: "Send test message",
       telegramTestSending: "Sending...",
       telegramTestSuccess: "Test message sent! Check your Telegram group",
@@ -3105,6 +3150,7 @@ const LANG_RAW = {
       settings: "设置",
       audits: "操作日志",
       loginActivity: "登录记录",
+      deviceApprovals: "设备批准",
       analytics: "数据分析",
       rolePerms: "角色权限",
       reports: "报表中心",
@@ -3490,6 +3536,19 @@ const BrandingContext = createContext({
   setBranding: () => {},
 });
 const useBranding = () => useCtx(BrandingContext);
+
+// Per-employee-device gating: an employee's very first device auto-
+// approves on login; logging in from a different device afterward
+// creates a "pending" row (see device_approvals table) until an admin
+// approves or rejects it from the Device Approvals page. While pending
+// (or rejected), the employee can still browse the portal normally but
+// can't punch in/out or submit new requests — see useDeviceApproval()
+// call sites (SelfPunch, LeaveRequests, OvertimeRequests,
+// AttendanceCorrections, ShiftSwapRequests).
+const DeviceApprovalContext = createContext({
+  status: "approved", // "approved" | "pending" | "rejected" (admin/kiosk sessions never set this, so it defaults to "approved" = unrestricted)
+});
+const useDeviceApproval = () => useCtx(DeviceApprovalContext);
 
 function getInitials(name) {
   const parts = (name || "").trim().split(/\s+/).filter(Boolean);
@@ -6277,6 +6336,25 @@ function getDeviceInfo() {
 
   return { deviceType, os, browser, userAgent: ua };
 }
+// A persistent per-browser id used to tell one employee device apart
+// from another across logins — unlike newSessionId() (fresh every
+// login, used for remote sign-out), this survives logout/login on the
+// same browser. A different browser, a different device, or a cleared
+// localStorage all look like a brand-new device to the device-approval
+// flow below.
+function getOrCreateDeviceId() {
+  const key = "hrsuite:deviceId";
+  try {
+    let id = window.localStorage.getItem(key);
+    if (!id) {
+      id = newSessionId();
+      window.localStorage.setItem(key, id);
+    }
+    return id;
+  } catch {
+    return newSessionId();
+  }
+}
 // Best-effort Android device model (e.g. "SM-A536E") via the User-Agent
 // Client Hints API. Chromium-based browsers on Android only (Chrome,
 // Edge, Samsung Internet) — not Firefox, and not available on iOS at
@@ -7513,6 +7591,7 @@ const DEFAULT_TELEGRAM_SETTINGS = {
   notifyPayroll: true,
   notifyLate: true,
   notifyChat: true,
+  notifyDevice: true,
 };
 function useTelegramSettings() {
   const [value, setValueState] = useState(DEFAULT_TELEGRAM_SETTINGS);
@@ -7546,6 +7625,7 @@ function useTelegramSettings() {
           notifyPayroll: data.notify_payroll ?? true,
           notifyLate: data.notify_late ?? true,
           notifyChat: data.notify_chat ?? true,
+          notifyDevice: data.notify_device ?? true,
         });
       } else {
         setValueState(DEFAULT_TELEGRAM_SETTINGS);
@@ -7573,6 +7653,7 @@ function useTelegramSettings() {
           notify_payroll: !!next.notifyPayroll,
           notify_late: !!next.notifyLate,
           notify_chat: !!next.notifyChat,
+          notify_device: !!next.notifyDevice,
         });
         if (error) {
           console.error(
@@ -20028,6 +20109,50 @@ function QrScanModal({ offices, mode, soundPreset, onMatch, onClose }) {
   );
 }
 
+// Shared banner shown on every employee page that requires an approved
+// device (punch clock, the four request forms) — see
+// DeviceApprovalContext above. Renders nothing once the device is
+// approved, so it's safe to drop at the top of any employee-facing
+// page unconditionally.
+function DeviceApprovalBanner({ style }) {
+  const { t } = useLang();
+  const { status } = useDeviceApproval();
+  if (status !== "pending" && status !== "rejected") return null;
+  const rejected = status === "rejected";
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 8,
+        padding: "10px 12px",
+        borderRadius: 10,
+        marginBottom: 14,
+        background: rejected ? T.roseSoft : T.goldSoft,
+        border: `1px solid ${rejected ? T.rose : T.gold}`,
+        ...style,
+      }}
+    >
+      <ShieldAlert
+        size={16}
+        style={{
+          flexShrink: 0,
+          marginTop: 1,
+          color: rejected ? T.rose : T.gold,
+        }}
+      />
+      <div style={{ fontSize: 12.5, color: T.textSoft, lineHeight: 1.5 }}>
+        <div style={{ fontWeight: 700, color: T.ink, marginBottom: 2 }}>
+          {rejected
+            ? t.devApproval?.rejectedBanner
+            : t.devApproval?.bannerTitle}
+        </div>
+        {!rejected && t.devApproval?.bannerBody}
+      </div>
+    </div>
+  );
+}
+
 function SelfPunch({
   emp,
   shift,
@@ -20039,6 +20164,9 @@ function SelfPunch({
   companyGraceMinutes = 0,
 }) {
   const { t, lang } = useLang();
+  const { status: deviceStatus } = useDeviceApproval();
+  const deviceApproved =
+    deviceStatus !== "pending" && deviceStatus !== "rejected";
   const today = todayStr();
   const rec = attendance.find(
     (a) => a.employeeId === emp.id && a.date === today,
@@ -20214,6 +20342,7 @@ function SelfPunch({
           {lang === "en" ? "Check In / Check Out" : "ចូល / ចេញ"}
         </h3>
       )}
+      <DeviceApprovalBanner />
       {!compact && (
         <div
           style={{
@@ -20575,7 +20704,7 @@ function SelfPunch({
           <Button
             variant="accent"
             onClick={() => punchIn()}
-            disabled={locBusy}
+            disabled={locBusy || !deviceApproved}
             style={{
               justifyContent: "center",
               padding: "13px 22px",
@@ -20605,7 +20734,7 @@ function SelfPunch({
               <Button
                 variant="ghost"
                 onClick={() => setScanOpen(true)}
-                disabled={locBusy}
+                disabled={locBusy || !deviceApproved}
                 style={{
                   justifyContent: "center",
                   padding: compact ? "13px 16px" : "13px 22px",
@@ -20636,7 +20765,7 @@ function SelfPunch({
           <Button
             variant="danger-solid"
             onClick={() => punchOut()}
-            disabled={locBusy}
+            disabled={locBusy || !deviceApproved}
             style={{
               justifyContent: "center",
               padding: "13px 22px",
@@ -20666,7 +20795,7 @@ function SelfPunch({
               <Button
                 variant="ghost"
                 onClick={() => setScanOpen(true)}
-                disabled={locBusy}
+                disabled={locBusy || !deviceApproved}
                 style={{
                   justifyContent: "center",
                   padding: compact ? "13px 16px" : "13px 22px",
@@ -23457,6 +23586,9 @@ function LeaveRequests({
   setLeavePolicy,
 }) {
   const { t, lang } = useLang();
+  const { status: deviceStatus } = useDeviceApproval();
+  const deviceApproved =
+    deviceStatus !== "pending" && deviceStatus !== "rejected";
   const [modal, setModal] = useState(false);
   const [rejectFor, setRejectFor] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
@@ -23676,6 +23808,7 @@ function LeaveRequests({
     ];
     return (
       <div>
+        <DeviceApprovalBanner />
         <div className="wf-grid-2" style={{ marginBottom: 16 }}>
           <Card
             accent={bal.remaining <= 0 ? T.rose : T.forest}
@@ -23857,6 +23990,7 @@ function LeaveRequests({
           <Button
             variant="accent"
             onClick={() => setModal(true)}
+            disabled={!deviceApproved}
             style={{ marginLeft: "auto" }}
           >
             <Plus size={15} /> {t.lv.addBtn}
@@ -25627,6 +25761,9 @@ function OvertimeRequests({
   holidays,
 }) {
   const { t, lang } = useLang();
+  const { status: deviceStatus } = useDeviceApproval();
+  const deviceApproved =
+    deviceStatus !== "pending" && deviceStatus !== "rejected";
   const [modal, setModal] = useState(false);
   const [rejectFor, setRejectFor] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
@@ -25777,6 +25914,7 @@ function OvertimeRequests({
 
     return (
       <div>
+        <DeviceApprovalBanner />
         <div
           style={{
             display: "grid",
@@ -25905,6 +26043,7 @@ function OvertimeRequests({
           <Button
             variant="accent"
             onClick={() => setModal(true)}
+            disabled={!deviceApproved}
             style={{ marginLeft: "auto" }}
           >
             <Plus size={15} /> {t.ot.addBtn}
@@ -26645,6 +26784,9 @@ function AttendanceCorrections({
   canApprove,
 }) {
   const { t } = useLang();
+  const { status: deviceStatus } = useDeviceApproval();
+  const deviceApproved =
+    deviceStatus !== "pending" && deviceStatus !== "rejected";
   const [modal, setModal] = useState(false);
   const [rejectFor, setRejectFor] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
@@ -26739,6 +26881,7 @@ function AttendanceCorrections({
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     return (
       <div>
+        <DeviceApprovalBanner />
         <div
           style={{
             display: "flex",
@@ -26746,7 +26889,11 @@ function AttendanceCorrections({
             marginBottom: 16,
           }}
         >
-          <Button variant="accent" onClick={() => setModal(true)}>
+          <Button
+            variant="accent"
+            onClick={() => setModal(true)}
+            disabled={!deviceApproved}
+          >
             <Plus size={15} /> {t.ac.addBtn}
           </Button>
         </div>
@@ -27159,6 +27306,9 @@ function ShiftSwapRequests({
   canApprove,
 }) {
   const { t } = useLang();
+  const { status: deviceStatus } = useDeviceApproval();
+  const deviceApproved =
+    deviceStatus !== "pending" && deviceStatus !== "rejected";
   const [modal, setModal] = useState(false);
   const [rejectFor, setRejectFor] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
@@ -27254,6 +27404,7 @@ function ShiftSwapRequests({
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     return (
       <div>
+        <DeviceApprovalBanner />
         <div
           style={{
             display: "flex",
@@ -27261,7 +27412,11 @@ function ShiftSwapRequests({
             marginBottom: 16,
           }}
         >
-          <Button variant="accent" onClick={() => setModal(true)}>
+          <Button
+            variant="accent"
+            onClick={() => setModal(true)}
+            disabled={!deviceApproved}
+          >
             <Plus size={15} /> {t.ss.addBtn}
           </Button>
         </div>
@@ -33580,6 +33735,7 @@ function TelegramSettingsCard() {
     { key: "notifyPayroll", label: t.settings.telegramCatPayroll },
     { key: "notifyLate", label: t.settings.telegramCatLate },
     { key: "notifyChat", label: t.settings.telegramCatChat },
+    { key: "notifyDevice", label: t.settings.telegramCatDevice },
   ];
 
   return (
@@ -34842,6 +34998,179 @@ function androidModelName(code) {
       return ANDROID_MODEL_MAP[prefix];
   }
   return null;
+}
+
+// Admin-facing list of device-approval requests (see
+// DeviceApprovalContext/getOrCreateDeviceId above) — an employee's very
+// first device is auto-approved at login, so only devices #2+ ever show
+// up here needing a decision.
+function DeviceApprovalsPage({
+  currentAdmin,
+  employees,
+  deviceApprovals,
+  setDeviceApprovals,
+  canApprove,
+}) {
+  const { t } = useLang();
+  const empOf = (id) => employees.find((e) => e.id === id);
+
+  const decide = (row, status) => {
+    setDeviceApprovals(
+      deviceApprovals.map((d) =>
+        d.id === row.id
+          ? {
+              ...d,
+              status,
+              decidedAt: new Date().toISOString(),
+              decidedById: currentAdmin?.id || null,
+              decidedByName: currentAdmin?.name || "",
+            }
+          : d,
+      ),
+      {
+        toastMessage:
+          status === "approved" ? t.settings.approved : t.settings.rejected,
+      },
+    );
+  };
+
+  const sorted = [...deviceApprovals].sort((a, b) => {
+    if (a.status === "pending" && b.status !== "pending") return -1;
+    if (a.status !== "pending" && b.status === "pending") return 1;
+    return (b.createdAt || "").localeCompare(a.createdAt || "");
+  });
+
+  return (
+    <div>
+      <Card style={{ padding: "14px 18px", marginBottom: 16 }}>
+        <div style={{ fontSize: 13.5, color: T.textSoft, lineHeight: 1.5 }}>
+          {t.devApproval.pageDesc}
+        </div>
+      </Card>
+      <Card style={{ overflowX: "auto" }}>
+        <table className="wf-table">
+          <thead>
+            <tr>
+              <th>{t.devApproval.employee}</th>
+              <th>{t.devApproval.device}</th>
+              <th>{t.devApproval.requestedAt}</th>
+              <th>{t.devApproval.status}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.length === 0 && (
+              <tr>
+                <td
+                  colSpan={5}
+                  style={{
+                    textAlign: "center",
+                    color: T.muted,
+                    padding: "24px 0",
+                  }}
+                >
+                  {t.devApproval.noRequest}
+                </td>
+              </tr>
+            )}
+            {sorted.map((r) => {
+              const emp = empOf(r.employeeId);
+              const deviceLabel =
+                [r.deviceType, r.os, r.browser].filter(Boolean).join(" · ") ||
+                "—";
+              return (
+                <tr key={r.id}>
+                  <td>
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 10 }}
+                    >
+                      <Avatar
+                        name={emp?.name || "?"}
+                        photo={emp?.photo}
+                        size={30}
+                      />
+                      <div>
+                        <div
+                          style={{
+                            fontWeight: 500,
+                            color: T.ink,
+                            fontSize: 14,
+                          }}
+                        >
+                          {emp?.name || "—"}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 11.5,
+                            color: T.muted,
+                            fontFamily: "'JetBrains Mono',monospace",
+                          }}
+                        >
+                          {emp?.code}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ fontSize: 13.5, color: T.textSoft }}>
+                    {deviceLabel}
+                  </td>
+                  <td
+                    style={{
+                      fontFamily: "'JetBrains Mono',monospace",
+                      fontSize: 13,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {r.createdAt ? new Date(r.createdAt).toLocaleString() : "—"}
+                  </td>
+                  <td>
+                    <StatusPill status={r.status} />
+                    {r.status !== "pending" && r.decidedByName && (
+                      <div
+                        style={{
+                          fontSize: 11,
+                          color: T.mutedLight,
+                          marginTop: 2,
+                        }}
+                      >
+                        {t.devApproval.decidedBy}: {r.decidedByName}
+                      </div>
+                    )}
+                  </td>
+                  <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                    {r.status === "pending" && canApprove && (
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 6,
+                          justifyContent: "flex-end",
+                        }}
+                      >
+                        <Button
+                          size="sm"
+                          variant="accent"
+                          onClick={() => decide(r, "approved")}
+                        >
+                          <ThumbsUp size={13} /> {t.devApproval.approve}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="danger-solid"
+                          onClick={() => decide(r, "rejected")}
+                        >
+                          <ThumbsDown size={13} /> {t.devApproval.reject}
+                        </Button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </Card>
+    </div>
+  );
 }
 function LoginActivityPage({
   role,
@@ -39257,6 +39586,12 @@ function buildNavAdmin(n) {
       permission: "viewAuditLog",
     },
     { id: "loginActivity", label: n.loginActivity, icon: Smartphone },
+    {
+      id: "deviceApprovals",
+      label: n.deviceApprovals,
+      icon: ShieldAlert,
+      permission: "approveRequests",
+    },
     { id: "settings", label: n.settings, icon: Settings2 },
   ]);
 }
@@ -39303,6 +39638,7 @@ const NAV_GROUP_MAP = {
   rolePerms: "system",
   audits: "system",
   loginActivity: "system",
+  deviceApprovals: "system",
   settings: "system",
   profile: "system",
 };
@@ -41598,6 +41934,86 @@ function AppInner() {
       audit: true,
       actorRef,
     });
+  // Device-approval requests — see getOrCreateDeviceId()/DeviceApprovalContext
+  // above. A row here is created once per (employee, browser) pair: the
+  // employee's very first device is inserted already "approved" (handled
+  // at login, not here), and every device after that starts "pending"
+  // until an admin decides it on the Device Approvals page.
+  const [deviceApprovals, setDeviceApprovals, devApprovalsReady] =
+    useSupabaseArray("device_approvals", {
+      fromDb: (r) => ({
+        id: r.id,
+        employeeId: r.employee_id,
+        deviceId: r.device_id,
+        deviceType: r.device_type,
+        os: r.os,
+        browser: r.browser,
+        status: r.status,
+        createdAt: r.created_at,
+        decidedAt: r.decided_at,
+        decidedById: r.decided_by_id,
+        decidedByName: r.decided_by_name,
+      }),
+      toDb: (r) => ({
+        id: r.id,
+        employee_id: r.employeeId,
+        device_id: r.deviceId,
+        device_type: r.deviceType || null,
+        os: r.os || null,
+        browser: r.browser || null,
+        status: r.status,
+        created_at: r.createdAt,
+        decided_at: r.decidedAt || null,
+        decided_by_id: r.decidedById || null,
+        decided_by_name: r.decidedByName || null,
+      }),
+      audit: true,
+      actorRef,
+      entityLabel: (r) => `device · ${r.employeeId || "?"}`,
+      notify: ({ type, row, old }) => {
+        if (type === "create" && row.status === "pending") {
+          const emp = employees.find((e) => e.id === row.employeeId);
+          const deviceLabel = [row.deviceType, row.os, row.browser]
+            .filter(Boolean)
+            .join(" · ");
+          return {
+            userType: "admin",
+            title: "សំណើអនុញ្ញាតឧបករណ៍ថ្មី",
+            body: `${emp?.name || "?"} (${emp?.code || row.employeeId}) កំពុងព្យាយាមចូលពីឧបករណ៍ថ្មី${deviceLabel ? `\n${deviceLabel}` : ""}`,
+            // NOTE: "device" is a new category, matching the naming
+            // convention of "leave"/"ot"/"attcorr"/"shiftswap" (which map
+            // to notify_leave/notify_ot/etc. on telegram_settings) — the
+            // telegram_notify edge function needs a notify_device column
+            // + matching branch to actually forward this to Telegram.
+            page: "device",
+            portal: "admin",
+            tag: `device-approval-${row.id}`,
+            entityId: row.id,
+          };
+        }
+        if (
+          type === "update" &&
+          old?.status !== row.status &&
+          (row.status === "approved" || row.status === "rejected")
+        ) {
+          return {
+            userType: "employee",
+            userId: row.employeeId,
+            title:
+              row.status === "approved"
+                ? "ឧបករណ៍ថ្មីរបស់អ្នកត្រូវបានអនុញ្ញាត"
+                : "ឧបករណ៍ថ្មីរបស់អ្នកត្រូវបានបដិសេធ",
+            body: [row.deviceType, row.os, row.browser]
+              .filter(Boolean)
+              .join(" · "),
+            page: "device",
+            portal: "employee",
+            tag: `device-approval-dec-${row.id}`,
+          };
+        }
+        return null;
+      },
+    });
   // { officer: {...}, senior: {...}, ... } — the saved matrix keyed by
   // rank, falling back to DEFAULT_ROLE_PERMISSIONS for any rank without
   // a saved row yet (fresh install, or a rank added after go-live).
@@ -41694,7 +42110,8 @@ function AppInner() {
     soundPolicyReady &&
     brandingReady &&
     sAdminReady &&
-    sEmpReady;
+    sEmpReady &&
+    devApprovalsReady;
   // If any one of the ~15 tables/settings above never resolves (a bad
   // network request that hangs instead of erroring, a stalled realtime
   // handshake, etc.) `ready` stays false forever and the skeleton below
@@ -41795,6 +42212,26 @@ function AppInner() {
       ? isSuperAdmin || can("canMessage")
       : moduleEnabled("messages") && !currentEmp?.messagesDisabled;
   const loggedIn = role === "admin" || !!currentEmp;
+  // Only meaningful for a logged-in employee session — admin/kiosk
+  // sessions are never restricted, so they always resolve to "approved"
+  // (see the DeviceApprovalContext default above). Declared here,
+  // unconditionally, rather than further down near the early-return
+  // branches (kiosk / not-logged-in screens) — hooks can't be called
+  // after a conditional return without changing hook count run-to-run,
+  // which is what caused the "Rendered more hooks than during the
+  // previous render" crash right after logging in.
+  const deviceApprovalStatus = useMemo(() => {
+    if (role === "admin" || !currentEmp) return "approved";
+    const deviceId = getOrCreateDeviceId();
+    const mine = deviceApprovals.find(
+      (d) => d.employeeId === currentEmp.id && d.deviceId === deviceId,
+    );
+    return mine?.status || "approved";
+  }, [role, currentEmp, deviceApprovals]);
+  const deviceApprovalCtxValue = useMemo(
+    () => ({ status: deviceApprovalStatus }),
+    [deviceApprovalStatus],
+  );
   // Same merge feeds the side nav so the "Messages" item itself
   // disappears for an employee whose override is on, not just the page
   // route.
@@ -42270,6 +42707,37 @@ function AppInner() {
               action: "login",
               sessionId: sid,
             });
+            // Device-approval bookkeeping: their very first device (no
+            // rows at all yet for this employee) is auto-approved; any
+            // later device that isn't already known starts "pending"
+            // and notifies admin (see the device_approvals notify
+            // callback above). Already-known devices (approved, pending
+            // or even rejected) are left as-is — re-deciding only
+            // happens from the Device Approvals page.
+            const deviceId = getOrCreateDeviceId();
+            const mineDevices = deviceApprovals.filter(
+              (d) => d.employeeId === id,
+            );
+            const already = mineDevices.find((d) => d.deviceId === deviceId);
+            if (!already) {
+              const info = getDeviceInfo();
+              setDeviceApprovals([
+                ...deviceApprovals,
+                {
+                  id: uid("dev"),
+                  employeeId: id,
+                  deviceId,
+                  deviceType: info.deviceType,
+                  os: info.os,
+                  browser: info.browser,
+                  status: mineDevices.length === 0 ? "approved" : "pending",
+                  createdAt: new Date().toISOString(),
+                  decidedAt: null,
+                  decidedById: null,
+                  decidedByName: "",
+                },
+              ]);
+            }
           }}
           go={goPortal}
         />
@@ -42338,886 +42806,914 @@ function AppInner() {
 
   return (
     <BrandingContext.Provider value={brandingCtxValue}>
-      <div
-        className={`wf-root wf-app-enter ${theme === "dark" ? "wf-dark" : ""} ${
-          glassEffect ? "wf-glass" : ""
-        } ${bottomNav ? "wf-role-staff" : ""}`}
-      >
+      <DeviceApprovalContext.Provider value={deviceApprovalCtxValue}>
         <div
-          className={`wf-overlay-scrim ${navOpen ? "open" : ""}`}
-          onClick={() => setNavOpen(false)}
-        />
-        <aside className={`wf-sidebar ${navOpen ? "open" : ""}`}>
-          <div className="wf-sidebar-inner">
-            <div
-              style={{
-                padding: "18px 18px",
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                borderBottom: "1px solid rgba(255,255,255,0.1)",
-              }}
-            >
-              <div className="wf-logo-badge">
-                {branding.logo ? (
-                  <img
-                    src={branding.logo}
-                    alt={brandDisplayName}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      borderRadius: "inherit",
-                    }}
-                  />
-                ) : (
-                  getInitials(brandDisplayName)
-                )}
-              </div>
-              <span
+          className={`wf-root wf-app-enter ${theme === "dark" ? "wf-dark" : ""} ${
+            glassEffect ? "wf-glass" : ""
+          } ${bottomNav ? "wf-role-staff" : ""}`}
+        >
+          <div
+            className={`wf-overlay-scrim ${navOpen ? "open" : ""}`}
+            onClick={() => setNavOpen(false)}
+          />
+          <aside className={`wf-sidebar ${navOpen ? "open" : ""}`}>
+            <div className="wf-sidebar-inner">
+              <div
                 style={{
-                  fontWeight: 600,
-                  fontSize: 15.5,
-                  fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {brandDisplayName}
-              </span>
-              <button
-                className="wf-menu-btn"
-                style={{ marginLeft: "auto", color: "rgba(255,255,255,0.6)" }}
-                onClick={() => setNavOpen(false)}
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <div className="wf-sidebar-search">
-              <Search size={14} />
-              <input
-                type="text"
-                value={navSearch}
-                onChange={(e) => setNavSearch(e.target.value)}
-                placeholder={t.searchMenu}
-              />
-            </div>
-            <nav className="wf-sidebar-nav">
-              {(() => {
-                const q = navSearch.trim().toLowerCase();
-                const filtered = q
-                  ? nav.filter((n) => n.label?.toLowerCase().includes(q))
-                  : nav;
-                if (filtered.length === 0) {
-                  return <div className="wf-nav-empty">{t.noResults}</div>;
-                }
-                const groups = NAV_GROUP_ORDER.map((groupKey) => ({
-                  groupKey,
-                  items: filtered.filter(
-                    (n) => (n.group || "main") === groupKey,
-                  ),
-                })).filter((g) => g.items.length > 0);
-                return groups.map(({ groupKey, items }) => (
-                  <div className="wf-nav-group" key={groupKey}>
-                    <div className="wf-nav-eyebrow">
-                      {t.navGroups?.[groupKey] || groupKey}
-                    </div>
-                    {items.map((n) => {
-                      const accent = n.accent || T.blue;
-                      const isActive =
-                        page === n.id || page?.startsWith(n.id + "/");
-                      return (
-                        <button
-                          key={n.id}
-                          className={`wf-nav-item ${isActive ? "active" : ""}`}
-                          onClick={() => {
-                            setPage(n.id);
-                            setNavOpen(false);
-                          }}
-                        >
-                          <span
-                            className="wf-nav-icon-wrap"
-                            style={
-                              theme === "dark"
-                                ? {
-                                    background: isActive
-                                      ? "rgba(255,255,255,0.22)"
-                                      : accent,
-                                    color: "#fff",
-                                  }
-                                : isActive
-                                  ? { background: T.blue, color: "#fff" }
-                                  : { background: accent + "40", color: accent }
-                            }
-                          >
-                            <n.icon size={17} />
-                          </span>
-                          <span className="wf-nav-label">{n.label}</span>
-                          <ChevronRight size={15} className="wf-nav-chevron" />
-                        </button>
-                      );
-                    })}
-                  </div>
-                ));
-              })()}
-            </nav>
-            <div
-              style={{
-                padding: 12,
-                borderTop: "1px solid rgba(255,255,255,0.1)",
-              }}
-            >
-              <div className="wf-sidebar-profile" style={{ marginBottom: 8 }}>
-                <div style={{ position: "relative", flexShrink: 0 }}>
-                  <Avatar
-                    name={
-                      role === "admin"
-                        ? currentAdmin?.name || "?"
-                        : currentEmp?.name || "?"
-                    }
-                    photo={
-                      role === "admin" ? currentAdmin?.photo : currentEmp?.photo
-                    }
-                    size={34}
-                  />
-                  <span
-                    style={{
-                      position: "absolute",
-                      right: -1,
-                      bottom: -1,
-                      width: 9,
-                      height: 9,
-                      borderRadius: "50%",
-                      background: T.forest,
-                      border: `2px solid ${T.card}`,
-                    }}
-                  />
-                </div>
-                <div style={{ minWidth: 0, flex: 1 }}>
-                  <div
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: T.ink,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {role === "admin" ? currentAdmin?.name : currentEmp?.name}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 11.5,
-                      color: T.muted,
-                      fontFamily: "'JetBrains Mono',monospace",
-                    }}
-                  >
-                    {role === "admin"
-                      ? adminRoleLabel(currentAdmin?.role, lang)
-                      : currentEmp?.code}
-                  </div>
-                </div>
-                <button
-                  className="wf-sidebar-kebab"
-                  onClick={() => {
-                    setPage("profile");
-                    setNavOpen(false);
-                  }}
-                >
-                  <MoreVertical size={16} />
-                </button>
-              </div>
-              <button
-                className="wf-nav-item wf-sidebar-signout"
-                style={{ color: T.rose }}
-                onClick={handleLogout}
-              >
-                <span
-                  className="wf-nav-icon-wrap"
-                  style={{ background: T.rose + "1a", color: T.rose }}
-                >
-                  <LogOut size={16} />
-                </span>
-                <span className="wf-nav-label">{t.logout}</span>
-              </button>
-              <button
-                type="button"
-                onClick={toggleTheme}
-                style={{
+                  padding: "18px 18px",
                   display: "flex",
                   alignItems: "center",
                   gap: 10,
-                  width: "100%",
-                  marginTop: 8,
-                  padding: "10px 12px",
-                  borderRadius: 10,
-                  border: `1px solid ${T.line}`,
-                  background: T.card,
-                  color: T.ink,
-                  fontSize: 14,
-                  fontWeight: 500,
-                  cursor: "pointer",
+                  borderBottom: "1px solid rgba(255,255,255,0.1)",
                 }}
               >
-                {theme === "dark" ? <Moon size={16} /> : <Sun size={16} />}
-                <span style={{ flex: 1, textAlign: "left" }}>
-                  {theme === "dark"
-                    ? t.settings.darkMode
-                    : t.settings.lightMode}
-                </span>
+                <div className="wf-logo-badge">
+                  {branding.logo ? (
+                    <img
+                      src={branding.logo}
+                      alt={brandDisplayName}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: "inherit",
+                      }}
+                    />
+                  ) : (
+                    getInitials(brandDisplayName)
+                  )}
+                </div>
                 <span
                   style={{
-                    width: 34,
-                    height: 19,
-                    borderRadius: 999,
-                    background: theme === "dark" ? T.blue : T.line,
-                    position: "relative",
-                    flexShrink: 0,
-                    transition: "background .15s ease",
+                    fontWeight: 600,
+                    fontSize: 15.5,
+                    fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
                   }}
                 >
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: 2,
-                      left: theme === "dark" ? 17 : 2,
-                      width: 15,
-                      height: 15,
-                      borderRadius: "50%",
-                      background: "#fff",
-                      transition: "left .15s ease",
-                    }}
-                  />
+                  {brandDisplayName}
                 </span>
-              </button>
-            </div>
-          </div>
-        </aside>
-
-        <div className="wf-main">
-          <header className="wf-header">
-            <button className="wf-menu-btn" onClick={() => setNavOpen(true)}>
-              <Menu size={20} />
-            </button>
-            <div style={{ minWidth: 0, flex: 1, overflow: "hidden" }}>
+                <button
+                  className="wf-menu-btn"
+                  style={{ marginLeft: "auto", color: "rgba(255,255,255,0.6)" }}
+                  onClick={() => setNavOpen(false)}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="wf-sidebar-search">
+                <Search size={14} />
+                <input
+                  type="text"
+                  value={navSearch}
+                  onChange={(e) => setNavSearch(e.target.value)}
+                  placeholder={t.searchMenu}
+                />
+              </div>
+              <nav className="wf-sidebar-nav">
+                {(() => {
+                  const q = navSearch.trim().toLowerCase();
+                  const filtered = q
+                    ? nav.filter((n) => n.label?.toLowerCase().includes(q))
+                    : nav;
+                  if (filtered.length === 0) {
+                    return <div className="wf-nav-empty">{t.noResults}</div>;
+                  }
+                  const groups = NAV_GROUP_ORDER.map((groupKey) => ({
+                    groupKey,
+                    items: filtered.filter(
+                      (n) => (n.group || "main") === groupKey,
+                    ),
+                  })).filter((g) => g.items.length > 0);
+                  return groups.map(({ groupKey, items }) => (
+                    <div className="wf-nav-group" key={groupKey}>
+                      <div className="wf-nav-eyebrow">
+                        {t.navGroups?.[groupKey] || groupKey}
+                      </div>
+                      {items.map((n) => {
+                        const accent = n.accent || T.blue;
+                        const isActive =
+                          page === n.id || page?.startsWith(n.id + "/");
+                        return (
+                          <button
+                            key={n.id}
+                            className={`wf-nav-item ${isActive ? "active" : ""}`}
+                            onClick={() => {
+                              setPage(n.id);
+                              setNavOpen(false);
+                            }}
+                          >
+                            <span
+                              className="wf-nav-icon-wrap"
+                              style={
+                                theme === "dark"
+                                  ? {
+                                      background: isActive
+                                        ? "rgba(255,255,255,0.22)"
+                                        : accent,
+                                      color: "#fff",
+                                    }
+                                  : isActive
+                                    ? { background: T.blue, color: "#fff" }
+                                    : {
+                                        background: accent + "40",
+                                        color: accent,
+                                      }
+                              }
+                            >
+                              <n.icon size={17} />
+                            </span>
+                            <span className="wf-nav-label">{n.label}</span>
+                            <ChevronRight
+                              size={15}
+                              className="wf-nav-chevron"
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ));
+                })()}
+              </nav>
               <div
                 style={{
-                  fontFamily: "'JetBrains Mono',monospace",
-                  fontSize: 11.5,
-                  fontWeight: 600,
-                  letterSpacing: ".08em",
-                  textTransform: "uppercase",
-                  color: T.muted,
-                  marginBottom: 2,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
+                  padding: 12,
+                  borderTop: "1px solid rgba(255,255,255,0.1)",
                 }}
               >
-                {brandDisplayName}
-              </div>
-              <h1
-                style={{
-                  fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
-                  fontWeight: 700,
-                  color: T.ink,
-                  fontSize: 16,
-                  letterSpacing: "-.01em",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {
-                  nav.find((n) => n.id === page || page?.startsWith(n.id + "/"))
-                    ?.label
-                }
-              </h1>
-            </div>
-            <div
-              style={{
-                marginLeft: "auto",
-                flexShrink: 0,
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
-              <div className="wf-role-badge">
-                <HeaderClock />
-              </div>
-              {role !== "admin" && currentEmp && (
-                <span
-                  className="wf-role-badge"
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 700,
-                    background: T.forestSoft,
-                    color: T.forestText,
-                    padding: "5px 10px",
-                    borderRadius: 8,
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    maxWidth: 90,
-                  }}
+                <div className="wf-sidebar-profile" style={{ marginBottom: 8 }}>
+                  <div style={{ position: "relative", flexShrink: 0 }}>
+                    <Avatar
+                      name={
+                        role === "admin"
+                          ? currentAdmin?.name || "?"
+                          : currentEmp?.name || "?"
+                      }
+                      photo={
+                        role === "admin"
+                          ? currentAdmin?.photo
+                          : currentEmp?.photo
+                      }
+                      size={34}
+                    />
+                    <span
+                      style={{
+                        position: "absolute",
+                        right: -1,
+                        bottom: -1,
+                        width: 9,
+                        height: 9,
+                        borderRadius: "50%",
+                        background: T.forest,
+                        border: `2px solid ${T.card}`,
+                      }}
+                    />
+                  </div>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 600,
+                        color: T.ink,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {role === "admin" ? currentAdmin?.name : currentEmp?.name}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 11.5,
+                        color: T.muted,
+                        fontFamily: "'JetBrains Mono',monospace",
+                      }}
+                    >
+                      {role === "admin"
+                        ? adminRoleLabel(currentAdmin?.role, lang)
+                        : currentEmp?.code}
+                    </div>
+                  </div>
+                  <button
+                    className="wf-sidebar-kebab"
+                    onClick={() => {
+                      setPage("profile");
+                      setNavOpen(false);
+                    }}
+                  >
+                    <MoreVertical size={16} />
+                  </button>
+                </div>
+                <button
+                  className="wf-nav-item wf-sidebar-signout"
+                  style={{ color: T.rose }}
+                  onClick={handleLogout}
                 >
-                  {t.employee}
-                </span>
-              )}
-              {role === "admin" && (
-                <span
-                  className="wf-role-badge"
+                  <span
+                    className="wf-nav-icon-wrap"
+                    style={{ background: T.rose + "1a", color: T.rose }}
+                  >
+                    <LogOut size={16} />
+                  </span>
+                  <span className="wf-nav-label">{t.logout}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={toggleTheme}
                   style={{
-                    fontSize: 12,
-                    fontWeight: 700,
-                    background: "rgba(91,141,239,0.14)",
-                    color: T.blue,
-                    padding: "5px 10px",
-                    borderRadius: 6,
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    maxWidth: 90,
-                  }}
-                  title={adminRoleLabel(currentAdmin?.role, lang)}
-                >
-                  {adminRoleLabel(currentAdmin?.role, lang)}
-                </span>
-              )}
-              <ThemeToggle variant="light" />
-              <LangToggle variant="light" />
-              {canUseMessages && (
-                <ChatQuickAccess
-                  role={role}
-                  currentEmp={currentEmp}
-                  messages={messages}
-                  setPage={setPage}
-                />
-              )}
-              <NotificationBell
-                role={role}
-                currentAdmin={currentAdmin}
-                currentEmp={currentEmp}
-                employees={employees}
-                shifts={shifts}
-                attendance={attendance}
-                leaveRequests={leaveRequests}
-                overtimeRequests={overtimeRequests}
-                performanceReviews={performanceReviews}
-                announcements={announcements}
-                attendanceCorrections={attendanceCorrections}
-                shiftSwapRequests={shiftSwapRequests}
-                setPage={setPage}
-              />
-              <Avatar
-                name={
-                  role === "admin"
-                    ? currentAdmin?.name || "?"
-                    : currentEmp?.name || "?"
-                }
-                photo={
-                  role === "admin" ? currentAdmin?.photo : currentEmp?.photo
-                }
-                size={32}
-              />
-            </div>
-          </header>
-
-          <main
-            ref={contentRef}
-            className={`wf-content ${bottomNav ? "wf-content-bnpad" : ""}`}
-          >
-            {employees.length === 0 &&
-              role === "admin" &&
-              page !== "employees" && (
-                <div
-                  style={{
-                    marginBottom: 16,
                     display: "flex",
                     alignItems: "center",
-                    gap: 8,
-                    background: T.goldSoft,
-                    color: T.goldText,
-                    fontSize: 14,
-                    padding: "10px 16px",
+                    gap: 10,
+                    width: "100%",
+                    marginTop: 8,
+                    padding: "10px 12px",
                     borderRadius: 10,
+                    border: `1px solid ${T.line}`,
+                    background: T.card,
+                    color: T.ink,
+                    fontSize: 14,
+                    fontWeight: 500,
+                    cursor: "pointer",
                   }}
                 >
-                  <AlertCircle size={16} /> {t.dash.noEmpWarn}
+                  {theme === "dark" ? <Moon size={16} /> : <Sun size={16} />}
+                  <span style={{ flex: 1, textAlign: "left" }}>
+                    {theme === "dark"
+                      ? t.settings.darkMode
+                      : t.settings.lightMode}
+                  </span>
+                  <span
+                    style={{
+                      width: 34,
+                      height: 19,
+                      borderRadius: 999,
+                      background: theme === "dark" ? T.blue : T.line,
+                      position: "relative",
+                      flexShrink: 0,
+                      transition: "background .15s ease",
+                    }}
+                  >
+                    <span
+                      style={{
+                        position: "absolute",
+                        top: 2,
+                        left: theme === "dark" ? 17 : 2,
+                        width: 15,
+                        height: 15,
+                        borderRadius: "50%",
+                        background: "#fff",
+                        transition: "left .15s ease",
+                      }}
+                    />
+                  </span>
+                </button>
+              </div>
+            </div>
+          </aside>
+
+          <div className="wf-main">
+            <header className="wf-header">
+              <button className="wf-menu-btn" onClick={() => setNavOpen(true)}>
+                <Menu size={20} />
+              </button>
+              <div style={{ minWidth: 0, flex: 1, overflow: "hidden" }}>
+                <div
+                  style={{
+                    fontFamily: "'JetBrains Mono',monospace",
+                    fontSize: 11.5,
+                    fontWeight: 600,
+                    letterSpacing: ".08em",
+                    textTransform: "uppercase",
+                    color: T.muted,
+                    marginBottom: 2,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {brandDisplayName}
                 </div>
-              )}
-            <div key={page?.split("/")[0] || page} className="wf-page-enter">
-              {page === "moreApps" && (
-                <MoreAppsPage
-                  nav={nav}
-                  setPage={setPage}
-                  onLogout={handleLogout}
-                  role={role}
-                  currentEmp={currentEmp}
-                  attendance={attendance}
-                  overtimeRequests={overtimeRequests}
-                  otPolicy={otPolicy}
-                  trainings={trainings}
-                />
-              )}
-              {page === "dashboard" && (
-                <Dashboard
-                  employees={employees}
-                  departments={departments}
-                  attendance={attendance}
-                  setAttendance={setAttendance}
-                  payrollPaid={payrollPaid}
-                  role={role}
-                  currentEmp={currentEmp}
-                  currentAdmin={currentAdmin}
-                  shifts={shifts}
-                  offices={offices}
-                  soundPreset={soundPolicy.preset}
-                  showSelfPunch={moduleEnabled("attendance")}
-                  setPage={setPage}
-                  moduleEnabled={moduleEnabled}
-                  leaveRequests={leaveRequests}
-                  announcements={announcements}
-                  overtimeRequests={overtimeRequests}
-                  otPolicy={otPolicy}
-                  payrollPolicy={payrollPolicy}
-                  attendanceCorrections={attendanceCorrections}
-                  documents={documents}
-                  onboardingTasks={onboardingTasks}
-                />
-              )}
-              {page === "analytics" && role === "admin" && (
-                <AnalyticsPage
-                  employees={employees}
-                  departments={departments}
-                  attendance={attendance}
-                  overtimeRequests={overtimeRequests}
-                  otPolicy={otPolicy}
-                  payrollPolicy={payrollPolicy}
-                />
-              )}
-              {page === "calendar" && role === "admin" && (
-                <CalendarPage
-                  role={role}
-                  currentEmp={currentEmp}
-                  employees={employees}
-                  holidays={holidays}
-                  leaveRequests={leaveRequests}
-                  trainings={trainings}
-                />
-              )}
-              {page === "reports" && role === "admin" && (
-                <ReportsCenter
-                  employees={employees}
-                  departments={departments}
-                  shifts={shifts}
-                  attendance={attendance}
-                  leaveRequests={leaveRequests}
-                  overtimeRequests={overtimeRequests}
-                  trainings={trainings}
-                  candidates={candidates}
-                  jobPostings={jobPostings}
-                  otPolicy={otPolicy}
-                  setPage={setPage}
-                  setVisitedPages={setVisitedPages}
-                />
-              )}
-              {page === "announcements" &&
-                (role === "admin" || moduleEnabled("announcements")) && (
-                  <Announcements
+                <h1
+                  style={{
+                    fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
+                    fontWeight: 700,
+                    color: T.ink,
+                    fontSize: 16,
+                    letterSpacing: "-.01em",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {
+                    nav.find(
+                      (n) => n.id === page || page?.startsWith(n.id + "/"),
+                    )?.label
+                  }
+                </h1>
+              </div>
+              <div
+                style={{
+                  marginLeft: "auto",
+                  flexShrink: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <div className="wf-role-badge">
+                  <HeaderClock />
+                </div>
+                {role !== "admin" && currentEmp && (
+                  <span
+                    className="wf-role-badge"
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      background: T.forestSoft,
+                      color: T.forestText,
+                      padding: "5px 10px",
+                      borderRadius: 8,
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      maxWidth: 90,
+                    }}
+                  >
+                    {t.employee}
+                  </span>
+                )}
+                {role === "admin" && (
+                  <span
+                    className="wf-role-badge"
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      background: "rgba(91,141,239,0.14)",
+                      color: T.blue,
+                      padding: "5px 10px",
+                      borderRadius: 6,
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      maxWidth: 90,
+                    }}
+                    title={adminRoleLabel(currentAdmin?.role, lang)}
+                  >
+                    {adminRoleLabel(currentAdmin?.role, lang)}
+                  </span>
+                )}
+                <ThemeToggle variant="light" />
+                <LangToggle variant="light" />
+                {canUseMessages && (
+                  <ChatQuickAccess
                     role={role}
-                    currentAdmin={currentAdmin}
-                    announcements={announcements}
-                    setAnnouncements={setAnnouncements}
-                    isSuperAdmin={isSuperAdmin || can("manageAnnouncements")}
+                    currentEmp={currentEmp}
+                    messages={messages}
+                    setPage={setPage}
                   />
                 )}
-              {(page === "employees" || page?.startsWith("employees/")) &&
-                role === "admin" && (
-                  <Employees
-                    page={page}
+                <NotificationBell
+                  role={role}
+                  currentAdmin={currentAdmin}
+                  currentEmp={currentEmp}
+                  employees={employees}
+                  shifts={shifts}
+                  attendance={attendance}
+                  leaveRequests={leaveRequests}
+                  overtimeRequests={overtimeRequests}
+                  performanceReviews={performanceReviews}
+                  announcements={announcements}
+                  attendanceCorrections={attendanceCorrections}
+                  shiftSwapRequests={shiftSwapRequests}
+                  setPage={setPage}
+                />
+                <Avatar
+                  name={
+                    role === "admin"
+                      ? currentAdmin?.name || "?"
+                      : currentEmp?.name || "?"
+                  }
+                  photo={
+                    role === "admin" ? currentAdmin?.photo : currentEmp?.photo
+                  }
+                  size={32}
+                />
+              </div>
+            </header>
+
+            <main
+              ref={contentRef}
+              className={`wf-content ${bottomNav ? "wf-content-bnpad" : ""}`}
+            >
+              {employees.length === 0 &&
+                role === "admin" &&
+                page !== "employees" && (
+                  <div
+                    style={{
+                      marginBottom: 16,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      background: T.goldSoft,
+                      color: T.goldText,
+                      fontSize: 14,
+                      padding: "10px 16px",
+                      borderRadius: 10,
+                    }}
+                  >
+                    <AlertCircle size={16} /> {t.dash.noEmpWarn}
+                  </div>
+                )}
+              <div key={page?.split("/")[0] || page} className="wf-page-enter">
+                {page === "moreApps" && (
+                  <MoreAppsPage
+                    nav={nav}
                     setPage={setPage}
+                    onLogout={handleLogout}
+                    role={role}
+                    currentEmp={currentEmp}
+                    attendance={attendance}
+                    overtimeRequests={overtimeRequests}
+                    otPolicy={otPolicy}
+                    trainings={trainings}
+                  />
+                )}
+                {page === "dashboard" && (
+                  <Dashboard
                     employees={employees}
                     departments={departments}
+                    attendance={attendance}
+                    setAttendance={setAttendance}
+                    payrollPaid={payrollPaid}
+                    role={role}
+                    currentEmp={currentEmp}
+                    currentAdmin={currentAdmin}
                     shifts={shifts}
                     offices={offices}
-                    setEmployees={setEmployees}
-                    isSuperAdmin={isSuperAdmin || can("manageEmployees")}
-                    currentAdmin={currentAdmin}
-                    documents={documents}
-                    setDocuments={setDocuments}
-                    attendance={attendance}
+                    soundPreset={soundPolicy.preset}
+                    showSelfPunch={moduleEnabled("attendance")}
+                    setPage={setPage}
+                    moduleEnabled={moduleEnabled}
                     leaveRequests={leaveRequests}
-                    performanceReviews={performanceReviews}
-                    trainings={trainings}
-                    assets={assets}
+                    announcements={announcements}
                     overtimeRequests={overtimeRequests}
                     otPolicy={otPolicy}
                     payrollPolicy={payrollPolicy}
-                    salaryAdjustments={salaryAdjustments}
+                    attendanceCorrections={attendanceCorrections}
+                    documents={documents}
+                    onboardingTasks={onboardingTasks}
                   />
                 )}
-              {page === "departments" && role === "admin" && (
-                <Departments
-                  departments={departments}
-                  setDepartments={setDepartments}
-                  employees={employees}
-                  isSuperAdmin={isSuperAdmin || can("manageDepartments")}
-                />
-              )}
-              {page === "shifts" && role === "admin" && (
-                <Shifts
-                  shifts={shifts}
-                  setShifts={setShifts}
-                  employees={employees}
-                  isSuperAdmin={isSuperAdmin || can("manageDepartments")}
-                  companyGraceMinutes={payrollPolicy?.lateGraceMinutes || 0}
-                  companyBreakMinutes={
-                    otPolicy?.breakMinutes ?? DEFAULT_OT_POLICY.breakMinutes
-                  }
-                />
-              )}
-              {page === "roster" &&
-                (role === "admin" || moduleEnabled("roster")) && (
-                  <Roster
+                {page === "analytics" && role === "admin" && (
+                  <AnalyticsPage
+                    employees={employees}
+                    departments={departments}
+                    attendance={attendance}
+                    overtimeRequests={overtimeRequests}
+                    otPolicy={otPolicy}
+                    payrollPolicy={payrollPolicy}
+                  />
+                )}
+                {page === "calendar" && role === "admin" && (
+                  <CalendarPage
                     role={role}
                     currentEmp={currentEmp}
                     employees={employees}
+                    holidays={holidays}
+                    leaveRequests={leaveRequests}
+                    trainings={trainings}
+                  />
+                )}
+                {page === "reports" && role === "admin" && (
+                  <ReportsCenter
+                    employees={employees}
                     departments={departments}
                     shifts={shifts}
-                    shiftRoster={shiftRoster}
-                    setShiftRoster={setShiftRoster}
+                    attendance={attendance}
+                    leaveRequests={leaveRequests}
+                    overtimeRequests={overtimeRequests}
+                    trainings={trainings}
+                    candidates={candidates}
+                    jobPostings={jobPostings}
+                    otPolicy={otPolicy}
+                    setPage={setPage}
+                    setVisitedPages={setVisitedPages}
+                  />
+                )}
+                {page === "announcements" &&
+                  (role === "admin" || moduleEnabled("announcements")) && (
+                    <Announcements
+                      role={role}
+                      currentAdmin={currentAdmin}
+                      announcements={announcements}
+                      setAnnouncements={setAnnouncements}
+                      isSuperAdmin={isSuperAdmin || can("manageAnnouncements")}
+                    />
+                  )}
+                {(page === "employees" || page?.startsWith("employees/")) &&
+                  role === "admin" && (
+                    <Employees
+                      page={page}
+                      setPage={setPage}
+                      employees={employees}
+                      departments={departments}
+                      shifts={shifts}
+                      offices={offices}
+                      setEmployees={setEmployees}
+                      isSuperAdmin={isSuperAdmin || can("manageEmployees")}
+                      currentAdmin={currentAdmin}
+                      documents={documents}
+                      setDocuments={setDocuments}
+                      attendance={attendance}
+                      leaveRequests={leaveRequests}
+                      performanceReviews={performanceReviews}
+                      trainings={trainings}
+                      assets={assets}
+                      overtimeRequests={overtimeRequests}
+                      otPolicy={otPolicy}
+                      payrollPolicy={payrollPolicy}
+                      salaryAdjustments={salaryAdjustments}
+                    />
+                  )}
+                {page === "departments" && role === "admin" && (
+                  <Departments
+                    departments={departments}
+                    setDepartments={setDepartments}
+                    employees={employees}
                     isSuperAdmin={isSuperAdmin || can("manageDepartments")}
                   />
                 )}
-              {page === "assets" &&
-                role === "admin" &&
-                (isSuperAdmin || can("manageAssets")) && (
-                  <Assets
-                    assets={assets}
-                    setAssets={setAssets}
-                    employees={employees}
-                    isSuperAdmin={isSuperAdmin || can("manageAssets")}
-                  />
-                )}
-              {page === "docExpiry" &&
-                role === "admin" &&
-                (isSuperAdmin || can("manageDocuments")) && (
-                  <DocumentExpiryPage
-                    documents={documents}
-                    employees={employees}
-                  />
-                )}
-              {page === "recruitment" &&
-                role === "admin" &&
-                (isSuperAdmin || can("manageRecruitment")) && (
-                  <Recruitment
-                    jobPostings={jobPostings}
-                    setJobPostings={setJobPostings}
-                    candidates={candidates}
-                    setCandidates={setCandidates}
-                    departments={departments}
-                    isSuperAdmin={isSuperAdmin || can("manageRecruitment")}
-                  />
-                )}
-              {page === "onboarding" &&
-                role === "admin" &&
-                (isSuperAdmin || can("manageRecruitment")) && (
-                  <OnboardingOffboarding
-                    employees={employees}
-                    onboardingTasks={onboardingTasks}
-                    setOnboardingTasks={setOnboardingTasks}
-                  />
-                )}
-              {page === "attendance" &&
-                (role === "admin" || moduleEnabled("attendance")) && (
-                  <Attendance
-                    role={role}
-                    currentEmp={currentEmp}
-                    employees={employees}
-                    departments={departments}
+                {page === "shifts" && role === "admin" && (
+                  <Shifts
                     shifts={shifts}
-                    attendance={attendance}
-                    setAttendance={setAttendance}
-                    isSuperAdmin={isSuperAdmin}
-                    offices={offices}
-                    setOffices={setOffices}
+                    setShifts={setShifts}
+                    employees={employees}
+                    isSuperAdmin={isSuperAdmin || can("manageDepartments")}
+                    companyGraceMinutes={payrollPolicy?.lateGraceMinutes || 0}
+                    companyBreakMinutes={
+                      otPolicy?.breakMinutes ?? DEFAULT_OT_POLICY.breakMinutes
+                    }
+                  />
+                )}
+                {page === "roster" &&
+                  (role === "admin" || moduleEnabled("roster")) && (
+                    <Roster
+                      role={role}
+                      currentEmp={currentEmp}
+                      employees={employees}
+                      departments={departments}
+                      shifts={shifts}
+                      shiftRoster={shiftRoster}
+                      setShiftRoster={setShiftRoster}
+                      isSuperAdmin={isSuperAdmin || can("manageDepartments")}
+                    />
+                  )}
+                {page === "assets" &&
+                  role === "admin" &&
+                  (isSuperAdmin || can("manageAssets")) && (
+                    <Assets
+                      assets={assets}
+                      setAssets={setAssets}
+                      employees={employees}
+                      isSuperAdmin={isSuperAdmin || can("manageAssets")}
+                    />
+                  )}
+                {page === "docExpiry" &&
+                  role === "admin" &&
+                  (isSuperAdmin || can("manageDocuments")) && (
+                    <DocumentExpiryPage
+                      documents={documents}
+                      employees={employees}
+                    />
+                  )}
+                {page === "recruitment" &&
+                  role === "admin" &&
+                  (isSuperAdmin || can("manageRecruitment")) && (
+                    <Recruitment
+                      jobPostings={jobPostings}
+                      setJobPostings={setJobPostings}
+                      candidates={candidates}
+                      setCandidates={setCandidates}
+                      departments={departments}
+                      isSuperAdmin={isSuperAdmin || can("manageRecruitment")}
+                    />
+                  )}
+                {page === "onboarding" &&
+                  role === "admin" &&
+                  (isSuperAdmin || can("manageRecruitment")) && (
+                    <OnboardingOffboarding
+                      employees={employees}
+                      onboardingTasks={onboardingTasks}
+                      setOnboardingTasks={setOnboardingTasks}
+                    />
+                  )}
+                {page === "attendance" &&
+                  (role === "admin" || moduleEnabled("attendance")) && (
+                    <Attendance
+                      role={role}
+                      currentEmp={currentEmp}
+                      employees={employees}
+                      departments={departments}
+                      shifts={shifts}
+                      attendance={attendance}
+                      setAttendance={setAttendance}
+                      isSuperAdmin={isSuperAdmin}
+                      offices={offices}
+                      setOffices={setOffices}
+                      holidays={holidays}
+                      overtimeRequests={overtimeRequests}
+                      soundPreset={soundPolicy.preset}
+                      payrollPolicy={payrollPolicy}
+                      otPolicy={otPolicy}
+                    />
+                  )}
+                {page === "holidays" && role === "admin" && (
+                  <Holidays
                     holidays={holidays}
+                    setHolidays={setHolidays}
+                    isSuperAdmin={isSuperAdmin || can("manageDepartments")}
+                  />
+                )}
+                {page === "leave" &&
+                  (role === "admin" || moduleEnabled("leave")) && (
+                    <LeaveRequests
+                      role={role}
+                      currentAdmin={currentAdmin}
+                      currentEmp={currentEmp}
+                      employees={employees}
+                      setEmployees={setEmployees}
+                      admins={admins}
+                      rolePermissionsMap={rolePermissionsMap}
+                      leaveRequests={leaveRequests}
+                      setLeaveRequests={setLeaveRequests}
+                      attendance={attendance}
+                      setAttendance={setAttendance}
+                      isSuperAdmin={isSuperAdmin || can("approveRequests")}
+                      canApprove={isSuperAdmin || can("approveRequests")}
+                      leavePolicy={leavePolicy}
+                      setLeavePolicy={setLeavePolicy}
+                    />
+                  )}
+                {page === "ot" && (role === "admin" || moduleEnabled("ot")) && (
+                  <OvertimeRequests
+                    role={role}
+                    currentAdmin={currentAdmin}
+                    currentEmp={currentEmp}
+                    employees={employees}
+                    admins={admins}
                     overtimeRequests={overtimeRequests}
-                    soundPreset={soundPolicy.preset}
-                    payrollPolicy={payrollPolicy}
+                    setOvertimeRequests={setOvertimeRequests}
                     otPolicy={otPolicy}
-                  />
-                )}
-              {page === "holidays" && role === "admin" && (
-                <Holidays
-                  holidays={holidays}
-                  setHolidays={setHolidays}
-                  isSuperAdmin={isSuperAdmin || can("manageDepartments")}
-                />
-              )}
-              {page === "leave" &&
-                (role === "admin" || moduleEnabled("leave")) && (
-                  <LeaveRequests
-                    role={role}
-                    currentAdmin={currentAdmin}
-                    currentEmp={currentEmp}
-                    employees={employees}
-                    setEmployees={setEmployees}
-                    admins={admins}
-                    rolePermissionsMap={rolePermissionsMap}
-                    leaveRequests={leaveRequests}
-                    setLeaveRequests={setLeaveRequests}
-                    attendance={attendance}
-                    setAttendance={setAttendance}
+                    setOtPolicy={setOtPolicy}
                     isSuperAdmin={isSuperAdmin || can("approveRequests")}
                     canApprove={isSuperAdmin || can("approveRequests")}
-                    leavePolicy={leavePolicy}
-                    setLeavePolicy={setLeavePolicy}
+                    holidays={holidays}
                   />
                 )}
-              {page === "ot" && (role === "admin" || moduleEnabled("ot")) && (
-                <OvertimeRequests
-                  role={role}
-                  currentAdmin={currentAdmin}
-                  currentEmp={currentEmp}
-                  employees={employees}
-                  admins={admins}
-                  overtimeRequests={overtimeRequests}
-                  setOvertimeRequests={setOvertimeRequests}
-                  otPolicy={otPolicy}
-                  setOtPolicy={setOtPolicy}
-                  isSuperAdmin={isSuperAdmin || can("approveRequests")}
-                  canApprove={isSuperAdmin || can("approveRequests")}
-                  holidays={holidays}
-                />
-              )}
-              {page === "payroll" &&
-                (role === "admin" || moduleEnabled("payroll")) && (
-                  <Payroll
-                    role={role}
-                    currentEmp={currentEmp}
-                    employees={employees}
-                    attendance={attendance}
-                    payrollPaid={payrollPaid}
-                    setPayrollPaid={setPayrollPaid}
-                    overtimeRequests={overtimeRequests}
-                    otPolicy={otPolicy}
-                    payrollPolicy={payrollPolicy}
-                    setPayrollPolicy={setPayrollPolicy}
-                    salaryAdjustments={salaryAdjustments}
-                  />
-                )}
-              {page === "payrollAdj" &&
-                (role === "admin" || moduleEnabled("payrollAdj")) && (
-                  <SalaryAdjustments
-                    role={role}
-                    currentAdmin={currentAdmin}
-                    currentEmp={currentEmp}
-                    employees={employees}
-                    admins={admins}
-                    adjustments={salaryAdjustments}
-                    setAdjustments={setSalaryAdjustments}
-                    isSuperAdmin={isSuperAdmin || can("managePayroll")}
-                    canApprove={isSuperAdmin || can("managePayroll")}
-                  />
-                )}
-              {page === "budget" && role === "admin" && (
-                <BudgetPlanning
-                  departments={departments}
-                  employees={employees}
-                  attendance={attendance}
-                  overtimeRequests={overtimeRequests}
-                  otPolicy={otPolicy}
-                  payrollPolicy={payrollPolicy}
-                  salaryAdjustments={salaryAdjustments}
-                  departmentBudgets={departmentBudgets}
-                  setDepartmentBudgets={setDepartmentBudgets}
-                  isSuperAdmin={isSuperAdmin || can("managePayroll")}
-                />
-              )}
-              {page === "review" &&
-                (role === "admin" || moduleEnabled("review")) && (
-                  <PerformanceReviews
-                    role={role}
-                    currentAdmin={currentAdmin}
-                    currentEmp={currentEmp}
-                    employees={employees}
-                    performanceReviews={performanceReviews}
-                    setPerformanceReviews={setPerformanceReviews}
-                    isSuperAdmin={isSuperAdmin}
-                  />
-                )}
-              {page === "training" && role === "admin" && (
-                <Trainings
-                  trainings={trainings}
-                  setTrainings={setTrainings}
-                  employees={employees}
-                  isSuperAdmin={isSuperAdmin}
-                />
-              )}
-              {page === "training" &&
-                role !== "admin" &&
-                currentEmp &&
-                moduleEnabled("training") && (
-                  <MyTrainings currentEmp={currentEmp} trainings={trainings} />
-                )}
-              {page === "documents" &&
-                role !== "admin" &&
-                currentEmp &&
-                moduleEnabled("documents") && (
-                  <MyDocuments currentEmp={currentEmp} documents={documents} />
-                )}
-              {page === "attcorr" &&
-                (role === "admin" || moduleEnabled("attcorr")) && (
-                  <AttendanceCorrections
-                    role={role}
-                    currentAdmin={currentAdmin}
-                    currentEmp={currentEmp}
-                    employees={employees}
-                    admins={admins}
-                    attendanceCorrections={attendanceCorrections}
-                    setAttendanceCorrections={setAttendanceCorrections}
-                    attendance={attendance}
-                    setAttendance={setAttendance}
-                    isSuperAdmin={isSuperAdmin || can("approveRequests")}
-                    canApprove={isSuperAdmin || can("approveRequests")}
-                  />
-                )}
-              {page === "shiftswap" &&
-                (role === "admin" || moduleEnabled("shiftswap")) && (
-                  <ShiftSwapRequests
-                    role={role}
-                    currentAdmin={currentAdmin}
-                    currentEmp={currentEmp}
-                    employees={employees}
-                    setEmployees={setEmployees}
-                    shifts={shifts}
-                    admins={admins}
-                    shiftSwapRequests={shiftSwapRequests}
-                    setShiftSwapRequests={setShiftSwapRequests}
-                    isSuperAdmin={isSuperAdmin || can("approveRequests")}
-                    canApprove={isSuperAdmin || can("approveRequests")}
-                  />
-                )}
-              {page === "messages" && canUseMessages && (
-                <MessagesPage
-                  role={role}
-                  currentAdmin={currentAdmin}
-                  currentEmp={currentEmp}
-                  employees={employees}
-                  admins={admins}
-                  messages={messages}
-                  setMessages={setMessages}
-                  activeCall={voiceCall.call}
-                  onStartCall={voiceCall.startCall}
-                />
-              )}
-              {page === "admins" && role === "admin" && isSuperAdmin && (
-                <AdminAccounts
-                  admins={admins}
-                  setAdmins={setAdmins}
-                  currentAdminId={currentAdmin?.id}
-                />
-              )}
-              {page === "rolePerms" && role === "admin" && isSuperAdmin && (
-                <RolePermissionsPage
-                  rolePermissions={rolePermissions}
-                  setRolePermissions={setRolePermissions}
-                />
-              )}
-              {page === "profile" &&
-                role !== "admin" &&
-                currentEmp &&
-                moduleEnabled("profile") && (
-                  <MyProfile
-                    currentEmp={currentEmp}
-                    employees={employees}
-                    setEmployees={setEmployees}
+                {page === "payroll" &&
+                  (role === "admin" || moduleEnabled("payroll")) && (
+                    <Payroll
+                      role={role}
+                      currentEmp={currentEmp}
+                      employees={employees}
+                      attendance={attendance}
+                      payrollPaid={payrollPaid}
+                      setPayrollPaid={setPayrollPaid}
+                      overtimeRequests={overtimeRequests}
+                      otPolicy={otPolicy}
+                      payrollPolicy={payrollPolicy}
+                      setPayrollPolicy={setPayrollPolicy}
+                      salaryAdjustments={salaryAdjustments}
+                    />
+                  )}
+                {page === "payrollAdj" &&
+                  (role === "admin" || moduleEnabled("payrollAdj")) && (
+                    <SalaryAdjustments
+                      role={role}
+                      currentAdmin={currentAdmin}
+                      currentEmp={currentEmp}
+                      employees={employees}
+                      admins={admins}
+                      adjustments={salaryAdjustments}
+                      setAdjustments={setSalaryAdjustments}
+                      isSuperAdmin={isSuperAdmin || can("managePayroll")}
+                      canApprove={isSuperAdmin || can("managePayroll")}
+                    />
+                  )}
+                {page === "budget" && role === "admin" && (
+                  <BudgetPlanning
                     departments={departments}
-                    shifts={shifts}
-                    saveError={employeesSaveError}
+                    employees={employees}
+                    attendance={attendance}
+                    overtimeRequests={overtimeRequests}
+                    otPolicy={otPolicy}
+                    payrollPolicy={payrollPolicy}
+                    salaryAdjustments={salaryAdjustments}
+                    departmentBudgets={departmentBudgets}
+                    setDepartmentBudgets={setDepartmentBudgets}
+                    isSuperAdmin={isSuperAdmin || can("managePayroll")}
                   />
                 )}
-              {page === "settings" && role === "admin" && currentAdmin && (
-                <AdminSettings
-                  currentAdmin={currentAdmin}
-                  admins={admins}
-                  setAdmins={setAdmins}
-                  isSuperAdmin={isSuperAdmin}
-                  saveError={adminsSaveError}
-                  soundPolicy={soundPolicy}
-                  setSoundPolicy={setSoundPolicy}
-                />
-              )}
-              {page === "audits" &&
-                role === "admin" &&
-                (isSuperAdmin || can("viewAuditLog")) && <AuditLogPage />}
-              {page === "loginActivity" &&
-                (role === "admin" || moduleEnabled("loginActivity")) && (
-                  <LoginActivityPage
+                {page === "review" &&
+                  (role === "admin" || moduleEnabled("review")) && (
+                    <PerformanceReviews
+                      role={role}
+                      currentAdmin={currentAdmin}
+                      currentEmp={currentEmp}
+                      employees={employees}
+                      performanceReviews={performanceReviews}
+                      setPerformanceReviews={setPerformanceReviews}
+                      isSuperAdmin={isSuperAdmin}
+                    />
+                  )}
+                {page === "training" && role === "admin" && (
+                  <Trainings
+                    trainings={trainings}
+                    setTrainings={setTrainings}
+                    employees={employees}
+                    isSuperAdmin={isSuperAdmin}
+                  />
+                )}
+                {page === "training" &&
+                  role !== "admin" &&
+                  currentEmp &&
+                  moduleEnabled("training") && (
+                    <MyTrainings
+                      currentEmp={currentEmp}
+                      trainings={trainings}
+                    />
+                  )}
+                {page === "documents" &&
+                  role !== "admin" &&
+                  currentEmp &&
+                  moduleEnabled("documents") && (
+                    <MyDocuments
+                      currentEmp={currentEmp}
+                      documents={documents}
+                    />
+                  )}
+                {page === "attcorr" &&
+                  (role === "admin" || moduleEnabled("attcorr")) && (
+                    <AttendanceCorrections
+                      role={role}
+                      currentAdmin={currentAdmin}
+                      currentEmp={currentEmp}
+                      employees={employees}
+                      admins={admins}
+                      attendanceCorrections={attendanceCorrections}
+                      setAttendanceCorrections={setAttendanceCorrections}
+                      attendance={attendance}
+                      setAttendance={setAttendance}
+                      isSuperAdmin={isSuperAdmin || can("approveRequests")}
+                      canApprove={isSuperAdmin || can("approveRequests")}
+                    />
+                  )}
+                {page === "shiftswap" &&
+                  (role === "admin" || moduleEnabled("shiftswap")) && (
+                    <ShiftSwapRequests
+                      role={role}
+                      currentAdmin={currentAdmin}
+                      currentEmp={currentEmp}
+                      employees={employees}
+                      setEmployees={setEmployees}
+                      shifts={shifts}
+                      admins={admins}
+                      shiftSwapRequests={shiftSwapRequests}
+                      setShiftSwapRequests={setShiftSwapRequests}
+                      isSuperAdmin={isSuperAdmin || can("approveRequests")}
+                      canApprove={isSuperAdmin || can("approveRequests")}
+                    />
+                  )}
+                {page === "messages" && canUseMessages && (
+                  <MessagesPage
                     role={role}
                     currentAdmin={currentAdmin}
                     currentEmp={currentEmp}
-                    isSuperAdmin={isSuperAdmin}
-                    activeSessionId={activeSessionId}
+                    employees={employees}
+                    admins={admins}
+                    messages={messages}
+                    setMessages={setMessages}
+                    activeCall={voiceCall.call}
+                    onStartCall={voiceCall.startCall}
                   />
                 )}
-            </div>
-          </main>
+                {page === "admins" && role === "admin" && isSuperAdmin && (
+                  <AdminAccounts
+                    admins={admins}
+                    setAdmins={setAdmins}
+                    currentAdminId={currentAdmin?.id}
+                  />
+                )}
+                {page === "rolePerms" && role === "admin" && isSuperAdmin && (
+                  <RolePermissionsPage
+                    rolePermissions={rolePermissions}
+                    setRolePermissions={setRolePermissions}
+                  />
+                )}
+                {page === "profile" &&
+                  role !== "admin" &&
+                  currentEmp &&
+                  moduleEnabled("profile") && (
+                    <MyProfile
+                      currentEmp={currentEmp}
+                      employees={employees}
+                      setEmployees={setEmployees}
+                      departments={departments}
+                      shifts={shifts}
+                      saveError={employeesSaveError}
+                    />
+                  )}
+                {page === "settings" && role === "admin" && currentAdmin && (
+                  <AdminSettings
+                    currentAdmin={currentAdmin}
+                    admins={admins}
+                    setAdmins={setAdmins}
+                    isSuperAdmin={isSuperAdmin}
+                    saveError={adminsSaveError}
+                    soundPolicy={soundPolicy}
+                    setSoundPolicy={setSoundPolicy}
+                  />
+                )}
+                {page === "audits" &&
+                  role === "admin" &&
+                  (isSuperAdmin || can("viewAuditLog")) && <AuditLogPage />}
+                {page === "loginActivity" &&
+                  (role === "admin" || moduleEnabled("loginActivity")) && (
+                    <LoginActivityPage
+                      role={role}
+                      currentAdmin={currentAdmin}
+                      currentEmp={currentEmp}
+                      isSuperAdmin={isSuperAdmin}
+                      activeSessionId={activeSessionId}
+                    />
+                  )}
+                {page === "deviceApprovals" &&
+                  role === "admin" &&
+                  (isSuperAdmin || can("approveRequests")) && (
+                    <DeviceApprovalsPage
+                      currentAdmin={currentAdmin}
+                      employees={employees}
+                      deviceApprovals={deviceApprovals}
+                      setDeviceApprovals={setDeviceApprovals}
+                      canApprove={isSuperAdmin || can("approveRequests")}
+                    />
+                  )}
+              </div>
+            </main>
 
-          {bottomNav && (
-            <nav
-              className={`wf-bottomnav ${navOpen ? "wf-bottomnav-hidden" : ""}`}
-            >
-              {bottomNav.map((n) => (
+            {bottomNav && (
+              <nav
+                className={`wf-bottomnav ${navOpen ? "wf-bottomnav-hidden" : ""}`}
+              >
+                {bottomNav.map((n) => (
+                  <button
+                    key={n.id}
+                    className={`wf-bottomnav-item ${page === n.id || page?.startsWith(n.id + "/") ? "active" : ""}`}
+                    onClick={() => setPage(n.id)}
+                  >
+                    <span className="wf-bnav-icon-wrap">
+                      <n.icon size={19} />
+                    </span>
+                    <span>{n.label}</span>
+                  </button>
+                ))}
                 <button
-                  key={n.id}
-                  className={`wf-bottomnav-item ${page === n.id || page?.startsWith(n.id + "/") ? "active" : ""}`}
-                  onClick={() => setPage(n.id)}
+                  className={`wf-bottomnav-item ${page === "moreApps" ? "active" : ""}`}
+                  onClick={() => setPage("moreApps")}
                 >
                   <span className="wf-bnav-icon-wrap">
-                    <n.icon size={19} />
+                    <LayoutGrid size={19} />
                   </span>
-                  <span>{n.label}</span>
+                  <span>{t.nav.apps}</span>
                 </button>
-              ))}
-              <button
-                className={`wf-bottomnav-item ${page === "moreApps" ? "active" : ""}`}
-                onClick={() => setPage("moreApps")}
-              >
-                <span className="wf-bnav-icon-wrap">
-                  <LayoutGrid size={19} />
-                </span>
-                <span>{t.nav.apps}</span>
-              </button>
-            </nav>
-          )}
+              </nav>
+            )}
+          </div>
         </div>
-      </div>
-      <CallOverlay
-        call={voiceCall.call}
-        callError={voiceCall.callError}
-        onAccept={voiceCall.acceptCall}
-        onReject={voiceCall.rejectCall}
-        onEnd={voiceCall.endCall}
-        onToggleMute={voiceCall.toggleMute}
-        onDismissError={voiceCall.clearCallError}
-      />
-      {confirmLogoutOpen && (
-        <ConfirmDialog
-          title={t.confirmLogoutTitle}
-          text={t.confirmLogoutMsg}
-          confirmLabel={t.logout}
-          icon={LogOut}
-          variant="danger-solid"
-          onCancel={() => setConfirmLogoutOpen(false)}
-          onConfirm={performLogout}
+        <CallOverlay
+          call={voiceCall.call}
+          callError={voiceCall.callError}
+          onAccept={voiceCall.acceptCall}
+          onReject={voiceCall.rejectCall}
+          onEnd={voiceCall.endCall}
+          onToggleMute={voiceCall.toggleMute}
+          onDismissError={voiceCall.clearCallError}
         />
-      )}
+        {confirmLogoutOpen && (
+          <ConfirmDialog
+            title={t.confirmLogoutTitle}
+            text={t.confirmLogoutMsg}
+            confirmLabel={t.logout}
+            icon={LogOut}
+            variant="danger-solid"
+            onCancel={() => setConfirmLogoutOpen(false)}
+            onConfirm={performLogout}
+          />
+        )}
+      </DeviceApprovalContext.Provider>
     </BrandingContext.Provider>
   );
 }
