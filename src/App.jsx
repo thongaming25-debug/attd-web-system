@@ -1250,6 +1250,10 @@ const LANG_RAW = {
         "ឧបករណ៍នេះត្រូវបានហាមឃាត់ដោយ admin សូមទាក់ទង admin របស់អ្នក",
       bannedToast: "បានហាមឃាត់ឧបករណ៍ដោយជោគជ័យ",
       unbannedToast: "បានដកហាមឃាត់ដោយជោគជ័យ",
+      sharedBadge: "ឧបករណ៍នេះក៏ត្រូវបានអនុញ្ញាតឲ្យ {names} ដែរ",
+      sharedConfirmTitle: "ឧបករណ៍នេះកំពុងត្រូវបានប្រើរួម",
+      sharedConfirmText:
+        "ឧបករណ៍នេះត្រូវបានអនុញ្ញាតរួចហើយសម្រាប់ {names}។ បើអ្នកអនុញ្ញាតបន្ថែម និយោជិកទាំងពីរនាក់នេះនឹងអាច Check-in/Check-out ពីឧបករណ៍តែមួយបាន — សូមប្រាកដថានេះជាការចង់ធ្វើដោយចេតនា (ឧ. ថេប្លេតការិយាល័យរួម) មិនមែនការចែករំលែកឧបករណ៍ដើម្បីចុះម៉ោងជំនួសគ្នា។",
     },
     adj: {
       pageTitle: "ប្រាក់ខ្ចី & ប្រាក់រង្វាន់",
@@ -2751,6 +2755,10 @@ const LANG_RAW = {
         "This device was banned by an admin — please contact your admin.",
       bannedToast: "Device banned successfully",
       unbannedToast: "Device unbanned successfully",
+      sharedBadge: "This device is also approved for {names}",
+      sharedConfirmTitle: "This device is already shared",
+      sharedConfirmText:
+        "This device is already approved for {names}. Approving it here too means both employees will be able to check in/out from the same device — make sure that's intentional (e.g. a shared office tablet), not two people sharing a phone to punch in for each other.",
     },
     adj: {
       pageTitle: "Advances & Bonuses",
@@ -35096,6 +35104,33 @@ function DeviceApprovalsPage({
   // LoginActivityPage's revoke/delete confirmations.
   const [confirmDialog, setConfirmDialog] = useState(null);
 
+  // Anti-buddy-punching signal: is this row's physical device already
+  // approved for a *different* employee? Computed live off the current
+  // deviceApprovals list (rather than a stored flag) so it stays correct
+  // even as approvals change after the row was created — e.g. two
+  // employees each got approved on the same device at different times.
+  // Surfaced both as a badge on every row and as an extra confirmation
+  // step before approving (see decide() below), since a shared device
+  // isn't necessarily malicious (a shared office tablet/kiosk browser is
+  // legitimate) but should never be silent.
+  const deviceIsSharedApproved = (row) =>
+    deviceApprovals.some(
+      (d) =>
+        d.deviceId === row.deviceId &&
+        d.employeeId !== row.employeeId &&
+        d.status === "approved",
+    );
+  const sharedWithNames = (row) =>
+    deviceApprovals
+      .filter(
+        (d) =>
+          d.deviceId === row.deviceId &&
+          d.employeeId !== row.employeeId &&
+          d.status === "approved",
+      )
+      .map((d) => empOf(d.employeeId)?.name || "?")
+      .join(", ");
+
   const decide = (row, status) => {
     setDeviceApprovals(
       deviceApprovals.map((d) =>
@@ -35114,6 +35149,30 @@ function DeviceApprovalsPage({
           status === "approved" ? t.settings.approved : t.settings.rejected,
       },
     );
+  };
+  // Approving is a one-click action for a normal new device, but if this
+  // device is already approved for someone else, force an explicit extra
+  // confirmation instead of letting it go through silently — this is the
+  // moment that would otherwise let one physical device be used to check
+  // in/out for two different identities.
+  const approve = (row) => {
+    if (!deviceIsSharedApproved(row)) {
+      decide(row, "approved");
+      return;
+    }
+    setConfirmDialog({
+      title: t.devApproval.sharedConfirmTitle,
+      text: t.devApproval.sharedConfirmText.replace(
+        "{names}",
+        sharedWithNames(row),
+      ),
+      confirmLabel: t.devApproval.approve,
+      icon: ShieldAlert,
+      onConfirm: () => {
+        setConfirmDialog(null);
+        decide(row, "approved");
+      },
+    });
   };
 
   // Superadmin-only: permanently blocks a device (distinct from
@@ -35279,6 +35338,25 @@ function DeviceApprovalsPage({
                   </td>
                   <td style={{ fontSize: 13.5, color: T.textSoft }}>
                     {deviceLabel}
+                    {deviceIsSharedApproved(r) && (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 4,
+                          marginTop: 4,
+                          fontSize: 11.5,
+                          color: T.rose,
+                          fontWeight: 500,
+                        }}
+                      >
+                        <ShieldAlert size={12} />
+                        {t.devApproval.sharedBadge.replace(
+                          "{names}",
+                          sharedWithNames(r),
+                        )}
+                      </div>
+                    )}
                   </td>
                   <td
                     style={{
@@ -35316,7 +35394,7 @@ function DeviceApprovalsPage({
                           <Button
                             size="sm"
                             variant="accent"
-                            onClick={() => decide(r, "approved")}
+                            onClick={() => approve(r)}
                           >
                             <ThumbsUp size={13} /> {t.devApproval.approve}
                           </Button>
@@ -42957,11 +43035,30 @@ function AppInner() {
             // callback above). Already-known devices (approved, pending
             // or even rejected) are left as-is — re-deciding only
             // happens from the Device Approvals page.
+            //
+            // Anti-buddy-punching exception: "first device" only means
+            // auto-approve when this physical device isn't *already*
+            // approved for a different employee. Without this check, an
+            // employee who has simply never logged in before could get
+            // instant, unreviewed access to check in/out from a
+            // coworker's already-approved phone — the exact "one device,
+            // many identities" hole this guards against. Such a case
+            // still creates the row (so it shows up and the employee
+            // isn't silently blocked), but it starts "pending" like any
+            // other new device, and is flagged so the admin sees the
+            // overlap at a glance on the Device Approvals page (see
+            // deviceIsSharedApproved in DeviceApprovalsPage below).
             const deviceId = getOrCreateDeviceId();
             const mineDevices = deviceApprovals.filter(
               (d) => d.employeeId === id,
             );
             const already = mineDevices.find((d) => d.deviceId === deviceId);
+            const approvedForSomeoneElse = deviceApprovals.some(
+              (d) =>
+                d.deviceId === deviceId &&
+                d.employeeId !== id &&
+                d.status === "approved",
+            );
             if (!already) {
               const info = getDeviceInfo();
               setDeviceApprovals([
@@ -42973,7 +43070,10 @@ function AppInner() {
                   deviceType: info.deviceType,
                   os: info.os,
                   browser: info.browser,
-                  status: mineDevices.length === 0 ? "approved" : "pending",
+                  status:
+                    mineDevices.length === 0 && !approvedForSomeoneElse
+                      ? "approved"
+                      : "pending",
                   createdAt: new Date().toISOString(),
                   decidedAt: null,
                   decidedById: null,
