@@ -1,6 +1,7 @@
 import React, {
   useState,
   useEffect,
+  useLayoutEffect,
   useCallback,
   useRef,
   useMemo,
@@ -4756,13 +4757,29 @@ body{background:var(--wf-paper);}
 }
 `;
 function useGlobalStyle() {
-  useEffect(() => {
+  // Stylesheet injection must happen in useLayoutEffect, not useEffect.
+  // useEffect fires *after* the browser has already painted, so on a hard
+  // refresh there's a real (if brief) frame where the DOM exists but none
+  // of these classes (.wf-sidebar's off-canvas transform, .wf-root's flex
+  // layout, every T.* background/border color) are defined yet — the
+  // mobile drawer renders unpositioned and overlapping the content instead
+  // of off-screen, all colors fall back to browser defaults, and the
+  // result is exactly the washed-out, overlapping "half sidebar over the
+  // dashboard" flash seen on refresh. useLayoutEffect runs synchronously
+  // right after the DOM is updated but before the browser paints, so the
+  // stylesheet is guaranteed to be present for that very first frame.
+  useLayoutEffect(() => {
     if (!document.getElementById(STYLE_ID)) {
       const tag = document.createElement("style");
       tag.id = STYLE_ID;
       tag.innerHTML = CSS;
       document.head.appendChild(tag);
     }
+  }, []);
+  // The web font swap is a much milder issue (a flash of fallback-font
+  // text, not a broken layout), so it stays on the regular async effect
+  // rather than blocking paint too.
+  useEffect(() => {
     if (!document.getElementById("wf-fonts")) {
       const link = document.createElement("link");
       link.id = "wf-fonts";
