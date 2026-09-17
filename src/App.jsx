@@ -40,6 +40,7 @@ import {
   Menu,
   Lock,
   ShieldCheck,
+  ShieldOff,
   KeyRound,
   UserCircle2,
   ArrowLeft,
@@ -1239,6 +1240,16 @@ const LANG_RAW = {
       rejectedBanner: "ឧបករណ៍នេះត្រូវបានបដិសេធ សូមទាក់ទង admin របស់អ្នក",
       requestAgain: "ស្នើសុំម្តងទៀត",
       requestAgainSent: "បានផ្ញើសំណើទៅ admin រួចហើយ",
+      ban: "ហាមឃាត់",
+      unban: "ដកហាមឃាត់",
+      banConfirm:
+        "ហាមឃាត់ឧបករណ៍នេះឥឡូវនេះ? បុគ្គលិកនឹងមិនអាចស្នើសុំម្តងទៀតដោយខ្លួនឯងបានទេ លុះត្រាតែអ្នកដកហាមឃាត់ជាមុនសិន",
+      deleteConfirm:
+        "លុបសំណើឧបករណ៍នេះចោល? បុគ្គលិកនឹងអាចស្នើសុំម្តងទៀតតាមរយៈការ login លើកក្រោយ",
+      bannedBanner:
+        "ឧបករណ៍នេះត្រូវបានហាមឃាត់ដោយ admin សូមទាក់ទង admin របស់អ្នក",
+      bannedToast: "បានហាមឃាត់ឧបករណ៍ដោយជោគជ័យ",
+      unbannedToast: "បានដកហាមឃាត់ដោយជោគជ័យ",
     },
     adj: {
       pageTitle: "ប្រាក់ខ្ចី & ប្រាក់រង្វាន់",
@@ -2730,6 +2741,16 @@ const LANG_RAW = {
       rejectedBanner: "This device was rejected — please contact your admin.",
       requestAgain: "Request again",
       requestAgainSent: "Request sent to admin",
+      ban: "Ban",
+      unban: "Unban",
+      banConfirm:
+        "Ban this device now? The employee won't be able to request again themselves until you unban it.",
+      deleteConfirm:
+        "Delete this device request? The employee will be able to request again next time they log in.",
+      bannedBanner:
+        "This device was banned by an admin — please contact your admin.",
+      bannedToast: "Device banned successfully",
+      unbannedToast: "Device unbanned successfully",
     },
     adj: {
       pageTitle: "Advances & Bonuses",
@@ -7997,6 +8018,11 @@ function getStatusMap(lang) {
       bg: T.roseSoft,
       fg: T.roseDark,
       label: en ? "Rejected" : "បដិសេធ",
+    },
+    banned: {
+      bg: "#3A3A3A",
+      fg: "#FFFFFF",
+      label: en ? "Banned" : "ហាមឃាត់",
     },
   };
 }
@@ -20123,8 +20149,10 @@ function DeviceApprovalBanner({ style }) {
   const { t } = useLang();
   const { status, requestAgain } = useDeviceApproval();
   const [justSent, setJustSent] = useState(false);
-  if (status !== "pending" && status !== "rejected") return null;
+  if (status === "approved") return null;
   const rejected = status === "rejected";
+  const banned = status === "banned";
+  const blocked = rejected || banned;
   return (
     <div
       style={{
@@ -20134,8 +20162,8 @@ function DeviceApprovalBanner({ style }) {
         padding: "10px 12px",
         borderRadius: 10,
         marginBottom: 14,
-        background: rejected ? T.roseSoft : T.goldSoft,
-        border: `1px solid ${rejected ? T.rose : T.gold}`,
+        background: blocked ? T.roseSoft : T.goldSoft,
+        border: `1px solid ${blocked ? T.rose : T.gold}`,
         ...style,
       }}
     >
@@ -20144,18 +20172,20 @@ function DeviceApprovalBanner({ style }) {
         style={{
           flexShrink: 0,
           marginTop: 1,
-          color: rejected ? T.rose : T.gold,
+          color: blocked ? T.rose : T.gold,
         }}
       />
       <div
         style={{ fontSize: 12.5, color: T.textSoft, lineHeight: 1.5, flex: 1 }}
       >
         <div style={{ fontWeight: 700, color: T.ink, marginBottom: 2 }}>
-          {rejected
-            ? t.devApproval?.rejectedBanner
-            : t.devApproval?.bannerTitle}
+          {banned
+            ? t.devApproval?.bannedBanner
+            : rejected
+              ? t.devApproval?.rejectedBanner
+              : t.devApproval?.bannerTitle}
         </div>
-        {!rejected && t.devApproval?.bannerBody}
+        {!blocked && t.devApproval?.bannerBody}
         {rejected && (
           <button
             type="button"
@@ -20198,8 +20228,11 @@ function SelfPunch({
 }) {
   const { t, lang } = useLang();
   const { status: deviceStatus } = useDeviceApproval();
-  const deviceApproved =
-    deviceStatus !== "pending" && deviceStatus !== "rejected";
+  // Positive check (only "approved" grants access) rather than
+  // excluding "pending"/"rejected" — so any future status (e.g.
+  // "banned") is blocked by default instead of silently slipping
+  // through as allowed.
+  const deviceApproved = deviceStatus === "approved";
   const today = todayStr();
   const rec = attendance.find(
     (a) => a.employeeId === emp.id && a.date === today,
@@ -23620,8 +23653,11 @@ function LeaveRequests({
 }) {
   const { t, lang } = useLang();
   const { status: deviceStatus } = useDeviceApproval();
-  const deviceApproved =
-    deviceStatus !== "pending" && deviceStatus !== "rejected";
+  // Positive check (only "approved" grants access) rather than
+  // excluding "pending"/"rejected" — so any future status (e.g.
+  // "banned") is blocked by default instead of silently slipping
+  // through as allowed.
+  const deviceApproved = deviceStatus === "approved";
   const [modal, setModal] = useState(false);
   const [rejectFor, setRejectFor] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
@@ -25795,8 +25831,11 @@ function OvertimeRequests({
 }) {
   const { t, lang } = useLang();
   const { status: deviceStatus } = useDeviceApproval();
-  const deviceApproved =
-    deviceStatus !== "pending" && deviceStatus !== "rejected";
+  // Positive check (only "approved" grants access) rather than
+  // excluding "pending"/"rejected" — so any future status (e.g.
+  // "banned") is blocked by default instead of silently slipping
+  // through as allowed.
+  const deviceApproved = deviceStatus === "approved";
   const [modal, setModal] = useState(false);
   const [rejectFor, setRejectFor] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
@@ -26818,8 +26857,11 @@ function AttendanceCorrections({
 }) {
   const { t } = useLang();
   const { status: deviceStatus } = useDeviceApproval();
-  const deviceApproved =
-    deviceStatus !== "pending" && deviceStatus !== "rejected";
+  // Positive check (only "approved" grants access) rather than
+  // excluding "pending"/"rejected" — so any future status (e.g.
+  // "banned") is blocked by default instead of silently slipping
+  // through as allowed.
+  const deviceApproved = deviceStatus === "approved";
   const [modal, setModal] = useState(false);
   const [rejectFor, setRejectFor] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
@@ -27340,8 +27382,11 @@ function ShiftSwapRequests({
 }) {
   const { t } = useLang();
   const { status: deviceStatus } = useDeviceApproval();
-  const deviceApproved =
-    deviceStatus !== "pending" && deviceStatus !== "rejected";
+  // Positive check (only "approved" grants access) rather than
+  // excluding "pending"/"rejected" — so any future status (e.g.
+  // "banned") is blocked by default instead of silently slipping
+  // through as allowed.
+  const deviceApproved = deviceStatus === "approved";
   const [modal, setModal] = useState(false);
   const [rejectFor, setRejectFor] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
@@ -35043,9 +35088,13 @@ function DeviceApprovalsPage({
   deviceApprovals,
   setDeviceApprovals,
   canApprove,
+  isSuperAdmin,
 }) {
   const { t } = useLang();
   const empOf = (id) => employees.find((e) => e.id === id);
+  // Drive ConfirmDialog instead of window.confirm — same pattern as
+  // LoginActivityPage's revoke/delete confirmations.
+  const [confirmDialog, setConfirmDialog] = useState(null);
 
   const decide = (row, status) => {
     setDeviceApprovals(
@@ -35067,6 +35116,80 @@ function DeviceApprovalsPage({
     );
   };
 
+  // Superadmin-only: permanently blocks a device (distinct from
+  // "rejected" — a rejected device can be re-requested by the employee
+  // themselves via requestAgain, a banned one can't; only an admin can
+  // lift it). Reachable from any current status, including approved,
+  // in case a device needs to be locked out after the fact.
+  const doBan = (row) => {
+    setDeviceApprovals(
+      deviceApprovals.map((d) =>
+        d.id === row.id
+          ? {
+              ...d,
+              status: "banned",
+              decidedAt: new Date().toISOString(),
+              decidedById: currentAdmin?.id || null,
+              decidedByName: currentAdmin?.name || "",
+            }
+          : d,
+      ),
+      { toastMessage: t.devApproval.bannedToast },
+    );
+  };
+  const ban = (row) =>
+    setConfirmDialog({
+      title: t.devApproval.ban,
+      text: t.devApproval.banConfirm,
+      confirmLabel: t.devApproval.ban,
+      icon: ShieldOff,
+      onConfirm: () => {
+        setConfirmDialog(null);
+        doBan(row);
+      },
+    });
+  // Puts a banned device back into the normal queue — reviewable again
+  // like any pending request, not silently re-approved.
+  const unban = (row) => {
+    setDeviceApprovals(
+      deviceApprovals.map((d) =>
+        d.id === row.id
+          ? {
+              ...d,
+              status: "pending",
+              decidedAt: null,
+              decidedById: null,
+              decidedByName: "",
+            }
+          : d,
+      ),
+      { toastMessage: t.devApproval.unbannedToast },
+    );
+  };
+
+  // Superadmin-only: removes the request entirely so the employee can
+  // send a fresh one next time they log in from that device (see the
+  // `already` lookup in the login handler above). NOTE: if this is the
+  // *only* device row left for that employee, their next-ever login
+  // from any device will be treated as their first device again and
+  // auto-approved — only delete a single mistaken/stale entry while
+  // the employee still has at least one other device on record if you
+  // want the next request to go through review instead.
+  const doDelete = (row) => {
+    setDeviceApprovals(
+      deviceApprovals.filter((d) => d.id !== row.id),
+      { toastMessage: t.settings.deleted },
+    );
+  };
+  const del = (row) =>
+    setConfirmDialog({
+      text: t.devApproval.deleteConfirm,
+      onConfirm: () => {
+        setConfirmDialog(null);
+        doDelete(row);
+      },
+    });
+
   const sorted = [...deviceApprovals].sort((a, b) => {
     if (a.status === "pending" && b.status !== "pending") return -1;
     if (a.status !== "pending" && b.status === "pending") return 1;
@@ -35075,6 +35198,16 @@ function DeviceApprovalsPage({
 
   return (
     <div>
+      {confirmDialog && (
+        <ConfirmDialog
+          title={confirmDialog.title}
+          text={confirmDialog.text}
+          confirmLabel={confirmDialog.confirmLabel}
+          icon={confirmDialog.icon}
+          onConfirm={confirmDialog.onConfirm}
+          onCancel={() => setConfirmDialog(null)}
+        />
+      )}
       <Card style={{ padding: "14px 18px", marginBottom: 16 }}>
         <div style={{ fontSize: 13.5, color: T.textSoft, lineHeight: 1.5 }}>
           {t.devApproval.pageDesc}
@@ -35171,30 +35304,59 @@ function DeviceApprovalsPage({
                     )}
                   </td>
                   <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                    {r.status === "pending" && canApprove && (
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: 6,
-                          justifyContent: "flex-end",
-                        }}
-                      >
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 6,
+                        justifyContent: "flex-end",
+                      }}
+                    >
+                      {r.status === "pending" && canApprove && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="accent"
+                            onClick={() => decide(r, "approved")}
+                          >
+                            <ThumbsUp size={13} /> {t.devApproval.approve}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="danger-solid"
+                            onClick={() => decide(r, "rejected")}
+                          >
+                            <ThumbsDown size={13} /> {t.devApproval.reject}
+                          </Button>
+                        </>
+                      )}
+                      {isSuperAdmin && r.status === "banned" && (
                         <Button
                           size="sm"
                           variant="accent"
-                          onClick={() => decide(r, "approved")}
+                          onClick={() => unban(r)}
                         >
-                          <ThumbsUp size={13} /> {t.devApproval.approve}
+                          <ShieldCheck size={13} /> {t.devApproval.unban}
                         </Button>
+                      )}
+                      {isSuperAdmin && r.status !== "banned" && (
                         <Button
                           size="sm"
                           variant="danger-solid"
-                          onClick={() => decide(r, "rejected")}
+                          onClick={() => ban(r)}
                         >
-                          <ThumbsDown size={13} /> {t.devApproval.reject}
+                          <ShieldOff size={13} /> {t.devApproval.ban}
                         </Button>
-                      </div>
-                    )}
+                      )}
+                      {isSuperAdmin && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => del(r)}
+                        >
+                          <Trash2 size={13} />
+                        </Button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               );
@@ -43740,6 +43902,7 @@ function AppInner() {
                       deviceApprovals={deviceApprovals}
                       setDeviceApprovals={setDeviceApprovals}
                       canApprove={isSuperAdmin || can("approveRequests")}
+                      isSuperAdmin={isSuperAdmin}
                     />
                   )}
               </div>
