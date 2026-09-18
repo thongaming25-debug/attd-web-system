@@ -4499,11 +4499,11 @@ body{background:var(--wf-paper);}
 .wf-btn-primary:hover:not(:disabled){filter:brightness(.92);}
 .wf-btn-accent{position:relative;overflow:hidden;background:${T.gold};color:var(--wf-gold-fg,#1A1300);box-shadow:0 3px 12px rgba(0,0,0,0.18);}
 .wf-btn-accent:hover:not(:disabled){box-shadow:0 5px 18px rgba(0,0,0,0.24);filter:brightness(1.06);}
-.wf-btn-accent::after{content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;background:linear-gradient(115deg,transparent,rgba(255,255,255,0.4),transparent);transform:skewX(-20deg);animation:wf-btn-shine 3.4s ease-in-out infinite;pointer-events:none;}
+.wf-btn-accent::after{content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;background:linear-gradient(115deg,transparent,rgba(255,255,255,0.4),transparent);transform:skewX(-20deg);animation:wf-btn-shine 6.5s cubic-bezier(0.45,0,0.25,1) infinite;pointer-events:none;}
 .wf-btn-premium{position:relative;overflow:hidden;background:linear-gradient(135deg,#4F6EF7,#8B5CF6);color:#fff;box-shadow:0 3px 12px rgba(124,92,240,0.35);}
 .wf-btn-premium:hover:not(:disabled){box-shadow:0 5px 18px rgba(124,92,240,0.48);filter:brightness(1.06);}
-.wf-btn-premium::after{content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;background:linear-gradient(115deg,transparent,rgba(255,255,255,0.4),transparent);transform:skewX(-20deg);animation:wf-btn-shine 3.4s ease-in-out infinite;pointer-events:none;}
-@keyframes wf-btn-shine{0%{left:-60%;}38%{left:130%;}100%{left:130%;}}
+.wf-btn-premium::after{content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;background:linear-gradient(115deg,transparent,rgba(255,255,255,0.4),transparent);transform:skewX(-20deg);animation:wf-btn-shine 6.5s cubic-bezier(0.45,0,0.25,1) infinite;pointer-events:none;}
+@keyframes wf-btn-shine{0%{left:-60%;}60%{left:130%;}100%{left:130%;}}
 .wf-btn-ghost{background:transparent;color:${T.ink};border-color:${T.line};}
 .wf-btn-ghost:hover:not(:disabled){background:${T.tableHeadBg};}
 .wf-btn-danger{background:transparent;color:${T.rose};border-color:${T.dangerBorder};}
