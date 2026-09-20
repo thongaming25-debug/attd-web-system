@@ -238,6 +238,8 @@ const LANG_RAW = {
     add: "បន្ថែម",
     search: "ស្វែងរក...",
     employee: "បុគ្គលិក",
+    openAdminInNewTab: "បើកផ្ទាំង Admin ក្នុង Tab ថ្មី",
+    openEmployeeInNewTab: "បើកផ្ទាំងបុគ្គលិកក្នុង Tab ថ្មី",
     status: "ស្ថានភាព",
     actions: "សកម្មភាព",
     noData: "មិនមានទិន្នន័យ",
@@ -1756,6 +1758,8 @@ const LANG_RAW = {
     add: "Add",
     search: "Search...",
     employee: "Employee",
+    openAdminInNewTab: "Open Admin in New Tab",
+    openEmployeeInNewTab: "Open Employee View in New Tab",
     status: "Status",
     actions: "Actions",
     noData: "No data",
@@ -10699,6 +10703,18 @@ function AdminLoginScreen({ admins, onLogin, go }) {
 function employeePortalUrl() {
   const { origin, pathname } = window.location;
   return `${origin}${pathname}#/employee`;
+}
+// Mirror of employeePortalUrl() above — used by the header's "open in a
+// new tab" switcher (see the wf-role-badge row in AppInner) so a device
+// signed into both an admin and an employee session at once can flip
+// between them without reusing the same tab's hash history (see the
+// portal router's history note further up in this file: switching
+// portals in-place pushes a real back-button entry, which is exactly
+// what surprises people when they instead keep two different portal
+// bookmarks open in one tab and then hit Back).
+function adminPortalUrl() {
+  const { origin, pathname } = window.location;
+  return `${origin}${pathname}#/admin`;
 }
 // Public, unauthenticated URL for one office's kiosk display (see
 // KioskDisplay below) — meant to be left open on a tablet/monitor
@@ -43923,6 +43939,34 @@ function AppInner() {
                   <div className="wf-role-badge">
                     <HeaderClock />
                   </div>
+                  {role === "admin" && sessionAdmin && sessionEmployee && (
+                    <button
+                      type="button"
+                      title={t.openEmployeeInNewTab}
+                      onClick={() =>
+                        window.open(
+                          employeePortalUrl(),
+                          "_blank",
+                          "noopener,noreferrer",
+                        )
+                      }
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: 30,
+                        height: 30,
+                        borderRadius: 8,
+                        border: `1px solid ${T.lineSoft}`,
+                        background: "transparent",
+                        color: T.muted,
+                        cursor: "pointer",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Repeat size={15} />
+                    </button>
+                  )}
                   {role !== "admin" && currentEmp && (
                     <span
                       className="wf-role-badge"
@@ -43962,7 +44006,6 @@ function AppInner() {
                       {adminRoleLabel(currentAdmin?.role, lang)}
                     </span>
                   )}
-                  <ThemeToggle variant="light" />
                   <LangToggle variant="light" />
                   {canUseMessages && (
                     <ChatQuickAccess
