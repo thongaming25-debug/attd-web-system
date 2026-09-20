@@ -4460,7 +4460,13 @@ const STYLE_ID = "wf-suite-style";
 const CSS = `
 *,*::before,*::after{box-sizing:border-box;}
 html,body,#root{height:100%;margin:0;padding:0;}
-body{background:var(--wf-paper);}
+body{background:var(--wf-paper);font-family:'Inter','Noto Sans Khmer',sans-serif;}
+/* Modals/drawers are portaled to <body>, i.e. OUTSIDE .wf-root, so they never
+   inherited the app font and fell back to the browser's default serif. Give
+   them the app font (and make their form controls inherit it). :where() keeps
+   specificity at 0 so any component that sets its own font still wins. */
+:where(.wf-modal-overlay){font-family:'Inter','Noto Sans Khmer',sans-serif;}
+:where(.wf-modal-overlay) :where(button,input,textarea,select,optgroup){font-family:inherit;}
 :root{
   --wf-gold:#F0A83B;
   --wf-ink:#10141C; --wf-ink-dark:#050810; --wf-paper:#F3F4F7; --wf-card:#FFFFFF;
@@ -5480,14 +5486,27 @@ function addMinutesToClock(hhmm, mins) {
   const total = (((h * 60 + m + mins) % 1440) + 1440) % 1440;
   return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
 }
-function timeAgoLabel(iso) {
+function timeAgoLabel(iso, lang = "km") {
   if (!iso) return "";
   const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  const hrs = Math.round(mins / 60);
+  const days = Math.round(hrs / 24);
+  if (lang === "en") {
+    if (mins < 1) return "just now";
+    if (mins < 60) return `${mins} min ago`;
+    if (hrs < 24) return `${hrs} hr ago`;
+    return `${days} ${days === 1 ? "day" : "days"} ago`;
+  }
+  if (lang === "zh") {
+    if (mins < 1) return "刚刚";
+    if (mins < 60) return `${mins} 分钟前`;
+    if (hrs < 24) return `${hrs} 小时前`;
+    return `${days} 天前`;
+  }
   if (mins < 1) return "ឥឡូវនេះ";
   if (mins < 60) return `${mins} នាទីមុន`;
-  const hrs = Math.round(mins / 60);
   if (hrs < 24) return `${hrs} ម៉ោងមុន`;
-  return `${Math.round(hrs / 24)} ថ្ងៃមុន`;
+  return `${days} ថ្ងៃមុន`;
 }
 // Chat date-separator label ("Today" / "Yesterday" / a localized date),
 // used to break up a message thread by day the way most chat apps do.
@@ -5509,6 +5528,88 @@ function chatDateSeparatorLabel(iso, lang, t) {
     year: d.getFullYear() !== now.getFullYear() ? "numeric" : undefined,
   });
 }
+// All notification copy lives here, per language (km / en / zh), so the
+// dropdown follows the language picked in the header instead of mixing
+// languages. Titles are plain strings; messages are small functions of
+// the data that goes into them (names, dates, hours...).
+const NOTIF_TEXT = {
+  km: {
+    leaveNewTitle: "សំណើសុំច្បាប់ថ្មី",
+    leaveNewMsg: (name, label) => `${name} បានស្នើសុំ${label}`,
+    otNewTitle: "សំណើសុំ OT ថ្មី",
+    otNewMsg: (name, hours, date) =>
+      `${name} បានស្នើសុំ OT ចំនួន ${hours} ម៉ោង នៅថ្ងៃទី ${date}`,
+    acNewTitle: "សំណើកែតម្រូវវត្តមានថ្មី",
+    acNewMsg: (name, date) =>
+      `${name} បានស្នើសុំកែតម្រូវវត្តមាននៅថ្ងៃទី ${date}`,
+    ssNewTitle: "សំណើដូរវេនថ្មី",
+    ssNewMsg: (name, date) => `${name} បានស្នើសុំគ្របដណ្តប់វេននៅថ្ងៃទី ${date}`,
+    missedTitle: "មិនទាន់ចុះឈ្មោះចូលធ្វើការ",
+    missedMsg: (name, shift, time) =>
+      `${name} មិនទាន់ចុះឈ្មោះចូលធ្វើការទេ (${shift} ${time})`,
+    leaveOk: "សំណើសុំច្បាប់របស់អ្នកត្រូវបានអនុម័ត",
+    leaveNo: "សំណើសុំច្បាប់របស់អ្នកត្រូវបានបដិសេធ",
+    otOk: "សំណើសុំ OT របស់អ្នកត្រូវបានអនុម័ត",
+    otNo: "សំណើសុំ OT របស់អ្នកត្រូវបានបដិសេធ",
+    hoursUnit: " ម៉ោង",
+    reviewNew: "អ្នកទទួលបានការវាយតម្លៃការងារថ្មី",
+    acOk: "សំណើកែតម្រូវវត្តមានរបស់អ្នកត្រូវបានអនុម័ត",
+    acNo: "សំណើកែតម្រូវវត្តមានរបស់អ្នកត្រូវបានបដិសេធ",
+    ssOk: "សំណើដូរវេនរបស់អ្នកត្រូវបានអនុម័ត",
+    ssNo: "សំណើដូរវេនរបស់អ្នកត្រូវបានបដិសេធ",
+    announceNew: "សេចក្តីប្រកាសថ្មីពីក្រុមហ៊ុន",
+  },
+  en: {
+    leaveNewTitle: "New leave request",
+    leaveNewMsg: (name, label) => `${name} requested ${label}`,
+    otNewTitle: "New OT Request",
+    otNewMsg: (name, hours, date) =>
+      `${name} requested ${hours}h OT on ${date}`,
+    acNewTitle: "New attendance correction request",
+    acNewMsg: (name, date) => `${name} requested a correction on ${date}`,
+    ssNewTitle: "New shift swap request",
+    ssNewMsg: (name, date) => `${name} requested coverage on ${date}`,
+    missedTitle: "Missed clock-in",
+    missedMsg: (name, shift, time) =>
+      `${name} hasn't clocked in yet (${shift} ${time})`,
+    leaveOk: "Your leave request was approved",
+    leaveNo: "Your leave request was rejected",
+    otOk: "Your OT request was approved",
+    otNo: "Your OT request was rejected",
+    hoursUnit: "h",
+    reviewNew: "You received a new performance review",
+    acOk: "Your attendance correction was approved",
+    acNo: "Your attendance correction was rejected",
+    ssOk: "Your shift swap request was approved",
+    ssNo: "Your shift swap request was rejected",
+    announceNew: "New company announcement",
+  },
+  zh: {
+    leaveNewTitle: "新的请假申请",
+    leaveNewMsg: (name, label) => `${name} 申请了${label}`,
+    otNewTitle: "新的加班申请",
+    otNewMsg: (name, hours, date) =>
+      `${name} 申请在 ${date} 加班 ${hours} 小时`,
+    acNewTitle: "新的考勤更正申请",
+    acNewMsg: (name, date) => `${name} 申请更正 ${date} 的考勤`,
+    ssNewTitle: "新的换班申请",
+    ssNewMsg: (name, date) => `${name} 申请 ${date} 的换班代班`,
+    missedTitle: "未打卡上班",
+    missedMsg: (name, shift, time) =>
+      `${name} 尚未打卡上班（${shift} ${time}）`,
+    leaveOk: "您的请假申请已批准",
+    leaveNo: "您的请假申请已被拒绝",
+    otOk: "您的加班申请已批准",
+    otNo: "您的加班申请已被拒绝",
+    hoursUnit: " 小时",
+    reviewNew: "您收到了新的绩效评估",
+    acOk: "您的考勤更正申请已批准",
+    acNo: "您的考勤更正申请已被拒绝",
+    ssOk: "您的换班申请已批准",
+    ssNo: "您的换班申请已被拒绝",
+    announceNew: "公司新公告",
+  },
+};
 // Notifications are derived live from existing data rather than stored
 // separately: admins/managers see new pending leave requests and active
 // employees who haven't clocked in today past their shift's start time;
@@ -5528,7 +5629,7 @@ function buildNotifications({
   lang = "km",
 }) {
   const LEAVE_TYPE_LABEL = getLeaveTypeLabel(lang);
-  const en = lang === "en";
+  const N = NOTIF_TEXT[lang] || NOTIF_TEXT.km;
   const list = [];
   if (role === "admin") {
     leaveRequests
@@ -5539,8 +5640,11 @@ function buildNotifications({
           id: `lr-pending-${r.id}`,
           page: "leave",
           tone: "gold",
-          title: "សំណើសុំច្បាប់ថ្មី",
-          message: `${emp?.name || "?"} បានស្នើសុំ${LEAVE_TYPE_LABEL[r.type] || "ច្បាប់"}`,
+          title: N.leaveNewTitle,
+          message: N.leaveNewMsg(
+            emp?.name || "?",
+            LEAVE_TYPE_LABEL[r.type] || LEAVE_TYPE_LABEL.other,
+          ),
           time: r.createdAt,
         });
       });
@@ -5552,10 +5656,8 @@ function buildNotifications({
           id: `ot-pending-${r.id}`,
           page: "ot",
           tone: "gold",
-          title: en ? "New OT Request" : "សំណើសុំ OT ថ្មី",
-          message: en
-            ? `${emp?.name || "?"} requested ${r.hours}h OT on ${r.date}`
-            : `${emp?.name || "?"} បានស្នើសុំ OT ចំនួន ${r.hours} ម៉ោង នៅថ្ងៃទី ${r.date}`,
+          title: N.otNewTitle,
+          message: N.otNewMsg(emp?.name || "?", r.hours, r.date),
           time: r.createdAt,
         });
       });
@@ -5567,12 +5669,8 @@ function buildNotifications({
           id: `ac-pending-${r.id}`,
           page: "attcorr",
           tone: "gold",
-          title: en
-            ? "New attendance correction request"
-            : "សំណើកែតម្រូវវត្តមានថ្មី",
-          message: en
-            ? `${emp?.name || "?"} requested a correction on ${r.date}`
-            : `${emp?.name || "?"} បានស្នើសុំកែតម្រូវវត្តមាននៅថ្ងៃទី ${r.date}`,
+          title: N.acNewTitle,
+          message: N.acNewMsg(emp?.name || "?", r.date),
           time: r.createdAt,
         });
       });
@@ -5584,10 +5682,8 @@ function buildNotifications({
           id: `ss-pending-${r.id}`,
           page: "shiftswap",
           tone: "gold",
-          title: en ? "New shift swap request" : "សំណើដូរវេនថ្មី",
-          message: en
-            ? `${emp?.name || "?"} requested coverage on ${r.date}`
-            : `${emp?.name || "?"} បានស្នើសុំគ្របដណ្តប់វេននៅថ្ងៃទី ${r.date}`,
+          title: N.ssNewTitle,
+          message: N.ssNewMsg(emp?.name || "?", r.date),
           time: r.createdAt,
         });
       });
@@ -5607,8 +5703,8 @@ function buildNotifications({
           id: `mc-${e.id}-${today}`,
           page: "attendance",
           tone: "rose",
-          title: "មិនទាន់ចុះឈ្មោះចូលធ្វើការ",
-          message: `${e.name} មិនទាន់ចុះឈ្មោះចូលធ្វើការទេ (${shift.name} ${hhmm(shift.start)})`,
+          title: N.missedTitle,
+          message: N.missedMsg(e.name, shift.name, hhmm(shift.start)),
           time: `${today}T${now}:00`,
         });
       });
@@ -5625,11 +5721,8 @@ function buildNotifications({
           id: `lr-decided-${r.id}`,
           page: "leave",
           tone: r.status === "approved" ? "forest" : "rose",
-          title:
-            r.status === "approved"
-              ? "សំណើសុំច្បាប់របស់អ្នកត្រូវបានអនុម័ត"
-              : "សំណើសុំច្បាប់របស់អ្នកត្រូវបានបដិសេធ",
-          message: `${LEAVE_TYPE_LABEL[r.type] || "ច្បាប់"} (${r.startDate} – ${r.endDate})`,
+          title: r.status === "approved" ? N.leaveOk : N.leaveNo,
+          message: `${LEAVE_TYPE_LABEL[r.type] || LEAVE_TYPE_LABEL.other} (${r.startDate} – ${r.endDate})`,
           time: r.reviewedAt,
         });
       });
@@ -5645,15 +5738,8 @@ function buildNotifications({
           id: `ot-decided-${r.id}`,
           page: "ot",
           tone: r.status === "approved" ? "forest" : "rose",
-          title:
-            r.status === "approved"
-              ? en
-                ? "Your OT request was approved"
-                : "សំណើសុំ OT របស់អ្នកត្រូវបានអនុម័ត"
-              : en
-                ? "Your OT request was rejected"
-                : "សំណើសុំ OT របស់អ្នកត្រូវបានបដិសេធ",
-          message: `${r.date} · ${r.hours}${en ? "h" : " ម៉ោង"}`,
+          title: r.status === "approved" ? N.otOk : N.otNo,
+          message: `${r.date} · ${r.hours}${N.hoursUnit}`,
           time: r.reviewedAt,
         });
       });
@@ -5664,9 +5750,7 @@ function buildNotifications({
           id: `pr-new-${r.id}`,
           page: "review",
           tone: "gold",
-          title: en
-            ? "You received a new performance review"
-            : "អ្នកទទួលបានការវាយតម្លៃការងារថ្មី",
+          title: N.reviewNew,
           message: r.period,
           time: r.createdAt,
         });
@@ -5683,14 +5767,7 @@ function buildNotifications({
           id: `ac-decided-${r.id}`,
           page: "attcorr",
           tone: r.status === "approved" ? "forest" : "rose",
-          title:
-            r.status === "approved"
-              ? en
-                ? "Your attendance correction was approved"
-                : "សំណើកែតម្រូវវត្តមានរបស់អ្នកត្រូវបានអនុម័ត"
-              : en
-                ? "Your attendance correction was rejected"
-                : "សំណើកែតម្រូវវត្តមានរបស់អ្នកត្រូវបានបដិសេធ",
+          title: r.status === "approved" ? N.acOk : N.acNo,
           message: r.date,
           time: r.reviewedAt,
         });
@@ -5707,14 +5784,7 @@ function buildNotifications({
           id: `ss-decided-${r.id}`,
           page: "shiftswap",
           tone: r.status === "approved" ? "forest" : "rose",
-          title:
-            r.status === "approved"
-              ? en
-                ? "Your shift swap request was approved"
-                : "សំណើដូរវេនរបស់អ្នកត្រូវបានអនុម័ត"
-              : en
-                ? "Your shift swap request was rejected"
-                : "សំណើដូរវេនរបស់អ្នកត្រូវបានបដិសេធ",
+          title: r.status === "approved" ? N.ssOk : N.ssNo,
           message: r.date,
           time: r.reviewedAt,
         });
@@ -5724,7 +5794,7 @@ function buildNotifications({
         id: `ann-new-${a.id}`,
         page: "announcements",
         tone: "gold",
-        title: en ? "New company announcement" : "សេចក្តីប្រកាសថ្មីពីក្រុមហ៊ុន",
+        title: N.announceNew,
         message: a.title,
         time: a.createdAt,
       });
@@ -8176,6 +8246,14 @@ function getStatusMap(lang) {
   };
 }
 function getLeaveTypeLabel(lang) {
+  if (lang === "zh") {
+    return {
+      annual: "年假",
+      sick: "病假",
+      unpaid: "无薪假 (UL)",
+      other: "其他",
+    };
+  }
   const en = lang === "en";
   return {
     annual: en ? "Annual Leave" : "ច្បាប់ប្រចាំឆ្នាំ",
@@ -8529,6 +8607,7 @@ function NotificationBell({
       announcements,
       attendanceCorrections,
       shiftSwapRequests,
+      lang,
     ],
   );
   const unread = notifications.filter((n) => !readIds.includes(n.id));
@@ -8672,7 +8751,7 @@ function NotificationBell({
                         marginTop: 3,
                       }}
                     >
-                      {timeAgoLabel(n.time)}
+                      {timeAgoLabel(n.time, lang)}
                     </div>
                   </span>
                 </button>
@@ -8748,7 +8827,9 @@ function Modal({
   onClose,
   children,
   width = 480,
+  size,
 }) {
+  const large = size === "lg";
   return createPortal(
     <div
       className="wf-modal-overlay"
@@ -8757,13 +8838,16 @@ function Modal({
       }}
     >
       <div className="wf-modal" style={{ maxWidth: width }}>
-        <div className="wf-modal-head">
+        <div
+          className="wf-modal-head"
+          style={large ? { padding: "14px 20px" } : undefined}
+        >
           {HeadIcon && (
             <div
               style={{
-                width: 38,
-                height: 38,
-                borderRadius: 10,
+                width: large ? 38 : 38,
+                height: large ? 38 : 38,
+                borderRadius: large ? 11 : 10,
                 background: "rgba(91,141,239,.12)",
                 display: "flex",
                 alignItems: "center",
@@ -8779,7 +8863,10 @@ function Modal({
             <h3
               style={{
                 fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
-                fontWeight: 600,
+                fontWeight: large ? 700 : 600,
+                fontSize: large ? 17 : undefined,
+                margin: large ? 0 : undefined,
+                lineHeight: large ? 1.3 : undefined,
                 color: T.ink,
               }}
             >
@@ -8803,7 +8890,7 @@ function Modal({
             <X size={18} />
           </button>
         </div>
-        <div style={{ padding: 20 }}>{children}</div>
+        <div style={{ padding: large ? 16 : 20 }}>{children}</div>
       </div>
     </div>,
     document.body,
@@ -23511,12 +23598,35 @@ function LeaveRequestForm({ onSave, onCancel, remaining }) {
 
 // Small inline "decided by" line shown on both the admin and employee
 // views, so everyone sees the same approve/reject attribution.
-function LeaveDecisionNote({ r, admins }) {
+function LeaveDecisionNote({ r, admins, prominent }) {
   const { t, lang } = useLang();
   if (r.status !== "approved" && r.status !== "rejected") return null;
   const decider = admins.find((a) => a.id === r.decidedById);
   const name = r.decidedByName || decider?.name || "—";
   const roleLabel = adminRoleLabel(r.decidedByRole, lang);
+  if (prominent) {
+    const ok = r.status === "approved";
+    const StatusIcon = ok ? CheckCircle2 : XCircle;
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 8,
+          fontSize: 14,
+          lineHeight: 1.45,
+          color: ok ? T.forestText : T.rose,
+        }}
+      >
+        <StatusIcon size={18} style={{ flexShrink: 0, marginTop: 1 }} />
+        <span style={{ minWidth: 0, wordBreak: "break-word" }}>
+          {ok ? t.lv.approvedBy : t.lv.rejectedBy} {name}
+          {roleLabel ? ` · ${roleLabel}` : ""}
+          {!ok && r.decisionReason ? ` — ${r.decisionReason}` : ""}
+        </span>
+      </div>
+    );
+  }
   return (
     <div style={{ fontSize: 12.5, color: T.textSoft, marginTop: 3 }}>
       {r.status === "approved" ? (
@@ -23535,6 +23645,154 @@ function LeaveDecisionNote({ r, admins }) {
   );
 }
 
+// Soft icon-tile colours reused across the leave detail modal.
+const LEAVE_TONES = {
+  blue: { bg: "rgba(91,141,239,.14)", fg: "#5B8DEF" },
+  purple: { bg: "rgba(139,92,246,.14)", fg: "#8B5CF6" },
+  green: { bg: "rgba(31,162,107,.14)", fg: "#1FA26B" },
+};
+// Status chip with an icon (check / cross / clock) — used in the profile
+// banner and next to each approver in the leave detail modal.
+function LeaveStatusChip({ status, large }) {
+  const { lang } = useLang();
+  const s = getStatusMap(lang)[status] || {
+    bg: "#EEE",
+    fg: "#555",
+    label: status,
+  };
+  const Icon =
+    status === "approved"
+      ? CheckCircle2
+      : status === "rejected"
+        ? XCircle
+        : status === "pending"
+          ? Clock
+          : null;
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 6,
+        background: s.bg,
+        color: s.fg,
+        fontSize: large ? 13 : 12.5,
+        fontWeight: 600,
+        padding: large ? "6px 12px" : "5px 10px",
+        borderRadius: 999,
+        whiteSpace: "nowrap",
+        flexShrink: 0,
+      }}
+    >
+      {Icon && <Icon size={large ? 16 : 14} />}
+      {s.label}
+    </span>
+  );
+}
+// Small bordered card: coloured icon square on top, muted label, bold value.
+function LeaveStatTile({ icon: Icon, tone, label, value, nowrap }) {
+  return (
+    <div
+      style={{
+        background: T.card,
+        border: `1px solid ${T.lineSoft}`,
+        borderRadius: 12,
+        padding: "10px 11px 10px",
+        minWidth: 0,
+      }}
+    >
+      <div
+        style={{
+          width: 30,
+          height: 30,
+          borderRadius: 9,
+          background: tone.bg,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: 8,
+        }}
+      >
+        <Icon size={15} color={tone.fg} />
+      </div>
+      <div style={{ fontSize: 12, color: T.muted, lineHeight: 1.3 }}>
+        {label}
+      </div>
+      <div
+        title={String(value)}
+        style={{
+          fontSize: 14,
+          fontWeight: 700,
+          color: T.ink,
+          marginTop: 2,
+          lineHeight: 1.3,
+          fontVariantNumeric: "tabular-nums",
+          whiteSpace: nowrap ? "nowrap" : "normal",
+          wordBreak: "break-word",
+        }}
+      >
+        {value}
+      </div>
+    </div>
+  );
+}
+// Bordered section card with an icon-tile heading and optional trailing
+// element (the "1 of 4 can approve" pill, for example).
+function LeaveSectionCard({ icon: Icon, tone, title, trailing, children }) {
+  const tn = tone || LEAVE_TONES.blue;
+  return (
+    <div
+      style={{
+        background: T.card,
+        border: `1px solid ${T.lineSoft}`,
+        borderRadius: 12,
+        padding: 12,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 10,
+          marginBottom: 9,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            minWidth: 0,
+          }}
+        >
+          {Icon && (
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: 8,
+                background: tn.bg,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <Icon size={14} color={tn.fg} />
+            </div>
+          )}
+          <span style={{ fontSize: 14, fontWeight: 700, color: T.ink }}>
+            {title}
+          </span>
+        </div>
+        {trailing}
+      </div>
+      {children}
+    </div>
+  );
+}
+
 // "Approvers Information" — every admin currently allowed to approve or
 // reject leave (superadmin, or anyone with the approveRequests
 // permission). It's an OR list, not a unanimous one: whichever admin
@@ -23542,111 +23800,6 @@ function LeaveDecisionNote({ r, admins }) {
 // decidedById the rest of the app already stores — so this panel is
 // purely a read of who's eligible plus that one decision, no new
 // backend workflow required.
-// Small "icon + value + caption" tile used across the leave detail modal —
-// a colored icon square, a bold value, and a small label underneath —
-// reused for leave/duration type, date/time, and balance tiles so they
-// all read consistently instead of the plain label-over-value pairs.
-function LeaveInfoTile({
-  icon: Icon,
-  value,
-  label,
-  mono,
-  valueColor,
-  valueSize = 14.5,
-}) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "flex-start",
-        gap: 10,
-        minWidth: 0,
-      }}
-    >
-      {Icon && (
-        <div
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: 9,
-            background: "rgba(91,141,239,.12)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
-        >
-          <Icon size={15} color={T.blue} />
-        </div>
-      )}
-      <div style={{ minWidth: 0 }}>
-        <div
-          style={{
-            fontSize: valueSize,
-            fontWeight: 700,
-            color: valueColor || T.ink,
-            fontFamily: mono ? "'JetBrains Mono',monospace" : "inherit",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {value}
-        </div>
-        <div style={{ fontSize: 12, color: T.muted, marginTop: 1 }}>
-          {label}
-        </div>
-      </div>
-    </div>
-  );
-}
-// Small icon-badge section heading (e.g. "Leave Balance", "Reason") used
-// throughout the leave detail modal, with an optional trailing element
-// (a count pill, in the approvers section).
-function LeaveSectionHeading({ icon: Icon, children, trailing }) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        marginBottom: 8,
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        {Icon && (
-          <div
-            style={{
-              width: 26,
-              height: 26,
-              borderRadius: 7,
-              background: "rgba(91,141,239,.12)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
-            <Icon size={13} color={T.blue} />
-          </div>
-        )}
-        <span style={{ fontSize: 14, fontWeight: 700, color: T.ink }}>
-          {children}
-        </span>
-      </div>
-      {trailing}
-    </div>
-  );
-}
-// Thin vertical rule used to separate tiles laid out in a row (leave
-// type/duration type, date/time, balance) — mirrors the reference design's
-// divider between fields sharing one bordered box.
-function LeaveTileDivider() {
-  return (
-    <div style={{ width: 1, alignSelf: "stretch", background: T.lineSoft }} />
-  );
-}
-
 function LeaveApproversPanel({ request, approvers, t, lang }) {
   if (!approvers || approvers.length === 0) {
     return (
@@ -23662,28 +23815,31 @@ function LeaveApproversPanel({ request, approvers, t, lang }) {
       return "rejected";
     return "pending";
   };
+  const orLabel = lang === "en" ? "OR" : lang === "zh" ? "或" : "ឬ";
   return (
-    <div>
-      <LeaveSectionHeading
-        icon={Users}
-        trailing={
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: T.forestText,
-              background: T.forestSoft,
-              padding: "3px 9px",
-              borderRadius: 999,
-              flexShrink: 0,
-            }}
-          >
-            {t.lv.canApproveCount(approvers.length)}
-          </span>
-        }
-      >
-        {t.lv.approversInformation}
-      </LeaveSectionHeading>
+    <LeaveSectionCard
+      icon={Users}
+      title={t.lv.approversInformation}
+      trailing={
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 5,
+            fontSize: 12,
+            fontWeight: 600,
+            color: T.forestText,
+            background: T.forestSoft,
+            padding: "4px 10px",
+            borderRadius: 999,
+            flexShrink: 0,
+          }}
+        >
+          <CheckCircle2 size={13} />
+          {t.lv.canApproveCount(approvers.length)}
+        </span>
+      }
+    >
       <div style={{ display: "flex", flexDirection: "column" }}>
         {approvers.map((a, i) => (
           <div key={a.id}>
@@ -23692,18 +23848,18 @@ function LeaveApproversPanel({ request, approvers, t, lang }) {
                 display: "flex",
                 alignItems: "center",
                 gap: 10,
-                padding: "9px 10px",
-                background: T.paper,
+                padding: "8px 11px",
+                background: T.tableHeadBg,
                 border: `1px solid ${T.lineSoft}`,
                 borderRadius: 10,
               }}
             >
-              <Avatar name={a.name} photo={a.photo} size={32} />
+              <Avatar name={a.name} photo={a.photo} size={34} />
               <div style={{ minWidth: 0, flex: 1 }}>
                 <div
                   style={{
                     fontSize: 14,
-                    fontWeight: 600,
+                    fontWeight: 700,
                     color: T.ink,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -23716,7 +23872,7 @@ function LeaveApproversPanel({ request, approvers, t, lang }) {
                   {adminRoleLabel(a.role, lang)}
                 </div>
               </div>
-              <StatusPill status={statusFor(a)} />
+              <LeaveStatusChip status={statusFor(a)} />
               <ChevronRight size={15} color={T.mutedLight} />
             </div>
             {i < approvers.length - 1 && (
@@ -23726,16 +23882,17 @@ function LeaveApproversPanel({ request, approvers, t, lang }) {
                   fontSize: 11.5,
                   fontWeight: 700,
                   color: T.mutedLight,
-                  padding: "3px 0",
+                  padding: "2px 0",
+                  letterSpacing: ".04em",
                 }}
               >
-                {lang === "en" ? "OR" : "ឬ"}
+                {orLabel}
               </div>
             )}
           </div>
         ))}
       </div>
-    </div>
+    </LeaveSectionCard>
   );
 }
 
@@ -23804,6 +23961,7 @@ function LeaveDetailModal({
   onCancelOwn,
 }) {
   const { t, lang } = useLang();
+  const isMobile = useIsMobile();
   const isHourly = request.durationType === "hourly";
   const days = leaveDurationDays(request);
   const hours = isHourly
@@ -23819,38 +23977,160 @@ function LeaveDetailModal({
     : days === 0.5
       ? t.lv.durationTypeHalfDay
       : t.lv.durationTypeHourly;
-  const boxStyle = {
-    padding: "10px 12px",
-    background: T.paper,
-    border: `1px solid ${T.lineSoft}`,
-    borderRadius: 10,
-  };
+  const tiles = [
+    {
+      icon: CalendarDays,
+      tone: LEAVE_TONES.blue,
+      label: t.lv.type,
+      value: getLeaveTypeLabel(lang)[request.type] || request.type,
+    },
+    {
+      icon: CalendarClock,
+      tone: LEAVE_TONES.purple,
+      label: t.lv.durationType,
+      value: durationTypeLabel,
+    },
+    ...(isHourly
+      ? [
+          {
+            icon: Calendar,
+            tone: LEAVE_TONES.green,
+            label: t.lv.startDate,
+            value: request.startDate,
+            nowrap: true,
+          },
+          {
+            icon: Clock,
+            tone: LEAVE_TONES.purple,
+            label: `${t.lv.startTime} – ${t.lv.endTime}`,
+            value: `${request.startTime} – ${request.endTime}`,
+          },
+        ]
+      : [
+          {
+            icon: Calendar,
+            tone: LEAVE_TONES.green,
+            label: t.lv.fromShort,
+            value: request.startDate,
+            nowrap: true,
+          },
+          {
+            icon: Calendar,
+            tone: LEAVE_TONES.purple,
+            label: t.lv.toShort,
+            value: request.endDate,
+            nowrap: true,
+          },
+        ]),
+  ];
+  const summary = [];
+  if (typeof remainingDays === "number") {
+    summary.push({
+      key: "balance",
+      tone: LEAVE_TONES.green,
+      label: t.lv.leaveBalance,
+      value: isHourly
+        ? t.lv.remainingHours(
+            Math.round(remainingDays * STANDARD_WORKDAY_HOURS),
+          )
+        : t.lv.remainingDays(remainingDays),
+      valueColor: T.forestText,
+    });
+  }
+  summary.push({
+    key: "duration",
+    tone: LEAVE_TONES.blue,
+    label: t.lv.totalDuration,
+    value: durationWords,
+    valueColor: T.ink,
+  });
+  const online = employee
+    ? isRecentlyActive(employee.lastActive, Date.now())
+    : false;
   return (
     <Modal
       title={t.lv.detailTitle}
       subtitle={t.lv.detailSubtitle}
       icon={ListChecks}
       onClose={onClose}
-      width={480}
+      width={560}
+      size="lg"
     >
-      <div>
-        {employee && (
+      <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+        {employee ? (
           <div
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
               gap: 10,
-              marginBottom: 16,
+              flexWrap: "wrap",
+              padding: "12px 14px",
+              borderRadius: 14,
+              background:
+                "linear-gradient(120deg, rgba(91,141,239,.14) 0%, rgba(91,141,239,.05) 60%, rgba(139,92,246,.07) 100%)",
+              border: "1px solid rgba(91,141,239,.14)",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <Avatar name={employee.name} photo={employee.photo} size={52} />
-              <div>
-                <div style={{ fontWeight: 700, color: T.ink, fontSize: 16 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                minWidth: 0,
+              }}
+            >
+              <div style={{ position: "relative", flexShrink: 0 }}>
+                <div
+                  style={{
+                    padding: 3,
+                    borderRadius: "50%",
+                    background: T.card,
+                    boxShadow: "0 2px 8px rgba(16,24,40,.14)",
+                    lineHeight: 0,
+                  }}
+                >
+                  <Avatar
+                    name={employee.name}
+                    photo={employee.photo}
+                    size={isMobile ? 44 : 52}
+                  />
+                </div>
+                {online && (
+                  <span
+                    title={
+                      lang === "en"
+                        ? "Online"
+                        : lang === "zh"
+                          ? "在线"
+                          : "កំពុងអនឡាញ"
+                    }
+                    style={{
+                      position: "absolute",
+                      right: 2,
+                      bottom: 2,
+                      width: 12,
+                      height: 12,
+                      borderRadius: "50%",
+                      background: T.forest,
+                      border: `2px solid ${T.card}`,
+                    }}
+                  />
+                )}
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <div
+                  style={{
+                    fontWeight: 700,
+                    color: T.ink,
+                    fontSize: isMobile ? 16 : 17,
+                    lineHeight: 1.25,
+                    wordBreak: "break-word",
+                  }}
+                >
                   {employee.name}
                 </div>
-                <div style={{ fontSize: 13, color: T.muted, marginTop: 1 }}>
+                <div style={{ fontSize: 12.5, color: T.muted, marginTop: 1 }}>
                   {t.login.employeeId}: {employee.code}
                 </div>
                 <span
@@ -23858,160 +24138,113 @@ function LeaveDetailModal({
                     display: "inline-flex",
                     alignItems: "center",
                     gap: 4,
-                    marginTop: 6,
+                    marginTop: 5,
                     fontSize: 12,
                     fontWeight: 600,
                     color: T.blue,
-                    background: "rgba(91,141,239,.12)",
-                    padding: "3px 9px",
+                    background: "rgba(91,141,239,.14)",
+                    padding: "2px 9px",
                     borderRadius: 999,
                   }}
                 >
-                  <User size={11} /> {t.employee}
+                  <User size={12} /> {t.employee}
                 </span>
               </div>
             </div>
-            <StatusPill status={request.status} />
+            <LeaveStatusChip status={request.status} large />
+          </div>
+        ) : (
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <LeaveStatusChip status={request.status} large />
           </div>
         )}
         <div
           style={{
-            display: "flex",
-            alignItems: "stretch",
-            justifyContent: "space-between",
-            gap: 12,
-            ...boxStyle,
-            marginBottom: 12,
+            display: "grid",
+            gridTemplateColumns: isMobile
+              ? "repeat(2, minmax(0, 1fr))"
+              : "repeat(4, minmax(0, 1fr))",
+            gap: 8,
           }}
         >
-          <LeaveInfoTile
-            icon={CalendarDays}
-            value={getLeaveTypeLabel(lang)[request.type] || request.type}
-            label={t.lv.type}
-          />
-          <LeaveTileDivider />
-          <LeaveInfoTile
-            icon={CalendarClock}
-            value={durationTypeLabel}
-            label={t.lv.durationType}
-          />
+          {tiles.map((tile, i) => (
+            <LeaveStatTile key={i} {...tile} />
+          ))}
         </div>
-        <div style={{ ...boxStyle, marginBottom: 12 }}>
-          {isHourly ? (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              isMobile || summary.length === 1 ? "1fr" : "1fr 1fr",
+            borderRadius: 12,
+            border: `1px solid ${T.lineSoft}`,
+            background: `linear-gradient(90deg, ${T.forestSoft}, rgba(91,141,239,.06))`,
+            overflow: "hidden",
+          }}
+        >
+          {summary.map((h, i) => (
             <div
+              key={h.key}
               style={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "space-between",
-                gap: 8,
+                gap: 11,
+                padding: "11px 13px",
+                minWidth: 0,
+                borderLeft:
+                  i > 0 && !isMobile ? `1px solid ${T.line}` : undefined,
+                borderTop:
+                  i > 0 && isMobile ? `1px solid ${T.line}` : undefined,
               }}
             >
-              <LeaveInfoTile
-                icon={Calendar}
-                value={request.startDate}
-                label={t.lv.startDate}
-                mono
-              />
-              <LeaveTileDivider />
-              <LeaveInfoTile
-                icon={Clock}
-                value={request.startTime}
-                label={t.lv.startTime}
-                mono
-                valueColor={T.forestText}
-              />
-              <span
+              <div
                 style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: T.mutedLight,
+                  width: 38,
+                  height: 38,
+                  borderRadius: 11,
+                  background: h.tone.bg,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                   flexShrink: 0,
                 }}
               >
-                {t.lv.hoursShort(hours)}
-              </span>
-              <LeaveInfoTile
-                icon={Clock}
-                value={request.endTime}
-                label={t.lv.endTime}
-                mono
-                valueColor={T.forestText}
-              />
+                <Clock size={19} color={h.tone.fg} />
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 12, color: T.muted }}>{h.label}</div>
+                <div
+                  style={{
+                    fontSize: isMobile ? 16 : 17,
+                    fontWeight: 700,
+                    color: h.valueColor,
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {h.value}
+                </div>
+              </div>
             </div>
-          ) : (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 12,
-              }}
-            >
-              <LeaveInfoTile
-                icon={Calendar}
-                value={request.startDate}
-                label={t.lv.fromShort}
-                mono
-              />
-              <LeaveTileDivider />
-              <LeaveInfoTile
-                icon={Calendar}
-                value={request.endDate}
-                label={t.lv.toShort}
-                mono
-              />
-            </div>
-          )}
+          ))}
         </div>
-        {typeof remainingDays === "number" && (
-          <div style={{ marginBottom: 12 }}>
-            <LeaveSectionHeading icon={Wallet}>
-              {t.lv.leaveBalance}
-            </LeaveSectionHeading>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "stretch",
-                justifyContent: "space-between",
-                gap: 12,
-                ...boxStyle,
-                background: T.forestSoft || T.paper,
-              }}
-            >
-              <LeaveInfoTile
-                value={
-                  isHourly
-                    ? t.lv.remainingHours(
-                        Math.round(remainingDays * STANDARD_WORKDAY_HOURS),
-                      )
-                    : t.lv.remainingDays(remainingDays)
-                }
-                label={lang === "en" ? "Remaining" : "នៅសល់"}
-                valueColor={T.forestText}
-                valueSize={19}
-              />
-              <LeaveTileDivider />
-              <LeaveInfoTile
-                icon={Clock}
-                value={durationWords}
-                label={t.lv.totalDuration}
-              />
-            </div>
-          </div>
-        )}
-        <div style={{ marginBottom: 12 }}>
-          <LeaveSectionHeading icon={MessageCircle}>
-            {t.lv.reason}
-          </LeaveSectionHeading>
-          <div style={{ ...boxStyle, fontSize: 14, color: T.textSoft }}>
+        <LeaveSectionCard icon={MessageCircle} title={t.lv.reason}>
+          <div
+            style={{
+              background: T.tableHeadBg,
+              borderRadius: 10,
+              padding: "9px 12px",
+              fontSize: 13.5,
+              color: T.textSoft,
+              minHeight: 36,
+              whiteSpace: "pre-wrap",
+              wordBreak: "break-word",
+            }}
+          >
             {request.reason || "—"}
           </div>
-        </div>
+        </LeaveSectionCard>
         {request.attachment && (
-          <div style={{ marginBottom: 12 }}>
-            <LeaveSectionHeading icon={Paperclip}>
-              {t.lv.attachment}
-            </LeaveSectionHeading>
+          <LeaveSectionCard icon={Paperclip} title={t.lv.attachment}>
             <a
               href={request.attachment.dataUrl}
               download={request.attachment.fileName}
@@ -24019,13 +24252,15 @@ function LeaveDetailModal({
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
-                ...boxStyle,
+                background: T.tableHeadBg,
+                borderRadius: 10,
+                padding: "9px 12px",
                 fontSize: 13.5,
                 color: T.forestText,
                 textDecoration: "none",
               }}
             >
-              <Paperclip size={13} />
+              <Paperclip size={14} />
               <span
                 style={{
                   overflow: "hidden",
@@ -24035,47 +24270,56 @@ function LeaveDetailModal({
               >
                 {request.attachment.fileName}
               </span>
-              <Download size={13} style={{ marginLeft: "auto" }} />
+              <Download size={14} style={{ marginLeft: "auto" }} />
             </a>
-          </div>
+          </LeaveSectionCard>
         )}
-        <div style={{ marginBottom: 8 }}>
-          <LeaveApproversPanel
-            request={request}
-            approvers={approvers}
-            t={t}
-            lang={lang}
-          />
-        </div>
-        <LeaveDecisionNote r={request} admins={admins} />
+        <LeaveApproversPanel
+          request={request}
+          approvers={approvers}
+          t={t}
+          lang={lang}
+        />
         <div
           style={{
             display: "flex",
-            justifyContent: "flex-end",
-            gap: 8,
-            marginTop: 14,
-            paddingTop: 14,
-            borderTop: `1px solid ${T.lineSoft}`,
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+            flexWrap: "wrap",
+            marginTop: 2,
           }}
         >
-          {canCancelOwn && (
-            <Button variant="danger" onClick={onCancelOwn}>
-              {t.lv.cancelRequest}
+          <div style={{ minWidth: 0, flex: "1 1 220px" }}>
+            <LeaveDecisionNote r={request} admins={admins} prominent />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              flexWrap: "wrap",
+              marginLeft: "auto",
+            }}
+          >
+            {canCancelOwn && (
+              <Button variant="danger" onClick={onCancelOwn}>
+                {t.lv.cancelRequest}
+              </Button>
+            )}
+            {canApprove && request.status === "pending" && (
+              <>
+                <Button variant="danger" onClick={onReject}>
+                  {t.lv.reject}
+                </Button>
+                <Button variant="accent" onClick={onApprove}>
+                  {t.lv.approve}
+                </Button>
+              </>
+            )}
+            <Button variant="ghost" onClick={onClose}>
+              {t.cancel}
             </Button>
-          )}
-          {canApprove && request.status === "pending" && (
-            <>
-              <Button variant="danger" onClick={onReject}>
-                {t.lv.reject}
-              </Button>
-              <Button variant="accent" onClick={onApprove}>
-                {t.lv.approve}
-              </Button>
-            </>
-          )}
-          <Button variant="ghost" onClick={onClose}>
-            {t.cancel}
-          </Button>
+          </div>
         </div>
       </div>
     </Modal>
@@ -28372,7 +28616,7 @@ function Announcements({
                 {t.ann.postedBy} {a.createdByName || "—"}
               </span>
               <span style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                {timeAgoLabel(a.createdAt)}
+                {timeAgoLabel(a.createdAt, lang)}
               </span>
             </div>
           </Card>
@@ -32216,7 +32460,7 @@ function MessagesPage({
                     peerOnline
                       ? t.chat.onlineLabel
                       : peerActiveIso
-                        ? `${t.chat.lastSeenLabel} ${timeAgoLabel(peerActiveIso)}`
+                        ? `${t.chat.lastSeenLabel} ${timeAgoLabel(peerActiveIso, lang)}`
                         : null,
                   ]
                     .filter(Boolean)
@@ -32575,8 +32819,8 @@ function MessagesPage({
                                 style={{ fontSize: 11, color: T.mutedLight }}
                               >
                                 {m.editedAt && !m.deleted
-                                  ? `${timeAgoLabel(m.createdAt)} · ${t.chat.edited}`
-                                  : timeAgoLabel(m.createdAt)}
+                                  ? `${timeAgoLabel(m.createdAt, lang)} · ${t.chat.edited}`
+                                  : timeAgoLabel(m.createdAt, lang)}
                                 {mine && m.id === lastMineMessageId && (
                                   <>
                                     {" · "}
@@ -32980,7 +33224,7 @@ function MessagesPage({
                         flexShrink: 0,
                       }}
                     >
-                      {timeAgoLabel(c.lastMessage.createdAt)}
+                      {timeAgoLabel(c.lastMessage.createdAt, lang)}
                     </div>
                   )}
                 </div>
