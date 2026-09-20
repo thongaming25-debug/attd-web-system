@@ -4565,6 +4565,15 @@ body{background:var(--wf-paper);font-family:'Inter','Noto Sans Khmer',sans-serif
 .wf-btn-premium:hover:not(:disabled){box-shadow:0 5px 18px rgba(124,92,240,0.48);filter:brightness(1.06);}
 .wf-btn-premium::after{content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;background:linear-gradient(115deg,transparent,rgba(255,255,255,0.4),transparent);transform:skewX(-20deg);animation:wf-btn-shine 6.5s cubic-bezier(0.45,0,0.25,1) infinite;pointer-events:none;}
 @keyframes wf-btn-shine{0%{left:-60%;}60%{left:130%;}100%{left:130%;}}
+/* ---- Slide-to-confirm control (mobile "Cancel Request" in the leave detail modal) ---- */
+@keyframes wf-slide-nudge{0%,100%{transform:translateX(0);}50%{transform:translateX(14px);}}
+@keyframes wf-slide-glow{0%,100%{box-shadow:0 0 0 4px rgba(229,72,77,0.14),0 4px 12px rgba(229,72,77,0.32);}50%{box-shadow:0 0 0 8px rgba(229,72,77,0.05),0 6px 16px rgba(229,72,77,0.44);}}
+@keyframes wf-slide-arrow{from{transform:translateX(-6px);opacity:.35;}to{transform:translateX(6px);opacity:1;}}
+@keyframes wf-slide-shimmer{from{background-position:100% 0;}to{background-position:0% 0;}}
+.wf-slide-handle-idle{animation:wf-slide-nudge 1.8s ease-in-out infinite,wf-slide-glow 1.8s ease-in-out infinite;}
+.wf-slide-arrow{animation:wf-slide-arrow 1.1s ease-in-out infinite alternate;}
+.wf-slide-label{background:linear-gradient(100deg,${T.rose} 30%,#FF9CA1 50%,${T.rose} 70%);background-size:260% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:wf-slide-shimmer 2.4s ease-in-out infinite alternate;}
+@media (prefers-reduced-motion:reduce){.wf-slide-handle-idle,.wf-slide-arrow,.wf-slide-label{animation:none;}}
 .wf-btn-ghost{background:transparent;color:${T.ink};border-color:${T.line};}
 .wf-btn-ghost:hover:not(:disabled){background:${T.tableHeadBg};}
 .wf-btn-danger{background:transparent;color:${T.rose};border-color:${T.dangerBorder};}
@@ -23947,6 +23956,204 @@ function LeaveRejectModal({ onCancel, onConfirm }) {
 // drifting apart. Admin-only actions (Approve/Reject) and the
 // employee-only "Cancel Request" action are both optional props, so the
 // same component renders correctly for either audience.
+// "Slide to confirm" control — a red handle you drag to the end of a pill
+// track to confirm a destructive action (used for "Cancel Request" on
+// phones, where an accidental tap on a plain button is too easy). Idle
+// state animates back and forth: the handle nudges + glows, the arrow runs
+// left/right and a highlight sweeps across the label. Releasing before ~85%
+// springs the handle back; reaching it turns the handle into a check and
+// calls onConfirm(). Keyboard: Enter / Space / → on the handle confirms.
+function SlideToConfirm({ label, ariaLabel, onConfirm }) {
+  const HANDLE = 44;
+  const PAD = 4;
+  const trackRef = useRef(null);
+  const maxRef = useRef(0);
+  const startRef = useRef(0);
+  const dragRef = useRef(0);
+  const timerRef = useRef(null);
+  const draggingRef = useRef(false);
+  const [drag, setDrag] = useState(0);
+  const [dragging, setDraggingState] = useState(false);
+  const [done, setDone] = useState(false);
+  useEffect(() => () => clearTimeout(timerRef.current), []);
+  // ref mirrors the state so fast pointer events never read a stale value
+  const setDragging = (v) => {
+    draggingRef.current = v;
+    setDraggingState(v);
+  };
+  const setPos = (x) => {
+    dragRef.current = x;
+    setDrag(x);
+  };
+  const measure = () => {
+    const w = trackRef.current ? trackRef.current.offsetWidth : 0;
+    maxRef.current = Math.max(0, w - HANDLE - PAD * 2);
+  };
+  const complete = () => {
+    if (done) return;
+    setDone(true);
+    setDragging(false);
+    setPos(maxRef.current);
+    timerRef.current = setTimeout(() => onConfirm && onConfirm(), 260);
+  };
+  const onDown = (e) => {
+    if (done) return;
+    measure();
+    startRef.current = e.clientX - dragRef.current;
+    setDragging(true);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch (_) {
+      /* pointer capture is optional */
+    }
+  };
+  const onMove = (e) => {
+    if (!draggingRef.current) return;
+    setPos(Math.min(maxRef.current, Math.max(0, e.clientX - startRef.current)));
+  };
+  const onUp = () => {
+    if (!draggingRef.current) return;
+    setDragging(false);
+    if (maxRef.current > 0 && dragRef.current >= maxRef.current * 0.85)
+      complete();
+    else setPos(0);
+  };
+  const onKey = (e) => {
+    if (done) return;
+    if (e.key === "Enter" || e.key === " " || e.key === "ArrowRight") {
+      e.preventDefault();
+      measure();
+      complete();
+    }
+  };
+  const progress = maxRef.current > 0 ? drag / maxRef.current : 0;
+  const idle = !dragging && drag === 0 && !done;
+  return (
+    <div
+      ref={trackRef}
+      style={{
+        position: "relative",
+        flex: 1,
+        minWidth: 0,
+        height: HANDLE + PAD * 2,
+        boxSizing: "border-box",
+        borderRadius: 999,
+        background: "rgba(229,72,77,0.08)",
+        border: "1px solid rgba(229,72,77,0.18)",
+        userSelect: "none",
+        WebkitUserSelect: "none",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: drag + HANDLE + PAD * 2,
+          borderRadius: 999,
+          background:
+            "linear-gradient(90deg, rgba(229,72,77,0.24), rgba(229,72,77,0.10))",
+          transition: dragging
+            ? "none"
+            : "width .3s cubic-bezier(.2,.9,.3,1.1)",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          paddingLeft: HANDLE + PAD * 2 + 4,
+          paddingRight: 36,
+          pointerEvents: "none",
+          opacity: done ? 0 : Math.max(0, 1 - progress * 1.5),
+          transition: dragging ? "none" : "opacity .25s",
+        }}
+      >
+        <span
+          className="wf-slide-label"
+          style={{
+            fontSize: 15,
+            fontWeight: 700,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {label}
+        </span>
+      </div>
+      <span
+        style={{
+          position: "absolute",
+          right: 14,
+          top: "50%",
+          marginTop: -9,
+          lineHeight: 0,
+          pointerEvents: "none",
+          opacity: done ? 0 : Math.max(0, 1 - progress * 2),
+          transition: dragging ? "none" : "opacity .25s",
+        }}
+      >
+        <ArrowRight className="wf-slide-arrow" size={18} color={T.rose} />
+      </span>
+      <div
+        style={{
+          position: "absolute",
+          left: PAD,
+          top: PAD,
+          transform: `translateX(${drag}px)`,
+          transition: dragging
+            ? "none"
+            : "transform .32s cubic-bezier(.2,.9,.3,1.15)",
+          willChange: "transform",
+        }}
+      >
+        <button
+          type="button"
+          role="slider"
+          aria-label={ariaLabel || label}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(progress * 100)}
+          className={idle ? "wf-slide-handle-idle" : undefined}
+          onPointerDown={onDown}
+          onPointerMove={onMove}
+          onPointerUp={onUp}
+          onPointerCancel={onUp}
+          onKeyDown={onKey}
+          style={{
+            width: HANDLE,
+            height: HANDLE,
+            borderRadius: "50%",
+            border: "none",
+            padding: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: `linear-gradient(135deg, #F2545C, ${T.rose})`,
+            color: "#fff",
+            cursor: dragging ? "grabbing" : "grab",
+            touchAction: "none",
+            boxShadow:
+              "0 0 0 4px rgba(229,72,77,0.14), 0 4px 12px rgba(229,72,77,0.32)",
+          }}
+        >
+          {done ? (
+            <Check size={22} strokeWidth={3} />
+          ) : (
+            <ChevronRight size={24} strokeWidth={3} />
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function LeaveDetailModal({
   request,
   employee,
@@ -23959,9 +24166,16 @@ function LeaveDetailModal({
   onReject,
   canCancelOwn,
   onCancelOwn,
+  onCancelOwnConfirmed,
 }) {
   const { t, lang } = useLang();
   const isMobile = useIsMobile();
+  const slideLabel =
+    lang === "en"
+      ? "Slide to Cancel"
+      : lang === "zh"
+        ? "滑动取消申请"
+        : "អូសដើម្បីដកសំណើ";
   const isHourly = request.durationType === "hourly";
   const days = leaveDurationDays(request);
   const hours = isHourly
@@ -24290,36 +24504,59 @@ function LeaveDetailModal({
             marginTop: 2,
           }}
         >
-          <div style={{ minWidth: 0, flex: "1 1 220px" }}>
-            <LeaveDecisionNote r={request} admins={admins} prominent />
-          </div>
-          <div
-            style={{
-              display: "flex",
-              gap: 8,
-              flexWrap: "wrap",
-              marginLeft: "auto",
-            }}
-          >
-            {canCancelOwn && (
-              <Button variant="danger" onClick={onCancelOwn}>
-                {t.lv.cancelRequest}
+          {(request.status === "approved" || request.status === "rejected") && (
+            <div style={{ minWidth: 0, flex: "1 1 220px" }}>
+              <LeaveDecisionNote r={request} admins={admins} prominent />
+            </div>
+          )}
+          {isMobile && canCancelOwn ? (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                flex: "1 1 100%",
+                minWidth: 0,
+              }}
+            >
+              <SlideToConfirm
+                label={slideLabel}
+                ariaLabel={t.lv.cancelRequest}
+                onConfirm={onCancelOwnConfirmed || onCancelOwn}
+              />
+              <Button variant="ghost" onClick={onClose}>
+                {t.cancel}
               </Button>
-            )}
-            {canApprove && request.status === "pending" && (
-              <>
-                <Button variant="danger" onClick={onReject}>
-                  {t.lv.reject}
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+                flexWrap: "wrap",
+                marginLeft: "auto",
+              }}
+            >
+              {canCancelOwn && (
+                <Button variant="danger" onClick={onCancelOwn}>
+                  {t.lv.cancelRequest}
                 </Button>
-                <Button variant="accent" onClick={onApprove}>
-                  {t.lv.approve}
-                </Button>
-              </>
-            )}
-            <Button variant="ghost" onClick={onClose}>
-              {t.cancel}
-            </Button>
-          </div>
+              )}
+              {canApprove && request.status === "pending" && (
+                <>
+                  <Button variant="danger" onClick={onReject}>
+                    {t.lv.reject}
+                  </Button>
+                  <Button variant="accent" onClick={onApprove}>
+                    {t.lv.approve}
+                  </Button>
+                </>
+              )}
+              <Button variant="ghost" onClick={onClose}>
+                {t.cancel}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </Modal>
@@ -24939,6 +25176,7 @@ function LeaveRequests({
             onClose={() => setViewFor(null)}
             canCancelOwn={viewFor.status === "pending"}
             onCancelOwn={() => setConfirmCancelOwn(viewFor)}
+            onCancelOwnConfirmed={() => cancelOwnRequest(viewFor)}
           />
         )}
         {confirmCancelOwn && (
