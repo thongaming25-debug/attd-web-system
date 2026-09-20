@@ -971,6 +971,9 @@ const LANG_RAW = {
       showingRange: (start, end, total) =>
         `បង្ហាញ ${start} ដល់ ${end} ក្នុងចំណោម ${total} លទ្ធផល`,
       perPage: (n) => `${n} ក្នុងមួយទំព័រ`,
+      detailSubtitle: "ព័ត៌មានសំណើ OT",
+      rateMultiplier: "អត្រាគុណ",
+      weightedHours: "ម៉ោងសមមូលក្រោយគុណអត្រា",
     },
     pay: {
       overviewTitle: "ទិដ្ឋភាពទូទៅប្រាក់ខែ",
@@ -1221,6 +1224,12 @@ const LANG_RAW = {
       confirmDel: "តើអ្នកប្រាកដទេថាចង់លុបសំណើនេះ?",
       noRequest: "មិនទាន់មានសំណើកែតម្រូវវត្តមានទេ",
       needOneField: "សូមបញ្ចូលម៉ោងចូល ឬម៉ោងចេញ យ៉ាងហោចណាស់មួយ",
+      detailSubtitle: "ព័ត៌មានសំណើកែតម្រូវវត្តមាន",
+      currentRecord: "កំណត់ត្រាបច្ចុប្បន្ន",
+      afterApproval: "បន្ទាប់ពីអនុម័ត",
+      noRecord: "មិនមានកំណត់ត្រា",
+      searchPlaceholder: "ស្វែងរកតាមឈ្មោះ ឬលេខកូដបុគ្គលិក...",
+      searchPlaceholderMine: "ស្វែងរកមូលហេតុ ឬស្ថានភាព...",
     },
     devApproval: {
       pageTitle: "ការអនុញ្ញាតឧបករណ៍ថ្មី",
@@ -2497,6 +2506,9 @@ const LANG_RAW = {
       showingRange: (start, end, total) =>
         `Showing ${start} to ${end} of ${total} results`,
       perPage: (n) => `${n} per page`,
+      detailSubtitle: "Overtime Request Information",
+      rateMultiplier: "Rate multiplier",
+      weightedHours: "Pay-equivalent hours",
     },
     pay: {
       overviewTitle: "Payroll Overview",
@@ -2746,6 +2758,12 @@ const LANG_RAW = {
       confirmDel: "Are you sure you want to delete this request?",
       noRequest: "No correction requests yet",
       needOneField: "Please enter at least a check-in or check-out time",
+      detailSubtitle: "Attendance Correction Information",
+      currentRecord: "Current record",
+      afterApproval: "After approval",
+      noRecord: "No record",
+      searchPlaceholder: "Search employee name or ID...",
+      searchPlaceholderMine: "Search reason or status...",
     },
     devApproval: {
       pageTitle: "Device Approvals",
@@ -23612,7 +23630,7 @@ function LeaveDecisionNote({ r, admins, prominent }) {
   if (r.status !== "approved" && r.status !== "rejected") return null;
   const decider = admins.find((a) => a.id === r.decidedById);
   const name = r.decidedByName || decider?.name || "—";
-  const roleLabel = adminRoleLabel(r.decidedByRole, lang);
+  const roleLabel = adminRoleLabel(r.decidedByRole || decider?.role, lang);
   if (prominent) {
     const ok = r.status === "approved";
     const StatusIcon = ok ? CheckCircle2 : XCircle;
@@ -24154,6 +24172,286 @@ function SlideToConfirm({ label, ariaLabel, onConfirm }) {
   );
 }
 
+// ---- Shared building blocks of the request "Detail" modals (Leave + Attendance
+// Correction) so both look and behave the same. ----
+function RequestProfileBanner({ employee, status }) {
+  const { t, lang } = useLang();
+  const isMobile = useIsMobile();
+  const online = employee
+    ? isRecentlyActive(employee.lastActive, Date.now())
+    : false;
+  return (
+    <>
+      {employee ? (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 10,
+            flexWrap: "wrap",
+            padding: "12px 14px",
+            borderRadius: 14,
+            background:
+              "linear-gradient(120deg, rgba(91,141,239,.14) 0%, rgba(91,141,239,.05) 60%, rgba(139,92,246,.07) 100%)",
+            border: "1px solid rgba(91,141,239,.14)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              minWidth: 0,
+            }}
+          >
+            <div style={{ position: "relative", flexShrink: 0 }}>
+              <div
+                style={{
+                  padding: 3,
+                  borderRadius: "50%",
+                  background: T.card,
+                  boxShadow: "0 2px 8px rgba(16,24,40,.14)",
+                  lineHeight: 0,
+                }}
+              >
+                <Avatar
+                  name={employee.name}
+                  photo={employee.photo}
+                  size={isMobile ? 44 : 52}
+                />
+              </div>
+              {online && (
+                <span
+                  title={
+                    lang === "en"
+                      ? "Online"
+                      : lang === "zh"
+                        ? "在线"
+                        : "កំពុងអនឡាញ"
+                  }
+                  style={{
+                    position: "absolute",
+                    right: 2,
+                    bottom: 2,
+                    width: 12,
+                    height: 12,
+                    borderRadius: "50%",
+                    background: T.forest,
+                    border: `2px solid ${T.card}`,
+                  }}
+                />
+              )}
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div
+                style={{
+                  fontWeight: 700,
+                  color: T.ink,
+                  fontSize: isMobile ? 16 : 17,
+                  lineHeight: 1.25,
+                  wordBreak: "break-word",
+                }}
+              >
+                {employee.name}
+              </div>
+              <div style={{ fontSize: 12.5, color: T.muted, marginTop: 1 }}>
+                {t.login.employeeId}: {employee.code}
+              </div>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  marginTop: 5,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: T.blue,
+                  background: "rgba(91,141,239,.14)",
+                  padding: "2px 9px",
+                  borderRadius: 999,
+                }}
+              >
+                <User size={12} /> {t.employee}
+              </span>
+            </div>
+          </div>
+          <LeaveStatusChip status={status} large />
+        </div>
+      ) : (
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <LeaveStatusChip status={status} large />
+        </div>
+      )}
+    </>
+  );
+}
+function RequestTileGrid({ tiles }) {
+  const isMobile = useIsMobile();
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: isMobile
+          ? "repeat(2, minmax(0, 1fr))"
+          : "repeat(4, minmax(0, 1fr))",
+        gap: 8,
+      }}
+    >
+      {tiles.map((tile, i) => (
+        <LeaveStatTile key={i} {...tile} />
+      ))}
+    </div>
+  );
+}
+function RequestSummaryCard({ items }) {
+  const isMobile = useIsMobile();
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: isMobile || items.length === 1 ? "1fr" : "1fr 1fr",
+        borderRadius: 12,
+        border: `1px solid ${T.lineSoft}`,
+        background: `linear-gradient(90deg, ${T.forestSoft}, rgba(91,141,239,.06))`,
+        overflow: "hidden",
+      }}
+    >
+      {items.map((h, i) => (
+        <div
+          key={h.key}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 11,
+            padding: "11px 13px",
+            minWidth: 0,
+            borderLeft: i > 0 && !isMobile ? `1px solid ${T.line}` : undefined,
+            borderTop: i > 0 && isMobile ? `1px solid ${T.line}` : undefined,
+          }}
+        >
+          <div
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: 11,
+              background: h.tone.bg,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <Clock size={19} color={h.tone.fg} />
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 12, color: T.muted }}>{h.label}</div>
+            <div
+              style={{
+                fontSize: isMobile ? 16 : 17,
+                fontWeight: 700,
+                color: h.valueColor,
+                lineHeight: 1.3,
+              }}
+            >
+              {h.value}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+// Footer: decision note on the left; on the right Cancel Request (employee,
+// pending) / Reject + Approve (approver, pending) / Close. On phones the
+// employee's Cancel Request becomes a slide-to-cancel control.
+function RequestDetailFooter({
+  request,
+  admins,
+  canCancelOwn,
+  onCancelOwn,
+  onCancelOwnConfirmed,
+  canApprove,
+  onApprove,
+  onReject,
+  onClose,
+}) {
+  const { t, lang } = useLang();
+  const isMobile = useIsMobile();
+  const slideLabel =
+    lang === "en"
+      ? "Slide to Cancel"
+      : lang === "zh"
+        ? "滑动取消申请"
+        : "អូសដើម្បីដកសំណើ";
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 12,
+        flexWrap: "wrap",
+        marginTop: 2,
+      }}
+    >
+      {(request.status === "approved" || request.status === "rejected") && (
+        <div style={{ minWidth: 0, flex: "1 1 220px" }}>
+          <LeaveDecisionNote r={request} admins={admins} prominent />
+        </div>
+      )}
+      {isMobile && canCancelOwn ? (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            flex: "1 1 100%",
+            minWidth: 0,
+          }}
+        >
+          <SlideToConfirm
+            label={slideLabel}
+            ariaLabel={t.lv.cancelRequest}
+            onConfirm={onCancelOwnConfirmed || onCancelOwn}
+          />
+          <Button variant="ghost" onClick={onClose}>
+            {t.cancel}
+          </Button>
+        </div>
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            flexWrap: "wrap",
+            marginLeft: "auto",
+          }}
+        >
+          {canCancelOwn && (
+            <Button variant="danger" onClick={onCancelOwn}>
+              {t.lv.cancelRequest}
+            </Button>
+          )}
+          {canApprove && request.status === "pending" && (
+            <>
+              <Button variant="danger" onClick={onReject}>
+                {t.lv.reject}
+              </Button>
+              <Button variant="accent" onClick={onApprove}>
+                {t.lv.approve}
+              </Button>
+            </>
+          )}
+          <Button variant="ghost" onClick={onClose}>
+            {t.cancel}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function LeaveDetailModal({
   request,
   employee,
@@ -24169,13 +24467,6 @@ function LeaveDetailModal({
   onCancelOwnConfirmed,
 }) {
   const { t, lang } = useLang();
-  const isMobile = useIsMobile();
-  const slideLabel =
-    lang === "en"
-      ? "Slide to Cancel"
-      : lang === "zh"
-        ? "滑动取消申请"
-        : "អូសដើម្បីដកសំណើ";
   const isHourly = request.durationType === "hourly";
   const days = leaveDurationDays(request);
   const hours = isHourly
@@ -24258,9 +24549,6 @@ function LeaveDetailModal({
     value: durationWords,
     valueColor: T.ink,
   });
-  const online = employee
-    ? isRecentlyActive(employee.lastActive, Date.now())
-    : false;
   return (
     <Modal
       title={t.lv.detailTitle}
@@ -24271,176 +24559,9 @@ function LeaveDetailModal({
       size="lg"
     >
       <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-        {employee ? (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 10,
-              flexWrap: "wrap",
-              padding: "12px 14px",
-              borderRadius: 14,
-              background:
-                "linear-gradient(120deg, rgba(91,141,239,.14) 0%, rgba(91,141,239,.05) 60%, rgba(139,92,246,.07) 100%)",
-              border: "1px solid rgba(91,141,239,.14)",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                minWidth: 0,
-              }}
-            >
-              <div style={{ position: "relative", flexShrink: 0 }}>
-                <div
-                  style={{
-                    padding: 3,
-                    borderRadius: "50%",
-                    background: T.card,
-                    boxShadow: "0 2px 8px rgba(16,24,40,.14)",
-                    lineHeight: 0,
-                  }}
-                >
-                  <Avatar
-                    name={employee.name}
-                    photo={employee.photo}
-                    size={isMobile ? 44 : 52}
-                  />
-                </div>
-                {online && (
-                  <span
-                    title={
-                      lang === "en"
-                        ? "Online"
-                        : lang === "zh"
-                          ? "在线"
-                          : "កំពុងអនឡាញ"
-                    }
-                    style={{
-                      position: "absolute",
-                      right: 2,
-                      bottom: 2,
-                      width: 12,
-                      height: 12,
-                      borderRadius: "50%",
-                      background: T.forest,
-                      border: `2px solid ${T.card}`,
-                    }}
-                  />
-                )}
-              </div>
-              <div style={{ minWidth: 0 }}>
-                <div
-                  style={{
-                    fontWeight: 700,
-                    color: T.ink,
-                    fontSize: isMobile ? 16 : 17,
-                    lineHeight: 1.25,
-                    wordBreak: "break-word",
-                  }}
-                >
-                  {employee.name}
-                </div>
-                <div style={{ fontSize: 12.5, color: T.muted, marginTop: 1 }}>
-                  {t.login.employeeId}: {employee.code}
-                </div>
-                <span
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 4,
-                    marginTop: 5,
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: T.blue,
-                    background: "rgba(91,141,239,.14)",
-                    padding: "2px 9px",
-                    borderRadius: 999,
-                  }}
-                >
-                  <User size={12} /> {t.employee}
-                </span>
-              </div>
-            </div>
-            <LeaveStatusChip status={request.status} large />
-          </div>
-        ) : (
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
-            <LeaveStatusChip status={request.status} large />
-          </div>
-        )}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: isMobile
-              ? "repeat(2, minmax(0, 1fr))"
-              : "repeat(4, minmax(0, 1fr))",
-            gap: 8,
-          }}
-        >
-          {tiles.map((tile, i) => (
-            <LeaveStatTile key={i} {...tile} />
-          ))}
-        </div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              isMobile || summary.length === 1 ? "1fr" : "1fr 1fr",
-            borderRadius: 12,
-            border: `1px solid ${T.lineSoft}`,
-            background: `linear-gradient(90deg, ${T.forestSoft}, rgba(91,141,239,.06))`,
-            overflow: "hidden",
-          }}
-        >
-          {summary.map((h, i) => (
-            <div
-              key={h.key}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 11,
-                padding: "11px 13px",
-                minWidth: 0,
-                borderLeft:
-                  i > 0 && !isMobile ? `1px solid ${T.line}` : undefined,
-                borderTop:
-                  i > 0 && isMobile ? `1px solid ${T.line}` : undefined,
-              }}
-            >
-              <div
-                style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: 11,
-                  background: h.tone.bg,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                <Clock size={19} color={h.tone.fg} />
-              </div>
-              <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 12, color: T.muted }}>{h.label}</div>
-                <div
-                  style={{
-                    fontSize: isMobile ? 16 : 17,
-                    fontWeight: 700,
-                    color: h.valueColor,
-                    lineHeight: 1.3,
-                  }}
-                >
-                  {h.value}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <RequestProfileBanner employee={employee} status={request.status} />
+        <RequestTileGrid tiles={tiles} />
+        <RequestSummaryCard items={summary} />
         <LeaveSectionCard icon={MessageCircle} title={t.lv.reason}>
           <div
             style={{
@@ -24494,70 +24615,17 @@ function LeaveDetailModal({
           t={t}
           lang={lang}
         />
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 12,
-            flexWrap: "wrap",
-            marginTop: 2,
-          }}
-        >
-          {(request.status === "approved" || request.status === "rejected") && (
-            <div style={{ minWidth: 0, flex: "1 1 220px" }}>
-              <LeaveDecisionNote r={request} admins={admins} prominent />
-            </div>
-          )}
-          {isMobile && canCancelOwn ? (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                flex: "1 1 100%",
-                minWidth: 0,
-              }}
-            >
-              <SlideToConfirm
-                label={slideLabel}
-                ariaLabel={t.lv.cancelRequest}
-                onConfirm={onCancelOwnConfirmed || onCancelOwn}
-              />
-              <Button variant="ghost" onClick={onClose}>
-                {t.cancel}
-              </Button>
-            </div>
-          ) : (
-            <div
-              style={{
-                display: "flex",
-                gap: 8,
-                flexWrap: "wrap",
-                marginLeft: "auto",
-              }}
-            >
-              {canCancelOwn && (
-                <Button variant="danger" onClick={onCancelOwn}>
-                  {t.lv.cancelRequest}
-                </Button>
-              )}
-              {canApprove && request.status === "pending" && (
-                <>
-                  <Button variant="danger" onClick={onReject}>
-                    {t.lv.reject}
-                  </Button>
-                  <Button variant="accent" onClick={onApprove}>
-                    {t.lv.approve}
-                  </Button>
-                </>
-              )}
-              <Button variant="ghost" onClick={onClose}>
-                {t.cancel}
-              </Button>
-            </div>
-          )}
-        </div>
+        <RequestDetailFooter
+          request={request}
+          admins={admins}
+          canCancelOwn={canCancelOwn}
+          onCancelOwn={onCancelOwn}
+          onCancelOwnConfirmed={onCancelOwnConfirmed}
+          canApprove={canApprove}
+          onApprove={onApprove}
+          onReject={onReject}
+          onClose={onClose}
+        />
       </div>
     </Modal>
   );
@@ -25633,62 +25701,54 @@ function LeaveRequests({
                     </div>
                   </td>
                   <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                    {r.status === "pending" ? (
-                      canApprove && (
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: 6,
-                            justifyContent: "flex-end",
-                          }}
-                        >
-                          <Button
-                            size="sm"
-                            variant="accent"
-                            onClick={() => approve(r)}
-                          >
-                            {t.lv.approve}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="danger"
-                            onClick={() => setRejectFor(r)}
-                          >
-                            {t.lv.reject}
-                          </Button>
-                        </div>
-                      )
-                    ) : (
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: 6,
-                          justifyContent: "flex-end",
-                          alignItems: "center",
-                        }}
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 6,
+                        justifyContent: "flex-end",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setViewFor(r)}
                       >
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setViewFor(r)}
-                        >
-                          <Eye size={13} /> {t.lv.view}
-                        </Button>
-                        {isSuperAdmin && (
-                          <button
-                            onClick={() => setConfirmDel(r)}
-                            style={{
-                              background: "none",
-                              border: "none",
-                              cursor: "pointer",
-                              color: T.mutedLight,
-                            }}
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        )}
-                      </div>
-                    )}
+                        <Eye size={13} /> {t.lv.view}
+                      </Button>
+                      {r.status === "pending"
+                        ? canApprove && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="accent"
+                                onClick={() => approve(r)}
+                              >
+                                {t.lv.approve}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="danger"
+                                onClick={() => setRejectFor(r)}
+                              >
+                                {t.lv.reject}
+                              </Button>
+                            </>
+                          )
+                        : isSuperAdmin && (
+                            <button
+                              onClick={() => setConfirmDel(r)}
+                              style={{
+                                background: "none",
+                                border: "none",
+                                cursor: "pointer",
+                                color: T.mutedLight,
+                              }}
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          )}
+                    </div>
                   </td>
                 </tr>
               );
@@ -26750,12 +26810,132 @@ function OtIconButton({ tint, title, onClick, children }) {
     </button>
   );
 }
+// "Detail" modal for one overtime request — same layout as the leave /
+// attendance-correction detail modals: profile banner, tiles, rate card,
+// reason, approvers, then the decision note + actions footer.
+function OtDetailModal({
+  request,
+  employee,
+  admins,
+  approvers,
+  otPolicy,
+  onClose,
+  canApprove,
+  onApprove,
+  onReject,
+  canCancelOwn,
+  onCancelOwn,
+  onCancelOwnConfirmed,
+}) {
+  const { t, lang } = useLang();
+  const DAY_TYPE_LABEL = getDayTypeLabel(lang, t);
+  const policy = otPolicy || DEFAULT_OT_POLICY;
+  const rate = Number(policy[OT_RATE_KEY[request.dayType]]) || 1;
+  const hours = Number(request.hours) || 0;
+  const applied = fmtAppliedOn(request.createdAt, lang);
+  const tiles = [
+    {
+      icon: CalendarDays,
+      tone: LEAVE_TONES.blue,
+      label: t.ot.date,
+      value: request.date,
+      nowrap: true,
+    },
+    {
+      icon: CalendarClock,
+      tone: LEAVE_TONES.purple,
+      label: t.ot.dayType,
+      value: DAY_TYPE_LABEL[request.dayType] || request.dayType || "—",
+    },
+    {
+      icon: Timer,
+      tone: LEAVE_TONES.green,
+      label: t.ot.hours,
+      value: fmtOtHM(hours),
+      nowrap: true,
+    },
+    {
+      icon: CalendarClock,
+      tone: LEAVE_TONES.purple,
+      label: t.ot.requestedOn,
+      value: applied.date,
+    },
+  ];
+  // Payroll pays approved OT as hours x hourly rate x this multiplier, so
+  // "pay-equivalent hours" is simply hours x multiplier.
+  const summary = [
+    {
+      key: "rate",
+      tone: LEAVE_TONES.blue,
+      label: t.ot.rateMultiplier,
+      value: `×${rate}`,
+      valueColor: T.ink,
+    },
+    {
+      key: "weighted",
+      tone: LEAVE_TONES.green,
+      label: t.ot.weightedHours,
+      value: fmtOtHM(hours * rate),
+      valueColor: T.forestText,
+    },
+  ];
+  return (
+    <Modal
+      title={t.lv.detailTitle}
+      subtitle={t.ot.detailSubtitle}
+      icon={ListChecks}
+      onClose={onClose}
+      width={560}
+      size="lg"
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+        <RequestProfileBanner employee={employee} status={request.status} />
+        <RequestTileGrid tiles={tiles} />
+        <RequestSummaryCard items={summary} />
+        <LeaveSectionCard icon={MessageCircle} title={t.ot.reason}>
+          <div
+            style={{
+              background: T.tableHeadBg,
+              borderRadius: 10,
+              padding: "9px 12px",
+              fontSize: 13.5,
+              color: T.textSoft,
+              minHeight: 36,
+              whiteSpace: "pre-wrap",
+              wordBreak: "break-word",
+            }}
+          >
+            {request.reason || "—"}
+          </div>
+        </LeaveSectionCard>
+        <LeaveApproversPanel
+          request={request}
+          approvers={approvers}
+          t={t}
+          lang={lang}
+        />
+        <RequestDetailFooter
+          request={request}
+          admins={admins}
+          canCancelOwn={canCancelOwn}
+          onCancelOwn={onCancelOwn}
+          onCancelOwnConfirmed={onCancelOwnConfirmed}
+          canApprove={canApprove}
+          onApprove={onApprove}
+          onReject={onReject}
+          onClose={onClose}
+        />
+      </div>
+    </Modal>
+  );
+}
 function OvertimeRequests({
   role,
   currentAdmin,
   currentEmp,
   employees,
   admins,
+  rolePermissionsMap,
   overtimeRequests,
   setOvertimeRequests,
   otPolicy,
@@ -26779,7 +26959,13 @@ function OvertimeRequests({
   const [otDateFrom, setOtDateFrom] = useState("");
   const [otDateTo, setOtDateTo] = useState("");
   const [otPageSize, setOtPageSize] = useState(10);
+  const [viewFor, setViewFor] = useState(null);
+  const [confirmCancelOwn, setConfirmCancelOwn] = useState(null);
   const empOf = (id) => employees.find((e) => e.id === id);
+  const approvers = useMemo(
+    () => eligibleLeaveApprovers(admins, rolePermissionsMap),
+    [admins, rolePermissionsMap],
+  );
   const DAY_TYPE_LABEL = getDayTypeLabel(lang, t);
 
   // Computed unconditionally (not inside the employee/admin branch below)
@@ -26872,6 +27058,42 @@ function OvertimeRequests({
     );
     setRejectFor(null);
   };
+
+  // An employee can withdraw their own request while it is still pending.
+  const cancelOwnRequest = (req) => {
+    if (
+      !currentEmp ||
+      req.employeeId !== currentEmp.id ||
+      req.status !== "pending"
+    )
+      return;
+    setOvertimeRequests(overtimeRequests.filter((r) => r.id !== req.id));
+    setConfirmCancelOwn(null);
+    setViewFor(null);
+  };
+  const isEmployeeView = role !== "admin" && !!currentEmp;
+  const detailModal = viewFor && (
+    <OtDetailModal
+      request={viewFor}
+      employee={isEmployeeView ? currentEmp : empOf(viewFor.employeeId)}
+      admins={admins}
+      approvers={approvers}
+      otPolicy={otPolicy}
+      onClose={() => setViewFor(null)}
+      canApprove={!isEmployeeView && canApprove}
+      onApprove={() => {
+        approve(viewFor);
+        setViewFor(null);
+      }}
+      onReject={() => {
+        setRejectFor(viewFor);
+        setViewFor(null);
+      }}
+      canCancelOwn={isEmployeeView && viewFor.status === "pending"}
+      onCancelOwn={() => setConfirmCancelOwn(viewFor)}
+      onCancelOwnConfirmed={() => cancelOwnRequest(viewFor)}
+    />
+  );
 
   const submit = (f) => {
     const employeeId = f.employeeId || currentEmp?.id;
@@ -27067,13 +27289,14 @@ function OvertimeRequests({
                 <th>{t.ot.hours}</th>
                 <th>{t.status}</th>
                 <th>{t.ot.requestedOn}</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
               {otPg.pageItems.length === 0 && (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     style={{
                       textAlign: "center",
                       color: T.muted,
@@ -27119,6 +27342,15 @@ function OvertimeRequests({
                       <div style={{ fontSize: 11.5, color: T.muted }}>
                         {applied.time}
                       </div>
+                    </td>
+                    <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setViewFor(r)}
+                      >
+                        <Eye size={13} /> {t.lv.view}
+                      </Button>
                     </td>
                   </tr>
                 );
@@ -27204,6 +27436,14 @@ function OvertimeRequests({
               otPolicy={otPolicy}
             />
           </Drawer>
+        )}
+        {detailModal}
+        {confirmCancelOwn && (
+          <ConfirmDialog
+            text={t.lv.cancelRequestConfirm}
+            onCancel={() => setConfirmCancelOwn(null)}
+            onConfirm={() => cancelOwnRequest(confirmCancelOwn)}
+          />
         )}
       </div>
     );
@@ -27470,44 +27710,54 @@ function OvertimeRequests({
                     </div>
                   </td>
                   <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                    {r.status === "pending"
-                      ? canApprove && (
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: 6,
-                              justifyContent: "flex-end",
-                            }}
-                          >
-                            <OtIconButton
-                              tint="violet"
-                              title={t.ot.approve}
-                              onClick={() => approve(r)}
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 6,
+                        justifyContent: "flex-end",
+                        alignItems: "center",
+                      }}
+                    >
+                      <OtIconButton
+                        tint="blue"
+                        title={t.lv.view}
+                        onClick={() => setViewFor(r)}
+                      >
+                        <Eye size={14} />
+                      </OtIconButton>
+                      {r.status === "pending"
+                        ? canApprove && (
+                            <>
+                              <OtIconButton
+                                tint="violet"
+                                title={t.ot.approve}
+                                onClick={() => approve(r)}
+                              >
+                                <ThumbsUp size={14} />
+                              </OtIconButton>
+                              <OtIconButton
+                                tint="rose"
+                                title={t.ot.reject}
+                                onClick={() => setRejectFor(r)}
+                              >
+                                <ThumbsDown size={14} />
+                              </OtIconButton>
+                            </>
+                          )
+                        : isSuperAdmin && (
+                            <button
+                              onClick={() => setConfirmDel(r)}
+                              style={{
+                                background: "none",
+                                border: "none",
+                                cursor: "pointer",
+                                color: T.mutedLight,
+                              }}
                             >
-                              <ThumbsUp size={14} />
-                            </OtIconButton>
-                            <OtIconButton
-                              tint="rose"
-                              title={t.ot.reject}
-                              onClick={() => setRejectFor(r)}
-                            >
-                              <ThumbsDown size={14} />
-                            </OtIconButton>
-                          </div>
-                        )
-                      : isSuperAdmin && (
-                          <button
-                            onClick={() => setConfirmDel(r)}
-                            style={{
-                              background: "none",
-                              border: "none",
-                              cursor: "pointer",
-                              color: T.mutedLight,
-                            }}
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        )}
+                              <Trash2 size={14} />
+                            </button>
+                          )}
+                    </div>
                   </td>
                 </tr>
               );
@@ -27588,6 +27838,7 @@ function OvertimeRequests({
           </div>
         )}
       </Card>
+      {detailModal}
       {rejectFor && (
         <OvertimeRejectModal
           onCancel={() => setRejectFor(null)}
@@ -27782,12 +28033,256 @@ function AttendanceCorrectionForm({ onSave, onCancel }) {
   );
 }
 
+// "Detail" modal for one attendance-correction request — same layout as the
+// leave detail modal: profile banner, tiles, current-vs-requested card,
+// reason, approvers, then the decision note + actions footer.
+function AcDetailModal({
+  request,
+  employee,
+  admins,
+  approvers,
+  attendance,
+  onClose,
+  canApprove,
+  onApprove,
+  onReject,
+  canCancelOwn,
+  onCancelOwn,
+  onCancelOwnConfirmed,
+}) {
+  const { t, lang } = useLang();
+  const rec = (attendance || []).find(
+    (a) => a.employeeId === request.employeeId && a.date === request.date,
+  );
+  const range = (i, o) =>
+    i || o ? `${i || "—"} – ${o || "—"}` : t.ac.noRecord;
+  // Same merge rule the approve action uses: a requested time replaces the
+  // stored one, a blank one keeps whatever is already there.
+  const current = range(rec?.checkIn, rec?.checkOut);
+  const after = range(
+    request.requestedCheckIn || rec?.checkIn,
+    request.requestedCheckOut || rec?.checkOut,
+  );
+  const applied = fmtAppliedOn(request.createdAt, lang);
+  const tiles = [
+    {
+      icon: CalendarDays,
+      tone: LEAVE_TONES.blue,
+      label: t.ac.date,
+      value: request.date,
+      nowrap: true,
+    },
+    {
+      icon: Clock,
+      tone: LEAVE_TONES.green,
+      label: t.ac.requestedCheckIn,
+      value: request.requestedCheckIn || "—",
+      nowrap: true,
+    },
+    {
+      icon: Clock,
+      tone: LEAVE_TONES.purple,
+      label: t.ac.requestedCheckOut,
+      value: request.requestedCheckOut || "—",
+      nowrap: true,
+    },
+    {
+      icon: CalendarClock,
+      tone: LEAVE_TONES.purple,
+      label: t.lv.appliedOn,
+      value: applied.date,
+    },
+  ];
+  const summary = [
+    {
+      key: "current",
+      tone: LEAVE_TONES.blue,
+      label: t.ac.currentRecord,
+      value: current,
+      valueColor: T.ink,
+    },
+    {
+      key: "after",
+      tone: LEAVE_TONES.green,
+      label: t.ac.afterApproval,
+      value: after,
+      valueColor: T.forestText,
+    },
+  ];
+  return (
+    <Modal
+      title={t.lv.detailTitle}
+      subtitle={t.ac.detailSubtitle}
+      icon={ListChecks}
+      onClose={onClose}
+      width={560}
+      size="lg"
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+        <RequestProfileBanner employee={employee} status={request.status} />
+        <RequestTileGrid tiles={tiles} />
+        <RequestSummaryCard items={summary} />
+        <LeaveSectionCard icon={MessageCircle} title={t.ac.reason}>
+          <div
+            style={{
+              background: T.tableHeadBg,
+              borderRadius: 10,
+              padding: "9px 12px",
+              fontSize: 13.5,
+              color: T.textSoft,
+              minHeight: 36,
+              whiteSpace: "pre-wrap",
+              wordBreak: "break-word",
+            }}
+          >
+            {request.reason || "—"}
+          </div>
+        </LeaveSectionCard>
+        <LeaveApproversPanel
+          request={request}
+          approvers={approvers}
+          t={t}
+          lang={lang}
+        />
+        <RequestDetailFooter
+          request={request}
+          admins={admins}
+          canCancelOwn={canCancelOwn}
+          onCancelOwn={onCancelOwn}
+          onCancelOwnConfirmed={onCancelOwnConfirmed}
+          canApprove={canApprove}
+          onApprove={onApprove}
+          onReject={onReject}
+          onClose={onClose}
+        />
+      </div>
+    </Modal>
+  );
+}
+
+// All / Pending / Approved / Rejected tab strip (same look as My Leave).
+function RequestStatusTabs({ value, onChange }) {
+  const { t } = useLang();
+  const TABS = [
+    { key: "", label: t.lv.tabAll },
+    { key: "pending", label: t.lv.pending },
+    { key: "approved", label: t.lv.approved },
+    { key: "rejected", label: t.lv.rejected },
+  ];
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 4,
+        borderBottom: `1px solid ${T.lineSoft}`,
+        marginBottom: 16,
+        overflowX: "auto",
+      }}
+    >
+      {TABS.map((tb) => {
+        const active = value === tb.key;
+        return (
+          <button
+            key={tb.key || "all"}
+            type="button"
+            onClick={() => onChange(tb.key)}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "9px 14px",
+              fontSize: 14,
+              fontWeight: active ? 600 : 500,
+              color: active ? T.forestText : T.muted,
+              borderBottom: active
+                ? `2px solid ${T.forest}`
+                : "2px solid transparent",
+              marginBottom: -1,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {tb.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// "Showing 1 to 10 of 23" + rows-per-page + prev/next, shared by both views.
+function RequestPaginationFooter({ pg, pageSize, setPageSize }) {
+  const { t } = useLang();
+  if (pg.total <= 0) return null;
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+        gap: 10,
+        padding: "12px 4px 2px",
+        fontSize: 13.5,
+        color: T.muted,
+      }}
+    >
+      <span>{t.lv.showingRange(pg.rangeStart, pg.rangeEnd, pg.total)}</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <Select
+          style={{ width: "auto", fontSize: 13, padding: "5px 26px 5px 10px" }}
+          value={pageSize}
+          onChange={(e) => setPageSize(Number(e.target.value))}
+        >
+          {[10, 25, 50].map((n) => (
+            <option key={n} value={n}>
+              {t.lv.perPage(n)}
+            </option>
+          ))}
+        </Select>
+        {pg.pageCount > 1 && (
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => pg.setPage(pg.page - 1)}
+              disabled={pg.page <= 1}
+              style={{ opacity: pg.page <= 1 ? 0.4 : 1 }}
+            >
+              <ChevronLeft size={14} />
+            </Button>
+            <span
+              style={{
+                fontSize: 13.5,
+                color: T.ink,
+                padding: "0 6px",
+                fontFamily: "'JetBrains Mono',monospace",
+              }}
+            >
+              {pg.page} / {pg.pageCount}
+            </span>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => pg.setPage(pg.page + 1)}
+              disabled={pg.page >= pg.pageCount}
+              style={{ opacity: pg.page >= pg.pageCount ? 0.4 : 1 }}
+            >
+              <ChevronRight size={14} />
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function AttendanceCorrections({
   role,
   currentAdmin,
   currentEmp,
   employees,
   admins,
+  rolePermissionsMap,
   attendanceCorrections,
   setAttendanceCorrections,
   attendance,
@@ -27795,7 +28290,7 @@ function AttendanceCorrections({
   isSuperAdmin,
   canApprove,
 }) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const { status: deviceStatus } = useDeviceApproval();
   // Positive check (only "approved" grants access) rather than
   // excluding "pending"/"rejected" — so any future status (e.g.
@@ -27805,7 +28300,68 @@ function AttendanceCorrections({
   const [modal, setModal] = useState(false);
   const [rejectFor, setRejectFor] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
+  const [confirmCancelOwn, setConfirmCancelOwn] = useState(null);
+  const [viewFor, setViewFor] = useState(null);
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [pageSize, setPageSize] = useState(10);
   const empOf = (id) => employees.find((e) => e.id === id);
+  const approvers = useMemo(
+    () => eligibleLeaveApprovers(admins, rolePermissionsMap),
+    [admins, rolePermissionsMap],
+  );
+  const isEmployeeView = role !== "admin" && !!currentEmp;
+
+  // One filtered + sorted list for both views (employee: only their own,
+  // newest first; admin: everyone, pending on top then newest first), then
+  // paginated. Hooks live up here so they never run conditionally.
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return attendanceCorrections
+      .filter((r) => (isEmployeeView ? r.employeeId === currentEmp.id : true))
+      .filter((r) => {
+        if (statusFilter && r.status !== statusFilter) return false;
+        if (dateFrom && r.date < dateFrom) return false;
+        if (dateTo && r.date > dateTo) return false;
+        if (q) {
+          let hay;
+          if (isEmployeeView) {
+            hay = `${r.reason || ""} ${r.status || ""} ${r.date || ""}`;
+          } else {
+            const emp = employees.find((e) => e.id === r.employeeId);
+            hay = `${emp?.name || ""} ${emp?.code || ""}`;
+          }
+          if (!hay.toLowerCase().includes(q)) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        if (!isEmployeeView) {
+          if (a.status === "pending" && b.status !== "pending") return -1;
+          if (a.status !== "pending" && b.status === "pending") return 1;
+        }
+        return (b.createdAt || "").localeCompare(a.createdAt || "");
+      });
+  }, [
+    attendanceCorrections,
+    employees,
+    isEmployeeView,
+    currentEmp,
+    statusFilter,
+    dateFrom,
+    dateTo,
+    query,
+  ]);
+  const pg = usePagination(filtered, pageSize);
+  const hasActiveFilter = !!(statusFilter || dateFrom || dateTo || query);
+  const clearFilters = () => {
+    setStatusFilter("");
+    setDateFrom("");
+    setDateTo("");
+    setQuery("");
+  };
 
   const approve = (req) => {
     setAttendanceCorrections(
@@ -27867,6 +28423,20 @@ function AttendanceCorrections({
     );
     setRejectFor(null);
   };
+  // An employee can withdraw their own request while it is still pending.
+  const cancelOwnRequest = (req) => {
+    if (
+      !currentEmp ||
+      req.employeeId !== currentEmp.id ||
+      req.status !== "pending"
+    )
+      return;
+    setAttendanceCorrections(
+      attendanceCorrections.filter((r) => r.id !== req.id),
+    );
+    setConfirmCancelOwn(null);
+    setViewFor(null);
+  };
 
   const submit = (f) => {
     if (!currentEmp) return;
@@ -27890,24 +28460,100 @@ function AttendanceCorrections({
     setModal(false);
   };
 
-  if (role !== "admin" && currentEmp) {
-    const mine = attendanceCorrections
-      .filter((r) => r.employeeId === currentEmp.id)
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const searchBox = (width, placeholder) => (
+    <div style={{ position: "relative", flexShrink: 0 }}>
+      <Search
+        size={14}
+        style={{
+          position: "absolute",
+          left: 10,
+          top: "50%",
+          transform: "translateY(-50%)",
+          color: T.muted,
+        }}
+      />
+      <Input
+        style={{ paddingLeft: 30, width }}
+        placeholder={placeholder}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+    </div>
+  );
+  const clearBtn = hasActiveFilter && (
+    <button
+      type="button"
+      className="wf-btn wf-btn-ghost wf-btn-sm"
+      title={t.clear}
+      onClick={clearFilters}
+      style={{ padding: "0 10px", height: 34, flexShrink: 0 }}
+    >
+      <Filter size={14} />
+    </button>
+  );
+  const mono = { fontFamily: "'JetBrains Mono',monospace" };
+  const appliedCell = (r) => {
+    const applied = fmtAppliedOn(r.createdAt, lang);
+    return (
+      <td style={{ fontSize: 12.5, color: T.textSoft, whiteSpace: "nowrap" }}>
+        <div>{applied.date}</div>
+        <div style={{ fontSize: 11.5, color: T.muted }}>{applied.time}</div>
+      </td>
+    );
+  };
+  const detailModal = viewFor && (
+    <AcDetailModal
+      request={viewFor}
+      employee={isEmployeeView ? currentEmp : empOf(viewFor.employeeId)}
+      admins={admins}
+      approvers={approvers}
+      attendance={attendance}
+      onClose={() => setViewFor(null)}
+      canApprove={!isEmployeeView && canApprove}
+      onApprove={() => {
+        approve(viewFor);
+        setViewFor(null);
+      }}
+      onReject={() => {
+        setRejectFor(viewFor);
+        setViewFor(null);
+      }}
+      canCancelOwn={isEmployeeView && viewFor.status === "pending"}
+      onCancelOwn={() => setConfirmCancelOwn(viewFor)}
+      onCancelOwnConfirmed={() => cancelOwnRequest(viewFor)}
+    />
+  );
+
+  if (isEmployeeView) {
     return (
       <div>
         <DeviceApprovalBanner />
+        <RequestStatusTabs value={statusFilter} onChange={setStatusFilter} />
         <div
           style={{
             display: "flex",
-            justifyContent: "flex-end",
+            alignItems: "center",
+            gap: 8,
+            flexWrap: "wrap",
             marginBottom: 16,
           }}
         >
+          <DateRangePicker
+            startValue={dateFrom}
+            endValue={dateTo}
+            onChangeStart={(e) => setDateFrom(e.target.value)}
+            onChangeEnd={(e) => setDateTo(e.target.value)}
+            placeholder={t.selectDate}
+            compact
+            style={{ width: 200, flexShrink: 0 }}
+          />
+          {searchBox(200, t.ac.searchPlaceholderMine)}
+          {clearBtn}
           <Button
             variant="accent"
             onClick={() => setModal(true)}
             disabled={!deviceApproved}
+            style={{ marginLeft: "auto" }}
           >
             <Plus size={15} /> {t.ac.addBtn}
           </Button>
@@ -27921,13 +28567,15 @@ function AttendanceCorrections({
                 <th>{t.ac.requestedCheckOut}</th>
                 <th>{t.ac.reason}</th>
                 <th>{t.status}</th>
+                <th>{t.lv.appliedOn}</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
-              {mine.length === 0 && (
+              {pg.pageItems.length === 0 && (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={7}
                     style={{
                       textAlign: "center",
                       color: T.muted,
@@ -27938,17 +28586,11 @@ function AttendanceCorrections({
                   </td>
                 </tr>
               )}
-              {mine.map((r) => (
+              {pg.pageItems.map((r) => (
                 <tr key={r.id}>
-                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                    {r.date}
-                  </td>
-                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                    {r.requestedCheckIn || "—"}
-                  </td>
-                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                    {r.requestedCheckOut || "—"}
-                  </td>
+                  <td style={mono}>{r.date}</td>
+                  <td style={mono}>{r.requestedCheckIn || "—"}</td>
+                  <td style={mono}>{r.requestedCheckOut || "—"}</td>
                   <td
                     style={{ fontSize: 13.5, color: T.textSoft, maxWidth: 200 }}
                   >
@@ -27956,12 +28598,27 @@ function AttendanceCorrections({
                   </td>
                   <td>
                     <StatusPill status={r.status} />
-                    <AcDecisionNote r={r} admins={admins} />
+                    <LeaveDecisionNote r={r} admins={admins} />
+                  </td>
+                  {appliedCell(r)}
+                  <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setViewFor(r)}
+                    >
+                      <Eye size={13} /> {t.lv.view}
+                    </Button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          <RequestPaginationFooter
+            pg={pg}
+            pageSize={pageSize}
+            setPageSize={setPageSize}
+          />
         </Card>
         {modal && (
           <Modal title={t.ac.addBtn} onClose={() => setModal(false)}>
@@ -27971,19 +28628,82 @@ function AttendanceCorrections({
             />
           </Modal>
         )}
+        {detailModal}
+        {confirmCancelOwn && (
+          <ConfirmDialog
+            text={t.lv.cancelRequestConfirm}
+            onCancel={() => setConfirmCancelOwn(null)}
+            onConfirm={() => cancelOwnRequest(confirmCancelOwn)}
+          />
+        )}
       </div>
     );
   }
 
-  // Admin view — pending requests surfaced on top, newest first.
-  const sorted = [...attendanceCorrections].sort((a, b) => {
-    if (a.status === "pending" && b.status !== "pending") return -1;
-    if (a.status !== "pending" && b.status === "pending") return 1;
-    return b.createdAt.localeCompare(a.createdAt);
-  });
+  // Admin view — pending requests surfaced on top, newest first; the same
+  // status / date-range / employee filters and pagination as My Leave.
   return (
     <div>
       {isSuperAdmin && <ReasonCategorySettings requestType="ac" />}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 10,
+          marginBottom: 12,
+          flexWrap: "wrap",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontWeight: 700, fontSize: 15, color: T.ink }}>
+            {t.nav.attCorrection}
+          </span>
+          <span
+            style={{
+              fontSize: 12.5,
+              fontWeight: 700,
+              color: T.forestText,
+              background: T.forestSoft,
+              borderRadius: 999,
+              padding: "2px 9px",
+            }}
+          >
+            {filtered.length}
+          </span>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            flexWrap: "wrap",
+            marginLeft: "auto",
+          }}
+        >
+          <Select
+            style={{ width: 140, flexShrink: 0 }}
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="">{t.lv.allStatus}</option>
+            <option value="pending">{t.lv.pending}</option>
+            <option value="approved">{t.lv.approved}</option>
+            <option value="rejected">{t.lv.rejected}</option>
+          </Select>
+          <DateRangePicker
+            startValue={dateFrom}
+            endValue={dateTo}
+            onChangeStart={(e) => setDateFrom(e.target.value)}
+            onChangeEnd={(e) => setDateTo(e.target.value)}
+            placeholder={t.selectDate}
+            compact
+            style={{ width: 200, flexShrink: 0 }}
+          />
+          {searchBox(200, t.ac.searchPlaceholder)}
+          {clearBtn}
+        </div>
+      </div>
       <Card style={{ overflowX: "auto" }}>
         <table className="wf-table">
           <thead>
@@ -27994,14 +28714,15 @@ function AttendanceCorrections({
               <th>{t.ac.requestedCheckOut}</th>
               <th>{t.ac.reason}</th>
               <th>{t.status}</th>
+              <th>{t.lv.appliedOn}</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {sorted.length === 0 && (
+            {pg.pageItems.length === 0 && (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={8}
                   style={{
                     textAlign: "center",
                     color: T.muted,
@@ -28012,7 +28733,7 @@ function AttendanceCorrections({
                 </td>
               </tr>
             )}
-            {sorted.map((r) => {
+            {pg.pageItems.map((r) => {
               const emp = empOf(r.employeeId);
               return (
                 <tr key={r.id}>
@@ -28039,7 +28760,7 @@ function AttendanceCorrections({
                           style={{
                             fontSize: 11.5,
                             color: T.muted,
-                            fontFamily: "'JetBrains Mono',monospace",
+                            ...mono,
                           }}
                         >
                           {emp?.code}
@@ -28047,15 +28768,9 @@ function AttendanceCorrections({
                       </div>
                     </div>
                   </td>
-                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                    {r.date}
-                  </td>
-                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                    {r.requestedCheckIn || "—"}
-                  </td>
-                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                    {r.requestedCheckOut || "—"}
-                  </td>
+                  <td style={mono}>{r.date}</td>
+                  <td style={mono}>{r.requestedCheckIn || "—"}</td>
+                  <td style={mono}>{r.requestedCheckOut || "—"}</td>
                   <td
                     style={{ fontSize: 13.5, color: T.textSoft, maxWidth: 200 }}
                   >
@@ -28063,54 +28778,71 @@ function AttendanceCorrections({
                   </td>
                   <td>
                     <StatusPill status={r.status} />
-                    <AcDecisionNote r={r} admins={admins} />
+                    <LeaveDecisionNote r={r} admins={admins} />
                   </td>
+                  {appliedCell(r)}
                   <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                    {r.status === "pending"
-                      ? canApprove && (
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: 6,
-                              justifyContent: "flex-end",
-                            }}
-                          >
-                            <Button
-                              size="sm"
-                              variant="accent"
-                              onClick={() => approve(r)}
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 6,
+                        justifyContent: "flex-end",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setViewFor(r)}
+                      >
+                        <Eye size={13} /> {t.lv.view}
+                      </Button>
+                      {r.status === "pending"
+                        ? canApprove && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="accent"
+                                onClick={() => approve(r)}
+                              >
+                                <ThumbsUp size={13} /> {t.ac.approve}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="danger"
+                                onClick={() => setRejectFor(r)}
+                              >
+                                <ThumbsDown size={13} /> {t.ac.reject}
+                              </Button>
+                            </>
+                          )
+                        : isSuperAdmin && (
+                            <button
+                              onClick={() => setConfirmDel(r)}
+                              style={{
+                                background: "none",
+                                border: "none",
+                                cursor: "pointer",
+                                color: T.mutedLight,
+                              }}
                             >
-                              <ThumbsUp size={13} /> {t.ac.approve}
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="danger"
-                              onClick={() => setRejectFor(r)}
-                            >
-                              <ThumbsDown size={13} /> {t.ac.reject}
-                            </Button>
-                          </div>
-                        )
-                      : isSuperAdmin && (
-                          <button
-                            onClick={() => setConfirmDel(r)}
-                            style={{
-                              background: "none",
-                              border: "none",
-                              cursor: "pointer",
-                              color: T.mutedLight,
-                            }}
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        )}
+                              <Trash2 size={14} />
+                            </button>
+                          )}
+                    </div>
                   </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
+        <RequestPaginationFooter
+          pg={pg}
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+        />
       </Card>
+      {detailModal}
       {rejectFor && (
         <AcRejectModal
           onCancel={() => setRejectFor(null)}
@@ -44776,6 +45508,7 @@ function AppInner() {
                         currentEmp={currentEmp}
                         employees={employees}
                         admins={admins}
+                        rolePermissionsMap={rolePermissionsMap}
                         overtimeRequests={overtimeRequests}
                         setOvertimeRequests={setOvertimeRequests}
                         otPolicy={otPolicy}
@@ -44875,6 +45608,7 @@ function AppInner() {
                         currentEmp={currentEmp}
                         employees={employees}
                         admins={admins}
+                        rolePermissionsMap={rolePermissionsMap}
                         attendanceCorrections={attendanceCorrections}
                         setAttendanceCorrections={setAttendanceCorrections}
                         attendance={attendance}
