@@ -3726,6 +3726,10 @@ const LANG_OPTIONS = [
 
 function LangToggle({ variant = "dark" }) {
   const { lang, setLang } = useLang();
+  // variant="header" = the roomier pill used in the desktop top bar; on
+  // phones it falls back to the compact "light" look it always had.
+  const isMobile = useIsMobile();
+  const isHeader = variant === "header" && !isMobile;
   const isDark = variant === "dark";
   const [open, setOpen] = useState(false);
   const boxRef = useRef(null);
@@ -3747,14 +3751,23 @@ function LangToggle({ variant = "dark" }) {
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 6,
-          background: isDark ? "rgba(255,255,255,0.10)" : T.paper,
-          border: `1px solid ${isDark ? "rgba(255,255,255,0.18)" : T.line}`,
-          borderRadius: 8,
+          gap: isHeader ? 8 : 6,
+          background: isHeader
+            ? T.card
+            : isDark
+              ? "rgba(255,255,255,0.10)"
+              : T.paper,
+          border: isHeader
+            ? `1px solid ${T.lineSoft}`
+            : `1px solid ${isDark ? "rgba(255,255,255,0.18)" : T.line}`,
+          borderRadius: isHeader ? 12 : 8,
           color: isDark ? "#fff" : T.ink,
-          fontSize: 13,
+          fontSize: isHeader ? 14 : 13,
           fontWeight: 600,
-          padding: "5px 10px",
+          padding: isHeader ? "0 14px" : "5px 10px",
+          height: isHeader ? 44 : undefined,
+          boxSizing: "border-box",
+          boxShadow: isHeader ? "0 1px 2px rgba(16,24,40,0.04)" : undefined,
           cursor: "pointer",
           transition: "background .15s, border-color .15s",
           backdropFilter: "blur(4px)",
@@ -3763,7 +3776,7 @@ function LangToggle({ variant = "dark" }) {
         <FlagIcon code={current.flag} />
         <span>{current.label}</span>
         <ChevronLeft
-          size={12}
+          size={isHeader ? 14 : 12}
           style={{
             transform: open ? "rotate(90deg)" : "rotate(-90deg)",
             transition: "transform .15s",
@@ -3849,6 +3862,7 @@ function useIsMobile(breakpoint = 821) {
 
 function HeaderClock() {
   const [now, setNow] = useState(() => new Date());
+  const { lang } = useLang();
   // Desktop/tablet gets a tidier bordered box with a clock icon (matching
   // the other header badges); mobile keeps the original compact live-dot
   // pill untouched, per request — this only ever changes the look on
@@ -3863,25 +3877,62 @@ function HeaderClock() {
   const ss = String(now.getSeconds()).padStart(2, "0");
 
   if (!isMobile) {
+    // Desktop/tablet: clock icon + time on top, full date underneath
+    // (e.g. "Sun, Sep 20, 2026"). Phones keep the compact live-dot pill below.
+    const dateLocale =
+      lang === "km" ? "km-KH" : lang === "zh" ? "zh-CN" : "en-US";
+    const dateLabel = now.toLocaleDateString(dateLocale, {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
     return (
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 7,
-          fontFamily: "'JetBrains Mono',monospace",
-          fontSize: 14,
-          fontWeight: 600,
-          color: T.ink,
-          padding: "9px 14px",
-          borderRadius: 10,
+          gap: 12,
+          padding: "6px 16px 6px 12px",
+          borderRadius: 14,
           border: `1px solid ${T.lineSoft}`,
           background: T.card,
-          letterSpacing: "-.01em",
+          boxShadow: "0 1px 2px rgba(16,24,40,0.04)",
         }}
       >
-        <Clock size={14} color={T.muted} />
-        {hh}:{mm}:{ss}
+        <Clock size={20} color={T.muted} strokeWidth={1.75} />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            lineHeight: 1.2,
+            whiteSpace: "nowrap",
+          }}
+        >
+          <span
+            style={{
+              fontFamily: "'Inter',sans-serif",
+              fontVariantNumeric: "tabular-nums",
+              fontSize: 15,
+              fontWeight: 700,
+              color: T.ink,
+              letterSpacing: "-.01em",
+            }}
+          >
+            {hh}:{mm}:{ss}
+          </span>
+          <span
+            style={{
+              fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
+              fontSize: 11.5,
+              fontWeight: 500,
+              color: T.muted,
+              marginTop: 1,
+            }}
+          >
+            {dateLabel}
+          </span>
+        </div>
       </div>
     );
   }
@@ -4621,6 +4672,20 @@ body{background:var(--wf-paper);}
 .wf-menu-btn,.wf-btn{transition:background .15s ease,transform .12s ease,box-shadow .15s ease,color .15s ease;}
 .wf-bottomnav.wf-bottomnav-hidden{display:none !important;}
 .wf-role-badge{white-space:nowrap;flex-shrink:0;}
+/* ---- Top-bar controls (desktop look; phones get the original compact look via the @media block below) ---- */
+.wf-hdr-actions{margin-left:auto;flex-shrink:0;display:flex;align-items:center;gap:10px;}
+.wf-hdr-iconbtn{position:relative;display:flex;align-items:center;justify-content:center;width:44px;height:44px;padding:0;box-sizing:border-box;border-radius:12px;border:1px solid ${T.lineSoft};background:${T.card};color:${T.ink};cursor:pointer;box-shadow:0 1px 2px rgba(16,24,40,0.04);transition:background .15s ease,border-color .15s ease,transform .12s ease;}
+.wf-hdr-iconbtn:hover{background:${T.paper};border-color:${T.line};}
+.wf-hdr-iconbtn:active{transform:scale(.95);}
+.wf-hdr-badge{position:absolute;top:-7px;right:-7px;min-width:20px;height:20px;padding:0 5px;box-sizing:border-box;border-radius:999px;background:${T.rose};color:#fff;font-size:11.5px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;border:2px solid ${T.card};box-shadow:0 2px 6px rgba(229,72,77,0.4);}
+.wf-hdr-rolegroup{display:flex;align-items:center;gap:6px;height:44px;padding:4px;box-sizing:border-box;border-radius:14px;border:1px solid rgba(91,141,239,0.20);background:rgba(91,141,239,0.07);flex-shrink:0;}
+.wf-hdr-rolegroup-staff{border-color:rgba(31,162,107,0.22);background:rgba(31,162,107,0.08);}
+.wf-hdr-switchbtn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;border:none;border-radius:10px;background:transparent;color:${T.blue};cursor:pointer;flex-shrink:0;transition:background .15s ease;}
+.wf-hdr-switchbtn:hover{background:rgba(91,141,239,0.16);}
+.wf-hdr-rolepill{display:flex;align-items:center;height:34px;padding:0 14px;box-sizing:border-box;border-radius:10px;background:rgba(91,141,239,0.16);color:#3B6FD8;font-size:13px;font-weight:600;white-space:nowrap;max-width:190px;overflow:hidden;text-overflow:ellipsis;}
+.wf-hdr-rolepill-staff{background:${T.forestSoft};color:${T.forestText};}
+.wf-dark .wf-hdr-rolepill{color:#8FB2F7;}
+.wf-dark .wf-hdr-rolepill-staff{color:${T.forestText};}
 .wf-bottomnav{display:none;position:absolute;left:0;right:0;bottom:0;z-index:45;background:${T.headerBg};backdrop-filter:blur(10px);border-top:1px solid ${T.lineSoft};align-items:stretch;justify-content:space-around;padding:5px 2px calc(5px + env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(5,8,16,0.08);}
 .wf-bottomnav-item{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;cursor:pointer;color:${T.muted};padding:5px 2px 4px;border-radius:9px;font-size:11px;font-weight:600;transition:color .15s ease;}
 .wf-bottomnav-item span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -4702,6 +4767,14 @@ body{background:var(--wf-paper);}
   .wf-header{padding:12px 16px;}
   .wf-content{padding:16px;}
   .wf-role-badge{display:none;}
+  .wf-hdr-actions{gap:8px;}
+  .wf-hdr-iconbtn{width:auto;height:auto;padding:6px;border:none;border-radius:0;background:none;box-shadow:none;}
+  .wf-hdr-iconbtn:hover{background:none;}
+  .wf-hdr-badge{top:1px;right:1px;min-width:16px;height:16px;padding:0 3px;font-size:11px;border-color:${T.paper};box-shadow:none;}
+  .wf-hdr-rolegroup{display:contents;}
+  .wf-hdr-rolepill{display:none;}
+  .wf-hdr-switchbtn{width:30px;height:30px;border-radius:8px;border:1px solid ${T.lineSoft};color:${T.muted};}
+  .wf-hdr-switchbtn:hover{background:transparent;}
   .wf-bottomnav{display:flex;}
   .wf-content.wf-content-bnpad{padding-bottom:86px;}
   .wf-glass .wf-content.wf-content-bnpad{padding-bottom:104px;}
@@ -8476,37 +8549,11 @@ function NotificationBell({
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label={t.notifications}
-        style={{
-          position: "relative",
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          color: T.ink,
-          padding: 6,
-          display: "flex",
-        }}
+        className="wf-hdr-iconbtn"
       >
         <Bell size={19} />
         {unread.length > 0 && (
-          <span
-            style={{
-              position: "absolute",
-              top: 1,
-              right: 1,
-              minWidth: 16,
-              height: 16,
-              borderRadius: 999,
-              background: T.rose,
-              color: "#fff",
-              fontSize: 11,
-              fontWeight: 700,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "0 3px",
-              border: `2px solid ${T.paper}`,
-            }}
-          >
+          <span className="wf-hdr-badge">
             {unread.length > 9 ? "9+" : unread.length}
           </span>
         )}
@@ -8678,42 +8725,21 @@ function ChatQuickAccess({ role, currentEmp, messages, setPage }) {
     <button
       onClick={() => setPage("messages")}
       aria-label={t.chat.title}
-      style={{
-        position: "relative",
-        background: "none",
-        border: "none",
-        cursor: "pointer",
-        color: T.ink,
-        padding: 6,
-        display: "flex",
-      }}
+      className="wf-hdr-iconbtn"
     >
       <MessageCircle size={19} />
       {unread > 0 && (
-        <span
-          style={{
-            position: "absolute",
-            top: 1,
-            right: 1,
-            minWidth: 16,
-            height: 16,
-            borderRadius: 999,
-            background: T.rose,
-            color: "#fff",
-            fontSize: 11,
-            fontWeight: 700,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "0 3px",
-            border: `2px solid ${T.paper}`,
-          }}
-        >
-          {unread > 9 ? "9+" : unread}
-        </span>
+        <span className="wf-hdr-badge">{unread > 9 ? "9+" : unread}</span>
       )}
     </button>
   );
+}
+// Header avatar: a touch larger on desktop (40px), original 32px on phones.
+// Kept as its own component so the size switch (a hook) doesn't have to
+// live inside AppInner, which has early returns above its JSX.
+function HeaderAvatar({ name, photo }) {
+  const isMobile = useIsMobile();
+  return <Avatar name={name} photo={photo} size={isMobile ? 32 : 40} />;
 }
 function Modal({
   title,
@@ -43927,86 +43953,45 @@ function AppInner() {
                     }
                   </h1>
                 </div>
-                <div
-                  style={{
-                    marginLeft: "auto",
-                    flexShrink: 0,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
-                >
+                <div className="wf-hdr-actions">
                   <div className="wf-role-badge">
                     <HeaderClock />
                   </div>
-                  {role === "admin" && sessionAdmin && sessionEmployee && (
-                    <button
-                      type="button"
-                      title={t.openEmployeeInNewTab}
-                      onClick={() =>
-                        window.open(
-                          employeePortalUrl(),
-                          "_blank",
-                          "noopener,noreferrer",
-                        )
-                      }
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        width: 30,
-                        height: 30,
-                        borderRadius: 8,
-                        border: `1px solid ${T.lineSoft}`,
-                        background: "transparent",
-                        color: T.muted,
-                        cursor: "pointer",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <Repeat size={15} />
-                    </button>
+                  {role === "admin" && (
+                    <div className="wf-hdr-rolegroup">
+                      {sessionAdmin && sessionEmployee && (
+                        <button
+                          type="button"
+                          className="wf-hdr-switchbtn"
+                          title={t.openEmployeeInNewTab}
+                          aria-label={t.openEmployeeInNewTab}
+                          onClick={() =>
+                            window.open(
+                              employeePortalUrl(),
+                              "_blank",
+                              "noopener,noreferrer",
+                            )
+                          }
+                        >
+                          <RefreshCw size={17} />
+                        </button>
+                      )}
+                      <span
+                        className="wf-hdr-rolepill"
+                        title={adminRoleLabel(currentAdmin?.role, lang)}
+                      >
+                        {adminRoleLabel(currentAdmin?.role, lang)}
+                      </span>
+                    </div>
                   )}
                   {role !== "admin" && currentEmp && (
-                    <span
-                      className="wf-role-badge"
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 700,
-                        background: T.forestSoft,
-                        color: T.forestText,
-                        padding: "5px 10px",
-                        borderRadius: 8,
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        maxWidth: 90,
-                      }}
-                    >
-                      {t.employee}
-                    </span>
+                    <div className="wf-hdr-rolegroup wf-hdr-rolegroup-staff">
+                      <span className="wf-hdr-rolepill wf-hdr-rolepill-staff">
+                        {t.employee}
+                      </span>
+                    </div>
                   )}
-                  {role === "admin" && (
-                    <span
-                      className="wf-role-badge"
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 700,
-                        background: "rgba(91,141,239,0.14)",
-                        color: T.blue,
-                        padding: "5px 10px",
-                        borderRadius: 6,
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        maxWidth: 90,
-                      }}
-                      title={adminRoleLabel(currentAdmin?.role, lang)}
-                    >
-                      {adminRoleLabel(currentAdmin?.role, lang)}
-                    </span>
-                  )}
-                  <LangToggle variant="light" />
+                  <LangToggle variant="header" />
                   {canUseMessages && (
                     <ChatQuickAccess
                       role={role}
@@ -44030,7 +44015,7 @@ function AppInner() {
                     shiftSwapRequests={shiftSwapRequests}
                     setPage={setPage}
                   />
-                  <Avatar
+                  <HeaderAvatar
                     name={
                       role === "admin"
                         ? currentAdmin?.name || "?"
@@ -44039,7 +44024,6 @@ function AppInner() {
                     photo={
                       role === "admin" ? currentAdmin?.photo : currentEmp?.photo
                     }
-                    size={32}
                   />
                 </div>
               </header>
