@@ -371,6 +371,8 @@ const LANG_RAW = {
       docsExpiringSoonCount: (n) => `${n} ឯកសារ/កិច្ចសន្យាជិតផុតកំណត់`,
       attCorrPending: (n) => `${n} សំណើកែតម្រូវវត្តមានកំពុងរង់ចាំ`,
       onboardingActiveCount: (n) => `${n} បុគ្គលិកកំពុងចាប់ផ្តើមការងារ`,
+      shiftSwapPending: (n) => `${n} សំណើដូរវេនកំពុងរង់ចាំ`,
+      payrollReviewCount: (n) => `${n} ប្រាក់ខែត្រូវពិនិត្យមុនបង់`,
     },
     analytics: {
       title: "វិភាគទិន្នន័យ",
@@ -1902,6 +1904,10 @@ const LANG_RAW = {
         `${n} attendance correction${n === 1 ? "" : "s"} pending`,
       onboardingActiveCount: (n) =>
         `${n} employee${n === 1 ? "" : "s"} onboarding`,
+      shiftSwapPending: (n) =>
+        `${n} shift swap request${n === 1 ? "" : "s"} pending`,
+      payrollReviewCount: (n) =>
+        `${n} payroll record${n === 1 ? "" : "s"} need${n === 1 ? "s" : ""} review`,
     },
     analytics: {
       title: "Analytics",
@@ -4707,6 +4713,10 @@ body{background:var(--wf-paper);font-family:'Inter','Noto Sans Khmer',sans-serif
 .wf-role-badge{white-space:nowrap;flex-shrink:0;}
 /* ---- Top-bar controls (desktop look; phones get the original compact look via the @media block below) ---- */
 .wf-hdr-actions{margin-left:auto;flex-shrink:0;display:flex;align-items:center;gap:10px;}
+.wf-hdr-searchbox{display:flex;align-items:center;gap:10px;width:320px;max-width:38vw;min-width:220px;height:44px;padding:0 10px 0 14px;box-sizing:border-box;border-radius:12px;border:1px solid ${T.lineSoft};background:${T.card};color:${T.muted};cursor:pointer;box-shadow:0 1px 2px rgba(16,24,40,0.04);transition:background .15s ease,border-color .15s ease;flex-shrink:1;}
+.wf-hdr-searchbox:hover{background:${T.paper};border-color:${T.line};}
+.wf-hdr-searchbox-text{flex:1;min-width:0;text-align:left;font-size:14px;font-family:'Inter','Noto Sans Khmer',sans-serif;color:${T.muted};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.wf-hdr-searchbox-kbd{flex-shrink:0;font-size:11.5px;font-family:'JetBrains Mono',monospace;font-weight:600;color:${T.muted};border:1px solid ${T.line};border-radius:7px;padding:4px 9px;background:${T.paper};}
 .wf-hdr-iconbtn{position:relative;display:flex;align-items:center;justify-content:center;width:44px;height:44px;padding:0;box-sizing:border-box;border-radius:12px;border:1px solid ${T.lineSoft};background:${T.card};color:${T.ink};cursor:pointer;box-shadow:0 1px 2px rgba(16,24,40,0.04);transition:background .15s ease,border-color .15s ease,transform .12s ease;}
 .wf-hdr-iconbtn:hover{background:${T.paper};border-color:${T.line};}
 .wf-hdr-iconbtn:active{transform:scale(.95);}
@@ -11509,6 +11519,7 @@ function Dashboard({
   attendanceCorrections = [],
   documents = [],
   onboardingTasks = [],
+  shiftSwapRequests = [],
 }) {
   const { t, lang } = useLang();
   const { theme } = useTheme();
@@ -11648,6 +11659,27 @@ function Dashboard({
         .filter((tk) => tk.type === "onboarding" && !tk.done)
         .map((tk) => tk.employeeId),
     ).size;
+    const pendingShiftSwap = (shiftSwapRequests || []).filter(
+      (r) => r.status === "pending",
+    ).length;
+    // "Needs review before paying": unpaid payroll rows for employees who
+    // still have a pending OT or attendance-correction request — either
+    // could change their pay once approved/rejected, so paying now risks
+    // an incorrect amount.
+    const pendingOtEmpIds = new Set(
+      (overtimeRequests || [])
+        .filter((r) => r.status === "pending")
+        .map((r) => r.employeeId),
+    );
+    const pendingAttCorrEmpIds = new Set(
+      (attendanceCorrections || [])
+        .filter((r) => r.status === "pending")
+        .map((r) => r.employeeId),
+    );
+    const payrollReview = (pendingRows || []).filter(
+      (row) =>
+        pendingOtEmpIds.has(row.emp.id) || pendingAttCorrEmpIds.has(row.emp.id),
+    ).length;
     const items = [
       pendingLeave > 0 && {
         key: "leave",
@@ -11681,6 +11713,22 @@ function Dashboard({
         label: t.dash.docsExpiringSoonCount(docsExpiring),
         linkTo: "docExpiry",
       },
+      pendingShiftSwap > 0 && {
+        key: "shiftswap",
+        icon: Repeat,
+        tone: "rose",
+        count: pendingShiftSwap,
+        label: t.dash.shiftSwapPending(pendingShiftSwap),
+        linkTo: "shiftswap",
+      },
+      payrollReview > 0 && {
+        key: "payrollReview",
+        icon: Wallet,
+        tone: "gold",
+        count: payrollReview,
+        label: t.dash.payrollReviewCount(payrollReview),
+        linkTo: "payroll",
+      },
       onboardingActive > 0 && {
         key: "onboarding",
         icon: UserPlus,
@@ -11699,6 +11747,8 @@ function Dashboard({
     attendanceCorrections,
     documents,
     onboardingTasks,
+    shiftSwapRequests,
+    pendingRows,
     t,
   ]);
 
@@ -42670,6 +42720,194 @@ function CalendarPage({
   );
 }
 
+// Admin-desktop-only quick-jump launcher (⌘K / Ctrl+K). Reuses the
+// already-permission-filtered `nav` array from AppInner so a command
+// palette entry never lets someone jump to a page their role/rank
+// couldn't otherwise reach — no separate hardcoded command list to
+// drift out of sync with the real nav.
+function CommandPalette({ open, onClose, nav, setPage, lang }) {
+  const [query, setQuery] = useState("");
+  const [highlight, setHighlight] = useState(0);
+  const inputRef = useRef(null);
+  const listRef = useRef(null);
+
+  useEffect(() => {
+    if (open) {
+      setQuery("");
+      setHighlight(0);
+      // Wait a tick so the portal is mounted before focusing.
+      const id = setTimeout(() => inputRef.current?.focus(), 0);
+      return () => clearTimeout(id);
+    }
+  }, [open]);
+
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return nav;
+    return nav.filter((n) => (n.label || "").toLowerCase().includes(q));
+  }, [query, nav]);
+
+  useEffect(() => {
+    setHighlight(0);
+  }, [query]);
+
+  useEffect(() => {
+    listRef.current
+      ?.querySelector(`[data-idx="${highlight}"]`)
+      ?.scrollIntoView({ block: "nearest" });
+  }, [highlight]);
+
+  const choose = (item) => {
+    if (!item) return;
+    setPage(item.id);
+    onClose();
+  };
+
+  if (!open) return null;
+
+  return createPortal(
+    <div
+      className="wf-modal-overlay"
+      style={{ alignItems: "flex-start", paddingTop: "12vh" }}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        className="wf-modal"
+        style={{
+          maxWidth: 560,
+          width: "100%",
+          padding: 0,
+          overflow: "hidden",
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            onClose();
+          } else if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setHighlight((h) => Math.min(h + 1, results.length - 1));
+          } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setHighlight((h) => Math.max(h - 1, 0));
+          } else if (e.key === "Enter") {
+            e.preventDefault();
+            choose(results[highlight]);
+          }
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            padding: "14px 18px",
+            borderBottom: `1px solid ${T.line}`,
+          }}
+        >
+          <Search size={18} color={T.muted} />
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={
+              lang === "km"
+                ? "វាយបញ្ជាឬស្វែងរកទំព័រ..."
+                : lang === "zh"
+                  ? "输入命令或搜索页面..."
+                  : "Type a command or search..."
+            }
+            style={{
+              flex: 1,
+              border: "none",
+              outline: "none",
+              background: "transparent",
+              fontSize: 15,
+              fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
+              color: T.ink,
+            }}
+          />
+          <kbd
+            style={{
+              fontSize: 11,
+              fontFamily: "'JetBrains Mono',monospace",
+              color: T.muted,
+              border: `1px solid ${T.line}`,
+              borderRadius: 5,
+              padding: "2px 6px",
+            }}
+          >
+            Esc
+          </kbd>
+        </div>
+        <div
+          ref={listRef}
+          style={{ maxHeight: "50vh", overflowY: "auto", padding: 6 }}
+        >
+          {results.length === 0 ? (
+            <div
+              style={{
+                padding: "24px 12px",
+                textAlign: "center",
+                color: T.muted,
+                fontSize: 13.5,
+              }}
+            >
+              {lang === "km"
+                ? "រកមិនឃើញទេ"
+                : lang === "zh"
+                  ? "未找到结果"
+                  : "No matching pages"}
+            </div>
+          ) : (
+            results.map((n, idx) => {
+              const Icon = n.icon;
+              const active = idx === highlight;
+              return (
+                <div
+                  key={n.id}
+                  data-idx={idx}
+                  onMouseEnter={() => setHighlight(idx)}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    choose(n);
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: "9px 10px",
+                    borderRadius: 8,
+                    cursor: "pointer",
+                    background: active ? T.forestSoft : "transparent",
+                  }}
+                >
+                  {Icon && (
+                    <Icon size={16} color={active ? T.forestText : T.muted} />
+                  )}
+                  <span
+                    style={{
+                      flex: 1,
+                      fontSize: 14,
+                      fontFamily: "'Inter','Noto Sans Khmer',sans-serif",
+                      color: active ? T.forestText : T.ink,
+                      fontWeight: active ? 600 : 500,
+                    }}
+                  >
+                    {n.label}
+                  </span>
+                  {active && <ArrowRight size={14} color={T.forestText} />}
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
 function AppInner() {
   useGlobalStyle();
   const { t, lang } = useLang();
@@ -44271,6 +44509,25 @@ function AppInner() {
       ? buildBottomNavAdmin(t.nav)
       : buildBottomNavEmployee(t.nav, employeeModules);
 
+  // Command palette (⌘K / Ctrl+K) — admin desktop only. Mobile has no
+  // hardware keyboard shortcut to trigger it, and the nav is one tap
+  // away there anyway, so both the shortcut and the trigger button stay
+  // out of the employee/mobile experience entirely.
+  const isMobile = useIsMobile();
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const canUseCommandPalette = role === "admin" && !isMobile;
+  useEffect(() => {
+    if (!canUseCommandPalette) return;
+    const handler = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen(true);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [canUseCommandPalette]);
+
   // Instantiated once here (not inside MessagesPage) so an incoming call
   // still rings no matter which page is currently open. selfId inside
   // the hook is null until currentAdmin/currentEmp resolve, so it's safe
@@ -44494,9 +44751,6 @@ function AppInner() {
                 }}
               />
               <div style={{ ...shimmer, height: 14, width: "55%" }} />
-            </div>
-            <div className="wf-sidebar-search">
-              <div style={{ ...shimmer, height: 32, borderRadius: 9 }} />
             </div>
             <nav className="wf-sidebar-nav">
               <div
@@ -44908,15 +45162,6 @@ function AppInner() {
                     <X size={18} />
                   </button>
                 </div>
-                <div className="wf-sidebar-search">
-                  <Search size={14} />
-                  <input
-                    type="text"
-                    value={navSearch}
-                    onChange={(e) => setNavSearch(e.target.value)}
-                    placeholder={t.searchMenu}
-                  />
-                </div>
                 <nav className="wf-sidebar-nav">
                   {(() => {
                     const q = navSearch.trim().toLowerCase();
@@ -45168,6 +45413,31 @@ function AppInner() {
                   </h1>
                 </div>
                 <div className="wf-hdr-actions">
+                  {canUseCommandPalette && (
+                    <button
+                      type="button"
+                      className="wf-hdr-searchbox"
+                      title={
+                        lang === "km"
+                          ? "ស្វែងរកលឿន (⌘K)"
+                          : lang === "zh"
+                            ? "快速搜索 (⌘K)"
+                            : "Quick jump (⌘K)"
+                      }
+                      aria-label="Command palette"
+                      onClick={() => setPaletteOpen(true)}
+                    >
+                      <Search size={15} />
+                      <span className="wf-hdr-searchbox-text">
+                        {lang === "km"
+                          ? "ស្វែងរកទំព័រ ឬលោតទៅម៉ឺនុយ..."
+                          : lang === "zh"
+                            ? "搜索页面或跳转到菜单..."
+                            : "Search pages or jump to a menu..."}
+                      </span>
+                      <kbd className="wf-hdr-searchbox-kbd">Ctrl K</kbd>
+                    </button>
+                  )}
                   <div className="wf-role-badge">
                     <HeaderClock />
                   </div>
@@ -45306,6 +45576,7 @@ function AppInner() {
                       attendanceCorrections={attendanceCorrections}
                       documents={documents}
                       onboardingTasks={onboardingTasks}
+                      shiftSwapRequests={shiftSwapRequests}
                     />
                   )}
                   {page === "analytics" && role === "admin" && (
@@ -45749,6 +46020,15 @@ function AppInner() {
             onToggleMute={voiceCall.toggleMute}
             onDismissError={voiceCall.clearCallError}
           />
+          {canUseCommandPalette && (
+            <CommandPalette
+              open={paletteOpen}
+              onClose={() => setPaletteOpen(false)}
+              nav={nav}
+              setPage={setPage}
+              lang={lang}
+            />
+          )}
           {confirmLogoutOpen && (
             <ConfirmDialog
               title={t.confirmLogoutTitle}
