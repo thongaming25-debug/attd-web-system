@@ -40,6 +40,8 @@ import {
   Loader2,
   Menu,
   Lock,
+  Unlock,
+  RotateCcw,
   ShieldCheck,
   ShieldOff,
   KeyRound,
@@ -63,6 +65,7 @@ import {
   ChevronDown,
   ChevronUp,
   MoreVertical,
+  MoreHorizontal,
   Download,
   Eye,
   EyeOff,
@@ -1001,6 +1004,14 @@ const LANG_RAW = {
       otPay: "ប្រាក់ OT",
       viewSlip: "មើលសន្លឹកប្រាក់ខែ",
       unmarkPaid: "ដកសញ្ញាបានបើក",
+      draftStatus: "ព្រាង",
+      approved: "បានអនុម័ត",
+      markApproved: "អនុម័ត",
+      unlockPayroll: "ដោះសោ",
+      bulkApprove: "អនុម័តដែលបានជ្រើសរើស",
+      selectAllDraft: "ជ្រើសរើសទាំងអស់ (ព្រាង)",
+      lockedHint: "បានចាក់សោ បន្ទាប់ពីបានបើកប្រាក់ខែហើយ",
+      revertToDraft: "ដកការអនុម័ត",
       monthLabel: "ខែ",
       currentMonthTag: "(ខែបច្ចុប្បន្ន)",
       viewingPastMonth: "កំពុងមើលប្រវត្តិខែមុន",
@@ -1014,6 +1025,13 @@ const LANG_RAW = {
       totalNetPayStat: "ប្រាក់ខែសុទ្ធសរុប",
       totalBaseSalaryStat: "ប្រាក់ខែមូលដ្ឋានសរុប",
       totalDeductionsStat: "ការកាត់ប្រាក់សរុប",
+      searchPlaceholder: "ស្វែងរកឈ្មោះ ឬលេខសម្គាល់បុគ្គលិក...",
+      allStatus: "គ្រប់ស្ថានភាព",
+      exportBtn: "នាំចេញ",
+      activeEmployeesSub: "បុគ្គលិកកំពុងធ្វើការ",
+      afterDeductionsSub: "ក្រោយកាត់ប្រាក់",
+      deductionsSub: "ពន្ធ ធានារ៉ាប់រង និងអវត្តមាន",
+      moreActions: "សកម្មភាពបន្ថែម",
       deductions: "ការកាត់ប្រាក់",
       policyDesc:
         "កំណត់អត្រាភាគរយពន្ធលើប្រាក់ខែ និងធានារ៉ាប់រង ព្រមទាំងកម្រិតប្រាក់ខែអប្បបរមា។ ការកាត់ប្រាក់នេះនឹងអនុវត្តលើបុគ្គលិកដែលមានប្រាក់ខែមូលដ្ឋានស្មើ ឬលើសពីកម្រិតកំណត់នេះប៉ុណ្ណោះ។",
@@ -2540,6 +2558,14 @@ const LANG_RAW = {
       otPay: "OT Pay",
       viewSlip: "View Payslip",
       unmarkPaid: "Unmark as Paid",
+      draftStatus: "Draft",
+      approved: "Approved",
+      markApproved: "Approve",
+      unlockPayroll: "Unlock",
+      bulkApprove: "Approve Selected",
+      selectAllDraft: "Select all draft",
+      lockedHint: "Locked after payroll was marked paid",
+      revertToDraft: "Revert to Draft",
       monthLabel: "Month",
       currentMonthTag: "(Current Month)",
       viewingPastMonth: "Viewing past month's history",
@@ -2553,6 +2579,13 @@ const LANG_RAW = {
       totalNetPayStat: "Total Net Pay",
       totalBaseSalaryStat: "Total Base Salary",
       totalDeductionsStat: "Total Deductions",
+      searchPlaceholder: "Search employee name or ID...",
+      allStatus: "All Status",
+      exportBtn: "Export",
+      activeEmployeesSub: "Active employees",
+      afterDeductionsSub: "After deductions",
+      deductionsSub: "Tax, insurance & attendance",
+      moreActions: "More actions",
       deductions: "Deductions",
       policyDesc:
         "Set the tax and insurance percentage rates, and the minimum base salary at which they start applying. Employees whose base salary is below the threshold are not deducted.",
@@ -4604,6 +4637,24 @@ body{background:var(--wf-paper);font-family:'Inter','Noto Sans Khmer',sans-serif
 .wf-btn-danger:hover:not(:disabled){background:${T.dangerHoverBg};}
 .wf-btn-danger-solid{background:${T.rose};color:#fff;}
 .wf-btn-danger-solid:hover:not(:disabled){background:${T.roseDark};}
+/* Payroll page buttons */
+.wf-pay-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 14px;border-radius:9px;font-size:13px;font-weight:600;border:1px solid transparent;cursor:pointer;white-space:nowrap;transition:background .15s ease,border-color .15s ease,box-shadow .15s ease,transform .1s ease;}
+.wf-pay-btn:active:not(:disabled){transform:scale(.97);}
+.wf-pay-btn:disabled{opacity:.5;cursor:not-allowed;}
+.wf-pay-btn:focus-visible{outline:2px solid ${T.blue};outline-offset:2px;}
+.wf-pay-btn-lg{height:40px;padding:0 16px;font-size:13.5px;}
+.wf-pay-btn-icon{width:36px;padding:0;}
+.wf-pay-btn-soft{background:color-mix(in srgb,${T.blue} 10%,${T.card});color:${T.blue};border-color:color-mix(in srgb,${T.blue} 30%,transparent);}
+.wf-pay-btn-soft:hover:not(:disabled){background:color-mix(in srgb,${T.blue} 18%,${T.card});}
+.wf-pay-btn-solid{background:${T.forestDark};color:#fff;box-shadow:0 1px 2px rgba(16,90,58,0.35);}
+.wf-pay-btn-solid:hover:not(:disabled){filter:brightness(.92);}
+.wf-pay-btn-outline{background:${T.card};color:${T.ink};border-color:${T.line};}
+.wf-pay-btn-outline:hover:not(:disabled){background:${T.tableHeadBg};}
+.wf-pay-menu{position:fixed;z-index:70;background:${T.card};border:1px solid ${T.line};border-radius:12px;box-shadow:0 12px 32px rgba(5,8,16,0.22);padding:6px;animation:wf-pop .15s cubic-bezier(.2,.9,.3,1.2);}
+.wf-pay-menu-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:none;border-radius:8px;background:transparent;color:${T.ink};font-size:13.5px;font-weight:500;cursor:pointer;text-align:left;}
+.wf-pay-menu-item:hover:not(:disabled){background:${T.tableHeadBg};}
+.wf-pay-menu-item:disabled{opacity:.5;cursor:not-allowed;}
+@media (prefers-reduced-motion:reduce){.wf-pay-btn,.wf-pay-menu{transition:none;animation:none;}}
 .wf-input{width:100%;padding:9px 12px;border-radius:7px;border:1px solid ${T.inputBorder};font-size:16px;background:${T.inputBg};color:${T.text};outline:none;font-family:inherit;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease;}
 .wf-input:focus{border-color:${T.gold};box-shadow:0 0 0 3px rgba(240,168,59,0.16);}
 .wf-field-label{display:block;font-size:12px;font-weight:700;color:${T.fieldLabel};margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;}
@@ -4672,6 +4723,9 @@ body{background:var(--wf-paper);font-family:'Inter','Noto Sans Khmer',sans-serif
 .wf-table tr:last-child td{border-bottom:none;}
 .wf-table tbody tr{transition:background .12s ease;}
 .wf-table tbody tr:hover{background:${T.tableHeadBg};}
+.wf-pay-table{min-width:900px;}
+.wf-pay-table th{padding:12px 16px;font-size:12.5px;}
+.wf-pay-table td{padding:12px 16px;vertical-align:middle;}
 .wf-grid{display:grid;gap:16px;}
 .wf-emp-linkbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600;color:${T.textSoft};padding:6px 4px;border-radius:6px;transition:background .15s ease,color .15s ease;white-space:nowrap;}
 .wf-emp-linkbtn:hover{background:${T.tableHeadBg};color:${T.ink};}
@@ -7399,7 +7453,10 @@ function useOfflinePendingCount(table) {
 }
 
 // payroll_paid is stored as one row per (employee, month) but the app
-// works with it as a flat map: { "<employeeId>-<YYYY-MM>": true }.
+// works with it as a flat map: { "<employeeId>-<YYYY-MM>": status }.
+// status is one of "draft" | "approved" | "paid". Older rows only have
+// the legacy boolean `paid` column (no `status` yet) — those are read
+// as "paid" or "draft" so existing data keeps working unchanged.
 // Employee ids never contain "-", so splitting on the first "-" safely
 // recovers employeeId and month from a key.
 function splitPayrollKey(key) {
@@ -7424,7 +7481,8 @@ function usePayrollPaid() {
       } else {
         const map = {};
         (data || []).forEach((r) => {
-          map[`${r.employee_id}-${r.month}`] = r.paid;
+          map[`${r.employee_id}-${r.month}`] =
+            r.status || (r.paid ? "paid" : "draft");
         });
         prevRef.current = map;
         setValueState(map);
@@ -7437,7 +7495,7 @@ function usePayrollPaid() {
   }, []);
 
   // Same live-sync reasoning as useSupabaseArray above: without this, a
-  // "mark as paid" done by one admin stays invisible to any other admin
+  // status change made by one admin stays invisible to any other admin
   // tab until it's reloaded. Uses the same shared realtime bus as
   // useSupabaseArray (one channel per tab) instead of a private channel.
   useEffect(() => {
@@ -7449,7 +7507,7 @@ function usePayrollPaid() {
         const key = `${row.employee_id}-${row.month}`;
         const next = { ...current };
         if (payload.eventType === "DELETE") delete next[key];
-        else next[key] = row.paid;
+        else next[key] = row.status || (row.paid ? "paid" : "draft");
         prevRef.current = next;
         return next;
       });
@@ -7471,9 +7529,12 @@ function usePayrollPaid() {
       (async () => {
         for (const key of changed) {
           const [employeeId, month] = splitPayrollKey(key);
-          const { error } = await supabase
-            .from("payroll_paid")
-            .upsert({ employee_id: employeeId, month, paid: next[key] });
+          const { error } = await supabase.from("payroll_paid").upsert({
+            employee_id: employeeId,
+            month,
+            status: next[key],
+            paid: next[key] === "paid",
+          });
           if (error) {
             console.error(
               "[supabase] upsert failed on payroll_paid:",
@@ -8265,6 +8326,11 @@ function getStatusMap(lang) {
       label: en ? "Pending" : "រង់ចាំបង់",
     },
     paid: { bg: T.forestSoft, fg: T.forestText, label: en ? "Paid" : "បង់រួច" },
+    payrollApproved: {
+      bg: "#E7ECF6",
+      fg: T.blue,
+      label: en ? "Approved" : "បានអនុម័ត",
+    },
     approved: {
       bg: T.forestSoft,
       fg: T.forestText,
@@ -8395,12 +8461,15 @@ function fmtAppliedOn(iso, lang) {
     return { date: iso, time: "" };
   }
 }
-function StatusPill({ status }) {
+function StatusPill({ status, style }) {
   const { lang } = useLang();
   const STATUS_MAP = getStatusMap(lang);
   const s = STATUS_MAP[status] || { bg: "#EEE", fg: "#555", label: status };
   return (
-    <span className="wf-badge" style={{ background: s.bg, color: s.fg }}>
+    <span
+      className="wf-badge"
+      style={{ background: s.bg, color: s.fg, ...style }}
+    >
       {s.label}
     </span>
   );
@@ -11595,7 +11664,7 @@ function Dashboard({
   const presentToday = attendance.filter((a) => a.date === today).length;
   const mk = monthKey();
   const paidCount = activeEmployees.filter(
-    (e) => payrollPaid[`${e.id}-${mk}`],
+    (e) => payrollPaid[`${e.id}-${mk}`] === "paid",
   ).length;
   const pendingPayroll = activeEmployees.length - paidCount;
   const rate = activeEmployees.length
@@ -11619,7 +11688,7 @@ function Dashboard({
     role === "admin"
       ? activeEmployees.map((e) => ({
           emp: e,
-          paid: !!payrollPaid[`${e.id}-${mk}`],
+          paid: payrollPaid[`${e.id}-${mk}`] === "paid",
           ...computePayroll(
             e,
             attendance,
@@ -11821,7 +11890,7 @@ function Dashboard({
   const myStatusLabel = myTodayRecord
     ? STATUS_MAP[myTodayRecord.status]?.label || myTodayRecord.status
     : t.dash.notCheckedIn;
-  const myPayrollPaid = !!payrollPaid[`${currentEmp?.id}-${mk}`];
+  const myPayrollPaid = payrollPaid[`${currentEmp?.id}-${mk}`] === "paid";
 
   const stats =
     role === "admin"
@@ -26391,7 +26460,12 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
       style={{
         padding: open ? 16 : 0,
         marginBottom: 16,
-        background: open ? T.card : T.forestSoft,
+        background: open
+          ? T.card
+          : `linear-gradient(100deg, ${T.forestSoft} 0%, color-mix(in srgb, ${T.forestSoft} 35%, ${T.card}) 100%)`,
+        borderColor: open
+          ? undefined
+          : `color-mix(in srgb, ${T.forest} 18%, transparent)`,
         overflow: "hidden",
       }}
     >
@@ -26402,7 +26476,8 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
           justifyContent: "space-between",
           gap: 12,
           cursor: "pointer",
-          padding: open ? 0 : "14px 18px",
+          flexWrap: "wrap",
+          padding: open ? 0 : "16px 20px",
         }}
         onClick={() => setOpen(!open)}
       >
@@ -26410,17 +26485,18 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
           {!open && (
             <div
               style={{
-                width: 34,
-                height: 34,
-                borderRadius: 9,
+                width: 46,
+                height: 46,
+                borderRadius: 14,
                 background: T.card,
+                boxShadow: "0 2px 8px rgba(16,90,58,0.14)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 flexShrink: 0,
               }}
             >
-              <Receipt size={16} color={T.forestText} />
+              <Wallet size={22} color={T.forestText} />
             </div>
           )}
           {open && <Receipt size={16} color={T.forest} />}
@@ -26428,8 +26504,8 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
             <span
               style={{
                 fontWeight: 700,
-                fontSize: 14.5,
-                color: open ? T.ink : T.forestText,
+                fontSize: open ? 14.5 : 16,
+                color: T.ink,
               }}
             >
               {t.pay.policyTitle}
@@ -26438,9 +26514,8 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
               <div
                 style={{
                   fontSize: 13,
-                  color: T.forestText,
-                  opacity: 0.85,
-                  marginTop: 1,
+                  color: T.textSoft,
+                  marginTop: 2,
                 }}
               >
                 {t.pay.policyBannerDesc}
@@ -26449,20 +26524,14 @@ function PayrollPolicySettings({ payrollPolicy, setPayrollPolicy }) {
           </div>
         </div>
         {!open && (
-          <span
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 3,
-              fontSize: 13.5,
-              fontWeight: 700,
-              color: T.blue,
-              whiteSpace: "nowrap",
-              flexShrink: 0,
-            }}
+          <button
+            type="button"
+            className="wf-pay-btn wf-pay-btn-outline wf-pay-btn-lg"
+            aria-expanded={open}
+            style={{ color: T.forestText, flexShrink: 0 }}
           >
-            {t.pay.viewPolicyLink} <ChevronRight size={14} />
-          </span>
+            {t.pay.viewPolicyLink} <ArrowRight size={15} />
+          </button>
         )}
         {open && (
           <span
@@ -39244,6 +39313,212 @@ function HistoricalPayrollModal({
   );
 }
 
+// ---- Payroll page building blocks (admin view) ------------------------
+// Blue pill used for "Custom rate / Custom UL policy" tags in the table.
+const PAY_BADGE = {
+  fontSize: 11,
+  fontWeight: 600,
+  color: T.blue,
+  background: `color-mix(in srgb, ${T.blue} 12%, ${T.card})`,
+  border: `1px solid color-mix(in srgb, ${T.blue} 25%, transparent)`,
+  padding: "2px 8px",
+  borderRadius: 999,
+  whiteSpace: "nowrap",
+};
+
+// KPI card for the admin summary row: tinted background + tinted border,
+// round icon chip on the left, label / value / small caption on the right.
+function PayKpiCard({ icon: Icon, tint, label, value, sub }) {
+  const c = OT_STAT_TINTS[tint] || OT_STAT_TINTS.violet;
+  return (
+    <div
+      style={{
+        background: c.bg,
+        border: `1px solid color-mix(in srgb, ${c.fg} 22%, transparent)`,
+        borderRadius: 14,
+        padding: "16px 18px",
+        display: "flex",
+        alignItems: "center",
+        gap: 14,
+        minWidth: 0,
+      }}
+    >
+      <div
+        style={{
+          width: 46,
+          height: 46,
+          borderRadius: 14,
+          background: `color-mix(in srgb, ${c.fg} 16%, ${T.card})`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        <Icon size={22} color={c.fg} />
+      </div>
+      <div style={{ minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 700,
+            color: c.fg,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {label}
+        </div>
+        <div
+          style={{
+            fontSize: 22,
+            fontWeight: 800,
+            color: T.ink,
+            lineHeight: 1.25,
+            fontVariantNumeric: "tabular-nums",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {value}
+        </div>
+        {sub && <div style={{ fontSize: 12.5, color: T.muted }}>{sub}</div>}
+      </div>
+    </div>
+  );
+}
+
+// A real <select> (keeps native keyboard + mobile pickers) dressed up with
+// an optional leading icon and a custom chevron.
+function PaySelect({
+  icon: Icon,
+  value,
+  onChange,
+  children,
+  ariaLabel,
+  minWidth = 160,
+}) {
+  return (
+    <span
+      style={{
+        position: "relative",
+        display: "inline-flex",
+        alignItems: "center",
+      }}
+    >
+      {Icon && (
+        <Icon
+          size={16}
+          color={T.muted}
+          style={{ position: "absolute", left: 12, pointerEvents: "none" }}
+        />
+      )}
+      <select
+        className="wf-input"
+        aria-label={ariaLabel}
+        value={value}
+        onChange={onChange}
+        style={{
+          appearance: "none",
+          WebkitAppearance: "none",
+          width: "auto",
+          minWidth,
+          height: 40,
+          borderRadius: 10,
+          paddingLeft: Icon ? 38 : 14,
+          paddingRight: 34,
+          fontWeight: 500,
+          cursor: "pointer",
+          background: T.card,
+        }}
+      >
+        {children}
+      </select>
+      <ChevronDown
+        size={15}
+        color={T.muted}
+        style={{ position: "absolute", right: 12, pointerEvents: "none" }}
+      />
+    </span>
+  );
+}
+
+// Small dropdown menu for the Payroll page (row "..." button and the Export
+// button). Rendered into document.body with fixed coordinates — the same
+// approach as DatePicker — so the table card's horizontal scrolling can
+// never clip it.
+function PayPopMenu({ items, renderTrigger, width = 200 }) {
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState(null);
+  const wrapRef = useRef(null);
+  const close = useCallback(() => setOpen(false), []);
+  useCloseOnOutside(wrapRef, close);
+  const place = useCallback(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const estH = items.length * 42 + 12;
+    const openUp =
+      window.innerHeight - r.bottom < estH + 12 && r.top > estH + 12;
+    setPos({
+      left: Math.min(
+        Math.max(8, r.right - width),
+        window.innerWidth - width - 8,
+      ),
+      top: openUp ? r.top - 6 : r.bottom + 6,
+      openUp,
+    });
+  }, [items.length, width]);
+  useEffect(() => {
+    if (!open) return undefined;
+    place();
+    window.addEventListener("scroll", place, true);
+    window.addEventListener("resize", place);
+    return () => {
+      window.removeEventListener("scroll", place, true);
+      window.removeEventListener("resize", place);
+    };
+  }, [open, place]);
+  return (
+    <span ref={wrapRef} style={{ display: "inline-flex" }}>
+      {renderTrigger({ open, toggle: () => setOpen((o) => !o) })}
+      {open &&
+        pos &&
+        createPortal(
+          <div
+            role="menu"
+            className="wf-pay-menu"
+            onMouseDown={(e) => e.stopPropagation()}
+            style={{
+              top: pos.top,
+              left: pos.left,
+              width,
+              transform: pos.openUp ? "translateY(-100%)" : "none",
+            }}
+          >
+            {items.map((it) => (
+              <button
+                key={it.key}
+                type="button"
+                role="menuitem"
+                disabled={it.disabled}
+                className="wf-pay-menu-item"
+                onClick={() => {
+                  setOpen(false);
+                  it.onClick();
+                }}
+              >
+                {it.icon && <it.icon size={15} />}
+                {it.label}
+              </button>
+            ))}
+          </div>,
+          document.body,
+        )}
+    </span>
+  );
+}
+
 // Full-tinted stat card for the Payroll pages (staff "My Payroll" overview
 // and the admin summary row) — unlike OtStatCard, the tint covers the
 // whole card rather than just the icon chip, matching the reference
@@ -40224,6 +40499,8 @@ function BudgetPlanning({
 function Payroll({
   role,
   currentEmp,
+  currentAdmin,
+  canManagePayroll = true,
   employees,
   attendance,
   payrollPaid,
@@ -40249,7 +40526,15 @@ function Payroll({
   const [xlsxExporting, setXlsxExporting] = useState(false);
   const [showHistorical, setShowHistorical] = useState(false);
   const [visibleCount, setVisibleCount] = useState(5);
+  const [selectedIds, setSelectedIds] = useState(() => new Set());
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const isPastMonth = mk !== currentMk;
+  // A changed month/search/filter changes which rows are on screen, so drop
+  // the selection rather than risk bulk-approving rows the admin can't see.
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [mk, search, statusFilter]);
   const activeEmployees = employees.filter((e) => e.status === "active");
   const list =
     role === "admin"
@@ -40610,31 +40895,124 @@ function Payroll({
     );
   }
 
-  const togglePaid = (empId) => {
-    const key = `${empId}-${mk}`;
-    const willBePaid = !payrollPaid[key];
-    setPayrollPaid({ ...payrollPaid, [key]: willBePaid });
-
-    // Only worth checking "is everyone done now?" on the transition
-    // into paid — unmarking someone can't complete the batch.
-    if (willBePaid) {
-      const allNowPaid = activeEmployees.every((e) =>
-        e.id === empId ? true : !!payrollPaid[`${e.id}-${mk}`],
-      );
-      if (allNowPaid && activeEmployees.length > 0) {
-        supabase.functions
-          .invoke("telegram_notify", {
-            body: {
-              text: `ប្រាក់ខែសម្រាប់ខែ ${mk} ត្រូវបានបើកផ្តល់ចប់សព្វគ្រប់ សម្រាប់និយោជិកទាំង ${activeEmployees.length} នាក់ សរុប $${totalNet.toFixed(2)}`,
-              category: "payroll",
-            },
-          })
-          .then(({ error }) => {
-            if (error)
-              console.error("[telegram] payroll notify failed:", error.message);
-          });
-      }
+  const getRowStatus = (empId) => payrollPaid[`${empId}-${mk}`] || "draft";
+  const statusLabel = (status) =>
+    status === "paid"
+      ? t.pay.paid
+      : status === "approved"
+        ? t.pay.approved
+        : t.pay.draftStatus;
+  const logPayrollStatusChange = (empId, fromStatus, toStatus) => {
+    const emp = employees.find((x) => x.id === empId);
+    writeAuditLog({
+      actor: currentAdmin
+        ? { type: "admin", id: currentAdmin.id, name: currentAdmin.name }
+        : null,
+      action: "update",
+      table: "payroll_paid",
+      entityId: `${empId}-${mk}`,
+      label: `${emp?.name || empId} — ${monthLabel(mk)}`,
+      changes: { status: { from: fromStatus, to: toStatus } },
+    });
+  };
+  const notifyIfAllPaid = (empId) => {
+    const allNowPaid = activeEmployees.every((e) =>
+      e.id === empId ? true : payrollPaid[`${e.id}-${mk}`] === "paid",
+    );
+    if (allNowPaid && activeEmployees.length > 0) {
+      supabase.functions
+        .invoke("telegram_notify", {
+          body: {
+            text: `ប្រាក់ខែសម្រាប់ខែ ${mk} ត្រូវបានបើកផ្តល់ចប់សព្វគ្រប់ សម្រាប់និយោជិកទាំង ${activeEmployees.length} នាក់ សរុប $${totalNet.toFixed(2)}`,
+            category: "payroll",
+          },
+        })
+        .then(({ error }) => {
+          if (error)
+            console.error("[telegram] payroll notify failed:", error.message);
+        });
     }
+  };
+  // draft -> approved
+  const approveRow = (empId) => {
+    const key = `${empId}-${mk}`;
+    const fromStatus = getRowStatus(empId);
+    if (fromStatus !== "draft") return;
+    setPayrollPaid({ ...payrollPaid, [key]: "approved" });
+    logPayrollStatusChange(empId, fromStatus, "approved");
+  };
+  // approved -> paid (locked)
+  const markPaidRow = (empId) => {
+    const key = `${empId}-${mk}`;
+    const fromStatus = getRowStatus(empId);
+    if (fromStatus !== "approved") return;
+    setPayrollPaid({ ...payrollPaid, [key]: "paid" });
+    logPayrollStatusChange(empId, fromStatus, "paid");
+    notifyIfAllPaid(empId);
+  };
+  // approved -> draft (undo an accidental Approve click; not locked yet
+  // so no special permission beyond canManagePayroll is needed)
+  const unapproveRow = (empId) => {
+    const key = `${empId}-${mk}`;
+    const fromStatus = getRowStatus(empId);
+    if (fromStatus !== "approved") return;
+    setPayrollPaid({ ...payrollPaid, [key]: "draft" });
+    logPayrollStatusChange(empId, fromStatus, "draft");
+  };
+  // paid -> approved (only way to edit a locked row again)
+  const unlockRow = (empId) => {
+    const key = `${empId}-${mk}`;
+    const fromStatus = getRowStatus(empId);
+    if (fromStatus !== "paid") return;
+    setPayrollPaid({ ...payrollPaid, [key]: "approved" });
+    logPayrollStatusChange(empId, fromStatus, "approved");
+  };
+  const toggleSelect = (empId) => {
+    setSelectedIds((cur) => {
+      const next = new Set(cur);
+      if (next.has(empId)) next.delete(empId);
+      else next.add(empId);
+      return next;
+    });
+  };
+  // Rows actually shown in the table (search + status filter). Totals,
+  // exports and the KPI cards keep using the full `list`.
+  const q = search.trim().toLowerCase();
+  const visibleList = list.filter((e) => {
+    if (statusFilter !== "all" && getRowStatus(e.id) !== statusFilter)
+      return false;
+    if (!q) return true;
+    return (
+      String(e.name || "")
+        .toLowerCase()
+        .includes(q) ||
+      String(e.code || "")
+        .toLowerCase()
+        .includes(q)
+    );
+  });
+  const draftIds = visibleList
+    .filter((e) => getRowStatus(e.id) === "draft")
+    .map((e) => e.id);
+  const allDraftSelected =
+    draftIds.length > 0 && draftIds.every((id) => selectedIds.has(id));
+  const toggleSelectAllDraft = () => {
+    setSelectedIds(allDraftSelected ? new Set() : new Set(draftIds));
+  };
+  // Only rows still in "draft" are ever bulk-approved, even if a paid or
+  // already-approved row's id somehow lingers in the selection.
+  const bulkApproveSelected = () => {
+    const targets = list.filter(
+      (e) => selectedIds.has(e.id) && getRowStatus(e.id) === "draft",
+    );
+    if (targets.length === 0) return;
+    const next = { ...payrollPaid };
+    targets.forEach((e) => {
+      next[`${e.id}-${mk}`] = "approved";
+    });
+    setPayrollPaid(next);
+    targets.forEach((e) => logPayrollStatusChange(e.id, "draft", "approved"));
+    setSelectedIds(new Set());
   };
   const totalNet = list.reduce(
     (sum, e) =>
@@ -40671,165 +41049,89 @@ function Payroll({
     );
   }, 0);
 
+  const canAct = role === "admin" && canManagePayroll;
+  const exportRows = () =>
+    list.map((e) => {
+      const { net, otPay, tax, insurance } = computePayroll(
+        e,
+        attendance,
+        mk,
+        overtimeRequests,
+        otPolicy,
+        payrollPolicy,
+        salaryAdjustments,
+      );
+      return [
+        e.name,
+        e.code,
+        e.salary,
+        otPay,
+        tax,
+        insurance,
+        net,
+        statusLabel(getRowStatus(e.id)),
+      ];
+    });
+  const handleExportCsv = () =>
+    exportCsv(
+      `payroll-${mk}.csv`,
+      [
+        t.employee,
+        "Code",
+        t.pay.baseSalary,
+        t.pay.otPay,
+        t.pay.taxLabel,
+        t.pay.insuranceLabel,
+        t.pay.netSalary,
+        t.status,
+      ],
+      exportRows(),
+    );
+  const handleExportXlsx = async () => {
+    setXlsxExporting(true);
+    try {
+      await exportPayrollXlsx({
+        filename: `payroll-${mk}.xlsx`,
+        companyName: branding?.name,
+        reportTitle: lang === "en" ? "Payroll Report" : "របាយការណ៍ប្រាក់ខែ",
+        periodLabel: monthLabel(mk),
+        columns: [
+          { header: t.employee, width: 24 },
+          { header: "Code", width: 12 },
+          { header: t.pay.baseSalary, width: 16, currency: true },
+          { header: t.pay.otPay, width: 14, currency: true },
+          { header: t.pay.taxLabel, width: 14, currency: true },
+          { header: t.pay.insuranceLabel, width: 14, currency: true },
+          { header: t.pay.netSalary, width: 16, currency: true },
+          { header: t.status, width: 14 },
+        ],
+        rows: exportRows(),
+        totalLabel: lang === "en" ? "TOTAL" : "សរុប",
+        totalValue: totalNet,
+        totalColIndex: 6,
+      });
+    } finally {
+      setXlsxExporting(false);
+    }
+  };
+  const exportItems = [
+    {
+      key: "csv",
+      icon: FileText,
+      label: t.exportCsv,
+      onClick: handleExportCsv,
+    },
+    {
+      key: "xlsx",
+      icon: FileSpreadsheet,
+      label: xlsxExporting ? "…" : t.exportExcel,
+      disabled: xlsxExporting,
+      onClick: handleExportXlsx,
+    },
+  ];
+
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-          marginBottom: 16,
-          flexWrap: "wrap",
-        }}
-      >
-        <span
-          style={{
-            fontSize: 12,
-            fontWeight: 700,
-            color: T.muted,
-            textTransform: "uppercase",
-            letterSpacing: ".03em",
-          }}
-        >
-          {t.pay.monthLabel}
-        </span>
-        <Select
-          value={mk}
-          onChange={(e) => setMk(e.target.value)}
-          style={{ width: "auto", minWidth: 170 }}
-        >
-          {availableMonths.map((m) => (
-            <option key={m} value={m}>
-              {monthLabel(m)}
-              {m === currentMk ? ` ${t.pay.currentMonthTag}` : ""}
-            </option>
-          ))}
-        </Select>
-        {isPastMonth && (
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              background: T.goldSoft,
-              color: T.goldText,
-              padding: "5px 10px",
-              borderRadius: 8,
-            }}
-          >
-            {t.pay.viewingPastMonth}
-          </span>
-        )}
-        {role === "admin" && (
-          <div style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
-            <Button
-              variant="ghost"
-              onClick={() =>
-                exportCsv(
-                  `payroll-${mk}.csv`,
-                  [
-                    t.employee,
-                    "Code",
-                    t.pay.baseSalary,
-                    t.pay.otPay,
-                    t.pay.taxLabel,
-                    t.pay.insuranceLabel,
-                    t.pay.netSalary,
-                    t.status,
-                  ],
-                  list.map((e) => {
-                    const paid = !!payrollPaid[`${e.id}-${mk}`];
-                    const { net, otPay, tax, insurance } = computePayroll(
-                      e,
-                      attendance,
-                      mk,
-                      overtimeRequests,
-                      otPolicy,
-                      payrollPolicy,
-                      salaryAdjustments,
-                    );
-                    return [
-                      e.name,
-                      e.code,
-                      e.salary,
-                      otPay,
-                      tax,
-                      insurance,
-                      net,
-                      paid ? t.pay.paid : t.pay.unpaid,
-                    ];
-                  }),
-                )
-              }
-            >
-              <Download size={15} /> {t.exportCsv}
-            </Button>
-            <Button
-              variant="ghost"
-              disabled={xlsxExporting}
-              onClick={async () => {
-                setXlsxExporting(true);
-                try {
-                  const dataRows = list.map((e) => {
-                    const paid = !!payrollPaid[`${e.id}-${mk}`];
-                    const { net, otPay, tax, insurance } = computePayroll(
-                      e,
-                      attendance,
-                      mk,
-                      overtimeRequests,
-                      otPolicy,
-                      payrollPolicy,
-                      salaryAdjustments,
-                    );
-                    return [
-                      e.name,
-                      e.code,
-                      e.salary,
-                      otPay,
-                      tax,
-                      insurance,
-                      net,
-                      paid ? t.pay.paid : t.pay.unpaid,
-                    ];
-                  });
-                  await exportPayrollXlsx({
-                    filename: `payroll-${mk}.xlsx`,
-                    companyName: branding?.name,
-                    reportTitle:
-                      lang === "en" ? "Payroll Report" : "របាយការណ៍ប្រាក់ខែ",
-                    periodLabel: monthLabel(mk),
-                    columns: [
-                      { header: t.employee, width: 24 },
-                      { header: "Code", width: 12 },
-                      { header: t.pay.baseSalary, width: 16, currency: true },
-                      { header: t.pay.otPay, width: 14, currency: true },
-                      { header: t.pay.taxLabel, width: 14, currency: true },
-                      {
-                        header: t.pay.insuranceLabel,
-                        width: 14,
-                        currency: true,
-                      },
-                      { header: t.pay.netSalary, width: 16, currency: true },
-                      { header: t.status, width: 14 },
-                    ],
-                    rows: dataRows,
-                    totalLabel: lang === "en" ? "TOTAL" : "សរុប",
-                    totalValue: totalNet,
-                    totalColIndex: 6,
-                  });
-                } finally {
-                  setXlsxExporting(false);
-                }
-              }}
-            >
-              <FileSpreadsheet size={15} />{" "}
-              {xlsxExporting ? "…" : t.exportExcel}
-            </Button>
-            <Button variant="ghost" onClick={() => setShowHistorical(true)}>
-              <History size={15} /> {t.pay.historicalBtn}
-            </Button>
-          </div>
-        )}
-      </div>
       {role === "admin" && (
         <PayrollPolicySettings
           payrollPolicy={payrollPolicy}
@@ -40839,285 +41141,506 @@ function Payroll({
       {role === "admin" && (
         <Card
           style={{
-            padding: 0,
+            padding: "16px 20px",
             marginBottom: 16,
-            overflow: "hidden",
-            position: "relative",
-            background: `linear-gradient(135deg, color-mix(in srgb, ${T.blue} 6%, ${T.card}) 0%, ${T.card} 65%)`,
+            display: "flex",
+            alignItems: "center",
+            gap: 14,
+            flexWrap: "wrap",
           }}
         >
-          <Wallet
-            size={130}
-            strokeWidth={1.3}
-            style={{
-              position: "absolute",
-              right: -14,
-              top: "50%",
-              transform: "translateY(-50%)",
-              opacity: 0.07,
-              color: T.blue,
-              pointerEvents: "none",
-            }}
+          <CalendarDays
+            size={22}
+            color={T.muted}
+            style={{ flexShrink: 0 }}
+            aria-hidden="true"
           />
-          <div style={{ padding: "20px 22px", position: "relative" }}>
+          <div style={{ flex: 1, minWidth: 180 }}>
             <div
               style={{
-                fontSize: 11.5,
-                fontWeight: 700,
-                textTransform: "uppercase",
-                letterSpacing: ".04em",
-                color: T.muted,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                flexWrap: "wrap",
+                fontSize: 13.5,
+                fontWeight: 600,
+                color: T.textSoft,
               }}
             >
-              {t.pay.totalPaid} · {monthLabel(mk)}
+              <span>
+                {t.pay.totalPaid} · {monthLabel(mk)}
+              </span>
+              {isPastMonth && (
+                <span
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 700,
+                    background: T.goldSoft,
+                    color: T.goldText,
+                    padding: "3px 9px",
+                    borderRadius: 999,
+                  }}
+                >
+                  {t.pay.viewingPastMonth}
+                </span>
+              )}
             </div>
             <div
               style={{
-                fontSize: 24,
-                fontWeight: 700,
+                fontSize: 28,
+                fontWeight: 800,
                 color: T.ink,
-                fontFamily: "'JetBrains Mono',monospace",
+                letterSpacing: "-0.02em",
+                lineHeight: 1.2,
                 marginTop: 2,
+                fontVariantNumeric: "tabular-nums",
               }}
             >
               {fmtMoney(totalNet)}
             </div>
           </div>
+          <PaySelect
+            icon={CalendarDays}
+            ariaLabel={t.pay.monthLabel}
+            value={mk}
+            onChange={(e) => setMk(e.target.value)}
+            minWidth={190}
+          >
+            {availableMonths.map((m) => (
+              <option key={m} value={m}>
+                {monthLabel(m)}
+                {m === currentMk ? ` ${t.pay.currentMonthTag}` : ""}
+              </option>
+            ))}
+          </PaySelect>
         </Card>
       )}
       {role === "admin" && (
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
             gap: 14,
             marginBottom: 16,
           }}
         >
-          <PayStatCard
+          <PayKpiCard
             icon={Users}
             tint="violet"
             label={t.pay.totalEmployeesStat}
             value={list.length}
+            sub={t.pay.activeEmployeesSub}
           />
-          <PayStatCard
+          <PayKpiCard
             icon={DollarSign}
             tint="forest"
             label={t.pay.totalNetPayStat}
             value={fmtMoney(totalNet)}
+            sub={t.pay.afterDeductionsSub}
           />
-          <PayStatCard
-            icon={BarChart3}
+          <PayKpiCard
+            icon={Wallet}
             tint="blue"
             label={t.pay.totalBaseSalaryStat}
             value={fmtMoney(totalBaseSalary)}
+            sub={t.pay.grossSalary}
           />
-          <PayStatCard
-            icon={TrendingDown}
+          <PayKpiCard
+            icon={ShieldAlert}
             tint="rose"
             label={t.pay.totalDeductionsStat}
             value={fmtMoney(totalDeductions)}
+            sub={t.pay.deductionsSub}
           />
         </div>
       )}
-      <Card style={{ overflowX: "auto" }}>
-        <table className="wf-table">
-          <thead>
-            <tr>
-              <th>{t.employee}</th>
-              <th>{t.pay.baseSalary}</th>
-              <th>{t.pay.deductions}</th>
-              <th>{t.pay.netSalary}</th>
-              <th>{t.status}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {list.map((e) => {
-              const paid = !!payrollPaid[`${e.id}-${mk}`];
-              const {
-                net,
-                absentDays,
-                unpaidLeaveDays,
-                excessLateDays,
-                otHours,
-                usesCustomRate,
-                usesCustomLatePolicy,
-                usesCustomUlPolicy,
-                tax,
-                insurance,
-                lateDeduction,
-                absenceDeduction,
-                unpaidLeaveDeduction,
-                bonusTotal,
-                advanceDeduction,
-              } = computePayroll(
-                e,
-                attendance,
-                mk,
-                overtimeRequests,
-                otPolicy,
-                payrollPolicy,
-                salaryAdjustments,
-              );
-              const deductionsTotal =
-                tax +
-                insurance +
-                lateDeduction +
-                absenceDeduction +
-                unpaidLeaveDeduction;
-              return (
-                <tr key={e.id}>
-                  <td>
-                    <div
-                      style={{ display: "flex", alignItems: "center", gap: 10 }}
-                    >
-                      <Avatar name={e.name} photo={e.photo} size={30} />
-                      <div>
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 6,
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontWeight: 500,
-                              color: T.ink,
-                              fontSize: 14,
-                            }}
-                          >
-                            {e.name}
-                          </span>
-                          {usesCustomRate && (
-                            <span
-                              style={{
-                                fontSize: 10.5,
-                                fontWeight: 700,
-                                color: T.goldText,
-                                background: T.goldSoft,
-                                padding: "2px 6px",
-                                borderRadius: 6,
-                                whiteSpace: "nowrap",
-                              }}
-                            >
-                              {t.pay.customRateBadge}
-                            </span>
-                          )}
-                          {usesCustomLatePolicy && (
-                            <span
-                              style={{
-                                fontSize: 10.5,
-                                fontWeight: 700,
-                                color: T.goldText,
-                                background: T.goldSoft,
-                                padding: "2px 6px",
-                                borderRadius: 6,
-                                whiteSpace: "nowrap",
-                              }}
-                            >
-                              {t.pay.customLatePolicyBadge}
-                            </span>
-                          )}
-                          {usesCustomUlPolicy && (
-                            <span
-                              style={{
-                                fontSize: 10.5,
-                                fontWeight: 700,
-                                color: T.goldText,
-                                background: T.goldSoft,
-                                padding: "2px 6px",
-                                borderRadius: 6,
-                                whiteSpace: "nowrap",
-                              }}
-                            >
-                              {t.pay.customUlPolicyBadge}
-                            </span>
-                          )}
-                        </div>
-                        {absentDays > 0 && (
-                          <div style={{ fontSize: 11.5, color: T.rose }}>
-                            {t.att.absentDays} {absentDays}
-                          </div>
-                        )}
-                        {unpaidLeaveDays > 0 && (
-                          <div style={{ fontSize: 11.5, color: T.rose }}>
-                            {t.pay.unpaidLeaveDed}: {unpaidLeaveDays}
-                          </div>
-                        )}
-                        {excessLateDays > 0 && (
-                          <div style={{ fontSize: 11.5, color: T.rose }}>
-                            {t.pay.lateDed}: {excessLateDays}
-                          </div>
-                        )}
-                        {otHours > 0 && (
-                          <div style={{ fontSize: 11.5, color: T.forestText }}>
-                            {t.ot.totalOtHours}: {otHours} {t.ot.hoursShort}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td style={{ fontFamily: "'JetBrains Mono',monospace" }}>
-                    {fmtMoney(e.salary)}
-                  </td>
+      <Card style={{ padding: 0, overflow: "hidden" }}>
+        {role === "admin" && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              flexWrap: "wrap",
+              padding: "14px 16px",
+              borderBottom: `1px solid ${T.lineSoft}`,
+            }}
+          >
+            <div
+              style={{
+                position: "relative",
+                flex: "1 1 240px",
+                maxWidth: 420,
+              }}
+            >
+              <Search
+                size={16}
+                color={T.muted}
+                style={{
+                  position: "absolute",
+                  left: 12,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  pointerEvents: "none",
+                }}
+              />
+              <input
+                className="wf-input"
+                type="search"
+                aria-label={t.pay.searchPlaceholder}
+                placeholder={t.pay.searchPlaceholder}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{ height: 40, borderRadius: 10, paddingLeft: 38 }}
+              />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                flexWrap: "wrap",
+                marginLeft: "auto",
+              }}
+            >
+              {canManagePayroll && selectedIds.size > 0 && (
+                <button
+                  type="button"
+                  className="wf-pay-btn wf-pay-btn-solid wf-pay-btn-lg"
+                  onClick={bulkApproveSelected}
+                >
+                  <CheckCircle2 size={16} /> {t.pay.bulkApprove} (
+                  {selectedIds.size})
+                </button>
+              )}
+              <PaySelect
+                ariaLabel={t.status}
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                minWidth={150}
+              >
+                <option value="all">{t.pay.allStatus}</option>
+                <option value="draft">{t.pay.draftStatus}</option>
+                <option value="approved">{t.pay.approved}</option>
+                <option value="paid">{t.pay.paid}</option>
+              </PaySelect>
+              <button
+                type="button"
+                className="wf-pay-btn wf-pay-btn-outline wf-pay-btn-lg"
+                onClick={() => setShowHistorical(true)}
+              >
+                <History size={16} /> {t.pay.historicalBtn}
+              </button>
+              <PayPopMenu
+                items={exportItems}
+                renderTrigger={({ open, toggle }) => (
+                  <button
+                    type="button"
+                    className="wf-pay-btn wf-pay-btn-solid wf-pay-btn-lg"
+                    aria-haspopup="menu"
+                    aria-expanded={open}
+                    onClick={toggle}
+                  >
+                    <Download size={16} /> {t.pay.exportBtn}
+                    <ChevronDown size={15} />
+                  </button>
+                )}
+              />
+            </div>
+          </div>
+        )}
+        <div style={{ overflowX: "auto" }}>
+          <table className="wf-table wf-pay-table">
+            <thead>
+              <tr>
+                {canAct && (
+                  <th style={{ width: 32 }}>
+                    <input
+                      type="checkbox"
+                      checked={allDraftSelected}
+                      disabled={draftIds.length === 0}
+                      onChange={toggleSelectAllDraft}
+                      title={t.pay.selectAllDraft}
+                      aria-label={t.pay.selectAllDraft}
+                      style={{ accentColor: T.forestDark }}
+                    />
+                  </th>
+                )}
+                <th>{t.employee}</th>
+                <th>{t.pay.baseSalary}</th>
+                <th>{t.pay.deductions}</th>
+                <th>{t.pay.netSalary}</th>
+                <th>{t.status}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {visibleList.length === 0 && (
+                <tr>
                   <td
+                    colSpan={canAct ? 7 : 6}
                     style={{
-                      fontFamily: "'JetBrains Mono',monospace",
-                      color: deductionsTotal > 0 ? T.rose : T.textSoft,
+                      textAlign: "center",
+                      color: T.muted,
+                      padding: "28px 16px",
                     }}
                   >
-                    {fmtMoney(deductionsTotal)}
-                  </td>
-                  <td
-                    style={{
-                      fontWeight: 700,
-                      color: T.forestText,
-                      fontFamily: "'JetBrains Mono',monospace",
-                    }}
-                  >
-                    {fmtMoney(net)}
-                  </td>
-                  <td>
-                    <StatusPill status={paid ? "paid" : "pending"} />
-                  </td>
-                  <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                    <button
-                      onClick={() => setSlipFor(e)}
-                      style={{
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: T.blue,
-                        marginRight: 12,
-                      }}
-                    >
-                      {t.pay.viewSlip}
-                    </button>
-                    {role === "admin" && (
-                      <button
-                        onClick={() => togglePaid(e.id)}
-                        style={{
-                          background: "none",
-                          border: "none",
-                          cursor: "pointer",
-                          fontSize: 13,
-                          fontWeight: 700,
-                          color: T.forest,
-                        }}
-                      >
-                        {paid ? t.pay.unmarkPaid : t.pay.markPaid}
-                      </button>
-                    )}
+                    {t.noResults}
                   </td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              )}
+              {visibleList.map((e) => {
+                const status = getRowStatus(e.id);
+                const {
+                  net,
+                  absentDays,
+                  unpaidLeaveDays,
+                  excessLateDays,
+                  otHours,
+                  usesCustomRate,
+                  usesCustomLatePolicy,
+                  usesCustomUlPolicy,
+                  tax,
+                  insurance,
+                  lateDeduction,
+                  absenceDeduction,
+                  unpaidLeaveDeduction,
+                } = computePayroll(
+                  e,
+                  attendance,
+                  mk,
+                  overtimeRequests,
+                  otPolicy,
+                  payrollPolicy,
+                  salaryAdjustments,
+                );
+                const deductionsTotal =
+                  tax +
+                  insurance +
+                  lateDeduction +
+                  absenceDeduction +
+                  unpaidLeaveDeduction;
+                // Forward step is a visible button; the backward steps
+                // (revert / unlock) live in the "..." menu so they can't be
+                // hit by accident.
+                const rowMenu = !canAct
+                  ? []
+                  : status === "approved"
+                    ? [
+                        {
+                          key: "revert",
+                          icon: RotateCcw,
+                          label: t.pay.revertToDraft,
+                          onClick: () => unapproveRow(e.id),
+                        },
+                      ]
+                    : status === "paid"
+                      ? [
+                          {
+                            key: "unlock",
+                            icon: Unlock,
+                            label: t.pay.unlockPayroll,
+                            onClick: () => unlockRow(e.id),
+                          },
+                        ]
+                      : [];
+                return (
+                  <tr key={e.id}>
+                    {canAct && (
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.has(e.id)}
+                          disabled={status !== "draft"}
+                          onChange={() => toggleSelect(e.id)}
+                          aria-label={e.name}
+                          style={{ accentColor: T.forestDark }}
+                        />
+                      </td>
+                    )}
+                    <td>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 12,
+                        }}
+                      >
+                        <Avatar name={e.name} photo={e.photo} size={40} />
+                        <div>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 6,
+                              flexWrap: "wrap",
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontWeight: 600,
+                                color: T.ink,
+                                fontSize: 14.5,
+                              }}
+                            >
+                              {e.name}
+                            </span>
+                            {usesCustomRate && (
+                              <span style={PAY_BADGE}>
+                                {t.pay.customRateBadge}
+                              </span>
+                            )}
+                            {usesCustomLatePolicy && (
+                              <span style={PAY_BADGE}>
+                                {t.pay.customLatePolicyBadge}
+                              </span>
+                            )}
+                            {usesCustomUlPolicy && (
+                              <span style={PAY_BADGE}>
+                                {t.pay.customUlPolicyBadge}
+                              </span>
+                            )}
+                          </div>
+                          {absentDays > 0 && (
+                            <div style={{ fontSize: 12, color: T.rose }}>
+                              {t.att.absentDays} {absentDays}
+                            </div>
+                          )}
+                          {unpaidLeaveDays > 0 && (
+                            <div style={{ fontSize: 12, color: T.rose }}>
+                              {t.pay.unpaidLeaveDed}: {unpaidLeaveDays}
+                            </div>
+                          )}
+                          {excessLateDays > 0 && (
+                            <div style={{ fontSize: 12, color: T.rose }}>
+                              {t.pay.lateDed}: {excessLateDays}
+                            </div>
+                          )}
+                          {otHours > 0 && (
+                            <div style={{ fontSize: 12, color: T.forestText }}>
+                              {t.ot.totalOtHours}: {otHours} {t.ot.hoursShort}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td
+                      style={{
+                        color: T.ink,
+                        fontWeight: 500,
+                        fontVariantNumeric: "tabular-nums",
+                      }}
+                    >
+                      {fmtMoney(e.salary)}
+                    </td>
+                    <td
+                      style={{
+                        fontWeight: 600,
+                        fontVariantNumeric: "tabular-nums",
+                        color: deductionsTotal > 0 ? T.rose : T.textSoft,
+                      }}
+                    >
+                      {fmtMoney(deductionsTotal)}
+                    </td>
+                    <td
+                      style={{
+                        fontWeight: 700,
+                        color: T.forestText,
+                        fontVariantNumeric: "tabular-nums",
+                      }}
+                    >
+                      {fmtMoney(net)}
+                    </td>
+                    <td>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 6,
+                        }}
+                      >
+                        <StatusPill
+                          status={
+                            status === "paid"
+                              ? "paid"
+                              : status === "approved"
+                                ? "payrollApproved"
+                                : "pending"
+                          }
+                          style={{ borderRadius: 999, padding: "4px 12px" }}
+                        />
+                        {status === "paid" && (
+                          <Lock
+                            size={13}
+                            color={T.muted}
+                            title={t.pay.lockedHint}
+                          />
+                        )}
+                      </div>
+                    </td>
+                    <td style={{ whiteSpace: "nowrap" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "flex-end",
+                          gap: 8,
+                        }}
+                      >
+                        <button
+                          type="button"
+                          className="wf-pay-btn wf-pay-btn-soft"
+                          onClick={() => setSlipFor(e)}
+                        >
+                          <Eye size={15} /> {t.pay.viewSlip}
+                        </button>
+                        {canAct && status === "draft" && (
+                          <button
+                            type="button"
+                            className="wf-pay-btn wf-pay-btn-solid"
+                            onClick={() => approveRow(e.id)}
+                          >
+                            <Check size={15} /> {t.pay.markApproved}
+                          </button>
+                        )}
+                        {canAct && status === "approved" && (
+                          <button
+                            type="button"
+                            className="wf-pay-btn wf-pay-btn-solid"
+                            onClick={() => markPaidRow(e.id)}
+                          >
+                            <Check size={15} /> {t.pay.markPaid}
+                          </button>
+                        )}
+                        {canAct &&
+                          (rowMenu.length > 0 ? (
+                            <PayPopMenu
+                              items={rowMenu}
+                              renderTrigger={({ open, toggle }) => (
+                                <button
+                                  type="button"
+                                  className="wf-pay-btn wf-pay-btn-outline wf-pay-btn-icon"
+                                  aria-haspopup="menu"
+                                  aria-expanded={open}
+                                  aria-label={t.pay.moreActions}
+                                  title={t.pay.moreActions}
+                                  onClick={toggle}
+                                >
+                                  <MoreHorizontal size={16} />
+                                </button>
+                              )}
+                            />
+                          ) : (
+                            <span style={{ width: 36, flexShrink: 0 }} />
+                          ))}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </Card>
       {slipFor && (
         <Payslip
@@ -45794,6 +46317,8 @@ function AppInner() {
                       <Payroll
                         role={role}
                         currentEmp={currentEmp}
+                        currentAdmin={currentAdmin}
+                        canManagePayroll={isSuperAdmin || can("managePayroll")}
                         employees={employees}
                         attendance={attendance}
                         payrollPaid={payrollPaid}
